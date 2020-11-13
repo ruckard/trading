@@ -85,6 +85,11 @@ This video assumes that we can earn 1,000 dollars out of 1,000 dollars each mont
 
 Note: I don't like this Zartex guy because he promotes his channel with a lot of ads in Youtube. However this specific video that he made made sense to me.
 
+# Trading approaches
+
+[My different approaches to trading](trading_approach.md)
+
+
 # Disclaimer - BOTTOM
 
 Please read the [disclaimer notice](disclaimer.md).
