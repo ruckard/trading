@@ -89,6 +89,9 @@ Note: I don't like this Zartex guy because he promotes his channel with a lot of
 
 [My different approaches to trading](trading_approach.md)
 
+# TradingView indicators and strategies
+
+[TradingView indicators and strategies page](tradingview-indicators.md)
 
 # Disclaimer - BOTTOM
 
