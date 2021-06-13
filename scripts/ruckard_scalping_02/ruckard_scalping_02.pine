@@ -30,6 +30,10 @@
 // [*] DCA Level 7: TakeProfit is set to 0.08%.
 // [*] DCA Level 8: TakeProfit is set to 0.05%.
 // [/LIST]
+// [B]Substrat 03 (SS03)[/B] : Too fast high DCAs close the position.
+// [LIST]
+// [*] If we are in DCA Level 4 (or higher) and two DCA levels are triggered in less than 2 minutes then the position is exited.
+// [/LIST]
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
