@@ -3,21 +3,15 @@
 
 //@version=4
 
-// Current version: v20201031 ( A061 )
+// Current version: v20210613 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
-// 
-// It was originally tested at BTCUSDT pair and 1D timeframe.
-// The strategy is a slightly modified copy of default TradingView strategy that appears when you create a blank new strategy.
-// It decides to go long when 14-period SMA crosses over 28-period SMA and goes short when 14-period SMA crosses under 28-period SMA.
+// This is 'Ruckard Scalping 02' strategy. It is written using 'Zignaly Tutorial' strategy as a base.
 //
-// Before using this documentation it's recommended that you:
-// [LIST]
-// [*] Use default TradingView strategy script or another script and setup its associated alert manually. Just make the alert pop-up in the screen.
-// [*] Create a 'Copy-Trader provider' (or Signal Provider) in Zignaly and send signals to it either thanks to your browser or with some basic programming.
-// [/LIST]
-
+// 
+// It was originally tested at LTCUSDT pair, 1m (1 minute) timeframe and 75x leverage.
+// The strategy applies many substrats.
+//
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
 // [LIST]
@@ -159,7 +153,7 @@
 
 // Tradingview Public description - END
 
-strategy("Zignaly Tutorial A061", shorttitle="A061ZigTuto", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
+strategy("Ruckard Scalping 02 001", shorttitle="A002R2Scalping001", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
 
 // INPUTS - BEGIN
 
