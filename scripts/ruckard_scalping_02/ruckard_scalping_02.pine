@@ -11,6 +11,17 @@
 // 
 // It was originally tested at LTCUSDT pair, 1m (1 minute) timeframe and 75x leverage.
 // The strategy applies many substrats.
+// [B]Substrat 01 (SS01)[/B] : We apply 8 DCAs levels:
+// [LIST]
+// [*] DCA Level 1: When price is 0.40% different (in opposite direction to the position side) to position price (DCATargetPercentage1=0.40) then 50% of the position (DCAAmountPercentage1=50) is rebought.
+// [*] DCA Level 2: When price is 0.40% different (in opposite direction to the position side) to position price (DCATargetPercentage2=0.40) then 50% of the position (DCAAmountPercentage2=50) is rebought.
+// [*] DCA Level 3: When price is 0.40% different (in opposite direction to the position side) to position price (DCATargetPercentage3=0.40) then 50% of the position (DCAAmountPercentage3=50) is rebought.
+// [*] DCA Level 4: When price is 0.40% different (in opposite direction to the position side) to position price (DCATargetPercentage4=0.40) then 50% of the position (DCAAmountPercentage4=50) is rebought.
+// [*] DCA Level 5: When price is 0.40% different (in opposite direction to the position side) to position price (DCATargetPercentage5=0.40) then 50% of the position (DCAAmountPercentage5=50) is rebought.
+// [*] DCA Level 6: When price is 0.40% different (in opposite direction to the position side) to position price (DCATargetPercentage6=0.40) then 50% of the position (DCAAmountPercentage6=50) is rebought.
+// [*] DCA Level 7: When price is 0.40% different (in opposite direction to the position side) to position price (DCATargetPercentage7=0.40) then 50% of the position (DCAAmountPercentage7=50) is rebought.
+// [*] DCA Level 8: When price is 0.40% different (in opposite direction to the position side) to position price (DCATargetPercentage8=0.40) then 50% of the position (DCAAmountPercentage8=50) is rebought.
+// [/LIST]
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
