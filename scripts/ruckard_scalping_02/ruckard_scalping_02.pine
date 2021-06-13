@@ -22,6 +22,14 @@
 // [*] DCA Level 7: When price is 0.40% different (in opposite direction to the position side) to position price (DCATargetPercentage7=0.40) then 50% of the position (DCAAmountPercentage7=50) is rebought.
 // [*] DCA Level 8: When price is 0.40% different (in opposite direction to the position side) to position price (DCATargetPercentage8=0.40) then 50% of the position (DCAAmountPercentage8=50) is rebought.
 // [/LIST]
+// [B]Substrat 02 (SS02)[/B] : Adjusted TakeProfit levels when too many DCAs are triggered:
+// [LIST]
+// [*] DCA Level 4: TakeProfit is set to 0.20%.
+// [*] DCA Level 5: TakeProfit is set to 0.15%.
+// [*] DCA Level 6: TakeProfit is set to 0.10%.
+// [*] DCA Level 7: TakeProfit is set to 0.08%.
+// [*] DCA Level 8: TakeProfit is set to 0.05%.
+// [/LIST]
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
