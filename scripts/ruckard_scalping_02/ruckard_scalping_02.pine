@@ -43,6 +43,7 @@
 // [/LIST]
 // [B]Substrat 05 (SS05)[/B] : Start date and hour setting.
 // [B]Substrat 06 (SS06)[/B] : Use 'TradingView only' integration as much as possible. Final stop loss should be hybrid though.
+// [B]Substrat 07 (SS07)[/B] : Both long and short sides are supported.
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
