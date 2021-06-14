@@ -48,6 +48,12 @@
 // [B]Substrat 09 (SS09)[/B] : If the strategy detects an opposite side opportunity the current side is not closed as it happens with the default Zignaly strategy. That way we might avoid false price direction changes.
 // [B]Substrat 10 (SS10)[/B] : If 4 DCAs have been triggered and price is greater than 0.80% then an stop loss is set to positive 0.20% (as a breakeven).
 // [B]Substrat 11 (SS11)[/B] : (Optional) If position price is not 0.30% greater than EMA30 in less than 60 minutes and no Trailing Stop is on then exit the position.
+// [B]Substrat 12 (SS12)[/B] : Which side a position should have is based on latest 30 periods.
+// [LIST]
+// [*] If candle maximums are higher and candle minimums are higher then we go long.
+// [*] If candle minimums are lower and candle maximums are lower then we go short.
+// [*] If it's mixed we don't open new positions.
+// [/LIST]
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
