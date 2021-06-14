@@ -64,6 +64,7 @@
 // [*] Short minimal price: 169.79 + (2.05*(20/100)) = 170.20
 // [*] That means that you can start the short position at 170.20 but you cannot start the short position at 170.19.
 // [/LIST]
+// [B]Substrat 14 (SS14)[/B] : -0.60% failsafe stop loss (when DCAs are not triggered fast enough or there are no DCAs left).
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
