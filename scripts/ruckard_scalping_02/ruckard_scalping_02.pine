@@ -54,6 +54,16 @@
 // [*] If candle minimums are lower and candle maximums are lower then we go short.
 // [*] If it's mixed we don't open new positions.
 // [/LIST]
+// [B]Substrat 13 (SS13)[/B] : Wait for a 20% retracement on the latest 30 period range before entering the position. Recalculate on each new period if position is not open yet.
+// Example:
+// [LIST]
+// [*] Last 30 periods maximum: 171.84.
+// [*] Last 30 periods minimum: 169.79.
+// [*] Last 30 periods indicate short position.
+// [*] Minimum to maximum distance: 171.84 - 169.79 = 2.05
+// [*] Short minimal price: 169.79 + (2.05*(20/100)) = 170.20
+// [*] That means that you can start the short position at 170.20 but you cannot start the short position at 170.19.
+// [/LIST]
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
