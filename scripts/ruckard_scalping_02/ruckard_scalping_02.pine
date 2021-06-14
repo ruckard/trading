@@ -66,6 +66,7 @@
 // [/LIST]
 // [B]Substrat 14 (SS14)[/B] : -0.60% failsafe stop loss (when DCAs are not triggered fast enough or there are no DCAs left).
 // [B]Substrat 15 (SS15)[/B] : Mode A (default): Trailing stop trigger at 1.10% and 0.70% distance.
+// [B]Substrat 16 (SS16)[/B] : Mode B (alternate): Take profit at 0.70%.
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
