@@ -44,6 +44,7 @@
 // [B]Substrat 05 (SS05)[/B] : Start date and hour setting.
 // [B]Substrat 06 (SS06)[/B] : Use 'TradingView only' integration as much as possible. Final stop loss should be hybrid though.
 // [B]Substrat 07 (SS07)[/B] : Both long and short sides are supported.
+// [B]Substrat 08 (SS08)[/B] : (Optional). If last position ends in breakeven we should wait 15 minutes, 30 minutes, 45 minutes, 60 minutes, 75 minutes and finally 100 minutes. This needs to be managed per side and reset when there is not a breakeven or the side is changed.
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
