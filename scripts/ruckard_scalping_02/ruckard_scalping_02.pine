@@ -41,6 +41,7 @@
 // [*] So that 50% of it can be rebought ( 7.5 USDT) because that's higher than the minimum in Binance (5 USDT).
 // [*] That also means the strategy needs to manage its capital internally to meet this requirement.
 // [/LIST]
+// [B]Substrat 05 (SS05)[/B] : Start date and hour setting.
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
