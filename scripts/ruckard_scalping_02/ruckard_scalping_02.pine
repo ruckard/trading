@@ -34,6 +34,13 @@
 // [LIST]
 // [*] If we are in DCA Level 4 (or higher) and two DCA levels are triggered in less than 2 minutes then the position is exited.
 // [/LIST]
+// [B]Substrat 04 (SS04)[/B] : 0.20 USDT initial real investment
+// [LIST]
+// [*] 0.20 USDT initial real investment
+// [*] At 75x leverage that means 15 USDT investment.
+// [*] So that 50% of it can be rebought ( 7.5 USDT) because that's higher than the minimum in Binance (5 USDT).
+// [*] That also means the strategy needs to manage its capital internally to meet this requirement.
+// [/LIST]
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
