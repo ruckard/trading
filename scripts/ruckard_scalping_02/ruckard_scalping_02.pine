@@ -42,6 +42,7 @@
 // [*] That also means the strategy needs to manage its capital internally to meet this requirement.
 // [/LIST]
 // [B]Substrat 05 (SS05)[/B] : Start date and hour setting.
+// [B]Substrat 06 (SS06)[/B] : Use 'TradingView only' integration as much as possible. Final stop loss should be hybrid though.
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
