@@ -46,6 +46,7 @@
 // [B]Substrat 07 (SS07)[/B] : Both long and short sides are supported.
 // [B]Substrat 08 (SS08)[/B] : (Optional). If last position ends in breakeven we should wait 15 minutes, 30 minutes, 45 minutes, 60 minutes, 75 minutes and finally 100 minutes. This needs to be managed per side and reset when there is not a breakeven or the side is changed.
 // [B]Substrat 09 (SS09)[/B] : If the strategy detects an opposite side opportunity the current side is not closed as it happens with the default Zignaly strategy. That way we might avoid false price direction changes.
+// [B]Substrat 10 (SS10)[/B] : If 4 DCAs have been triggered and price is greater than 0.80% then an stop loss is set to positive 0.20% (as a breakeven).
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
