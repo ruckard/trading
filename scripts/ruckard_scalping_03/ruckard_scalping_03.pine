@@ -9,7 +9,7 @@
 // This is 'Ruckard Scalping 03' strategy. It is written using 'Zignaly Tutorial' strategy as a base.
 //
 // 
-// It was originally tested at LTCUSDT pair, 1m (1 minute) timeframe and 10x leverage.
+// It was originally tested at SXPUSDT pair, 1m (1 minute) timeframe and 10x leverage.
 // The strategy applies many substrats.
 // [B]Substrat 01 (SS01)[/B] : We apply 8 DCAs levels:
 // [LIST]
