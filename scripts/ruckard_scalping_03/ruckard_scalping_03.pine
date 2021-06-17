@@ -3,10 +3,10 @@
 
 //@version=4
 
-// Current version: v20210613 ( A001 )
+// Current version: v20210617 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This is 'Ruckard Scalping 02' strategy. It is written using 'Zignaly Tutorial' strategy as a base.
+// This is 'Ruckard Scalping 03' strategy. It is written using 'Zignaly Tutorial' strategy as a base.
 //
 // 
 // It was originally tested at LTCUSDT pair, 1m (1 minute) timeframe and 75x leverage.
@@ -209,7 +209,7 @@
 
 // Tradingview Public description - END
 
-strategy("Ruckard Scalping 02 001", shorttitle="A002R2Scalping001", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
+strategy("Ruckard Scalping 03 001", shorttitle="A001R3Scalping", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
 
 // INPUTS - BEGIN
 
