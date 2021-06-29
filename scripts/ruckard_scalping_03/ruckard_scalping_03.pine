@@ -11,7 +11,7 @@
 // 
 // It was originally tested at SXPUSDT pair, 1m (1 minute) timeframe and 10x leverage.
 // The strategy applies many substrats.
-// [B]Substrat 01 (SS01)[/B] : We apply 8 DCAs levels:
+// [B]Substrat 01 (SS01)[/B] : We apply 2 DCAs levels:
 // [LIST]
 // [*] DCA Level 1: When price is 1.00% different (in opposite direction to the position side) to position price (DCATargetPercentage1=1.00) then 100% of the position (DCAAmountPercentage1=100) is rebought.
 // [*] DCA Level 2: When price is 1.51% different (in opposite direction to the position side) to position price (DCATargetPercentage2=1.51) then  50% of the position (DCAAmountPercentage2=50) is rebought. Note: This means 100% at 2% in other systems.
