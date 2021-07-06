@@ -16,26 +16,26 @@
 // [*] DCA Level 1: When price is 1.00% different (in opposite direction to the position side) to position price (DCATargetPercentage1=1.00) then 100% of the position (DCAAmountPercentage1=100) is rebought.
 // [*] DCA Level 2: When price is 1.51% different (in opposite direction to the position side) to position price (DCATargetPercentage2=1.51) then  50% of the position (DCAAmountPercentage2=50) is rebought. Note: This means 100% at 2% in other systems.
 // [/LIST]
-// [B]Substrat 02 (SS03)[/B] : Too fast high DCAs close the position.
-// [B]Substrat 03 (SS04)[/B] : 1.5 USDT initial real investment
+// [B]Substrat 02 (SS02)[/B] : Too fast high DCAs close the position.
+// [B]Substrat 03 (SS03)[/B] : 1.5 USDT initial real investment
 // [LIST]
 // [*] 1.50 USDT initial real investment. Later on the real investment should be 1% of total capital.
 // [*] At 10x leverage that means 15 USDT investment.
 // [*] So that 50% of it can be rebought ( 7.5 USDT) because that's higher than the minimum in Binance (5 USDT).
 // [*] That also means the strategy needs to manage its capital internally to meet this requirement.
 // [/LIST]
-// [B]Substrat 04 (SS05)[/B] : Start date and hour setting.
-// [B]Substrat 05 (SS06)[/B] : Use 'TradingView only' integration as much as possible. Final stop loss should be hybrid though.
-// [B]Substrat 06 (SS07)[/B] : Both long and short sides are supported.
-// [B]Substrat 07 (SS08)[/B] : If the strategy detects an opposite side opportunity the current side is not closed as it happens with the default Zignaly strategy. That way we might avoid false price direction changes.
-// [B]Substrat 08 (SS10)[/B] : (Optional) If position price is not 0.30% greater than EMA30 in less than 60 minutes and no Trailing Stop is on then exit the position.
-// [B]Substrat 09 (SS11)[/B] : Entry trigger
+// [B]Substrat 04 (SS04)[/B] : Start date and hour setting.
+// [B]Substrat 05 (SS05)[/B] : Use 'TradingView only' integration as much as possible. Final stop loss should be hybrid though.
+// [B]Substrat 06 (SS06)[/B] : Both long and short sides are supported.
+// [B]Substrat 07 (SS07)[/B] : If the strategy detects an opposite side opportunity the current side is not closed as it happens with the default Zignaly strategy. That way we might avoid false price direction changes.
+// [B]Substrat 08 (SS08)[/B] : (Optional) If position price is not 0.30% greater than EMA30 in less than 60 minutes and no Trailing Stop is on then exit the position.
+// [B]Substrat 09 (SS09)[/B] : Entry trigger
 // [LIST]
 // [*] If in the last 30 minutes there is a 5% (or higher) price drop then we enter in long.
 // [*] If in the last 30 minutes there is a 5% (or higher) price bump then we enter in short.
 // [/LIST]
-// [B]Substrat 10 (SS13)[/B] : -10.00% Stop Loss
-// [B]Substrat 11 (SS14)[/B] : Take profit at 1% of 50% of position. The 50% left of the position will be exited based on Stop loss based on candles method.
+// [B]Substrat 10 (SS10)[/B] : -10.00% Stop Loss
+// [B]Substrat 11 (SS11)[/B] : Take profit at 1% of 50% of position. The 50% left of the position will be exited based on Stop loss based on candles method.
 //
 // [B]SETTINGS[/B]
 // [B]__ SETTINGS - Capital[/B]
