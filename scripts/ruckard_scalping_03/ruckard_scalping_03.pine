@@ -191,6 +191,7 @@ _ZIGSIGNALPROVIDER_     = "Signal Provider"                , _ZIGCOPYTRADERPROVI
 i_zignalyProviderType    = input(_ZIGCOPYTRADERPROVIDER_,  "(ZIG) Provider type", options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
 L_S     = "Long and Short"                , _L_  = "Long Only"                , _S_ = "Short Only"
 i_strategyType    = input(_L_,  "(STRAT) Strategy Type", options=[L_S, _L_, _S_])
+i_startTime = input(title="Start Time", type=input.time, defval=timestamp("05 Jul 2021 00:00 +0300"))
 // Order comments based debug
 i_enableOrderCommentDebug = input(true, title="(DEBUG) Enable debug on order comments {True}", type=input.bool)
 i_enableTakeProfit      = input(false, "(STOPTAKE) Take Profit? {false}")
@@ -243,6 +244,8 @@ _oldInsideABuyOrder := insideABuyOrder
 oldInsideASellOrder := insideASellOrder
 
 var int lastOrderOpenBarTime = na
+
+afterStartTime = time >= i_startTime
 
 // Handle recalculate after Stop Loss / Take Profit order
 if (strategy.position_size == 0.0)
@@ -538,7 +541,7 @@ PRE_LONG = false
 PRE_LONG := longCondition and (not tooRecentOrderNotOpenAdvice)
 
 // LONG = PRE_LONG[1] and PRE_LONG // Wait for confirmation
-LONG = PRE_LONG // Do not wait for confirmation
+LONG = PRE_LONG and afterStartTime // Do not wait for confirmation
 
 // Decide if we are going to LONG/Go LONG - END
 
@@ -547,7 +550,7 @@ PRE_SHORT = false
 PRE_SHORT := shortCondition and (not tooRecentOrderNotOpenAdvice)
 
 // SHORT = PRE_SHORT[1] and PRE_SHORT // Wait for confirmation
-SHORT = PRE_SHORT // Do not wait for confirmation
+SHORT = PRE_SHORT and afterStartTime // Do not wait for confirmation
 
 // Decide if we are going to SHORT/Go SHORT - END
 
