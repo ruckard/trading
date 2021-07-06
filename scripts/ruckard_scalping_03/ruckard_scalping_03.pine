@@ -62,7 +62,7 @@
 // [B]__ SETTINGS - Strategy[/B]
 // [LIST]
 // [*] (STRAT) Strategy Type: 'Long and Short', 'Long Only' or 'Short Only'.
-// [*] (STOPTAKE) Take Profit? {false}: Whether to enable Take Profit.
+// [*] (STOPTAKE) Take Profit? {True}: Whether to enable Take Profit.
 // [*] (STOPTAKE) Stop Loss? {True}: Whether to enable Stop Loss.
 // [*] (TRAILING) Enable Trailing Take Profit (%) {True}: Whether to enable Trailing Take Profit.
 // [*] (STOPTAKE) Take Profit % {3.0}: Take profit percentage. This setting is only used when '(STOPTAKE) Take Profit?' setting is set to true.
@@ -194,10 +194,11 @@ i_strategyType    = input(_L_,  "(STRAT) Strategy Type", options=[L_S, _L_, _S_]
 i_startTime = input(title="Start Time", type=input.time, defval=timestamp("05 Jul 2021 00:00 +0300"))
 // Order comments based debug
 i_enableOrderCommentDebug = input(true, title="(DEBUG) Enable debug on order comments {True}", type=input.bool)
-i_enableTakeProfit      = input(false, "(STOPTAKE) Take Profit? {false}")
+i_enableTakeProfit      = input(true, "(STOPTAKE) Take Profit? {True}")
 i_enableStopLoss      = input(true, "(STOPTAKE) Stop Loss? {True}")
 i_enableTrailingTakeProfit = input(true, title="(TRAILING) Enable Trailing Take Profit (%) {True}", type=input.bool)
-i_TakeProfit      = input(1.1, title="(STOPTAKE) Take Profit % {3.0}") / 100
+i_TakeProfit      = input(1.0, title="(STOPTAKE) Take Profit % {1.0}") / 100
+i_TakeProfitPercentage      = input(50.0, title="(STOPTAKE) Take Profit Amount Percentage % {50.0}") / 100
 i_StopLoss      = input(10.0, title="(STOPTAKE) Stop Loss % {10.0}", minval=0.01  ) / 100
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input(1.2, "(TRAILING) Trailing Take Profit Trigger (%) {2.5}",minval=0,step=0.01,type=input.float) * 0.01
@@ -321,7 +322,7 @@ f_getZignalyLongAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
     float _floatEntryQuantityContractsUSDT = _entryQuantityContractsUSDT
     _entryQuantityContractsUSDTStr = tostring(_entryQuantityContractsUSDT, "0." + f_priceDecimalDigitsZeroString())
     float _floatCurrentCapital = _currentCapital
-    float _entryQuantityContractsPercent = (_floatEntryQuantityContractsUSDT / _floatCurrentCapital) * 100.00
+    float _entryQuantityContractsPercent = (_floatEntryQuantityContractsUSDT / _floatCurrentCapital) * i_TakeProfitPercentage * 100.00
     _entryQuantityContractsPercentStr = tostring(_entryQuantityContractsPercent, "0." + f_priceDecimalDigitsZeroString())
 
     // This is actually not needed because with pyramiding=0 it's impossible that an order is scaled (and thus modified)
@@ -405,7 +406,7 @@ f_getZignalyShortAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
     float _floatEntryQuantityContractsUSDT = _entryQuantityContractsUSDT
     _entryQuantityContractsUSDTStr = tostring(_entryQuantityContractsUSDT, "0." + f_priceDecimalDigitsZeroString())
     float _floatCurrentCapital = _currentCapital
-    float _entryQuantityContractsPercent = (_floatEntryQuantityContractsUSDT / _floatCurrentCapital) * 100.00
+    float _entryQuantityContractsPercent = (_floatEntryQuantityContractsUSDT / _floatCurrentCapital) * i_TakeProfitPercentage * 100.00
     _entryQuantityContractsPercentStr = tostring(_entryQuantityContractsPercent, "0." + f_priceDecimalDigitsZeroString())
 
     // This is actually not needed because with pyramiding=0 it's impossible that an order is scaled (and thus modified)
