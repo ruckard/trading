@@ -178,7 +178,7 @@
 
 // Tradingview Public description - END
 
-strategy("Ruckard Scalping 03 001", shorttitle="A001R3Scalping", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
+strategy("Ruckard Scalping 03 001", shorttitle="A001R3Scalping", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=3, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
 
 // INPUTS - BEGIN
 
@@ -203,6 +203,12 @@ i_StopLoss      = input(10.0, title="(STOPTAKE) Stop Loss % {10.0}", minval=0.01
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input(1.2, "(TRAILING) Trailing Take Profit Trigger (%) {2.5}",minval=0,step=0.01,type=input.float) * 0.01
 i_trailingTakeProfitPercentageOffset = input(25.0, "(TRAILING) Trailing Take Profit as a percentage of Trailing Take Profit Trigger (%) {25.0}",minval=0,step=0.01,type=input.float) * 0.01
+
+// DCA - Inputs
+i_DCAAmountPercentage1 = input(100, "(DCA1) Amount Percentage (%) {100.0}",minval=1,step=0.01,type=input.float) * 0.01
+i_DCAAmountPercentage2 = input(50, "(DCA1) Amount Percentage (%) {50.0}",minval=1,step=0.01,type=input.float) * 0.01
+
+
 // Zignaly - Email (zignalye)
 _ZIGNALYE_="Email", _ZIGNALYW_="WebHook"
 i_zignalyAlertType    = input(_ZIGNALYW_,  "(ZIG) Zignaly Alert Type {WebHook}", options=[_ZIGNALYW_, _ZIGNALYE_])
@@ -601,6 +607,16 @@ contractMultiplier = f_getContractMultiplier(i_contractMaximumDecimalNumber)
 
 entryQuantityContracts = (floor(((entryQuantity / close) * entryQuantityContractsReducer) * contractMultiplier) / contractMultiplier)
 entryQuantityContractsUSDT = entryQuantityContracts * (close)
+// Case 0: No DCA
+//   No need to modify entryQuantityContractsUSDT
+// Case 1: First DCA
+if (LONG_DCA and not(LONG_DCA[1]))
+    entryQuantityContractsUSDT := i_DCAAmountPercentage1 * entryQuantityContractsUSDT
+// Case 2: Second DCA
+if (LONG_DCA and (LONG_DCA[1]))
+    entryQuantityContractsUSDT := i_DCAAmountPercentage2 * entryQuantityContractsUSDT
+// Case 3: Third DCA
+// Should not trigger because of pyramiding=3.
 
 // How much to LONG/GO LONG/SHORT/GO SHORT - END
 
@@ -612,7 +628,7 @@ var float tmpPositionBeforeOpeningOrder = na
 if (i_strategyType == _L_)
     if LONG
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
-        tmpOrderAlertMessage := f_getZignalyLongAlertMessage(entryQuantityContractsUSDT, currentCapital)
+        tmpOrderAlertMessage := f_getZignalyLongAlertMessage(entryQuantityContractsUSDT, currentCapital, LONG_DCA)
         tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
         strategy.entry("[B]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
@@ -626,13 +642,14 @@ if (i_strategyType == _L_)
         strategy.close("[B]", alert_message=i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
         insideABuyOrder := false
         0 // Workaround for making every if branch to return the same type of value
+
 // GO LONG only logic - END
 
 // GO SHORT only logic - BEGIN
 if (i_strategyType == _S_)
     if SHORT
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
-        tmpOrderAlertMessage := f_getZignalyShortAlertMessage(entryQuantityContractsUSDT, currentCapital)
+        tmpOrderAlertMessage := f_getZignalyShortAlertMessage(entryQuantityContractsUSDT, currentCapital, SHORT_DCA)
         tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
         strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
@@ -665,7 +682,7 @@ if (i_strategyType == L_S)
 
     if LONG
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
-        tmpOrderAlertMessage := f_getZignalyLongAlertMessage(entryQuantityContractsUSDT, currentCapital)
+        tmpOrderAlertMessage := f_getZignalyLongAlertMessage(entryQuantityContractsUSDT, currentCapital, LONG_DCA)
         tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
         strategy.entry("[B]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
@@ -679,7 +696,7 @@ if (i_strategyType == L_S)
         insideABuyOrder := false
     if SHORT
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
-        tmpOrderAlertMessage := f_getZignalyShortAlertMessage(entryQuantityContractsUSDT, currentCapital)
+        tmpOrderAlertMessage := f_getZignalyShortAlertMessage(entryQuantityContractsUSDT, currentCapital, SHORT_DCA)
         tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
         strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
