@@ -1,0 +1,841 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © ruckard
+
+//@version=4
+
+// Current version: v20211014 ( A065 )
+// Tradingview Public description - BEGIN
+// 
+// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
+// This specific strategy also includes Risk Management.
+// 
+// It was originally tested at BTCUSDT pair and 1D timeframe.
+// The strategy is a slightly modified copy of default TradingView strategy that appears when you create a blank new strategy.
+// It decides to go long when 14-period SMA crosses over 28-period SMA and goes short when 14-period SMA crosses under 28-period SMA.
+//
+// Before using this documentation it's recommended that you:
+// [LIST]
+// [*] Use default TradingView strategy script or another script and setup its associated alert manually. Just make the alert pop-up in the screen.
+// [*] Create a 'Copy-Trader provider' (or Signal Provider) in Zignaly and send signals to it either thanks to your browser or with some basic programming.
+// [/LIST]
+
+// [B]SETTINGS[/B]
+// [B]__ SETTINGS - Capital[/B]
+// [LIST]
+// [*] (CAPITAL) Capital quote invested per order in USDT units {100.0}. This setting is only used when '(ZIG) Provider type' is set to 'Signal Provider'.
+// [*] (CAPITAL) Capital percentage invested per order (%) {25.0}. This setting is only used when '(ZIG) Provider type' is set to 'Copy Trader Provider'.
+// [/LIST]
+// [B]__ SETTINGS - Misc[/B]
+// [LIST]
+// [*] (ZIG) Enable Alert message {True}: Whether to enable alert message or not.
+// [*] (DEBUG) Enable debug on order comments {False}: Whether to show alerts on order comments or not.
+// [*] Number of decimal digits for Prices {2}.
+// [*] (DECIMAL) Maximum number of decimal for contracts {3}.
+// [/LIST]
+// [B]__ SETTINGS - Zignaly[/B]
+// [LIST]
+// [*] (ZIG) Integration type {TradingView only}: [b]Hybrid[/b]: Both TradingView and Zignaly handle take profit, trailing stops and stop losses. Useful if you are scared about TradingView not firing an alert. It might arise problems if TradingView and Zignaly get out of sync. [b]TradingView only[/b]: TradingView sends entry and exit orders to Zignaly so that Zignaly only buys or sells. Zignaly won't handle stop loss or other settings on its own.
+// [*] (ZIG) Zignaly Alert Type {WebHook}: 'Email' or 'WebHook'.
+// [*] (ZIG) Provider type {Profit Sharing Provider}: 'Profit Sharing Provider', 'Copy Trader Provider', or 'Signal Provider'. 'Copy Trader Provider' or 'Profit Sharing Provider' sends a percentage to manage. 'Signal Provider' sends a quote to manage.
+// [*] (ZIG) Exchange {Zignaly}: 'Zignaly', 'Binance' or 'Kucoin'.
+// [*] (ZIG) Exchange Type {Futures}: 'Spot' or 'Futures'.
+// [*] (ZIG) Leverage {1}. Set it to '1' when '(ZIG) Exchange Type' is set to 'Spot'.
+// [/LIST]
+// [B]__ SETTINGS - Strategy[/B]
+// [LIST]
+// [*] (STRAT) Strategy Type: 'Long and Short', 'Long Only' or 'Short Only'.
+// [*] (STOPTAKE) Take Profit? {false}: Whether to enable Take Profit.
+// [*] (STOPTAKE) Stop Loss? {True}: Whether to enable Stop Loss.
+// [*] (TRAILING) Enable Trailing Take Profit (%) {True}: Whether to enable Trailing Take Profit.
+// [*] (STOPTAKE) Take Profit % {3.0}: Take profit percentage. This setting is only used when '(STOPTAKE) Take Profit?' setting is set to true.
+// [*] (STOPTAKE) Stop Loss % {2.0}: Stop loss percentage. This setting is only used when '(STOPTAKE) Stop Loss?' setting is set to true.
+// [*] (TRAILING) Trailing Take Profit Trigger (%) {2.5}: Trailing Stop Trigger Percentage. This setting is only used when '(TRAILING) Enable Trailing Take Profit (%)' setting is set to true.
+// [*] (TRAILING) Trailing Take Profit as a percentage of Trailing Take Profit Trigger (%) {25.0}: Trailing Stop Distance Percentage. This setting is only used when '(TRAILING) Enable Trailing Take Profit (%)' setting is set to true.
+// [*] (RECENT) Number of minutes to wait to open a new order after the previous one has been opened {6}.
+// [/LIST]
+// [B]____ SETTINGS - Risk Management [/B]
+// [list]
+// [*] (RISKM) Risk Management Type: 'Safe', 'Somewhat safe compound' or 'Unsafe compound'. '[b]Safe[/b]': Calculations are always done with the initial capital (1000) in mind. The maximum losses per trade/day/week/month are taken into account. '[b]Somewhat safe compound[/b]': Calculations are done with initial capital (1000) or a higher capital if it increases. The maximum losses per trade/day/week/month are taken into account. '[b]Unsafe compound[/b]': In each order all the current capital is gambled and only the default stop loss per order is taken into account. That means that the maximum losses per trade/day/week/month are not taken into account. [b]Default[/b]: 'Somewhat safe compound'.
+// [*] (RISKM) Maximum loss per trade % {1.0}.
+// [*] (RISKM) Maximum loss per day % {6.0}.
+// [*] (RISKM) Maximum loss per week % {8.0}.
+// [*] (RISKM) Maximum loss per month % {10.0}.
+// [/list]
+
+// [B]DEFAULT SETTINGS[/B]
+
+// By default this strategy has been setup with these beginner settings:
+// [LIST]
+// [*] '(ZIG) Integration type' : TradingView only
+// [*] '(ZIG) Provider type'    : 'Copy Trader Provider'
+// [*] '(ZIG) Exchange'         : 'Binance'
+// [*] '(ZIG) Exchange Type'    : 'Spot'
+// [*] '(STRAT) Strategy Type'  : 'Long Only'
+// [*] '(ZIG) Leverage'         : '1' (Or no leverage)
+// [/LIST]
+// but you can change those settings if needed.
+
+
+// [B]FIRST STEP[/B]
+// [LIST]
+// [*] For both future or spot markets you should make sure to change '(ZIG) Zignaly Alert Type' to match either WebHook or Email. If you have a non paid account in TradingView as in October 2020 you would have to use Email which it's free to use.
+// [/LIST]
+
+// [B]RECOMMENDED SETTINGS[/B]
+// [B]__ RECOMMENDED SETTINGS - Spot markets[/B]
+// [LIST]
+// [*] '(ZIG) Exchange Type'   setting should be set to 'Spot'
+// [*] '(STRAT) Strategy Type' setting should be set to 'Long Only'
+// [*] '(ZIG) Leverage'        setting should be set to '1'
+// [/LIST]
+// [B]__ RECOMMENDED SETTINGS - Future markets[/B]
+// [LIST]
+// [*] '(ZIG) Exchange Type'   setting should be set to 'Futures'
+// [*] '(STRAT) Strategy Type' setting should be set to 'Long and Short'
+// [*] '(ZIG) Leverage'        setting might be changed if desired.
+// [/LIST]
+// [B]__ RECOMMENDED SETTINGS - Signal Providers[/B]
+// [LIST]
+// [*] '(ZIG) Provider type'   setting should be set to 'Signal Provider'
+// [*] '(CAPITAL) Capital quote invested per order in USDT units' setting might be changed if desired.
+// [/LIST]
+// [B]__ RECOMMENDED SETTINGS - Copy Trader Providers[/B]
+// [LIST]
+// [*] '(ZIG) Provider type'   setting should be set to 'Copy Trader Provider'
+// [*] '(CAPITAL) Capital percentage invested per order (%)' setting might be changed if desired.
+// [*] Strategy Properties setting: 'Initial Capital' might be changed if desired.
+// [/LIST]
+
+// [B]INTEGRATION TYPE EXPLANATION[/B]
+// [LIST]
+// [*] 'Hybrid': Both TradingView and Zignaly handle take profit, trailing stops and stop losses. Useful if you are scared about TradingView not firing an alert. It might arise problems if TradingView and Zignaly get out of sync.
+// [*] 'TradingView only': TradingView sends entry and exit orders to Zignaly so that Zignaly only buys or sells. Zignaly won't handle stop loss or other settings on its own.
+// [/LIST]
+
+// [B]HOW TO USE THIS STRATEGY[/B]
+// [LIST]
+// [*] Beginner: Copy and paste the strategy and change it to your needs. Turn off '(DEBUG) Enable debug on order comments' setting.
+// [*] Medium: Reuse functions and inputs from this strategy into your own as if it was a library.
+// [*] Advanced: Check Strategy Tester. List of trades. Copy and paste the different suggested 'alert_message' variable contents to your script and change them to your needs.
+// [*] Expert: You needed a way to pass data from TradingView script to the alert. Now you know it's the 'alert_message' variable. You can find several examples in the source code using the variable. You also have seen 'ALERTS SETUP' explanation below. An additional quick look at 'Strategy Tester', 'List of Trades' and you are ready to go.
+// [/LIST]
+
+
+// [B] ALERTS SETUP[/B]
+// This is the important piece of information that allows you to connect TradingView to Zignaly in a semi-automatic manner.
+// [B] __ ALERTS SETUP - WebHook[/B]
+// [LIST]
+// [*] Webhook URL: https : // zignaly . com / api / signals.php?key=MYSECRETKEY
+// [*] Message: { {{strategy.order.alert_message}} , "key" : "MYSECRETKEY" }
+// [/LIST]
+// [B] __ ALERTS SETUP - Email[/B]
+// [LIST]
+// [*] Setup a new Hotmail account
+// [*] Add it as an 'SMS email' in TradingView Profile settings page.
+// [*] Confirm your own the email address
+// [*] Create a rule in your Hotmail account that 'Redirects' (not forwards) emails to 'signals @ zignaly . email' when (1): 'Subject' includes 'Alert', (2): 'Email body' contains string 'MYZIGNALYREDIRECTTRIGGER' and (3): 'From' contains 'noreply @ tradingview . com'.
+// [*] In 'More Actions' check: Send Email-to-SMS
+// [*] Message: ||{{strategy.order.alert_message}}||key=MYSECRETKEY||
+// MYZIGNALYREDIRECTTRIGGER
+// [/LIST]
+
+
+// '(DEBUG) Enable debug on order comments' is turned on by default so that you can see in the Strategy Tester. List of Trades. The different orders alert_message that would have been sent to your alert. You might want to turn it off it some many letters in the screen is problem.
+
+// [B]STRATEGY ADVICE[/B]
+// [LIST]
+// [*] If you turn on 'Take Profit' then turn off 'Trailing Take Profit'.
+// [/LIST]
+//
+// [B]ZIGNALY SIDE ADVICE[/B]
+// [LIST]
+// [*] If you are a 'Signal Provider' make sure that 'Allow reusing the same signalId if there isn't any open position using it?' setting in the profile tab is set to true.
+// [*] You can find your 'MYSECRETKEY' in your 'Copy Trader/Signal' provider Edit tab at 'Signal URL'.
+// [/LIST]
+//
+// [B]ADDITIONAL ZIGNALY DOCUMENTATION[/B]
+// This beginner's guide is quite basic and meant to be an introduction. Please read additional documentation to learn what you actually can do with Zignaly.
+// [LIST]
+// [*] docs . zignaly . com / signals / how-to -- How to send signals to Zignaly
+// [*] help . zignaly . com / hc/en-us/categories/360002703720-Sending-Signals -- Sending zignals
+// [/LIST]
+//
+// [B]FINAL REMARKS[/B]
+// [LIST]
+// [*] This strategy tries to match the Pine Script Coding Conventions as best as possible.
+// [*] You can check my 'Ruckard TradingLatino' strategy for a more complex strategy that it's also integrated with Zignaly. Unfortunatley it does not use Pine Script Coding Conventions as much.
+// [/LIST]
+
+// Tradingview Public description - END
+
+strategy("Zignaly Risk M. A065", shorttitle="A065ZigRisk", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
+
+// INPUTS - BEGIN
+
+// Strategy - Inputs
+i_enableZignalyAlert = input(true, "(ZIG) Enable Alert message {True}")
+
+_ZIGHYBRIDINTEGRATION_     = "Hybrid"                , _ZIGTVONLYINTEGRATION_  = "TradingView only"
+i_zignalyIntegrationType    = input(_ZIGTVONLYINTEGRATION_,  "(ZIG) Integration type", options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
+_ZIGSIGNALPROVIDER_     = "Signal Provider"                , _ZIGCOPYTRADERPROVIDER_  = "Profit Sharing/Copy Trader Provider"
+i_zignalyProviderType    = input(_ZIGCOPYTRADERPROVIDER_,  "(ZIG) Provider type", options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
+L_S     = "Long and Short"                , _L_  = "Long Only"                , _S_ = "Short Only"
+i_strategyType    = input(_L_,  "(STRAT) Strategy Type", options=[L_S, _L_, _S_])
+// Order comments based debug
+i_enableOrderCommentDebug = input(false, title="(DEBUG) Enable debug on order comments {False}", type=input.bool)
+i_enableTakeProfit      = input(false, "(STOPTAKE) Take Profit? {false}")
+i_enableStopLoss      = input(true, "(STOPTAKE) Stop Loss? {True}")
+i_enableTrailingTakeProfit = input(true, title="(TRAILING) Enable Trailing Take Profit (%) {True}", type=input.bool)
+i_takeProfit      = input(1.1, title="(STOPTAKE) Take Profit % {3.0}") / 100
+i_stopLoss      = input(7.0, title="(STOPTAKE) Stop Loss % {7.0}", minval=0.01  ) / 100
+// Trailing Take Profit - Inputs
+i_trailingTakeProfitPercentageTrigger = input(1.2, "(TRAILING) Trailing Take Profit Trigger (%) {2.5}",minval=0,step=0.01,type=input.float) * 0.01
+i_trailingTakeProfitPercentageOffset = input(25.0, "(TRAILING) Trailing Take Profit as a percentage of Trailing Take Profit Trigger (%) {25.0}",minval=0,step=0.01,type=input.float) * 0.01
+// Zignaly - Email (zignalye)
+_ZIGNALYE_="Email", _ZIGNALYW_="WebHook"
+i_zignalyAlertType    = input(_ZIGNALYW_,  "(ZIG) Zignaly Alert Type {WebHook}", options=[_ZIGNALYW_, _ZIGNALYE_])
+_ZIGEXZIGNALY_     = "Zignaly", _ZIGEXBINANCE_     = "Binance"                , _ZIGEXKUCOIN_  = "Kucoin"
+i_zignalyExchange   = input(_ZIGEXZIGNALY_,  "(ZIG) Exchange {Zignaly}", options=[_ZIGEXZIGNALY_, _ZIGEXBINANCE_, _ZIGEXKUCOIN_])
+_ZIGEXTYPESPOT_     = "spot"                , _ZIGEXFUTURES_  = "futures"
+i_zignalyExchangeType   = input(_ZIGEXFUTURES_,  "(ZIG) Exchange Type {Futures}", options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_])
+i_zignalyLeverage = input(1, "(ZIG) Leverage {1}",minval=1,step=1,maxval=125,type=input.integer)
+var i_zignalyLeverage_str = tostring(i_zignalyLeverage) // It needs to run only once
+i_priceDecimalDigits = input(2, "Number of decimal digits for Prices {2}", minval=0, maxval=10, step=1)
+// Decimal - Inputs
+i_contractMaximumDecimalNumber = input(3, title="(DECIMAL) Maximum number of decimal for contracts {3}",minval=0)
+i_tooRecentMinutesNumber = input(6, "(RECENT) Number of minutes to wait to open a new order after the previous one has been opened {6}", minval=1, maxval=100, step=1)
+i_CapitalQuote      = input(100.0,  title="(CAPITAL) Capital quote invested per order in USDT units {100.0}")
+i_CapitalPercentage = input(25.0,   title="(CAPITAL) Capital percentage invested per order (%) {25.0}",minval=0,step=0.01,type=input.float) * 0.01
+// Risk Management - Inputs
+_SAFE_="Safe", _SCOMPOUND_="Somewhat safe compound", _UCOMPOUND_="Unsafe compound"
+i_riskManagementType    = input(_SCOMPOUND_,  "(RISKM) Risk Management Type", options=[_SAFE_, _SCOMPOUND_, _UCOMPOUND_])
+i_riskManagementMaximumLossPerTrade    = input(1.0, title="(RISKM) Maximum loss per trade % {1.0}"  ) / 100
+i_riskManagementMaximumLossPerDay    = input(6.0, title="(RISKM) Maximum loss per day % {6.0}"  ) / 100
+i_riskManagementMaximumLossPerWeek = input(8.0, title="(RISKM) Maximum loss per week % {8.0}"  ) / 100
+i_riskManagementMaximumLossPerMonth = input(10.0, title="(RISKM) Maximum loss per month % {10.0}"  ) / 100
+
+// INPUTS - END
+
+
+
+// Strategy - INIT - BEGIN
+
+// order Stop Loss
+float orderStopLoss = na
+
+// Dynamic Trailing Take Profit - Variables
+
+var int buyOrderOpenBarIndex = na
+var int sellOrderOpenBarIndex = na
+
+// Handle to avoid two long and short orders being too next to each other
+var bool _oldInsideABuyOrder = false
+var bool oldInsideASellOrder = false
+var bool insideABuyOrder = false
+var bool insideASellOrder = false
+
+_oldInsideABuyOrder := insideABuyOrder
+oldInsideASellOrder := insideASellOrder
+
+var int lastOrderOpenBarTime = na
+
+// Handle recalculate after Stop Loss / Take Profit order
+if (strategy.position_size == 0.0)
+    insideABuyOrder := false
+    insideASellOrder := false
+else
+    lastOrderOpenBarTime := time_close
+
+// Zignaly
+exchangeTickerID = syminfo.basecurrency + syminfo.currency
+var string zignalySeparator = ","
+var string zignalyQuote = "\""
+var string zignalyEquals = "="
+if ( i_zignalyAlertType == _ZIGNALYE_)
+    zignalySeparator := "||"
+    zignalyQuote := ""
+    zignalyEquals := "="
+else
+    zignalySeparator := ","
+    zignalyQuote := "\""
+    zignalyEquals := ":"
+
+zignalyCommonAlertMessage = zignalyQuote + "exchange" + zignalyQuote + zignalyEquals + zignalyQuote + i_zignalyExchange + zignalyQuote + zignalySeparator + zignalyQuote + "exchangeAccountType" + zignalyQuote + zignalyEquals + zignalyQuote + i_zignalyExchangeType + zignalyQuote + zignalySeparator + zignalyQuote + "pair" + zignalyQuote + zignalyEquals + zignalyQuote + "" + exchangeTickerID  + zignalyQuote + zignalySeparator + zignalyQuote + "leverage" + zignalyQuote + zignalyEquals + zignalyQuote + i_zignalyLeverage_str + zignalyQuote
+
+var string tmpOrderComment = na
+var string tmpOrderAlertMessage = na
+
+var int i_tooRecentMinutesNumber_ms = i_tooRecentMinutesNumber * 60 * 1000 // Convert minutes into milliseconds only once
+
+// Strategy - INIT - END
+
+// FUNCTIONS - BEGIN
+
+// Decimals - Functions
+f_getContractMultiplier(_contractMaximumDecimalNumber) =>
+    _contractMultiplier = 1
+    if (_contractMaximumDecimalNumber == 0)
+        _contractMultiplier // Return 1
+    else
+        for _counter = 1 to _contractMaximumDecimalNumber
+            _contractMultiplier:= _contractMultiplier * 10
+        _contractMultiplier
+
+f_priceDecimalDigitsZeroString () =>
+    // Dependencies: i_priceDecimalDigits (initialized in inputs).
+    _zeroString = ""
+    if not (i_priceDecimalDigits == 0)
+        for _digit = 1 to i_priceDecimalDigits
+            _zeroString := _zeroString + "0"
+    _zeroString
+
+// —————————— PineCoders MTF Selection Framework functions
+// ————— Converts current "timeframe.multiplier" plus the TF into minutes of type float.
+f_resInMinutes() =>
+    _resInMinutes = timeframe.multiplier * (
+      timeframe.isseconds ? 1. / 60. :
+      timeframe.isminutes ? 1.       :
+      timeframe.isdaily   ? 1440.    :
+      timeframe.isweekly  ? 10080.   :
+      timeframe.ismonthly ? 43800.   : na)
+
+var currentResInMinutes = f_resInMinutes() // We need to calculate it only once
+
+f_getResolutionBarMinutes(resolution) =>
+    minutes = resolution == '1' ? (1 * 1) :
+     resolution == '3' ? (3 * 1) :
+     resolution == '5' ? (5 * 1) :
+     resolution == '15' ? (15 * 1) :
+     resolution == '30' ? (30 * 1) :
+     resolution == '45' ? (45 * 1) :
+     resolution == '60' ? (60 * 1) :
+     resolution == '120' ? (2 * 60) :
+     resolution == '180' ? (3 * 60) :
+     resolution == '240' ? (4 * 60) :
+     resolution == '1D' ? (24 * 60) :
+     resolution == '1W' ? (7 * 24 * 60) :
+     resolution == '1M' ? (4 * 7 * 24 * 60) :
+     currentResInMinutes // Equal to current symbol
+    minutes
+
+// Zignalye - Functions - BEGIN
+f_getZignalyLongAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
+    // Dependencies: zignalyQuote
+    // Dependencies: zignalyEquals
+    // Dependencies: zignalySeparator
+    // Dependencies: zignalyCommonAlertMessage
+
+    // Dependencies: i_enableStopLoss (initialized in inputs).
+    // Dependencies: i_enableTakeProfit (initialized in inputs).
+    // Dependencies: i_takeProfit (initialized in inputs).
+    // Dependencies: i_enableTrailingTakeProfit (initialized in inputs).
+    // Dependencies: i_trailingTakeProfitPercentageOffset (initialized in inputs).
+    // Dependencies: i_trailingTakeProfitPercentageTrigger (initialized in inputs).
+    // Dependencies: i_zignalyIntegrationType (initialized in inputs).
+    
+    // Function Dependencies: f_priceDecimalDigitsZeroString()
+
+    var string _zignaleStopLossCombo = ""
+    var string _zignaleTakeProfitCombo = ""
+    var string _zignaleTrailingTakeProfitCombo = ""
+    _zignalyLongCommonAlertMessage = zignalyQuote + "type" + zignalyQuote + zignalyEquals + zignalyQuote + "entry" + zignalyQuote + zignalySeparator + zignalyQuote + "side" + zignalyQuote + zignalyEquals + zignalyQuote + "long" + zignalyQuote + zignalySeparator + zignalyQuote + "orderType" + zignalyQuote + zignalyEquals + zignalyQuote + "market" + zignalyQuote + zignalySeparator + zignalyQuote + "signalId" + zignalyQuote + zignalyEquals + zignalyQuote + "LONG-" + exchangeTickerID + zignalyQuote
+    float _floatEntryQuantityContractsUSDT = _entryQuantityContractsUSDT
+    _entryQuantityContractsUSDTStr = tostring(_entryQuantityContractsUSDT, "0." + f_priceDecimalDigitsZeroString())
+    float _floatCurrentCapital = _currentCapital
+    float _entryQuantityContractsPercent = (_floatEntryQuantityContractsUSDT / _floatCurrentCapital) * 100.00
+    _entryQuantityContractsPercentStr = tostring(_entryQuantityContractsPercent, "0." + f_priceDecimalDigitsZeroString())
+
+    if (i_enableStopLoss and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
+        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "-" + tostring((nz(orderStopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+    else
+        _zignaleStopLossCombo := ""
+    if (i_enableTakeProfit and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
+        _zignaleTakeProfitCombo := zignalySeparator + zignalyQuote + "takeProfitPercentage1" + zignalyQuote + zignalyEquals + zignalyQuote + "" + tostring((i_takeProfit * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+    else
+        _zignaleTakeProfitCombo := ""
+    if (i_enableTrailingTakeProfit and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
+        _zignaleTrailingTakeProfitCombo := zignalySeparator + zignalyQuote + "trailingStopDistancePercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "-" + tostring((i_trailingTakeProfitPercentageOffset * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote + zignalySeparator + zignalyQuote + "trailingStopTriggerPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "" + tostring((i_trailingTakeProfitPercentageTrigger * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+    else
+        _zignaleTrailingTakeProfitCombo := ""
+
+
+
+    var string _message = ""
+    if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_)
+        _message := 
+             zignalyCommonAlertMessage + 
+             zignalySeparator + 
+             _zignalyLongCommonAlertMessage + 
+             zignalySeparator + 
+             zignalyQuote + "positionSizePercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "" +  _entryQuantityContractsPercentStr + zignalyQuote +
+             _zignaleStopLossCombo +
+             _zignaleTakeProfitCombo +
+             _zignaleTrailingTakeProfitCombo
+    else // _ZIGSIGNALPROVIDER_
+        _message := 
+             zignalyCommonAlertMessage + 
+             zignalySeparator + 
+             _zignalyLongCommonAlertMessage + 
+             zignalySeparator + 
+             zignalyQuote + "positionSizeQuote" + zignalyQuote + zignalyEquals + zignalyQuote + "" +  _entryQuantityContractsUSDTStr + zignalyQuote +
+             _zignaleStopLossCombo +
+             _zignaleTakeProfitCombo +
+             _zignaleTrailingTakeProfitCombo
+
+    _message
+
+f_getZignalyLongCloseAlertMessage() =>
+    // Dependencies: zignalyQuote
+    // Dependencies: zignalyEquals
+    // Dependencies: zignalySeparator
+    // Dependencies: zignalyCommonAlertMessage
+
+    _zignalyLongCloseCommonAlertMessage = zignalyQuote + "type" + zignalyQuote + zignalyEquals + zignalyQuote + "exit" + zignalyQuote + zignalySeparator + zignalyQuote + "side" + zignalyQuote + zignalyEquals + zignalyQuote + "long" + zignalyQuote + zignalySeparator + zignalyQuote + "orderType" + zignalyQuote + zignalyEquals + zignalyQuote + "market" + zignalyQuote + zignalySeparator + zignalyQuote + "signalId" + zignalyQuote + zignalyEquals + zignalyQuote + "LONG-" + exchangeTickerID + zignalyQuote
+    
+    var string _message = ""
+    _message := zignalyCommonAlertMessage + zignalySeparator + _zignalyLongCloseCommonAlertMessage
+    _message
+
+f_getZignalyShortAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
+    // Dependencies: zignalyQuote
+    // Dependencies: zignalyEquals
+    // Dependencies: zignalySeparator
+    // Dependencies: zignalyCommonAlertMessage
+
+    // Dependencies: i_enableStopLoss (initialized in inputs).
+    // Dependencies: i_enableTakeProfit (initialized in inputs).
+    // Dependencies: i_takeProfit (initialized in inputs).
+    // Dependencies: i_enableTrailingTakeProfit (initialized in inputs).
+    // Dependencies: i_trailingTakeProfitPercentageOffset (initialized in inputs).
+    // Dependencies: i_trailingTakeProfitPercentageTrigger (initialized in inputs).
+    // Dependencies: i_zignalyIntegrationType (initialized in inputs).
+    
+    // Function Dependencies: f_priceDecimalDigitsZeroString()
+
+    var string _zignaleStopLossCombo = ""
+    var string _zignaleTakeProfitCombo = ""
+    var string _zignaleTrailingTakeProfitCombo = ""
+    _zignalyLongCloseCommonAlertMessage = zignalyQuote + "type" + zignalyQuote + zignalyEquals + zignalyQuote + "entry" + zignalyQuote + zignalySeparator + zignalyQuote + "side" + zignalyQuote + zignalyEquals + zignalyQuote + "short" + zignalyQuote + zignalySeparator + zignalyQuote + "orderType" + zignalyQuote + zignalyEquals + zignalyQuote + "market" + zignalyQuote + zignalySeparator + zignalyQuote + "signalId" + zignalyQuote + zignalyEquals + zignalyQuote + "SHORT-" + exchangeTickerID + zignalyQuote
+    float _floatEntryQuantityContractsUSDT = _entryQuantityContractsUSDT
+    _entryQuantityContractsUSDTStr = tostring(_entryQuantityContractsUSDT, "0." + f_priceDecimalDigitsZeroString())
+    float _floatCurrentCapital = _currentCapital
+    float _entryQuantityContractsPercent = (_floatEntryQuantityContractsUSDT / _floatCurrentCapital) * 100.00
+    _entryQuantityContractsPercentStr = tostring(_entryQuantityContractsPercent, "0." + f_priceDecimalDigitsZeroString())
+
+    if (i_enableStopLoss and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
+        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "" + tostring((nz(orderStopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+    else
+        _zignaleStopLossCombo := ""
+    if (i_enableTakeProfit and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
+        _zignaleTakeProfitCombo := zignalySeparator + zignalyQuote + "takeProfitPercentage1" + zignalyQuote + zignalyEquals + zignalyQuote + "-" + tostring((i_takeProfit * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+    else
+        _zignaleTakeProfitCombo := ""
+    if (i_enableTrailingTakeProfit and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
+        _zignaleTrailingTakeProfitCombo := zignalySeparator + zignalyQuote + "trailingStopDistancePercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "" + tostring((i_trailingTakeProfitPercentageOffset * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote + zignalySeparator + zignalyQuote + "trailingStopTriggerPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "-" + tostring((i_trailingTakeProfitPercentageTrigger * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+    else
+        _zignaleTrailingTakeProfitCombo := ""
+
+
+
+    var string _message = ""
+    if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_)
+        _message := 
+             zignalyCommonAlertMessage + 
+             zignalySeparator + 
+             _zignalyLongCloseCommonAlertMessage + 
+             zignalySeparator + 
+             zignalyQuote + "positionSizePercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "" +  _entryQuantityContractsPercentStr + zignalyQuote +
+             _zignaleStopLossCombo +
+             _zignaleTakeProfitCombo +
+             _zignaleTrailingTakeProfitCombo
+    else // _ZIGSIGNALPROVIDER_
+        _message := 
+             zignalyCommonAlertMessage + 
+             zignalySeparator + 
+             _zignalyLongCloseCommonAlertMessage + 
+             zignalySeparator + 
+             zignalyQuote + "positionSizeQuote" + zignalyQuote + zignalyEquals + zignalyQuote + "" +  _entryQuantityContractsUSDTStr + zignalyQuote +
+             _zignaleStopLossCombo +
+             _zignaleTakeProfitCombo +
+             _zignaleTrailingTakeProfitCombo
+
+    _message
+
+f_getZignalyShortCloseAlertMessage() =>
+    // Dependencies: zignalyQuote
+    // Dependencies: zignalyEquals
+    // Dependencies: zignalySeparator
+    // Dependencies: zignalyCommonAlertMessage
+
+    zignalyShortCloseCommonAlertMessage = zignalyQuote + "type" + zignalyQuote + zignalyEquals + zignalyQuote + "exit" + zignalyQuote + zignalySeparator + zignalyQuote + "side" + zignalyQuote + zignalyEquals + zignalyQuote + "short" + zignalyQuote + zignalySeparator + zignalyQuote + "orderType" + zignalyQuote + zignalyEquals + zignalyQuote + "market" + zignalyQuote + zignalySeparator + zignalyQuote + "signalId" + zignalyQuote + zignalyEquals + zignalyQuote + "SHORT-" + exchangeTickerID + zignalyQuote
+    
+    var string _message = ""
+    _message := zignalyCommonAlertMessage + zignalySeparator + zignalyShortCloseCommonAlertMessage
+    _message
+
+// Zignalye - Functions - END
+
+// Order comment - Functions - BEGIN
+
+f_getOrderComment(_typeOrder, _side, _alertMessage) =>
+    // Dependencies: i_enableOrderCommentDebug (initialized in inputs).
+
+    // TODO: Add descriptive comments
+    // _typeOrder="entry" or _typeOrder="close"
+    // _side: true means long ; false means short ; We can use strategy.long or strategy.short as true and false aliases
+    // _alertMessage
+    var string _orderComment = ""
+    
+    if (i_enableOrderCommentDebug)
+        _orderComment := _alertMessage
+    else
+        // TODO: Use human explanations instead of default order comment value (na)
+        _orderComment := na
+        
+    _orderComment
+
+// Order comment - Functions - END
+
+// Too recent orders functions
+
+f_getTooRecentOrderNotOpenAdvice () =>
+    // Dependencies: i_tooRecentMinutesNumber_ms
+    // Dependencies: lastOrderOpenBarTime
+
+    // Condition 1: The order was open
+    // Condition 2: The order was long or short
+    // Condition 3: Time since order was last open is smaller than minimum between orders
+    // Returns boolean
+    bool _isTooRecent =  ((time_close) <= (lastOrderOpenBarTime + i_tooRecentMinutesNumber_ms))
+
+    bool _tooRecentOrderBuyNotOpenAdvice = na
+    if (na(lastOrderOpenBarTime))
+        _tooRecentOrderBuyNotOpenAdvice := false
+    else
+        _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
+    _tooRecentOrderBuyNotOpenAdvice
+
+// FUNCTIONS - END
+
+
+// Strategy Body - BEGIN
+
+
+// Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
+// longCondition = crossover(sma(close, 14), sma(close, 28))
+// shortCondition = crossunder(sma(close, 14), sma(close, 28))
+longCondition = sma(close, 14) >= sma(close, 28)
+shortCondition = sma(close, 14) < sma(close, 28)
+// Simple Logic to go LONG/LONG or go SHORT/SHORT - END
+
+
+// Position price calculation - BEGIN
+float positionPrice = na
+if (insideASellOrder or insideABuyOrder)
+    positionPrice := strategy.position_avg_price
+else
+    positionPrice := close
+    
+// Position price calculation - END
+
+tooRecentOrderNotOpenAdvice = f_getTooRecentOrderNotOpenAdvice ()
+
+// Decide if we are going to LONG/Go LONG - BEGIN
+PRE_LONG = false
+PRE_LONG := longCondition and (not tooRecentOrderNotOpenAdvice)
+
+// LONG = PRE_LONG[1] and PRE_LONG // Wait for confirmation
+LONG = PRE_LONG // Do not wait for confirmation
+
+// Decide if we are going to LONG/Go LONG - END
+
+// Decide if we are going to SHORT/Go SHORT - BEGIN
+PRE_SHORT = false
+PRE_SHORT := shortCondition and (not tooRecentOrderNotOpenAdvice)
+
+// SHORT = PRE_SHORT[1] and PRE_SHORT // Wait for confirmation
+SHORT = PRE_SHORT // Do not wait for confirmation
+
+// Decide if we are going to SHORT/Go SHORT - END
+
+// Decide if a LONG/LONG entry should be closed - BEGIN
+LONG_CLOSE = true
+LONG_CLOSE := not (longCondition)
+
+// Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
+if LONG_CLOSE
+    LONG := false
+// Decide if a LONG/LONG entry should be closed - END
+
+// Decide if a SHORT/SHORT entry should be closed - BEGIN
+SHORT_CLOSE = true
+SHORT_CLOSE := not (shortCondition)
+
+// Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
+if SHORT_CLOSE
+    SHORT := false
+// Decide if a SHORT/SHORT entry should be closed - END
+
+// orderStopLoss is just here just in case
+// we implement i_longStopLoss and i_shortStopLoss
+// in the future
+if LONG
+    orderStopLoss := i_stopLoss
+else
+    orderStopLoss := i_stopLoss
+
+
+// How much to LONG/GO LONG/SHORT/GO SHORT - BEGIN
+
+// Custom take profit and stop loss
+LongTakeProfit = positionPrice * (1 + i_takeProfit)
+ShortTakeProfit = positionPrice * (1 - i_takeProfit)
+
+float LongStopLoss = na
+float ShortStopLoss = na
+
+LongStopLoss := positionPrice * (1 - orderStopLoss)
+ShortStopLoss := positionPrice * (1 + orderStopLoss)
+
+float entryQuantity = na
+float currentCapital = strategy.initial_capital + strategy.netprofit
+
+if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_)
+    entryQuantity := i_CapitalPercentage * currentCapital
+else // _ZIGSIGNALPROVIDER_
+    entryQuantity := i_CapitalQuote
+
+if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only implemented for CopyTrader Providers
+    // i_riskManagementMaximumLossPerDay
+    var float currentDayEntryQuantity = na
+    currentDayEntryQuantity := na
+    var currentDayLoss = 0.0
+    var currentDayCapital = 0.0
+    var currentDay = 0
+    var dayMinutes = f_getResolutionBarMinutes('1D')
+    var barMinutes = f_getResolutionBarMinutes(timeframe.period)
+    barMinutesToNow = bar_index * barMinutes
+    currentDay := floor (barMinutesToNow / dayMinutes)
+
+    // i_riskManagementMaximumLossPerWeek
+    var float currentWeekEntryQuantity = na
+    currentWeekEntryQuantity := na
+    var currentWeekLoss = 0.0
+    var currentWeekCapital = 0.0
+    var currentWeek = 0
+    var weekMinutes = f_getResolutionBarMinutes('1W')
+    currentWeek := floor (barMinutesToNow / weekMinutes)
+
+    // riskManagementMaximumLossPerMonth
+    var float currentMonthEntryQuantity = na
+    currentMonthEntryQuantity := na
+    var currentMonthLoss = 0.0
+    var currentMonthCapital = 0.0
+    var currentMonth = 0
+    var monthMinutes = f_getResolutionBarMinutes('1M')
+    currentMonth := floor (barMinutesToNow / monthMinutes)
+
+    float tmpEntryQuantity = na
+
+    if (i_riskManagementType == _SAFE_)
+        // Safe means we stick to the original initial capital
+        // to enforce our risk management policy
+        tmpEntryQuantity := (strategy.initial_capital * i_riskManagementMaximumLossPerTrade) / orderStopLoss
+
+    else if (i_riskManagementType == _SCOMPOUND_)
+        // Safe compound means that we are gambling everything we have
+        // but we try to follow risk management rules
+        tmpEntryQuantity:= (currentCapital * i_riskManagementMaximumLossPerTrade) / orderStopLoss
+
+    else if (i_riskManagementType == _UCOMPOUND_)
+        // Unsafe compound means that we are gambling always everything we have
+        tmpEntryQuantity := currentCapital
+
+    if (tmpEntryQuantity > currentCapital)
+        // Avoid being stuck when numbers don't match
+        entryQuantity := currentCapital
+    else
+        entryQuantity := tmpEntryQuantity
+
+    // DAY
+    if (currentDay[1] != currentDay)
+        currentDayLoss := 0.0
+        currentDayCapital := currentCapital
+    else
+        if (currentCapital < currentDayCapital)
+            currentDayLoss := currentDayCapital - currentCapital
+        else
+            currentDayLoss := 0.0
+        tmpCurrentDayLossPerOne = currentDayLoss / currentDayCapital
+        if (tmpCurrentDayLossPerOne >= i_riskManagementMaximumLossPerDay)
+            currentDayEntryQuantity:= 0.0 // Avoid entering a position
+
+    // WEEK
+    if (currentWeek[1] != currentWeek)
+        currentWeekLoss := 0.0
+        currentWeekCapital := currentCapital
+    else
+        if (currentCapital < currentWeekCapital)
+            currentWeekLoss := currentWeekCapital - currentCapital
+        else
+            currentWeekLoss := 0.0
+        tmpCurrentWeekLossPerOne = currentWeekLoss / currentWeekCapital
+        if (tmpCurrentWeekLossPerOne >= i_riskManagementMaximumLossPerWeek)
+            currentWeekEntryQuantity:= 0.0 // Avoid entering a position
+
+    // MONTH
+    if (currentMonth[1] != currentMonth)
+        currentMonthLoss := 0.0
+        currentMonthCapital := currentCapital
+    else
+        if (currentCapital < currentMonthCapital)
+            currentMonthLoss := currentMonthCapital - currentCapital
+        else
+            currentMonthLoss := 0.0
+        tmpCurrentMonthLossPerOne = currentMonthLoss / currentMonthCapital
+        if (tmpCurrentMonthLossPerOne >= i_riskManagementMaximumLossPerMonth)
+            currentMonthEntryQuantity:= 0.0 // Avoid entering a position
+
+    // Avoid to enter a position overall logic
+    if ( (not na(currentDayEntryQuantity)) or (not na(currentWeekEntryQuantity)) or (not na(currentMonthEntryQuantity)) )
+        entryQuantity:= 0.0
+
+float entryQuantityContractsReducer = 0.99
+
+contractMultiplier = f_getContractMultiplier(i_contractMaximumDecimalNumber)
+
+// We assume the current price is current bar close
+
+entryQuantityContracts = (floor(((entryQuantity / close) * entryQuantityContractsReducer) * contractMultiplier) / contractMultiplier)
+entryQuantityContractsUSDT = entryQuantityContracts * (close)
+
+// How much to LONG/GO LONG/SHORT/GO SHORT - END
+
+
+// GO LONG only logic - BEGIN
+
+var float tmpPositionBeforeOpeningOrder = na
+
+if (i_strategyType == _L_)
+    if LONG
+        tmpPositionBeforeOpeningOrder := strategy.position_avg_price
+        tmpOrderAlertMessage := f_getZignalyLongAlertMessage(entryQuantityContractsUSDT, currentCapital)
+        tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+        strategy.entry("[B]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
+            buyOrderOpenBarIndex := bar_index + 1
+        insideABuyOrder := true
+        0 // Workaround for making every if branch to return the same type of value
+    else if LONG_CLOSE
+        tmpOrderComment := f_getOrderComment("close", strategy.long, f_getZignalyLongCloseAlertMessage())
+        strategy.close("[B]", alert_message=i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
+        insideABuyOrder := false
+        0 // Workaround for making every if branch to return the same type of value
+// GO LONG only logic - END
+
+// GO SHORT only logic - BEGIN
+if (i_strategyType == _S_)
+    if SHORT
+        tmpPositionBeforeOpeningOrder := strategy.position_avg_price
+        tmpOrderAlertMessage := f_getZignalyShortAlertMessage(entryQuantityContractsUSDT, currentCapital)
+        tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+        strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
+            sellOrderOpenBarIndex := bar_index + 1
+        insideASellOrder := true
+        0 // Workaround for making every if branch to return the same type of value
+    else if SHORT_CLOSE
+        tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
+        insideASellOrder := false
+        0 // Workaround for making every if branch to return the same type of value
+// GO SHORT only logic - END
+
+// GO LONG and SHORT logic - BEGIN
+if (i_strategyType == L_S)
+// Asumption: Above we have:
+// if LONG_CLOSE
+//    LONG := false
+// if SHORT_CLOSE
+//    SHORT := false
+
+    // LONG and SHORT cannot be true at the same time
+    // Anyways we will take it into account
+    if (LONG == true) and (SHORT == true)
+        LONG := true
+        SHORT := false
+        SHORT_CLOSE := true
+
+    if LONG
+        tmpPositionBeforeOpeningOrder := strategy.position_avg_price
+        tmpOrderAlertMessage := f_getZignalyLongAlertMessage(entryQuantityContractsUSDT, currentCapital)
+        tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+        strategy.entry("[B]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
+            buyOrderOpenBarIndex := bar_index + 1
+        insideABuyOrder := true
+    if LONG_CLOSE
+        tmpOrderComment := f_getOrderComment("close", strategy.long, f_getZignalyLongCloseAlertMessage())
+        strategy.close("[B]", alert_message=i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
+        insideABuyOrder := false
+    if SHORT
+        tmpPositionBeforeOpeningOrder := strategy.position_avg_price
+        tmpOrderAlertMessage := f_getZignalyShortAlertMessage(entryQuantityContractsUSDT, currentCapital)
+        tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+        strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
+            sellOrderOpenBarIndex := bar_index + 1
+        insideASellOrder := true
+    if SHORT_CLOSE
+        tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
+        insideASellOrder := false
+// GO LONG and SHORT logic - END
+
+// Handle STOP LOSS (and similar) order exits - BEGIN
+
+// Quick Paste - BEGIN
+float longTrailingTakeProfitPrice = na
+float longTrailingTakeProfitPoints = na
+float longTrailingTakeProfitOffset = na
+float shortTrailingTakeProfitPrice = na
+float shortTrailingTakeProfitPoints = na
+float shortTrailingTakeProfitOffset = na
+
+// Calculate trailing_take_profit_offset based on tick units
+longTmpTtpBaseValue = positionPrice * (1 + i_trailingTakeProfitPercentageTrigger)
+longTmpTtpTop_value = longTmpTtpBaseValue * (1 + i_trailingTakeProfitPercentageOffset)
+longTrailingTakeProfitOffsetFloat = longTmpTtpTop_value - longTmpTtpBaseValue
+float longTrailingTakeProfitOffsetTick = floor (longTrailingTakeProfitOffsetFloat / syminfo.mintick)
+
+shortTmpTtpBaseValue = positionPrice * (1 - i_trailingTakeProfitPercentageTrigger)
+shortTmpTtpBottomValue = shortTmpTtpBaseValue * (1 - i_trailingTakeProfitPercentageOffset)
+shortTrailingTakeProfitOffsetFloat = shortTmpTtpBaseValue - shortTmpTtpBottomValue
+float shortTrailingTakeProfitOffsetTick = floor (shortTrailingTakeProfitOffsetFloat / syminfo.mintick)
+
+if i_enableTrailingTakeProfit
+    longTrailingTakeProfitPrice := positionPrice * (1 + i_trailingTakeProfitPercentageTrigger)
+    longTrailingTakeProfitOffset := longTrailingTakeProfitOffsetTick
+    shortTrailingTakeProfitPrice := positionPrice * (1 - i_trailingTakeProfitPercentageTrigger)
+    shortTrailingTakeProfitOffset := shortTrailingTakeProfitOffsetTick
+else
+    longTrailingTakeProfitPrice := na
+    longTrailingTakeProfitOffset := na
+    shortTrailingTakeProfitPrice := na
+    shortTrailingTakeProfitOffset := na
+// Quick Paste - END
+
+// This might trigger additional close orders than needed in zignaly
+// Better close an existing order twice than regreting zignaly not having closed it.
+
+tmpOrderComment := f_getOrderComment("close", strategy.long, f_getZignalyLongCloseAlertMessage())
+strategy.exit("[SL/TP]", "[B]", stop= i_enableStopLoss ? LongStopLoss : na, limit= i_enableTakeProfit ? LongTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? longTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? longTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
+tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
+strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, limit= i_enableTakeProfit ? ShortTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? shortTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? shortTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
+
+// Handle STOP LOSS (and similar) order exits - END
+
+// Strategy Body - END
+
+
+    
