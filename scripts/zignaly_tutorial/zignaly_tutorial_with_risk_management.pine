@@ -220,6 +220,15 @@ i_riskManagementMaximumLossPerMonth = input(10.0, title="(RISKM) Maximum loss pe
 
 // Strategy - INIT - BEGIN
 
+// orderStopLoss is just here just in case
+// we implement i_longStopLoss and i_shortStopLoss
+// in the future
+float orderStopLoss = na
+if LONG
+    orderStopLoss := i_stopLoss
+else
+    orderStopLoss := i_stopLoss
+
 // Dynamic Trailing Take Profit - Variables
 
 var int buyOrderOpenBarIndex = na
@@ -343,7 +352,7 @@ f_getZignalyLongAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
     _entryQuantityContractsPercentStr = tostring(_entryQuantityContractsPercent, "0." + f_priceDecimalDigitsZeroString())
 
     if (i_enableStopLoss and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
-        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "-" + tostring((nz(i_stopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "-" + tostring((nz(orderStopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
     else
         _zignaleStopLossCombo := ""
     if (i_enableTakeProfit and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
@@ -420,7 +429,7 @@ f_getZignalyShortAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
     _entryQuantityContractsPercentStr = tostring(_entryQuantityContractsPercent, "0." + f_priceDecimalDigitsZeroString())
 
     if (i_enableStopLoss and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
-        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "" + tostring((nz(i_stopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "" + tostring((nz(orderStopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
     else
         _zignaleStopLossCombo := ""
     if (i_enableTakeProfit and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
@@ -582,8 +591,8 @@ ShortTakeProfit = positionPrice * (1 - i_takeProfit)
 float LongStopLoss = na
 float ShortStopLoss = na
 
-LongStopLoss := positionPrice * (1 - i_stopLoss)
-ShortStopLoss := positionPrice * (1 + i_stopLoss)
+LongStopLoss := positionPrice * (1 - orderStopLoss)
+ShortStopLoss := positionPrice * (1 + orderStopLoss)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
@@ -622,13 +631,6 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
     var currentMonth = 0
     var monthMinutes = f_getResolutionBarMinutes('1M')
     currentMonth := floor (barMinutesToNow / monthMinutes)
-
-
-    float orderStopLoss = na
-    if LONG
-        orderStopLoss := constantBuyStopLoss
-    else
-        orderStopLoss := constantSellStopLoss
 
     float tmpEntryQuantity = na
 
