@@ -225,11 +225,6 @@ i_riskManagementMaximumLossPerMonth = input(10.0, title="(RISKM) Maximum loss pe
 var int buyOrderOpenBarIndex = na
 var int sellOrderOpenBarIndex = na
 
-var float buyStopLoss = na
-var float sellStopLoss = na
-var float newBuyStopLoss = na
-var float newSellStopLoss = na
-
 // Handle to avoid two long and short orders being too next to each other
 var bool _oldInsideABuyOrder = false
 var bool oldInsideASellOrder = false
@@ -291,6 +286,35 @@ f_priceDecimalDigitsZeroString () =>
             _zeroString := _zeroString + "0"
     _zeroString
 
+// —————————— PineCoders MTF Selection Framework functions
+// ————— Converts current "timeframe.multiplier" plus the TF into minutes of type float.
+f_resInMinutes() =>
+    _resInMinutes = timeframe.multiplier * (
+      timeframe.isseconds ? 1. / 60. :
+      timeframe.isminutes ? 1.       :
+      timeframe.isdaily   ? 1440.    :
+      timeframe.isweekly  ? 10080.   :
+      timeframe.ismonthly ? 43800.   : na)
+
+var currentResInMinutes = f_resInMinutes() // We need to calculate it only once
+
+f_getResolutionBarMinutes(resolution) =>
+    minutes = resolution == '1' ? (1 * 1) :
+     resolution == '3' ? (3 * 1) :
+     resolution == '5' ? (5 * 1) :
+     resolution == '15' ? (15 * 1) :
+     resolution == '30' ? (30 * 1) :
+     resolution == '45' ? (45 * 1) :
+     resolution == '60' ? (60 * 1) :
+     resolution == '120' ? (2 * 60) :
+     resolution == '180' ? (3 * 60) :
+     resolution == '240' ? (4 * 60) :
+     resolution == '1D' ? (24 * 60) :
+     resolution == '1W' ? (7 * 24 * 60) :
+     resolution == '1M' ? (4 * 7 * 24 * 60) :
+     currentResInMinutes // Equal to current symbol
+    minutes
+
 // Zignalye - Functions - BEGIN
 f_getZignalyLongAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
     // Dependencies: zignalyQuote
@@ -318,15 +342,8 @@ f_getZignalyLongAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
     float _entryQuantityContractsPercent = (_floatEntryQuantityContractsUSDT / _floatCurrentCapital) * 100.00
     _entryQuantityContractsPercentStr = tostring(_entryQuantityContractsPercent, "0." + f_priceDecimalDigitsZeroString())
 
-    // This is actually not needed because with pyramiding=0 it's impossible that an order is scaled (and thus modified)
-    float _constantBuyStopLoss = na
-    if (_oldInsideABuyOrder and insideABuyOrder)
-        _constantBuyStopLoss := buyStopLoss
-    else
-        _constantBuyStopLoss := newBuyStopLoss
-
     if (i_enableStopLoss and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
-        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "-" + tostring((nz(_constantBuyStopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "-" + tostring((nz(i_StopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
     else
         _zignaleStopLossCombo := ""
     if (i_enableTakeProfit and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
@@ -402,15 +419,8 @@ f_getZignalyShortAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
     float _entryQuantityContractsPercent = (_floatEntryQuantityContractsUSDT / _floatCurrentCapital) * 100.00
     _entryQuantityContractsPercentStr = tostring(_entryQuantityContractsPercent, "0." + f_priceDecimalDigitsZeroString())
 
-    // This is actually not needed because with pyramiding=0 it's impossible that an order is scaled (and thus modified)
-    float _constantSellStopLoss = na
-    if (oldInsideASellOrder and insideASellOrder)
-        _constantSellStopLoss := sellStopLoss
-    else
-        _constantSellStopLoss := newSellStopLoss
-    
     if (i_enableStopLoss and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
-        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "" + tostring((nz(_constantSellStopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "" + tostring((nz(i_StopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
     else
         _zignaleStopLossCombo := ""
     if (i_enableTakeProfit and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
@@ -527,9 +537,6 @@ else
 
 tooRecentOrderNotOpenAdvice = f_getTooRecentOrderNotOpenAdvice ()
 
-newBuyStopLoss := i_StopLoss
-newSellStopLoss := i_StopLoss
-
 // Decide if we are going to LONG/Go LONG - BEGIN
 PRE_LONG = false
 PRE_LONG := longCondition and (not tooRecentOrderNotOpenAdvice)
@@ -575,8 +582,8 @@ ShortTakeProfit = positionPrice * (1 - i_TakeProfit)
 float LongStopLoss = na
 float ShortStopLoss = na
 
-LongStopLoss := positionPrice * (1 - buyStopLoss)
-ShortStopLoss := positionPrice * (1 + sellStopLoss)
+LongStopLoss := positionPrice * (1 - i_StopLoss)
+ShortStopLoss := positionPrice * (1 + i_StopLoss)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
@@ -587,7 +594,7 @@ else // _ZIGSIGNALPROVIDER_
     entryQuantity := i_CapitalQuote
 
 if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only implemented for Signal Providers
-    // risk_management_maximum_loss_per_day
+    // i_riskManagementMaximumLossPerDay
     var float currentDayEntryQuantity = na
     currentDayEntryQuantity := na
     var currentDayLoss = 0.0
@@ -598,7 +605,7 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
     barMinutesToNow = bar_index * barMinutes
     currentDay := floor (barMinutesToNow / dayMinutes)
 
-    // risk_management_maximum_loss_per_week
+    // i_riskManagementMaximumLossPerWeek
     var float currentWeekEntryQuantity = na
     currentWeekEntryQuantity := na
     var currentWeekLoss = 0.0
@@ -618,7 +625,7 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
 
 
     float orderStopLoss = na
-    if BUY
+    if LONG
         orderStopLoss := constantBuyStopLoss
     else
         orderStopLoss := constantSellStopLoss
@@ -641,9 +648,9 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
 
     if (tmpEntryQuantity > currentCapital)
         // Avoid being stuck when numbers don't match
-        entry_quantity := currentCapital
+        entryQuantity := currentCapital
     else
-        entry_quantity := tmpEntryQuantity
+        entryQuantity := tmpEntryQuantity
 
     // DAY
     if (currentDay[1] != currentDay)
@@ -655,7 +662,7 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
         else
             currentDayLoss := 0.0
         tmpCurrentDayLossPerOne = currentDayLoss / currentDayCapital
-        if (tmpCurrentDayLossPerOne >= risk_management_maximum_loss_per_day)
+        if (tmpCurrentDayLossPerOne >= i_riskManagementMaximumLossPerDay)
             currentDayEntryQuantity:= 0.0 // Avoid entering a position
 
     // WEEK
@@ -668,11 +675,11 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
         else
             currentWeekLoss := 0.0
         tmpCurrentWeekLossPerOne = currentWeekLoss / currentWeekCapital
-        if (tmpCurrentWeekLossPerOne >= risk_management_maximum_loss_per_week)
+        if (tmpCurrentWeekLossPerOne >= i_riskManagementMaximumLossPerWeek)
             currentWeekEntryQuantity:= 0.0 // Avoid entering a position
 
     // MONTH
-    if (current_month[1] != current_month)
+    if (currentMonth[1] != currentMonth)
         currentMonthLoss := 0.0
         currentMonthCapital := currentCapital
     else
@@ -681,12 +688,12 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
         else
             currentMonthLoss := 0.0
         tmpCurrentMonthLossPerOne = currentMonthLoss / currentMonthCapital
-        if (tmpCurrentMonthLossPerOne >= riskManagementMaximumLossPerMonth)
+        if (tmpCurrentMonthLossPerOne >= i_riskManagementMaximumLossPerMonth)
             currentMonthEntryQuantity:= 0.0 // Avoid entering a position
 
     // Avoid to enter a position overall logic
     if ( (not na(currentDayEntryQuantity)) or (not na(currentWeekEntryQuantity)) or (not na(currentMonthEntryQuantity)) )
-        entry_quantity:= 0.0
+        entryQuantity:= 0.0
 
 float entryQuantityContractsReducer = 0.99
 
@@ -712,8 +719,6 @@ if (i_strategyType == _L_)
         strategy.entry("[B]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
-        if (not insideABuyOrder)
-            buyStopLoss := newBuyStopLoss
         insideABuyOrder := true
         0 // Workaround for making every if branch to return the same type of value
     else if LONG_CLOSE
@@ -732,8 +737,6 @@ if (i_strategyType == _S_)
         strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             sellOrderOpenBarIndex := bar_index + 1
-        if (not insideASellOrder)
-            sellStopLoss := newSellStopLoss
         insideASellOrder := true
         0 // Workaround for making every if branch to return the same type of value
     else if SHORT_CLOSE
@@ -765,8 +768,6 @@ if (i_strategyType == L_S)
         strategy.entry("[B]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
-        if (not insideABuyOrder)
-            buyStopLoss := newBuyStopLoss
         insideABuyOrder := true
     if LONG_CLOSE
         tmpOrderComment := f_getOrderComment("close", strategy.long, f_getZignalyLongCloseAlertMessage())
@@ -779,8 +780,6 @@ if (i_strategyType == L_S)
         strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             sellOrderOpenBarIndex := bar_index + 1
-        if (not insideASellOrder)
-            sellStopLoss := newSellStopLoss
         insideASellOrder := true
     if SHORT_CLOSE
         tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
