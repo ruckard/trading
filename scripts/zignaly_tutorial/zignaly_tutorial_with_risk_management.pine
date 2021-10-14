@@ -36,9 +36,9 @@
 // [LIST]
 // [*] (ZIG) Integration type {TradingView only}: [b]Hybrid[/b]: Both TradingView and Zignaly handle take profit, trailing stops and stop losses. Useful if you are scared about TradingView not firing an alert. It might arise problems if TradingView and Zignaly get out of sync. [b]TradingView only[/b]: TradingView sends entry and exit orders to Zignaly so that Zignaly only buys or sells. Zignaly won't handle stop loss or other settings on its own.
 // [*] (ZIG) Zignaly Alert Type {WebHook}: 'Email' or 'WebHook'.
-// [*] (ZIG) Provider type {Copy Trader Provider}: 'Copy Trader Provider' or 'Signal Provider'. 'Copy Trader Provider' sends a percentage to manage. 'Signal Provider' sends a quote to manage.
-// [*] (ZIG) Exchange: 'Binance' or 'Kucoin'.
-// [*] (ZIG) Exchange Type {Spot}: 'Spot' or 'Futures'.
+// [*] (ZIG) Provider type {Profit Sharing Provider}: 'Profit Sharing Provider', 'Copy Trader Provider', or 'Signal Provider'. 'Copy Trader Provider' or 'Profit Sharing Provider' sends a percentage to manage. 'Signal Provider' sends a quote to manage.
+// [*] (ZIG) Exchange {Zignaly}: 'Zignaly', 'Binance' or 'Kucoin'.
+// [*] (ZIG) Exchange Type {Futures}: 'Spot' or 'Futures'.
 // [*] (ZIG) Leverage {1}. Set it to '1' when '(ZIG) Exchange Type' is set to 'Spot'.
 // [/LIST]
 // [B]__ SETTINGS - Strategy[/B]
@@ -177,7 +177,7 @@ i_enableZignalyAlert = input(true, "(ZIG) Enable Alert message {True}")
 
 _ZIGHYBRIDINTEGRATION_     = "Hybrid"                , _ZIGTVONLYINTEGRATION_  = "TradingView only"
 i_zignalyIntegrationType    = input(_ZIGTVONLYINTEGRATION_,  "(ZIG) Integration type", options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
-_ZIGSIGNALPROVIDER_     = "Signal Provider"                , _ZIGCOPYTRADERPROVIDER_  = "Copy Trader Provider"
+_ZIGSIGNALPROVIDER_     = "Signal Provider"                , _ZIGCOPYTRADERPROVIDER_  = "Profit Sharing/Copy Trader Provider"
 i_zignalyProviderType    = input(_ZIGCOPYTRADERPROVIDER_,  "(ZIG) Provider type", options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
 L_S     = "Long and Short"                , _L_  = "Long Only"                , _S_ = "Short Only"
 i_strategyType    = input(_L_,  "(STRAT) Strategy Type", options=[L_S, _L_, _S_])
@@ -194,10 +194,10 @@ i_trailingTakeProfitPercentageOffset = input(25.0, "(TRAILING) Trailing Take Pro
 // Zignaly - Email (zignalye)
 _ZIGNALYE_="Email", _ZIGNALYW_="WebHook"
 i_zignalyAlertType    = input(_ZIGNALYW_,  "(ZIG) Zignaly Alert Type {WebHook}", options=[_ZIGNALYW_, _ZIGNALYE_])
-_ZIGEXBINANCE_     = "Binance"                , _ZIGEXKUCOIN_  = "Kucoin"
-i_zignalyExchange   = input(_ZIGEXBINANCE_,  "(ZIG) Exchange", options=[_ZIGEXBINANCE_, _ZIGEXKUCOIN_])
+_ZIGEXZIGNALY_     = "Zignaly", _ZIGEXBINANCE_     = "Binance"                , _ZIGEXKUCOIN_  = "Kucoin"
+i_zignalyExchange   = input(_ZIGEXZIGNALY_,  "(ZIG) Exchange {Zignaly}", options=[_ZIGEXZIGNALY_, _ZIGEXBINANCE_, _ZIGEXKUCOIN_])
 _ZIGEXTYPESPOT_     = "spot"                , _ZIGEXFUTURES_  = "futures"
-i_zignalyExchangeType   = input(_ZIGEXTYPESPOT_,  "(ZIG) Exchange Type {Spot}", options=[_ZIGEXTYPESPOT_, _ZIGEXFUTURES_])
+i_zignalyExchangeType   = input(_ZIGEXFUTURES_,  "(ZIG) Exchange Type {Futures}", options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_])
 i_zignalyLeverage = input(1, "(ZIG) Leverage {1}",minval=1,step=1,maxval=125,type=input.integer)
 var i_zignalyLeverage_str = tostring(i_zignalyLeverage) // It needs to run only once
 i_priceDecimalDigits = input(2, "Number of decimal digits for Prices {2}", minval=0, maxval=10, step=1)
