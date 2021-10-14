@@ -3,11 +3,11 @@
 
 //@version=4
 
-// Current version: v20211014 ( A065 )
+// Current version: v20211014 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
-// This specific strategy also includes Risk Management.
+// This strategy implements QuickFingers Luc strategy.
+// It's based on my former Zignaly Integration Tutorial strategy which included Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 1D timeframe.
 // The strategy is a slightly modified copy of default TradingView strategy that appears when you create a blank new strategy.
@@ -168,7 +168,7 @@
 
 // Tradingview Public description - END
 
-strategy("Zignaly Risk M. A065", shorttitle="A065ZigRisk", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
+strategy("Ruckard QuickFingers Luc A001", shorttitle="A001RQFLuc", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
 
 // INPUTS - BEGIN
 
