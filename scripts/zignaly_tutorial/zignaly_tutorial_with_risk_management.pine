@@ -187,7 +187,7 @@ i_enableTakeProfit      = input(false, "(STOPTAKE) Take Profit? {false}")
 i_enableStopLoss      = input(true, "(STOPTAKE) Stop Loss? {True}")
 i_enableTrailingTakeProfit = input(true, title="(TRAILING) Enable Trailing Take Profit (%) {True}", type=input.bool)
 i_takeProfit      = input(1.1, title="(STOPTAKE) Take Profit % {3.0}") / 100
-i_stopLoss      = input(2.0, title="(STOPTAKE) Stop Loss % {2.0}", minval=0.01  ) / 100
+i_stopLoss      = input(7.0, title="(STOPTAKE) Stop Loss % {7.0}", minval=0.01  ) / 100
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input(1.2, "(TRAILING) Trailing Take Profit Trigger (%) {2.5}",minval=0,step=0.01,type=input.float) * 0.01
 i_trailingTakeProfitPercentageOffset = input(25.0, "(TRAILING) Trailing Take Profit as a percentage of Trailing Take Profit Trigger (%) {25.0}",minval=0,step=0.01,type=input.float) * 0.01
