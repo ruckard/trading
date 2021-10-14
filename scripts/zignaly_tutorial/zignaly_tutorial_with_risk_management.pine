@@ -186,8 +186,8 @@ i_enableOrderCommentDebug = input(true, title="(DEBUG) Enable debug on order com
 i_enableTakeProfit      = input(false, "(STOPTAKE) Take Profit? {false}")
 i_enableStopLoss      = input(true, "(STOPTAKE) Stop Loss? {True}")
 i_enableTrailingTakeProfit = input(true, title="(TRAILING) Enable Trailing Take Profit (%) {True}", type=input.bool)
-i_TakeProfit      = input(1.1, title="(STOPTAKE) Take Profit % {3.0}") / 100
-i_StopLoss      = input(2.0, title="(STOPTAKE) Stop Loss % {2.0}", minval=0.01  ) / 100
+i_takeProfit      = input(1.1, title="(STOPTAKE) Take Profit % {3.0}") / 100
+i_stopLoss      = input(2.0, title="(STOPTAKE) Stop Loss % {2.0}", minval=0.01  ) / 100
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input(1.2, "(TRAILING) Trailing Take Profit Trigger (%) {2.5}",minval=0,step=0.01,type=input.float) * 0.01
 i_trailingTakeProfitPercentageOffset = input(25.0, "(TRAILING) Trailing Take Profit as a percentage of Trailing Take Profit Trigger (%) {25.0}",minval=0,step=0.01,type=input.float) * 0.01
@@ -324,7 +324,7 @@ f_getZignalyLongAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
 
     // Dependencies: i_enableStopLoss (initialized in inputs).
     // Dependencies: i_enableTakeProfit (initialized in inputs).
-    // Dependencies: i_TakeProfit (initialized in inputs).
+    // Dependencies: i_takeProfit (initialized in inputs).
     // Dependencies: i_enableTrailingTakeProfit (initialized in inputs).
     // Dependencies: i_trailingTakeProfitPercentageOffset (initialized in inputs).
     // Dependencies: i_trailingTakeProfitPercentageTrigger (initialized in inputs).
@@ -343,11 +343,11 @@ f_getZignalyLongAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
     _entryQuantityContractsPercentStr = tostring(_entryQuantityContractsPercent, "0." + f_priceDecimalDigitsZeroString())
 
     if (i_enableStopLoss and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
-        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "-" + tostring((nz(i_StopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "-" + tostring((nz(i_stopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
     else
         _zignaleStopLossCombo := ""
     if (i_enableTakeProfit and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
-        _zignaleTakeProfitCombo := zignalySeparator + zignalyQuote + "takeProfitPercentage1" + zignalyQuote + zignalyEquals + zignalyQuote + "" + tostring((i_TakeProfit * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+        _zignaleTakeProfitCombo := zignalySeparator + zignalyQuote + "takeProfitPercentage1" + zignalyQuote + zignalyEquals + zignalyQuote + "" + tostring((i_takeProfit * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
     else
         _zignaleTakeProfitCombo := ""
     if (i_enableTrailingTakeProfit and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
@@ -401,7 +401,7 @@ f_getZignalyShortAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
 
     // Dependencies: i_enableStopLoss (initialized in inputs).
     // Dependencies: i_enableTakeProfit (initialized in inputs).
-    // Dependencies: i_TakeProfit (initialized in inputs).
+    // Dependencies: i_takeProfit (initialized in inputs).
     // Dependencies: i_enableTrailingTakeProfit (initialized in inputs).
     // Dependencies: i_trailingTakeProfitPercentageOffset (initialized in inputs).
     // Dependencies: i_trailingTakeProfitPercentageTrigger (initialized in inputs).
@@ -420,11 +420,11 @@ f_getZignalyShortAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
     _entryQuantityContractsPercentStr = tostring(_entryQuantityContractsPercent, "0." + f_priceDecimalDigitsZeroString())
 
     if (i_enableStopLoss and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
-        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "" + tostring((nz(i_StopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + "stopLossPercentage" + zignalyQuote + zignalyEquals + zignalyQuote + "" + tostring((nz(i_stopLoss) * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
     else
         _zignaleStopLossCombo := ""
     if (i_enableTakeProfit and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
-        _zignaleTakeProfitCombo := zignalySeparator + zignalyQuote + "takeProfitPercentage1" + zignalyQuote + zignalyEquals + zignalyQuote + "-" + tostring((i_TakeProfit * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
+        _zignaleTakeProfitCombo := zignalySeparator + zignalyQuote + "takeProfitPercentage1" + zignalyQuote + zignalyEquals + zignalyQuote + "-" + tostring((i_takeProfit * 100), "0." + f_priceDecimalDigitsZeroString()) + zignalyQuote
     else
         _zignaleTakeProfitCombo := ""
     if (i_enableTrailingTakeProfit and (i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_))
@@ -576,14 +576,14 @@ if SHORT_CLOSE
 // How much to LONG/GO LONG/SHORT/GO SHORT - BEGIN
 
 // Custom take profit and stop loss
-LongTakeProfit = positionPrice * (1 + i_TakeProfit)
-ShortTakeProfit = positionPrice * (1 - i_TakeProfit)
+LongTakeProfit = positionPrice * (1 + i_takeProfit)
+ShortTakeProfit = positionPrice * (1 - i_takeProfit)
 
 float LongStopLoss = na
 float ShortStopLoss = na
 
-LongStopLoss := positionPrice * (1 - i_StopLoss)
-ShortStopLoss := positionPrice * (1 + i_StopLoss)
+LongStopLoss := positionPrice * (1 - i_stopLoss)
+ShortStopLoss := positionPrice * (1 + i_stopLoss)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
