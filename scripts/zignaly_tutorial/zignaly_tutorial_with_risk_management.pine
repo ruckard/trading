@@ -605,7 +605,7 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_)
 else // _ZIGSIGNALPROVIDER_
     entryQuantity := i_CapitalQuote
 
-if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only implemented for Signal Providers
+if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only implemented for CopyTrader Providers
     // i_riskManagementMaximumLossPerDay
     var float currentDayEntryQuantity = na
     currentDayEntryQuantity := na
