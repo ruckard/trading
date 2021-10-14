@@ -220,14 +220,8 @@ i_riskManagementMaximumLossPerMonth = input(10.0, title="(RISKM) Maximum loss pe
 
 // Strategy - INIT - BEGIN
 
-// orderStopLoss is just here just in case
-// we implement i_longStopLoss and i_shortStopLoss
-// in the future
+// order Stop Loss
 float orderStopLoss = na
-if LONG
-    orderStopLoss := i_stopLoss
-else
-    orderStopLoss := i_stopLoss
 
 // Dynamic Trailing Take Profit - Variables
 
@@ -581,6 +575,15 @@ SHORT_CLOSE := not (shortCondition)
 if SHORT_CLOSE
     SHORT := false
 // Decide if a SHORT/SHORT entry should be closed - END
+
+// orderStopLoss is just here just in case
+// we implement i_longStopLoss and i_shortStopLoss
+// in the future
+if LONG
+    orderStopLoss := i_stopLoss
+else
+    orderStopLoss := i_stopLoss
+
 
 // How much to LONG/GO LONG/SHORT/GO SHORT - BEGIN
 
