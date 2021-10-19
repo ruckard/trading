@@ -543,16 +543,16 @@ bool longCondition = false
 
 if forceAverage
     if newLow
-        if (newLowCondition and close<lowerLevel-(dropDistance*atr(50)))
-            longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown) and addStateBuy==0 and (smallOscillator<45)
+        if (newLowCondition and (close<lowerLevel-(dropDistance*atr(50))))
+            longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown)) and (addStateBuy==0) and (smallOscillator<45)
     else // not newLow
-        longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown) and addStateBuy==0 and (smallOscillator<45)
+        longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown)) and (addStateBuy==0) and (smallOscillator<45)
 else // not forceAverage
     if newLow
-        if (newLowCondition and close<lowerLevel-(dropDistance*atr(50)))
-            longCondition := (crossover(sslUp,sslDown) and addStateBuy==0 and (smallOscillator<45)
+        if (newLowCondition and (close<lowerLevel-(dropDistance*atr(50))))
+            longCondition := (crossover(sslUp,sslDown) and (addStateBuy==0) and (smallOscillator<45)
     else // not newLow
-        longCondition := (crossover(sslUp,sslDown) and addStateBuy==0 and (smallOscillator<45)
+        longCondition := (crossover(sslUp,sslDown)) and (addStateBuy==0) and (smallOscillator<45)
 
 shortCondition = sma(close, 14) < sma(close, 28)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
