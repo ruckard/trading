@@ -539,18 +539,20 @@ f_getTooRecentOrderNotOpenAdvice () =>
 // Quick NOTE: 'New Low Sensitivity' setting being 1000 for BTC at 1h timeframe is probably too large and should be smaller.
 // Quick NOTE: There is no bounce detection whatsoever here.
 
-longCondition =
- (not forceAverage or (forceAverage and close<trendBaseline)) and
- (crossover(sslUp,sslDown) and
-  addStateBuy==0 and
-  (smallOscillator<45)
- ) and
- (
-  (
-   not newLow
-  ) or
-  (newLow and newLowCondition and close<lowerLevel-(dropDistance*atr(50)))
- )
+bool longCondition = false
+
+if forceAverage
+    if newLow
+        if (newLowCondition and close<lowerLevel-(dropDistance*atr(50)))
+            longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown) and addStateBuy==0 and (smallOscillator<45)
+    else // not newLow
+        longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown) and addStateBuy==0 and (smallOscillator<45)
+else // not forceAverage
+    if newLow
+        if (newLowCondition and close<lowerLevel-(dropDistance*atr(50)))
+            longCondition := (crossover(sslUp,sslDown) and addStateBuy==0 and (smallOscillator<45)
+    else // not newLow
+        longCondition := (crossover(sslUp,sslDown) and addStateBuy==0 and (smallOscillator<45)
 
 shortCondition = sma(close, 14) < sma(close, 28)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
