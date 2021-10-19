@@ -541,17 +541,17 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 bool longCondition = false
 
-if forceAverage
-    if newLow
-        if (newLowCondition and (close<lowerLevel-(dropDistance*atr(50))))
+if i_entryBelowAverage
+    if i_newLowRequired
+        if (newLowCondition and (close<lowerLevel-(i_entryATRDropDistance*atr(50))))
             longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown)) and (addStateBuy==0) and (smallOscillator<45)
-    else // not newLow
+    else // not i_newLowRequired
         longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown)) and (addStateBuy==0) and (smallOscillator<45)
-else // not forceAverage
-    if newLow
-        if (newLowCondition and (close<lowerLevel-(dropDistance*atr(50))))
+else // not i_entryBelowAverage
+    if i_newLowRequired
+        if (newLowCondition and (close<lowerLevel-(i_entryATRDropDistance*atr(50))))
             longCondition := (crossover(sslUp,sslDown) and (addStateBuy==0) and (smallOscillator<45)
-    else // not newLow
+    else // not i_newLowRequired
         longCondition := (crossover(sslUp,sslDown)) and (addStateBuy==0) and (smallOscillator<45)
 
 shortCondition = sma(close, 14) < sma(close, 28)
