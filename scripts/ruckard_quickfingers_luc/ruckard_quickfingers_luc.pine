@@ -522,9 +522,42 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = crossover(sma(close, 14), sma(close, 28))
-// shortCondition = crossunder(sma(close, 14), sma(close, 28))
-longCondition = sma(close, 14) >= sma(close, 28)
+
+// Explanation of newLowCondition:
+// If 10% to the left of lowest period length has still the same lowest point... then there is no low.
+// If 10% to the left of lowest period length has a higher lowest point than the current lowest point... then there is a new low.
+
+// Explanation of QuickFingers Luc long
+// * If 'Force Entry Below Average?' is true then make sure price is below the trendBaseline (which it's basically an hma).
+// * Make sure that the trend is bullish. We use our 5 period Semaphore Signal Level channel to identify when high crosses over low.
+// * Do not go long if we already are in a long position
+// * Make sure that either one of these two is true:
+// ** Our smallOscillator (Hma of 50 periods of rsi of 75 periods) is below 45
+// ** If 'Allow Pullbacks' is true and trendBaseline (which it's basically an hma) current value is higher than last bar value and finally our smallOscillatorPullback (Hma of 50 periods of rsi of 75 periods) is below 45.
+// * Make sure that either one of these four is true:
+// ** If 'Allow Pullbacks' is true then make sure we have already entered at least twice the order
+// ** 'Require New Low?' is set to false.
+// ** 'Require New Low?' is set to true and at the same time the trendBaseline (which it's basically an hma) current value is higher than last bar value. Also at the same time 'Allow Pullbacks' is true.
+// ** 'Require New Low?' is set to true and at the same time a 'new Long Condition' has happened. Also make sure that the current price is lower than our lowerLevel (based on lowest value on 1000 periods) minus our 'Drop Distance'(1) times atr of 50 periods. This last comparison makes sure to break what was a lowest point in the past. I assume lowest does not take into account the current price for its calculus. Otherwise this does not make sense.
+
+// Quick NOTE: 'New Low Sensitivity' setting being 1000 for BTC at 1h timeframe is probably too large and should be smaller.
+// Quick NOTE: There is no bounce detection whatsoever here.
+
+longCondition =
+ (not forceAverage or (forceAverage and close<trendBaseline)) and
+ (crossover(sslUp,sslDown) and
+  addStateBuy==0 and
+  (smallOscillator<45 or (allowPullbacks and trendBaseline>trendBaseline[1] and smallOscillatorPullback<45))
+ ) and
+ (
+  (allowPullbacks and count>1) or
+  (
+   not newLow or
+   (newLow and trendBaseline>trendBaseline[1] and allowPullbacks)
+  ) or
+  (newLow and newLowCondition and close<lowerLevel-(dropDistance*atr(50)))
+ )
+
 shortCondition = sma(close, 14) < sma(close, 28)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
