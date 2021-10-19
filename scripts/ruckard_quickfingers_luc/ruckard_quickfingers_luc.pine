@@ -554,6 +554,13 @@ else // not i_entryBelowAverage
     else // not i_newLowRequired
         longCondition := (crossover(sslUp,sslDown)) and (addStateBuy==0) and (smallOscillator<45)
 
+bool longExitCondition = false
+
+longExitConditionTooLow = (close>firstEntry-i_exitATRDropDistance*atr(50))
+longExitConditionThereIsProfit = close>lastClose+(spacing*2)*atr(50)
+longExitCondition := longExitConditionTooLow or longExitConditionThereIsProfit
+
+
 shortCondition = sma(close, 14) < sma(close, 28)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
@@ -589,7 +596,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := not (longCondition)
+LONG_CLOSE := longExitCondition
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
