@@ -874,13 +874,14 @@ strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, lim
 // Handle STOP LOSS (and similar) order exits - END
 
 // Extra script logic - BEGIN
-if lower==lower[i_newLowSensitivity/10]
+oldLowerLevelCandidate = lowerLevelCandidate[i_newLowSensitivity/10]
+if (lowerLevelCandidate == oldLowerLevelCandidate)
     newLowCondition:=false
     lowerLevel:=0.0
-if lower!=lower[i_newLowSensitivity/10] and close<lower[i_newLowSensitivity/10]
+if (lowerLevelCandidate!=oldLowerLevelCandidate) and (close<oldLowerLevelCandidate)
     newLowCondition:=true
-if newLowCondition==true and lowerLevel==0.0
-    lowerLevel:=lower[1]
+if newLowCondition and lowerLevel==0.0
+    lowerLevel:=lowerLevelCandidate[1]
 // Extra script logic - END
 
 
