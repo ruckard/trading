@@ -560,18 +560,20 @@ sslUp   = Hlv < 0 ? sslsmaLow : sslsmaHigh
 
 bool longCondition = false
 
-if i_entryBelowAverage
-    if i_newLowRequired
-        if (newLowCondition and (close<lowerLevel-(i_entryATRDropDistance*atr(50))))
-            longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown)) and newLongEntryAllowed and (smallOscillator<45)
-    else // not i_newLowRequired
-        longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown)) and newLongEntryAllowed and (smallOscillator<45)
-else // not i_entryBelowAverage
-    if i_newLowRequired
-        if (newLowCondition and (close<lowerLevel-(i_entryATRDropDistance*atr(50))))
-            longCondition := (crossover(sslUp,sslDown) and newLongEntryAllowed and (smallOscillator<45)
-    else // not i_newLowRequired
-        longCondition := (crossover(sslUp,sslDown)) and newLongEntryAllowed and (smallOscillator<45)
+longConditionMinimum = newLongEntryAllowed and (crossover(sslUp,sslDown)) and (smallOscillator<45)
+if longConditionMinimum
+    if i_entryBelowAverage
+        if i_newLowRequired
+            if (newLowCondition and (close<lowerLevel-(i_entryATRDropDistance*atr(50))))
+                longCondition := close<trendBaseline
+        else // not i_newLowRequired
+            longCondition := close<trendBaseline
+    else // not i_entryBelowAverage
+        if i_newLowRequired
+            if (newLowCondition and (close<lowerLevel-(i_entryATRDropDistance*atr(50))))
+                longCondition := true
+        else // not i_newLowRequired
+            longCondition := true
 
 bool longExitCondition = false
 
