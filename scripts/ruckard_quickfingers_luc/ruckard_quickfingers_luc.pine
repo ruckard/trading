@@ -213,7 +213,8 @@ i_riskManagementMaximumLossPerTrade    = input(1.0, title="(RISKM) Maximum loss 
 i_riskManagementMaximumLossPerDay    = input(6.0, title="(RISKM) Maximum loss per day % {6.0}"  ) / 100
 i_riskManagementMaximumLossPerWeek = input(8.0, title="(RISKM) Maximum loss per week % {8.0}"  ) / 100
 i_riskManagementMaximumLossPerMonth = input(10.0, title="(RISKM) Maximum loss per month % {10.0}"  ) / 100
-
+// QFL
+i_newLowSensitivityDetection=input(defval=10,title="New Low Sensitivity Trigger % {10.0}",minval=1,step=0.01,maxval=100,type=input.float)
 // INPUTS - END
 
 
@@ -874,7 +875,7 @@ strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, lim
 // Handle STOP LOSS (and similar) order exits - END
 
 // Extra script logic - BEGIN
-oldLowerLevelCandidate = lowerLevelCandidate[i_newLowSensitivity/10]
+oldLowerLevelCandidate = lowerLevelCandidate[i_newLowSensitivity*(round(i_newLowSensitivityDetection/100.00))]
 if (lowerLevelCandidate == oldLowerLevelCandidate)
     newLowCondition:=false
     lowerLevel:=0.0
