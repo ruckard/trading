@@ -884,8 +884,8 @@ if (lowerLevelCandidate == smallLowerLevelCandidate)
     lowerLevel:=0.0
 if (lowerLevelCandidate!=smallLowerLevelCandidate) and (close<smallLowerLevelCandidate)
     newLowCondition:=true
-if newLowCondition and lowerLevel==0.0
-    lowerLevel:=lowerLevelCandidate[1]
+    if (lowerLevel==0.0)
+        lowerLevel:=lowerLevelCandidate[1]
 // Extra script logic - END
 
 
