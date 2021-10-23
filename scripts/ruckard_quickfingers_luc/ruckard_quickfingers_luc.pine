@@ -526,6 +526,15 @@ var float lowerLevel=0.0
 
 trendBaseline = hma(close,i_trendLength)
 
+// SSL Channel - BEGIN
+sslsmaHigh=ema(high, i_sslLength)
+sslsmaLow=ema(low, i_sslLength)
+Hlv = 0
+Hlv := close > sslsmaHigh ? 1 : close < sslsmaLow ? -1 : Hlv[1]
+sslDown = Hlv < 0 ? sslsmaHigh: sslsmaLow
+sslUp   = Hlv < 0 ? sslsmaLow : sslsmaHigh
+// SSL Channel - END
+
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 
