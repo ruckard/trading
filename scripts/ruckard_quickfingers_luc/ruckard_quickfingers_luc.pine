@@ -522,6 +522,7 @@ f_getTooRecentOrderNotOpenAdvice () =>
 // Strategy Body - BEGIN
 
 var bool newLowCondition = false
+var float lowerLevel=0.0
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
