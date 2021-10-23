@@ -524,6 +524,11 @@ f_getTooRecentOrderNotOpenAdvice () =>
 var bool newLowCondition = false
 var float lowerLevel=0.0
 
+// addStateBuy: When it's value is one means that no need to entry into a Long position (or increase it)
+// It's used for DCA. Without DCA it has no use.
+// TODO: Find a better name and maybe change it's logic.
+var addStateBuy=0
+
 trendBaseline = hma(close,i_trendLength)
 
 // SSL Channel - BEGIN
