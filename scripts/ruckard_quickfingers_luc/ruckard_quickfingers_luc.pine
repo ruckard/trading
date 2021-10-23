@@ -214,7 +214,7 @@ i_riskManagementMaximumLossPerDay    = input(6.0, title="(RISKM) Maximum loss pe
 i_riskManagementMaximumLossPerWeek = input(8.0, title="(RISKM) Maximum loss per week % {8.0}"  ) / 100
 i_riskManagementMaximumLossPerMonth = input(10.0, title="(RISKM) Maximum loss per month % {10.0}"  ) / 100
 // QFL
-i_newLowSensitivityDetection=input(defval=10,title="New Low Sensitivity Trigger % {10.0}",minval=1,step=0.01,maxval=100,type=input.float)
+i_smallLowerLevelLengthPercentage=input(defval=10,title="Small Lower Level length (based on New Low Sensitivity %) {10.0}",minval=1,step=0.01,maxval=100,type=input.float)
 // INPUTS - END
 
 
@@ -876,13 +876,13 @@ strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, lim
 
 // Extra script logic - BEGIN
 // Low level logic explanation: If our new level candidate is the same one as the old one then we have not detected a new low (newLowCondition is set to false), so our new lowerLevel is 0.
-// However if our new level candidate is different than the old one then there is a chance of a new Low. It is confirmed if the price is lower than our oldLowerLevelCandidate (Lowlevel 100 bars ago).
+// However if our new level candidate is different than the old one then there is a chance of a new Low. It is confirmed if the price is lower than our smallLowerLevelCandidate (Lowlevel 100 bars ago).
 // If there is a new low and lowerLevel is zero (previously there was not a new long condition) then lowerLevel is set to the lowerLevelCandidate of the last candle.
-oldLowerLevelCandidate = lowerLevelCandidate[i_newLowSensitivity*(round(i_newLowSensitivityDetection/100.00))]
-if (lowerLevelCandidate == oldLowerLevelCandidate)
+smallLowerLevelCandidate = lowerLevelCandidate[i_newLowSensitivity*(round(i_smallLowerLevelLengthPercentage/100.00))]
+if (lowerLevelCandidate == smallLowerLevelCandidate)
     newLowCondition:=false
     lowerLevel:=0.0
-if (lowerLevelCandidate!=oldLowerLevelCandidate) and (close<oldLowerLevelCandidate)
+if (lowerLevelCandidate!=smallLowerLevelCandidate) and (close<smallLowerLevelCandidate)
     newLowCondition:=true
 if newLowCondition and lowerLevel==0.0
     lowerLevel:=lowerLevelCandidate[1]
