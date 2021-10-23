@@ -520,6 +520,8 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 // Strategy Body - BEGIN
 
+var bool newLowCondition = false
+
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 
@@ -870,6 +872,17 @@ tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortC
 strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, limit= i_enableTakeProfit ? ShortTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? shortTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? shortTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
 
 // Handle STOP LOSS (and similar) order exits - END
+
+// Extra script logic - BEGIN
+if lower==lower[i_newLowSensitivity/10]
+    newLowCondition:=false
+    lowerLevel:=0.0
+if lower!=lower[i_newLowSensitivity/10] and close<lower[i_newLowSensitivity/10]
+    newLowCondition:=true
+if newLowCondition==true and lowerLevel==0.0
+    lowerLevel:=lower[1]
+// Extra script logic - END
+
 
 // Strategy Body - END
 
