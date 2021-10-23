@@ -524,10 +524,9 @@ f_getTooRecentOrderNotOpenAdvice () =>
 var bool newLowCondition = false
 var float lowerLevel=0.0
 
-// addStateBuy: When it's value is one means that no need to entry into a Long position (or increase it)
+// newLongEntryAllowed: When it's false it avoids going long again so that it does not go long (or reinvest) indefinitively.
 // It's used for DCA. Without DCA it has no use.
-// TODO: Find a better name and maybe change it's logic.
-var addStateBuy=0
+var newLongEntryAllowed = true
 
 trendBaseline = hma(close,i_trendLength)
 
@@ -564,15 +563,15 @@ bool longCondition = false
 if i_entryBelowAverage
     if i_newLowRequired
         if (newLowCondition and (close<lowerLevel-(i_entryATRDropDistance*atr(50))))
-            longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown)) and (addStateBuy==0) and (smallOscillator<45)
+            longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown)) and newLongEntryAllowed and (smallOscillator<45)
     else // not i_newLowRequired
-        longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown)) and (addStateBuy==0) and (smallOscillator<45)
+        longCondition := (close<trendBaseline) and (crossover(sslUp,sslDown)) and newLongEntryAllowed and (smallOscillator<45)
 else // not i_entryBelowAverage
     if i_newLowRequired
         if (newLowCondition and (close<lowerLevel-(i_entryATRDropDistance*atr(50))))
-            longCondition := (crossover(sslUp,sslDown) and (addStateBuy==0) and (smallOscillator<45)
+            longCondition := (crossover(sslUp,sslDown) and newLongEntryAllowed and (smallOscillator<45)
     else // not i_newLowRequired
-        longCondition := (crossover(sslUp,sslDown)) and (addStateBuy==0) and (smallOscillator<45)
+        longCondition := (crossover(sslUp,sslDown)) and newLongEntryAllowed and (smallOscillator<45)
 
 bool longExitCondition = false
 
