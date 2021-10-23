@@ -875,8 +875,8 @@ strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, lim
 // Handle STOP LOSS (and similar) order exits - END
 
 // Extra script logic - BEGIN
-// Low level logic explanation: If our new level candidate is the same one as the old one then we have not detected a new low (newLowCondition is set to false), so our new lowerLevel is 0.
-// However if our new level candidate is different than the old one then there is a chance of a new Low. It is confirmed if the price is lower than our smallLowerLevel (Lowlevel 100 bars ago).
+// Low level logic explanation: If our new level candidate is the same one as the small one then we have not detected a new low (newLowCondition is set to false), so our new lowerLevel is 0.
+// However if our new level candidate is different than the small one then there is a chance of a new Low. It is confirmed if the price is lower than our smallLowerLevel (Lowest price from latest 1000 bars but the one from 100 bars ago).
 // If there is a new low and lowerLevel is zero (previously there was not a new long condition) then lowerLevel is set to the lowerLevelCandidate of the last candle.
 smallLowerLevel = lowerLevelCandidate[i_newLowSensitivity*(round(i_smallLowerLevelLengthPercentage/100.00))]
 if (lowerLevelCandidate == smallLowerLevel)
