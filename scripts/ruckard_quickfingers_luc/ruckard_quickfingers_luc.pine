@@ -582,10 +582,31 @@ lowerLevelCandidate=lowest(i_newLowSensitivity)
 // Quick NOTE: 'New Low Sensitivity' setting being 1000 for BTC at 1h timeframe is probably too large and should be smaller.
 // Quick NOTE: There is no bounce detection whatsoever here.
 
+
+
 bool longCondition = false
 
 atr50 = atr(50) // atr needs to be calculated on each tick
 longConditionMinimum = newLongEntryAllowed and (crossover(sslUp,sslDown)) and (smallOscillator<45)
+
+// Debug plots - BEGIN
+plotchar(newLongEntryAllowed, "Long1newLongEntryAllowed", "", location = location.top)
+plotchar(crossover(sslUp,sslDown), "Long2sslCrossover", "", location = location.top)
+plotchar(smallOscillator<45, "Long3smallOscillator<45", "", location = location.top)
+plotchar(longConditionMinimum, "longConditionMinimum", "", location = location.top)
+
+plotchar((close<lowerLevel-(i_entryATRDropDistance*atr50)), "Long4NewLowDetected", "", location = location.top)
+plotchar(close, "Long4.1.close", "", location = location.top)
+plotchar((lowerLevel-(i_entryATRDropDistance*atr50)), "Long4.2.Difference", "", location = location.top)
+plotchar(lowerLevel, "Long4.2.1.LowerLevel", "", location = location.top)
+plotchar(i_entryATRDropDistance*atr50, "Long4.2.2.Multiplication", "", location = location.top)
+plotchar(i_entryATRDropDistance, "Long4.2.2.1.i_entryATRDropDistance", "", location = location.top)
+plotchar(atr50, "Long4.2.2.2.atr50", "", location = location.top)
+
+plotchar(close<trendBaseline, "Long5BelowAverage", "", location = location.top)
+
+// Debug plots - END
+
 if longConditionMinimum
     if i_entryBelowAverage
         if i_newLowRequired
