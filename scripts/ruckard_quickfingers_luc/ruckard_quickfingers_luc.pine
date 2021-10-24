@@ -539,6 +539,9 @@ sslDown = Hlv < 0 ? sslsmaHigh: sslsmaLow
 sslUp   = Hlv < 0 ? sslsmaLow : sslsmaHigh
 // SSL Channel - END
 
+//Small Oscillator
+smallOscillator=hma(rsi(close,i_smallOscillatorInput),50)
+
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 
