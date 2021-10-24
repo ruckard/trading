@@ -523,6 +523,7 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 var bool newLowCondition = false
 var float lowerLevel=0.0
+var float firstEntry = 0.0
 
 // newLongEntryAllowed: When it's false it avoids going long again so that it does not go long (or reinvest) indefinitively.
 // It's used for DCA. Without DCA it has no use.
@@ -907,6 +908,10 @@ if (lowerLevelCandidate!=smallLowerLevel) and (close<smallLowerLevel)
     newLowCondition:=true
     if (lowerLevel==0.0)
         lowerLevel:=lowerLevelCandidate[1]
+
+// This was originally thought for DCA and 'count==0' as an additional condition
+if longCondition
+    firstEntry := close
 // Extra script logic - END
 
 // Extra painting - BEGIN
