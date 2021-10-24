@@ -561,6 +561,8 @@ sslUp   = Hlv < 0 ? sslsmaLow : sslsmaHigh
 //Small Oscillator
 smallOscillator=hma(rsi(close,i_smallOscillatorInput),50)
 
+lowerLevelCandidate=lowest(i_newLowSensitivity)
+
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 
