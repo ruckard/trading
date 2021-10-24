@@ -584,25 +584,26 @@ lowerLevelCandidate=lowest(i_newLowSensitivity)
 
 bool longCondition = false
 
+atr50 = atr(50) // atr needs to be calculated on each tick
 longConditionMinimum = newLongEntryAllowed and (crossover(sslUp,sslDown)) and (smallOscillator<45)
 if longConditionMinimum
     if i_entryBelowAverage
         if i_newLowRequired
-            if (newLowCondition and (close<lowerLevel-(i_entryATRDropDistance*atr(50))))
+            if (newLowCondition and (close<lowerLevel-(i_entryATRDropDistance*atr50)))
                 longCondition := close<trendBaseline
         else // not i_newLowRequired
             longCondition := close<trendBaseline
     else // not i_entryBelowAverage
         if i_newLowRequired
-            if (newLowCondition and (close<lowerLevel-(i_entryATRDropDistance*atr(50))))
+            if (newLowCondition and (close<lowerLevel-(i_entryATRDropDistance*atr50)))
                 longCondition := true
         else // not i_newLowRequired
             longCondition := true
 
 bool longExitCondition = false
 
-longExitConditionTooLow = (close>firstEntry-i_exitATRDropDistance*atr(50))
-longExitConditionThereIsProfit = close>lastClose+(spacing*2)*atr(50)
+longExitConditionTooLow = (close>firstEntry-i_exitATRDropDistance*atr50)
+longExitConditionThereIsProfit = close>lastClose+(spacing*2)*atr50
 longExitCondition := longExitConditionTooLow or longExitConditionThereIsProfit
 
 
