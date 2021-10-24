@@ -525,6 +525,7 @@ var bool newLowCondition = false
 var float lowerLevel=0.0
 var float firstEntry = 0.0
 var float lastClose = 0.0
+float spacing = 10.0
 
 // newLongEntryAllowed: When it's false it avoids going long again so that it does not go long (or reinvest) indefinitively.
 // It's used for DCA. Without DCA it has no use.
