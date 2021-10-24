@@ -960,6 +960,10 @@ if longCondition
 // Extra painting - BEGIN
 color trendBaselineColor = color.new(trendBaseline>trendBaseline[1]?color.lime : trendBaseline<trendBaseline[1]?color.green:na,transp=80)
 plot(i_viewTrend ? trendBaseline : na, style=plot.style_circles, color=trendBaselineColor)
+
+plot(i_newLowRequired ? lowerLevelCandidate : na , color=newLowCondition ? color.white : color.gray)
+plot(i_newLowRequired ? smallLowerLevel : na , color=newLowCondition ? color.orange : color.yellow)
+
 // Extra painting - END
 
 
