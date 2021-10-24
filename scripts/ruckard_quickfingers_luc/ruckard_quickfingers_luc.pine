@@ -937,7 +937,8 @@ if longCondition
 // Extra script logic - END
 
 // Extra painting - BEGIN
-plot(i_viewTrend ? trendBaseline : na, style=plot.style_circles, color=trendBaseline>trendBaseline[1]?color.lime : trendBaseline<trendBaseline[1]?color.green:na,transp=80)
+color trendBaselineColor = color.new(trendBaseline>trendBaseline[1]?color.lime : trendBaseline<trendBaseline[1]?color.green:na,transp=80)
+plot(i_viewTrend ? trendBaseline : na, style=plot.style_circles, color=trendBaselineColor)
 // Extra painting - END
 
 
