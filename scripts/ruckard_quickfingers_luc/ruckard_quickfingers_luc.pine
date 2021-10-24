@@ -214,7 +214,23 @@ i_riskManagementMaximumLossPerDay    = input(6.0, title="(RISKM) Maximum loss pe
 i_riskManagementMaximumLossPerWeek = input(8.0, title="(RISKM) Maximum loss per week % {8.0}"  ) / 100
 i_riskManagementMaximumLossPerMonth = input(10.0, title="(RISKM) Maximum loss per month % {10.0}"  ) / 100
 // QFL
+i_sslLength=input(title="SSL Length", defval=5)
+i_smallOscillatorInput=input(defval = 75, title = "Oscillator Sensitivity", minval=1)
+i_trendLength=input(defval=1000,title="Trend Length",minval=1)
+i_viewTrend = input(title="View Trend?",defval=false)
+i_entryBelowAverage = input(title="Force Entry Below Average? (May reduce pullback frequency)",defval=false)
+i_newLowRequired = input(title="Require New Low?",defval=true)
+i_newLowSensitivity=input(defval=1000,title="New Low Sensitivity",minval=1)
+i_entryATRDropDistance=input(defval=1,title="Entry Drop Distance in ATR (below low)",minval=1)
+i_exitATRDropDistance=input(defval=2,title="Exit Drop Distance in ATR (below entry)", minval=0)
 i_smallLowerLevelLengthPercentage=input(defval=10,title="Small Lower Level length (based on New Low Sensitivity %) {10.0}",minval=1,step=0.01,maxval=100,type=input.float)
+
+// i_entryOrderSpacing=input(defval = 15, title = "Entry Order Spacing", minval=2)
+// i_advancedPositionManagement = input(title="Advanced Position Management",defval=true)
+// i_exitSignalSpeed=input(defval=55, title="Exit Signal Speed")
+// i_allowPullbacks = input(title="Allow Pullbacks?",defval=true)
+// i_pullbackSensitivity=input(defval = 75, title = "Pullback Sensitivity", minval=1)
+
 // INPUTS - END
 
 
