@@ -3,7 +3,7 @@
 
 //@version=4
 
-// Current version: v20211014 ( A001 )
+// Current version: v20211024 ( A002 )
 // Tradingview Public description - BEGIN
 // 
 // This strategy implements QuickFingers Luc strategy.
@@ -168,7 +168,7 @@
 
 // Tradingview Public description - END
 
-strategy("Ruckard QuickFingers Luc A001", shorttitle="A001RQFLuc", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
+strategy("Ruckard QuickFingers Luc A002", shorttitle="A002RQFLuc", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
 
 // INPUTS - BEGIN
 
