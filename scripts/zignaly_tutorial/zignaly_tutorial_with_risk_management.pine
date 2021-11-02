@@ -228,8 +228,8 @@ i_riskManagementMaximumLossPerMonth = input.float(10.0, title='(RISKM) Maximum l
 
 // Strategy - INIT - BEGIN
 
-onStartTimeInterval = (not i_strategyStartTimeOn) or (timenow >= i_strategyStartTime)
-offStopTimeInterval = (i_strategyStopTimeOn) and (timenow > i_strategyStopTime)
+onStartTimeInterval = (not i_strategyStartTimeOn) or (time >= i_strategyStartTime)
+offStopTimeInterval = (i_strategyStopTimeOn) and (time > i_strategyStopTime)
 
 // order Stop Loss
 float orderStopLoss = na
