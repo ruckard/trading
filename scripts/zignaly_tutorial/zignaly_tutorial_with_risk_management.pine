@@ -44,6 +44,10 @@
 // [B]__ SETTINGS - Strategy[/B]
 // [LIST]
 // [*] (STRAT) Strategy Type: 'Long and Short', 'Long Only' or 'Short Only'.
+// [*] (STRAT) Strategy Start Time {2021-01-01 00:00:00}: When to start the strategy if '(STRAT) Strategy Start Time forced?' setting is set to true.
+// [*] (STRAT) Strategy Stop Time {2021-12-31 00:00:00}: When to stop the strategy if '(STRAT) Strategy Stop Time forced?' setting is set to true.
+// [*] (STRAT) Strategy Start Time forced? {True}: Whether to start the strategy from a given point in time.
+// [*] (STRAT) Strategy Stop Time forced? {False}: Whether to stop the strategy after a given point in time.
 // [*] (STOPTAKE) Take Profit? {false}: Whether to enable Take Profit.
 // [*] (STOPTAKE) Stop Loss? {True}: Whether to enable Stop Loss.
 // [*] (TRAILING) Enable Trailing Take Profit (%) {True}: Whether to enable Trailing Take Profit.
@@ -181,6 +185,10 @@ _ZIGSIGNALPROVIDER_ = 'Signal Provider', _ZIGCOPYTRADERPROVIDER_ = 'Profit Shari
 i_zignalyProviderType = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider type', options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only'
 i_strategyType = input.string(_L_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_])
+i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Start Time {2021-01-01 00:00:00}')
+i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
+i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
+i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -219,6 +227,9 @@ i_riskManagementMaximumLossPerMonth = input.float(10.0, title='(RISKM) Maximum l
 
 
 // Strategy - INIT - BEGIN
+
+onStartTimeInterval = (not i_strategyStartTimeOn) or (timenow >= i_strategyStartTime)
+offStopTimeInterval = (i_strategyStopTimeOn) and (timenow > i_strategyStopTime)
 
 // order Stop Loss
 float orderStopLoss = na
@@ -544,7 +555,7 @@ tooRecentOrderNotOpenAdvice = f_getTooRecentOrderNotOpenAdvice ()
 
 // Decide if we are going to LONG/Go LONG - BEGIN
 PRE_LONG = false
-PRE_LONG := longCondition and (not tooRecentOrderNotOpenAdvice)
+PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice)
 
 // LONG = PRE_LONG[1] and PRE_LONG // Wait for confirmation
 LONG = PRE_LONG // Do not wait for confirmation
@@ -553,7 +564,7 @@ LONG = PRE_LONG // Do not wait for confirmation
 
 // Decide if we are going to SHORT/Go SHORT - BEGIN
 PRE_SHORT = false
-PRE_SHORT := shortCondition and (not tooRecentOrderNotOpenAdvice)
+PRE_SHORT := onStartTimeInterval and shortCondition and (not tooRecentOrderNotOpenAdvice)
 
 // SHORT = PRE_SHORT[1] and PRE_SHORT // Wait for confirmation
 SHORT = PRE_SHORT // Do not wait for confirmation
@@ -562,7 +573,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := not (longCondition)
+LONG_CLOSE := offStopTimeInterval or (not (longCondition))
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -571,7 +582,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := not (shortCondition)
+SHORT_CLOSE := offStopTimeInterval or (not (shortCondition))
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
