@@ -59,6 +59,7 @@
 // [*] (STRAT) Strategy Stop Time {2021-12-31 00:00:00}: When to stop the strategy if '(STRAT) Strategy Stop Time forced?' setting is set to true.
 // [*] (STRAT) Strategy Start Time forced? {True}: Whether to start the strategy from a given point in time.
 // [*] (STRAT) Strategy Stop Time forced? {False}: Whether to stop the strategy after a given point in time.
+// [*] (STRAT) Number of StopLoss to switch sides {2}: When 2 StopLoss are reached the strategy changes side.
 // [*] (STOPTAKE) Take Profit? {false}: Whether to enable Take Profit.
 // [*] (STOPTAKE) Stop Loss? {True}: Whether to enable Stop Loss.
 // [*] (TRAILING) Enable Trailing Take Profit (%) {True}: Whether to enable Trailing Take Profit.
@@ -200,6 +201,7 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+i_strategyStopLossNumberSwitch = input.int(2, '(STRAT) Number of StopLoss to switch sides {2}', minval=1, step=1, maxval=10)
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -555,10 +557,12 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = crossover(sma(close, 14), sma(close, 28))
-// shortCondition = crossunder(sma(close, 14), sma(close, 28))
-longCondition = ta.sma(close, 14) >= ta.sma(close, 28)
-shortCondition = ta.sma(close, 14) < ta.sma(close, 28)
+longCondition = true
+shortCondition = false
+if (shortTermStopLossCount == i_strategyStopLossNumberSwitch)
+    longCondition := not longCondition
+    shortCondition := not shortCondition
+    shortTermStopLossCount := 0
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
