@@ -745,14 +745,14 @@ if (i_strategyType == _L_)
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
         tmpOrderAlertMessage := f_getZignalyLongAlertMessage(entryQuantityContractsUSDT, currentCapital)
         tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
-        strategy.entry("[B]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
         insideABuyOrder := true
         0 // Workaround for making every if branch to return the same type of value
     else if LONG_CLOSE
         tmpOrderComment := f_getOrderComment("close", strategy.long, f_getZignalyLongCloseAlertMessage())
-        strategy.close("[B]", alert_message=i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
+        strategy.close("[L]", alert_message=i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
         insideABuyOrder := false
         0 // Workaround for making every if branch to return the same type of value
 // GO LONG only logic - END
@@ -794,13 +794,13 @@ if (i_strategyType == L_S)
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
         tmpOrderAlertMessage := f_getZignalyLongAlertMessage(entryQuantityContractsUSDT, currentCapital)
         tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
-        strategy.entry("[B]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
         insideABuyOrder := true
     if LONG_CLOSE
         tmpOrderComment := f_getOrderComment("close", strategy.long, f_getZignalyLongCloseAlertMessage())
-        strategy.close("[B]", alert_message=i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
+        strategy.close("[L]", alert_message=i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
         insideABuyOrder := false
     if SHORT
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
@@ -853,7 +853,7 @@ else
 // Better close an existing order twice than regreting zignaly not having closed it.
 
 tmpOrderComment := f_getOrderComment("close", strategy.long, f_getZignalyLongCloseAlertMessage())
-strategy.exit("[SL/TP]", "[B]", stop= i_enableStopLoss ? LongStopLoss : na, limit= i_enableTakeProfit ? LongTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? longTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? longTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
+strategy.exit("[SL/TP]", "[L]", stop= i_enableStopLoss ? LongStopLoss : na, limit= i_enableTakeProfit ? LongTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? longTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? longTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
 tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
 strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, limit= i_enableTakeProfit ? ShortTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? shortTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? shortTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
 
