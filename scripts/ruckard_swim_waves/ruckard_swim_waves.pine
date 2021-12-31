@@ -3,7 +3,7 @@
 
 //@version=5
 
-// Current version: v20211231 ( A001 )
+// Current version: v20211231 ( A002 )
 // Tradingview Public description - BEGIN
 // 
 // This strategy tries to swim the waves under the water like submarines do. That way you avoid ocean surface storms.
@@ -184,7 +184,7 @@
 
 // Tradingview Public description - END
 
-strategy('Ruckard Swim Waves A001', shorttitle='A001RSwimWaves', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=18, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Ruckard Swim Waves A002', shorttitle='A002RSwimWaves', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=18, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 // INPUTS - BEGIN
 
