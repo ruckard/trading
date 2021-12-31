@@ -184,7 +184,7 @@
 
 // Tradingview Public description - END
 
-strategy('Ruckard Swim Waves A001', shorttitle='A001RSwimWaves', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=18, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
+strategy('Ruckard Swim Waves A001', shorttitle='A001RSwimWaves', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=18, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 // INPUTS - BEGIN
 
