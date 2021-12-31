@@ -556,6 +556,9 @@ f_getTooRecentOrderNotOpenAdvice () =>
 // Strategy Body - BEGIN
 
 
+// Debug plots - BEGIN
+plotchar(shortTermStopLossCount, "shortTermStopLossCountPRE", "", location = location.top)
+// Debug plots - END
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 longCondition = true
 shortCondition = false
@@ -564,6 +567,9 @@ if (shortTermStopLossCount == i_strategyStopLossNumberSwitch)
     shortCondition := not shortCondition
     shortTermStopLossCount := 0
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
+// Debug plots - BEGIN
+plotchar(shortTermStopLossCount, "shortTermStopLossCountPOST", "", location = location.top)
+// Debug plots - END
 
 
 // Position price calculation - BEGIN
