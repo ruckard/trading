@@ -6,12 +6,23 @@
 // Current version: v20211231 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
+// This strategy tries to swim the waves under the water like submarines do. That way you avoid ocean surface storms.
 // This specific strategy also includes Risk Management.
 // 
-// It was originally tested at BTCUSDT pair and 1D timeframe.
-// The strategy is a slightly modified copy of default TradingView strategy that appears when you create a blank new strategy.
-// It decides to go long when 14-period SMA crosses over 28-period SMA and goes short when 14-period SMA crosses under 28-period SMA.
+// It was originally tested at LTCUSDT pair and 1 minute timeframe.
+// The original static design of this strategy is to establish a 2 to 1 ratio like this:
+// * Side: Long
+// * Pair: LTC/USDT
+// * Amount: 6 USDT
+// * Leverage: 1x (To reduce fees)
+// * StopLoss: -0.50%
+// * TakeProfit: 1.00%
+// * Breakeven based on TrailingTakeProfit: +0.50% with -0.40% distance.
+//
+// In addition to former design we specify how we handle this strategy dynamically:
+// * Two StopLoss in a row trigger a side change and StopLoss count is reset to zero.
+// * Once a TakeProfit is a reached StopLoss count is reset to zero.
+// * If a TrailingStopLoss is reached we don't modify StopLoss count (or we do modify it depending on a setting).
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
