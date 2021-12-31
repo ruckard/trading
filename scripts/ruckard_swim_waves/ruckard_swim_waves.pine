@@ -250,6 +250,15 @@ float orderStopLoss = na
 var int buyOrderOpenBarIndex = na
 var int sellOrderOpenBarIndex = na
 
+var shortTermStopLossCount = 0
+// Handle StopLossCount
+// Reset StopLossCount when a trade has been won
+if (strategy.closedtrades[1] != strategy.closedtrades[0]) and (strategy.wintrades[1] != strategy.wintrades[0])
+    shortTermStopLossCount := 0
+// Count StopLoss when it happens
+if (strategy.closedtrades[1] != strategy.closedtrades[0]) and (strategy.losstrades[1] != strategy.losstrades[0])
+    shortTermStopLossCount := shortTermStopLossCount + 1
+
 // Handle to avoid two long and short orders being too next to each other
 var bool _oldInsideABuyOrder = false
 var bool oldInsideASellOrder = false
