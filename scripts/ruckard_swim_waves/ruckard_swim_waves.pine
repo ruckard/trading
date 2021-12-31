@@ -560,8 +560,8 @@ f_getTooRecentOrderNotOpenAdvice () =>
 plotchar(shortTermStopLossCount, "shortTermStopLossCountPRE", "", location = location.top)
 // Debug plots - END
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-longCondition = true
-shortCondition = false
+var longCondition = true
+var shortCondition = false
 if (shortTermStopLossCount == i_strategyStopLossNumberSwitch)
     longCondition := not longCondition
     shortCondition := not shortCondition
