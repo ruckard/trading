@@ -204,7 +204,7 @@ i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {Fa
 i_strategyStopLossNumberSwitch = input.int(2, '(STRAT) Number of StopLoss to switch sides {2}', minval=1, step=1, maxval=10)
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
-i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
+i_enableTakeProfit = input.bool(true, '(STOPTAKE) Take Profit? {true}')
 i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
 i_enableTrailingTakeProfit = input.bool(true, title='(TRAILING) Enable Trailing Take Profit (%) {True}')
 i_takeProfit = input.float(1.0, title='(STOPTAKE) Take Profit % {1.0}') / 100
