@@ -159,7 +159,7 @@
 
 // Tradingview Public description - END
 
-strategy("Zignaly Tutorial A061", shorttitle="A061ZigTuto", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.1)
+strategy("Zignaly Tutorial A061", shorttitle="A061ZigTuto", overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 // INPUTS - BEGIN
 
