@@ -193,16 +193,16 @@ i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {Fa
 i_stochPeriodK = input.int(200, title="(STRAT) Stoch K", minval=1, step=10)
 i_stochPeriodD = input.int(3, title="(STRAT) Stoch D", minval=1)
 i_stochSmoothK = input.int(100, title="(STRAT) Stoch Smooth", minval=1, step=10)
-i_stochLongEntry = input.float(50, title="(STRAT) Stoch Long Entry", minval=0.01, step=0.01)
-i_stochLongExit = input.float(60, title="(STRAT) Stoch Long Exit", minval=0.01, step=0.01)
-i_stochExitOnCrossUnder = input.bool(true, title="(STRAT) Exit on CrossUnder (true) or CrossOver (false) {True}")
+i_stochLongEntry = input.float(25, title="(STRAT) Stoch Long Entry {50}", minval=0.01, step=0.01)
+i_stochLongExit = input.float(75, title="(STRAT) Stoch Long Exit {60}", minval=0.01, step=0.01)
+i_stochExitOnCrossUnder = input.bool(false, title="(STRAT) Exit on CrossUnder (true) or CrossOver (false) {True}")
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
 i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
-i_enableTrailingTakeProfit = input.bool(true, title='(TRAILING) Enable Trailing Take Profit (%) {True}')
+i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {True}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}') / 100
-i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
+i_stopLoss = input.float(1.0, title='(STOPTAKE) Stop Loss % {1.0}', minval=0.01) / 100
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01) * 0.01
 i_trailingTakeProfitPercentageOffset = input.float(25.0, '(TRAILING) Trailing Take Profit as a percentage of Trailing Take Profit Trigger (%) {25.0}', minval=0, step=0.01) * 0.01
