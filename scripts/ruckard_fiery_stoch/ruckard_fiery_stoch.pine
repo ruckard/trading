@@ -586,9 +586,9 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
 if (i_stochExitOnCrossUnder)
-    LONG_CLOSE := offStopTimeInterval or (not (longCondition)) and ta.crossunder(stochK, i_stochLongExit)
+    LONG_CLOSE := offStopTimeInterval or (not (longCondition)) or ta.crossunder(stochK, i_stochLongExit)
 else
-    LONG_CLOSE := offStopTimeInterval or (not (longCondition)) and ta.crossover(stochK, i_stochLongExit)
+    LONG_CLOSE := offStopTimeInterval or (not (longCondition)) or ta.crossover(stochK, i_stochLongExit)
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
