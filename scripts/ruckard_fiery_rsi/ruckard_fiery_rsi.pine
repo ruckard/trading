@@ -189,6 +189,11 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+i_rsiLength = input.int(14, '(STRAT) RSI length {14}', minval=1, step=1)
+i_rsiUseEmergency = input.bool(false, "RSI . Use Emergency Exit?")
+i_rsiLongEntry = input.float(35, "RSI Long Entry {35}", minval=0.01, step=0.01, maxval=100.00)
+i_rsiLongExit = input.float(75, "RSI Long Exit {75}", minval=0.01, step=0.01, maxval=100.00)
+i_rsiLongEmergencyExit = input.float(10, "RSI Long Emergency Exit {10}", minval=0.01, step=0.01, maxval=100.00)
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -539,6 +544,7 @@ longCondition = true
 shortCondition = false
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+rsi = ta.rsi(close, i_rsiLength)
 
 // Position price calculation - BEGIN
 float positionPrice = na
@@ -553,7 +559,7 @@ tooRecentOrderNotOpenAdvice = f_getTooRecentOrderNotOpenAdvice ()
 
 // Decide if we are going to LONG/Go LONG - BEGIN
 PRE_LONG = false
-PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice)
+PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice) and ta.crossover(rsi, i_rsiLongEntry)
 
 // LONG = PRE_LONG[1] and PRE_LONG // Wait for confirmation
 LONG = PRE_LONG // Do not wait for confirmation
@@ -571,7 +577,10 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or (not (longCondition))
+if (i_rsiUseEmergency)
+    LONG_CLOSE := offStopTimeInterval or (not (longCondition)) or ta.crossunder(rsi, i_rsiLongExit) or ta.crossunder(rsi, i_rsiLongEmergencyExit)
+else
+    LONG_CLOSE := offStopTimeInterval or (not (longCondition)) or ta.crossunder(rsi, i_rsiLongExit)
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
