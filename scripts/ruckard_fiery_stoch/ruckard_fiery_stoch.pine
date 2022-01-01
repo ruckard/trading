@@ -189,6 +189,12 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+// Stochastic - Inputs
+i_stochPeriodK = input.int(200, title="(STRAT) Stoch K", minval=1, step=10)
+// i_stochPeriodD = input.int(3, title="(STRAT) Stoch D", minval=1)
+i_stochSmoothK = input.int(100, title="(STRAT) Stoch Smooth", minval=1, step=10)
+i_stochLongEntry = input.float(50, title="(STRAT) Stoch Long Entry", minval=0.01, step=0.01)
+i_stochLongExit = input.float(60, title="(STRAT) Stoch Long Exit", minval=0.01, step=0.01)
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -539,6 +545,8 @@ longCondition = true
 shortCondition = false
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+stochK = ta.sma(ta.stoch(close, high, low, i_stochPeriodK), i_stochSmoothK)
+// stochD = ta.sma(stochK, i_stochPeriodD)
 
 // Position price calculation - BEGIN
 float positionPrice = na
@@ -553,7 +561,7 @@ tooRecentOrderNotOpenAdvice = f_getTooRecentOrderNotOpenAdvice ()
 
 // Decide if we are going to LONG/Go LONG - BEGIN
 PRE_LONG = false
-PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice)
+PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice) and ta.crossover(stochK, i_stochLongEntry)
 
 // LONG = PRE_LONG[1] and PRE_LONG // Wait for confirmation
 LONG = PRE_LONG // Do not wait for confirmation
@@ -571,7 +579,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or (not (longCondition))
+LONG_CLOSE := offStopTimeInterval or (not (longCondition)) and ta.crossunder(stochK, i_stochLongExit)
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
