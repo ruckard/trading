@@ -547,6 +547,8 @@ hTFFastEma = ta.ema(close, hTFFastEmaPeriod)
 hTFSlowEmaPeriod = i_HigherTFSlowEma * i_HigherTFMultiplier
 hTFSlowEma = ta.ema(close, hTFSlowEmaPeriod)
 
+lowEmaPeriodElapsed = bar_index > hTFSlowEmaPeriod
+
 changeMinimumPeriod = i_HigherTFChangeMinimumPeriod * i_HigherTFMultiplier
 var longCondition = true
 var shortCondition = false
@@ -583,9 +585,9 @@ tooRecentOrderNotOpenAdvice = f_getTooRecentOrderNotOpenAdvice ()
 // Decide if we are going to LONG/Go LONG - BEGIN
 PRE_LONG = false
 if (i_rsiUseLongPreEntry)
-    PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice) and ta.crossover(rsi, i_rsiLongEntry) and rsiLongPreEntered
+    PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice) and ta.crossover(rsi, i_rsiLongEntry) and rsiLongPreEntered and lowEmaPeriodElapsed
 else
-    PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice) and ta.crossover(rsi, i_rsiLongEntry)
+    PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice) and ta.crossover(rsi, i_rsiLongEntry) and lowEmaPeriodElapsed
 
 if (ta.crossover(rsi, i_rsiLongEntry))
     rsiLongPreEntered := false
