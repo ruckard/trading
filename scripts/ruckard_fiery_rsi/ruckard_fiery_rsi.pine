@@ -197,7 +197,7 @@ i_rsiLongEmergencyExit = input.float(10, "RSI Long Emergency Exit {10}", minval=
 i_rsiShortEntry = input.float(55, "RSI Short Entry {55}", minval=0.01, step=0.01, maxval=100.00)
 i_rsiUseShortPreEntry = input.bool(true, "RSI . Use Short Pre Entry? {True}")
 i_rsiShortPreEntryPercentage = input.float(5, "RSI Short Pre Entry % {5}", minval=0.01, step=0.01, maxval=100.00) * 0.01
-i_rsiShortExit = input.float(45, "RSI Short Exit {45}", minval=0.01, step=0.01, maxval=100.00)
+i_rsiShortExit = input.float(47, "RSI Short Exit {47}", minval=0.01, step=0.01, maxval=100.00)
 // i_rsiShortEmergencyExit = input.float(10, "RSI Short Emergency Exit {85}", minval=0.01, step=0.01, maxval=100.00)
 i_HigherTFMultiplier = input.int(15, '(STRAT) Higher Time Frame Multiplier {15}', minval=1, step=1)
 i_HigherTFFastEma = input.int(14, '(STRAT) Higher Time Frame Fast EMA {14}', minval=1, step=1)
