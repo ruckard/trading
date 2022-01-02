@@ -578,8 +578,8 @@ if (ta.crossunder(rsi, i_rsiShortPreEntry))
     rsiShortPreEntered := true
 
 plot(rsi, color=(not shortCondition) ? color.white : color.gray, linewidth=2)
-plot(i_rsiLongEntry, color=color.green)
-plot(i_rsiLongExit, color=color.red)
+plot((not shortCondition) ? i_rsiLongEntry : i_rsiShortEntry, color=color.green)
+plot((not shortCondition) ? i_rsiLongExit : i_rsiShortExit, color=color.red)
 
 // Position price calculation - BEGIN
 float positionPrice = na
