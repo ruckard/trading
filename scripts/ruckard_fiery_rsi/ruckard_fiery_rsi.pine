@@ -194,6 +194,10 @@ i_rsiUseLongPreEntry = input.bool(true, "RSI . Use Long Pre Entry? {True}")
 i_rsiLongPreEntryPercentage = input.float(5, "RSI Long Pre Entry % {5}", minval=0.01, step=0.01, maxval=100.00) * 0.01
 i_rsiLongExit = input.float(55, "RSI Long Exit {55}", minval=0.01, step=0.01, maxval=100.00)
 i_rsiLongEmergencyExit = input.float(10, "RSI Long Emergency Exit {10}", minval=0.01, step=0.01, maxval=100.00)
+i_HigherTFMultiplier = input.int(5, '(STRAT) Higher Time Frame Multiplier {5}', minval=1, step=1)
+i_HigherTFFastEma = input.int(14, '(STRAT) Higher Time Frame Fast EMA {14}', minval=1, step=1)
+i_HigherTFSlowEma = input.int(55, '(STRAT) Higher Time Frame Slow EMA {55}', minval=1, step=1)
+i_HigherTFChangeMinimumPeriod = input.int(2, '(STRAT) Higher Time Frame Minimum periods in a row for change{2}', minval=1, step=1)
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -538,10 +542,21 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 // Strategy Body - BEGIN
 
+hTFFastEmaPeriod = i_HigherTFFastEma * i_HigherTFMultiplier
+hTFFastEma = ta.ema(close, hTFFastEmaPeriod)
+hTFSlowEmaPeriod = i_HigherTFSlowEma * i_HigherTFMultiplier
+hTFSlowEma = ta.ema(close, hTFSlowEmaPeriod)
 
+changeMinimumPeriod = i_HigherTFChangeMinimumPeriod * i_HigherTFMultiplier
+var longCondition = true
+var shortCondition = false
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-longCondition = true
-shortCondition = false
+if (hTFFastEma > hTFSlowEma) and (hTFFastEma[changeMinimumPeriod] > hTFSlowEma[changeMinimumPeriod])
+    longCondition := true
+    shortCondition := false
+if (hTFFastEma < hTFSlowEma) and (hTFFastEma[changeMinimumPeriod] < hTFSlowEma[changeMinimumPeriod])
+    longCondition := false
+    shortCondition := true
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 rsi = ta.rsi(close, i_rsiLength)
