@@ -170,7 +170,7 @@
 
 // Tradingview Public description - END
 
-strategy('Ruckard Fiery RSI A001', shorttitle='A001RFRSI', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Ruckard Fiery RSI A001', shorttitle='A001RFRSI', overlay=false, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 // INPUTS - BEGIN
 
@@ -543,6 +543,10 @@ shortCondition = false
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 rsi = ta.rsi(close, i_rsiLength)
+
+plot(rsi, color=color.white, linewidth=2)
+plot(i_rsiLongEntry, color=color.green)
+plot(i_rsiLongExit, color=color.red)
 
 // Position price calculation - BEGIN
 float positionPrice = na
