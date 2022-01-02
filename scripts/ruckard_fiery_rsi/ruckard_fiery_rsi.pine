@@ -554,11 +554,11 @@ var longCondition = true
 var shortCondition = false
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 if (hTFFastEma > hTFSlowEma) and (hTFFastEma[changeMinimumPeriod] > hTFSlowEma[changeMinimumPeriod])
-    longCondition := true
+    longCondition := false
     shortCondition := false
 if (hTFFastEma < hTFSlowEma) and (hTFFastEma[changeMinimumPeriod] < hTFSlowEma[changeMinimumPeriod])
     longCondition := false
-    shortCondition := false
+    shortCondition := true
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 rsi = ta.rsi(close, i_rsiLength)
