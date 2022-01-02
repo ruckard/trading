@@ -556,7 +556,7 @@ if (hTFFastEma > hTFSlowEma) and (hTFFastEma[changeMinimumPeriod] > hTFSlowEma[c
     shortCondition := false
 if (hTFFastEma < hTFSlowEma) and (hTFFastEma[changeMinimumPeriod] < hTFSlowEma[changeMinimumPeriod])
     longCondition := false
-    shortCondition := true
+    shortCondition := false
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 rsi = ta.rsi(close, i_rsiLength)
