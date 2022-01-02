@@ -3,7 +3,7 @@
 
 //@version=5
 
-// Current version: v20220102 ( A007 )
+// Current version: v20220102 ( A008 )
 // Tradingview Public description - BEGIN
 // 
 // This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
@@ -170,7 +170,7 @@
 
 // Tradingview Public description - END
 
-strategy('Ruckard Fiery RSI A007', shorttitle='A007RFRSI', overlay=false, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Ruckard Fiery RSI A008', shorttitle='A008RFRSI', overlay=false, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 // INPUTS - BEGIN
 
