@@ -194,6 +194,11 @@ i_rsiUseLongPreEntry = input.bool(true, "RSI . Use Long Pre Entry? {True}")
 i_rsiLongPreEntryPercentage = input.float(5, "RSI Long Pre Entry % {5}", minval=0.01, step=0.01, maxval=100.00) * 0.01
 i_rsiLongExit = input.float(55, "RSI Long Exit {55}", minval=0.01, step=0.01, maxval=100.00)
 i_rsiLongEmergencyExit = input.float(10, "RSI Long Emergency Exit {10}", minval=0.01, step=0.01, maxval=100.00)
+i_rsiShortEntry = input.float(55, "RSI Short Entry {55}", minval=0.01, step=0.01, maxval=100.00)
+i_rsiUseShortPreEntry = input.bool(true, "RSI . Use Short Pre Entry? {True}")
+i_rsiShortPreEntryPercentage = input.float(5, "RSI Short Pre Entry % {5}", minval=0.01, step=0.01, maxval=100.00) * 0.01
+i_rsiShortExit = input.float(45, "RSI Short Exit {45}", minval=0.01, step=0.01, maxval=100.00)
+// i_rsiShortEmergencyExit = input.float(10, "RSI Short Emergency Exit {85}", minval=0.01, step=0.01, maxval=100.00)
 i_HigherTFMultiplier = input.int(15, '(STRAT) Higher Time Frame Multiplier {15}', minval=1, step=1)
 i_HigherTFFastEma = input.int(14, '(STRAT) Higher Time Frame Fast EMA {14}', minval=1, step=1)
 i_HigherTFSlowEma = input.int(55, '(STRAT) Higher Time Frame Slow EMA {55}', minval=1, step=1)
@@ -567,6 +572,11 @@ var rsiLongPreEntered = false
 if (ta.crossover(rsi, i_rsiLongPreEntry))
     rsiLongPreEntered := true
 
+float i_rsiShortPreEntry = i_rsiShortEntry + (i_rsiShortEntry * i_rsiShortPreEntryPercentage)
+var rsiShortPreEntered = false
+if (ta.crossunder(rsi, i_rsiShortPreEntry))
+    rsiShortPreEntered := true
+
 plot(rsi, color=longCondition ? color.white : color.gray, linewidth=2)
 plot(i_rsiLongEntry, color=color.green)
 plot(i_rsiLongExit, color=color.red)
@@ -599,7 +609,13 @@ LONG = PRE_LONG // Do not wait for confirmation
 
 // Decide if we are going to SHORT/Go SHORT - BEGIN
 PRE_SHORT = false
-PRE_SHORT := onStartTimeInterval and shortCondition and (not tooRecentOrderNotOpenAdvice)
+if (i_rsiUseShortPreEntry)
+    PRE_SHORT := onStartTimeInterval and shortCondition and (not tooRecentOrderNotOpenAdvice) and ta.crossunder(rsi, i_rsiShortEntry) and rsiShortPreEntered and lowEmaPeriodElapsed
+else
+    PRE_SHORT := onStartTimeInterval and shortCondition and (not tooRecentOrderNotOpenAdvice) and ta.crossunder(rsi, i_rsiShortEntry) and lowEmaPeriodElapsed
+
+if (ta.crossunder(rsi, i_rsiShortEntry))
+    rsiShortPreEntered := false
 
 // SHORT = PRE_SHORT[1] and PRE_SHORT // Wait for confirmation
 SHORT = PRE_SHORT // Do not wait for confirmation
@@ -620,7 +636,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or (not (shortCondition))
+SHORT_CLOSE := offStopTimeInterval or (not (shortCondition)) or ta.crossover(rsi, i_rsiShortExit)
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
