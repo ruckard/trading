@@ -577,7 +577,7 @@ var rsiShortPreEntered = false
 if (ta.crossunder(rsi, i_rsiShortPreEntry))
     rsiShortPreEntered := true
 
-plot(rsi, color=(not shortCondition) ? color.white : color.gray, linewidth=2)
+plot(rsi, color=(not lowEmaPeriodElapsed) ? color.navy : (not shortCondition) ? color.white : color.gray, linewidth=2)
 plot((not shortCondition) ? i_rsiLongEntry : i_rsiShortEntry, color=color.green)
 plot((not shortCondition) ? i_rsiLongExit : i_rsiShortExit, color=color.red)
 
