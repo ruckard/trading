@@ -190,6 +190,8 @@ i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {Fa
 i_rsiLength = input.int(14, '(STRAT) RSI length {14}', minval=1, step=1)
 i_rsiUseEmergency = input.bool(false, "RSI . Use Emergency Exit?")
 i_rsiLongEntry = input.float(40, "RSI Long Entry {40}", minval=0.01, step=0.01, maxval=100.00)
+i_rsiUseLongPreEntry = input.bool(true, "RSI . Use Long Pre Entry? {True}")
+i_rsiLongPreEntryPercentage = input.float(5, "RSI Long Pre Entry % {5}", minval=0.01, step=0.01, maxval=100.00) * 0.01
 i_rsiLongExit = input.float(55, "RSI Long Exit {55}", minval=0.01, step=0.01, maxval=100.00)
 i_rsiLongEmergencyExit = input.float(10, "RSI Long Emergency Exit {10}", minval=0.01, step=0.01, maxval=100.00)
 // Order comments based debug
@@ -543,6 +545,10 @@ shortCondition = false
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 rsi = ta.rsi(close, i_rsiLength)
+float i_rsiLongPreEntry = i_rsiLongEntry - (i_rsiLongEntry * i_rsiLongPreEntryPercentage)
+var rsiLongPreEntered = false
+if (ta.crossover(rsi, i_rsiLongPreEntry))
+    rsiLongPreEntered := true
 
 plot(rsi, color=color.white, linewidth=2)
 plot(i_rsiLongEntry, color=color.green)
@@ -561,7 +567,13 @@ tooRecentOrderNotOpenAdvice = f_getTooRecentOrderNotOpenAdvice ()
 
 // Decide if we are going to LONG/Go LONG - BEGIN
 PRE_LONG = false
-PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice) and ta.crossover(rsi, i_rsiLongEntry)
+if (i_rsiUseLongPreEntry)
+    PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice) and ta.crossover(rsi, i_rsiLongEntry) and rsiLongPreEntered
+else
+    PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice) and ta.crossover(rsi, i_rsiLongEntry)
+
+if (ta.crossover(rsi, i_rsiLongEntry))
+    rsiLongPreEntered := false
 
 // LONG = PRE_LONG[1] and PRE_LONG // Wait for confirmation
 LONG = PRE_LONG // Do not wait for confirmation
