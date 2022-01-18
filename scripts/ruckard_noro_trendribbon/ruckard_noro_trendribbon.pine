@@ -189,6 +189,10 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+i_maType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) MA Type [SMA]')
+i_maLength = input.int(20, minval = 5,  title = '(STRAT) MA Length (min. 5) [20]')
+i_maSource = input.source(ohlc4, title = '(STRAT) MA Source [ohlc4]')
+i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohcl4]')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -535,10 +539,18 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = crossover(sma(close, 14), sma(close, 28))
-// shortCondition = crossunder(sma(close, 14), sma(close, 28))
-longCondition = ta.sma(close, 14) >= ta.sma(close, 28)
-shortCondition = ta.sma(close, 14) < ta.sma(close, 28)
+ma = i_maType == "SMA" ? ta.sma(i_maSource, i_maLength) : i_maType == "EMA" ? ta.ema(i_maSource, i_maLength) : i_maType == "VWMA" ? ta.vwma(i_maSource, i_maLength) : ta.rma(i_maSource, i_maLength)
+//Price Channel
+highestMA = ta.highest(ma, i_maLength)
+lowestMA = ta.lowest(ma, i_maLength)
+
+//Trend
+trend = 0
+trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 : trend[1]
+
+//Trading
+longCondition = (trend == 1)
+shortCondition = (trend == -1)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
