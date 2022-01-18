@@ -196,6 +196,8 @@ i_maType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'],
 i_maLength = input.int(20, minval = 5,  title = '(STRAT) MA Length (min. 5) [20]')
 i_maSource = input.source(ohlc4, title = '(STRAT) MA Source [ohlc4]')
 i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohcl4]')
+i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
+i_showBackground = input.bool(true, title = 'Show color [true]')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -353,6 +355,15 @@ longCondition = (trend == 1)
 shortCondition = (trend == -1)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+MAColor = i_showRibbon ? color.black : na
+MAPlot = plot(ma, color = MAColor, title = "MA")
+highestLowestColor = i_showRibbon ? color.blue : na
+highestMAPlot = plot(highestMA, color = highestLowestColor, title = "Upper line")
+lowestMAPlot = plot(lowestMA, color = highestLowestColor, title = "Lower Line")
+highestMABackgroundColor = i_showBackground ? color.red : na
+lowestMABackgroundColor = i_showBackground ? color.blue : na
+fill(highestMAPlot, MAPlot, color = color.new(highestMABackgroundColor, 50))
+fill(lowestMAPlot, MAPlot, color = color.new(lowestMABackgroundColor, 50))
 
 // Position price calculation - BEGIN
 float positionPrice = na
