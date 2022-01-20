@@ -528,6 +528,21 @@ f_getTooRecentOrderNotOpenAdvice () =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
+f_getCurrentPeriod (_period) =>
+    periodMinutes = f_getResolutionBarMinutes(_period)
+    barMinutes = f_getResolutionBarMinutes(timeframe.period)
+    barMinutesToNow = bar_index * barMinutes
+    currentPeriod = math.floor(barMinutesToNow / periodMinutes)
+
+f_getCurrentDay () =>
+    f_getCurrentPeriod ('1D')
+
+f_getCurrentWeek () =>
+    f_getCurrentPeriod ('1W')
+
+f_getCurrentMonth () =>
+    f_getCurrentPeriod ('1M')
+
 // FUNCTIONS - END
 
 
@@ -625,10 +640,7 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
     var currentDayLoss = 0.0
     var currentDayCapital = 0.0
     var currentDay = 0
-    var dayMinutes = f_getResolutionBarMinutes('1D')
-    var barMinutes = f_getResolutionBarMinutes(timeframe.period)
-    barMinutesToNow = bar_index * barMinutes
-    currentDay := math.floor(barMinutesToNow / dayMinutes)
+    currentDay := f_getCurrentDay ()
 
     // i_riskManagementMaximumLossPerWeek
     var float currentWeekEntryQuantity = na
@@ -636,8 +648,7 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
     var currentWeekLoss = 0.0
     var currentWeekCapital = 0.0
     var currentWeek = 0
-    var weekMinutes = f_getResolutionBarMinutes('1W')
-    currentWeek := math.floor(barMinutesToNow / weekMinutes)
+    currentWeek := f_getCurrentWeek ()
 
     // riskManagementMaximumLossPerMonth
     var float currentMonthEntryQuantity = na
@@ -645,8 +656,7 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
     var currentMonthLoss = 0.0
     var currentMonthCapital = 0.0
     var currentMonth = 0
-    var monthMinutes = f_getResolutionBarMinutes('1M')
-    currentMonth := math.floor(barMinutesToNow / monthMinutes)
+    currentMonth := f_getCurrentMonth ()
 
     float tmpEntryQuantity = na
 
