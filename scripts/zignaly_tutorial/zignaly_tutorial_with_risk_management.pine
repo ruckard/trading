@@ -543,6 +543,62 @@ f_getCurrentWeek () =>
 f_getCurrentMonth () =>
     f_getCurrentPeriod ('1M')
 
+f_getRiskManagementAdvisedEntryQuantity (_entryQuantity, _currentCapital, _currentDay, _currentDayCapital, _currentDayLoss, _currentWeek, _currentWeekCapital, _currentWeekLoss, _currentMonth, _currentMonthCapital, _currentMonthLoss) =>
+    p_entryQuantity = _entryQuantity
+    p_currentDayCapital = _currentDayCapital
+    p_currentDayLoss = _currentDayLoss
+    p_currentWeekCapital = _currentWeekCapital
+    p_currentWeekLoss = _currentWeekLoss
+    p_currentMonthCapital = _currentMonthCapital
+    p_currentMonthLoss = _currentMonthLoss
+
+    float currentDayEntryQuantity = na
+    float currentWeekEntryQuantity = na
+    float currentMonthEntryQuantity = na
+    // DAY
+    if (_currentDay[1] != _currentDay)
+        p_currentDayLoss := 0.0
+        p_currentDayCapital := _currentCapital
+    else
+        if (_currentCapital < p_currentDayCapital)
+            p_currentDayLoss := p_currentDayCapital - _currentCapital
+        else
+            p_currentDayLoss := 0.0
+        tmpCurrentDayLossPerOne = p_currentDayLoss / p_currentDayCapital
+        if (tmpCurrentDayLossPerOne >= i_riskManagementMaximumLossPerDay)
+            currentDayEntryQuantity:= 0.0 // Avoid entering a position
+
+    // WEEK
+    if (_currentWeek[1] != _currentWeek)
+        p_currentWeekLoss := 0.0
+        p_currentWeekCapital := _currentCapital
+    else
+        if (_currentCapital < p_currentWeekCapital)
+            p_currentWeekLoss := p_currentWeekCapital - _currentCapital
+        else
+            p_currentWeekLoss := 0.0
+        tmpCurrentWeekLossPerOne = p_currentWeekLoss / p_currentWeekCapital
+        if (tmpCurrentWeekLossPerOne >= i_riskManagementMaximumLossPerWeek)
+            currentWeekEntryQuantity:= 0.0 // Avoid entering a position
+
+    // MONTH
+    if (_currentMonth[1] != _currentMonth)
+        p_currentMonthLoss := 0.0
+        p_currentMonthCapital := _currentCapital
+    else
+        if (_currentCapital < p_currentMonthCapital)
+            p_currentMonthLoss := p_currentMonthCapital - _currentCapital
+        else
+            p_currentMonthLoss := 0.0
+        tmpCurrentMonthLossPerOne = p_currentMonthLoss / p_currentMonthCapital
+        if (tmpCurrentMonthLossPerOne >= i_riskManagementMaximumLossPerMonth)
+            currentMonthEntryQuantity:= 0.0 // Avoid entering a position
+
+    // Avoid to enter a position overall logic
+    if ( (not na(currentDayEntryQuantity)) or (not na(currentWeekEntryQuantity)) or (not na(currentMonthEntryQuantity)) )
+        p_entryQuantity:= 0.0
+    [p_entryQuantity, _currentDay, p_currentDayCapital, p_currentDayLoss, _currentWeek, p_currentWeekCapital, p_currentWeekLoss, _currentMonth, p_currentMonthCapital, p_currentMonthLoss]
+
 // FUNCTIONS - END
 
 
@@ -634,28 +690,18 @@ else // _ZIGSIGNALPROVIDER_
     entryQuantity := i_CapitalQuote
 
 if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only implemented for CopyTrader Providers
-    // i_riskManagementMaximumLossPerDay
-    var float currentDayEntryQuantity = na
-    currentDayEntryQuantity := na
     var currentDayLoss = 0.0
     var currentDayCapital = 0.0
     var currentDay = 0
-    currentDay := f_getCurrentDay ()
-
-    // i_riskManagementMaximumLossPerWeek
-    var float currentWeekEntryQuantity = na
-    currentWeekEntryQuantity := na
     var currentWeekLoss = 0.0
     var currentWeekCapital = 0.0
     var currentWeek = 0
-    currentWeek := f_getCurrentWeek ()
-
-    // riskManagementMaximumLossPerMonth
-    var float currentMonthEntryQuantity = na
-    currentMonthEntryQuantity := na
     var currentMonthLoss = 0.0
     var currentMonthCapital = 0.0
     var currentMonth = 0
+
+    currentDay := f_getCurrentDay ()
+    currentWeek := f_getCurrentWeek ()
     currentMonth := f_getCurrentMonth ()
 
     float tmpEntryQuantity = na
@@ -680,48 +726,15 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
     else
         entryQuantity := tmpEntryQuantity
 
-    // DAY
-    if (currentDay[1] != currentDay)
-        currentDayLoss := 0.0
-        currentDayCapital := currentCapital
-    else
-        if (currentCapital < currentDayCapital)
-            currentDayLoss := currentDayCapital - currentCapital
-        else
-            currentDayLoss := 0.0
-        tmpCurrentDayLossPerOne = currentDayLoss / currentDayCapital
-        if (tmpCurrentDayLossPerOne >= i_riskManagementMaximumLossPerDay)
-            currentDayEntryQuantity:= 0.0 // Avoid entering a position
+    [__entryQuantity, __currentDay, __currentDayCapital, __currentDayLoss, __currentWeek, __currentWeekCapital, __currentWeekLoss, __currentMonth, __currentMonthCapital, __currentMonthLoss] = f_getRiskManagementAdvisedEntryQuantity (entryQuantity, currentCapital, currentDay, currentDayCapital, currentDayLoss, currentWeek, currentWeekCapital, currentWeekLoss, currentMonth, currentMonthCapital, currentMonthLoss)
 
-    // WEEK
-    if (currentWeek[1] != currentWeek)
-        currentWeekLoss := 0.0
-        currentWeekCapital := currentCapital
-    else
-        if (currentCapital < currentWeekCapital)
-            currentWeekLoss := currentWeekCapital - currentCapital
-        else
-            currentWeekLoss := 0.0
-        tmpCurrentWeekLossPerOne = currentWeekLoss / currentWeekCapital
-        if (tmpCurrentWeekLossPerOne >= i_riskManagementMaximumLossPerWeek)
-            currentWeekEntryQuantity:= 0.0 // Avoid entering a position
-
-    // MONTH
-    if (currentMonth[1] != currentMonth)
-        currentMonthLoss := 0.0
-        currentMonthCapital := currentCapital
-    else
-        if (currentCapital < currentMonthCapital)
-            currentMonthLoss := currentMonthCapital - currentCapital
-        else
-            currentMonthLoss := 0.0
-        tmpCurrentMonthLossPerOne = currentMonthLoss / currentMonthCapital
-        if (tmpCurrentMonthLossPerOne >= i_riskManagementMaximumLossPerMonth)
-            currentMonthEntryQuantity:= 0.0 // Avoid entering a position
-
-    // Avoid to enter a position overall logic
-    if ( (not na(currentDayEntryQuantity)) or (not na(currentWeekEntryQuantity)) or (not na(currentMonthEntryQuantity)) )
-        entryQuantity:= 0.0
+    entryQuantity := __entryQuantity
+    currentDayLoss := __currentDayLoss
+    currentDayCapital := __currentDayCapital
+    currentWeekLoss := __currentWeekLoss
+    currentWeekCapital := __currentWeekCapital
+    currentMonthLoss := __currentMonthLoss
+    currentMonthCapital := __currentMonthCapital
 
 float entryQuantityContractsReducer = 0.99
 
