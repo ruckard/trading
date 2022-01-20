@@ -51,3 +51,72 @@ export getCurrentWeek () =>
 // @returns Current month number from strategy start
 export getCurrentMonth () =>
     getCurrentPeriod ('1M')
+
+// @function Returns advised entry quantity. Otherwise returns zero if required daily, weekly and montly maximum losses have been reached.
+// @param entryQuantity entry Quantity that has already been calculated
+// @param currentCapital The current capital in the strategy
+// @param currentDay Current day number from strategy start
+// @param currentDayCapital Last capital seen in this same day
+// @param currentWeek Current week number from strategy start
+// @param currentWeekCapital Last capital seen in this same week
+// @param currentMonth Current month number from strategy start
+// @param currentMonthCapital Last capital seen in this same month
+// @param maximumLossPerDay Maximum required loss per day (per unit)
+// @param maximumLossPerWeek Maximum required loss per week (per unit)
+// @param maximumLossPerMonth Maximum required loss per month (per unit)
+// @returns Advised entry quantity and extra needed variables
+export advisedEntryQuantity (float entryQuantity, float currentCapital, int currentDay, float currentDayCapital, int currentWeek, float currentWeekCapital, int currentMonth, float currentMonthCapital, float maximumLossPerDay, float maximumLossPerWeek, float maximumLossPerMonth) =>
+    float p_entryQuantity = entryQuantity
+    float p_currentDayCapital = currentDayCapital
+    float p_currentWeekCapital = currentWeekCapital
+    float p_currentMonthCapital = currentMonthCapital
+
+    float currentDayLoss = na
+    float currentWeekLoss = na
+    float currentMonthLoss = na
+    float currentDayEntryQuantity = na
+    float currentWeekEntryQuantity = na
+    float currentMonthEntryQuantity = na
+    // DAY
+    if (currentDay[1] != currentDay)
+        currentDayLoss := 0.0
+        p_currentDayCapital := currentCapital
+    else
+        if (currentCapital < p_currentDayCapital)
+            currentDayLoss := p_currentDayCapital - currentCapital
+        else
+            currentDayLoss := 0.0
+        tmpCurrentDayLossPerOne = currentDayLoss / p_currentDayCapital
+        if (tmpCurrentDayLossPerOne >= maximumLossPerDay)
+            currentDayEntryQuantity:= 0.0 // Avoid entering a position
+
+    // WEEK
+    if (currentWeek[1] != currentWeek)
+        currentWeekLoss := 0.0
+        p_currentWeekCapital := currentCapital
+    else
+        if (currentCapital < p_currentWeekCapital)
+            currentWeekLoss := p_currentWeekCapital - currentCapital
+        else
+            currentWeekLoss := 0.0
+        tmpCurrentWeekLossPerOne = currentWeekLoss / p_currentWeekCapital
+        if (tmpCurrentWeekLossPerOne >= maximumLossPerWeek)
+            currentWeekEntryQuantity:= 0.0 // Avoid entering a position
+
+    // MONTH
+    if (currentMonth[1] != currentMonth)
+        currentMonthLoss := 0.0
+        p_currentMonthCapital := currentCapital
+    else
+        if (currentCapital < p_currentMonthCapital)
+            currentMonthLoss := p_currentMonthCapital - currentCapital
+        else
+            currentMonthLoss := 0.0
+        tmpCurrentMonthLossPerOne = currentMonthLoss / p_currentMonthCapital
+        if (tmpCurrentMonthLossPerOne >= maximumLossPerMonth)
+            currentMonthEntryQuantity:= 0.0 // Avoid entering a position
+
+    // Avoid to enter a position overall logic
+    if ( (not na(currentDayEntryQuantity)) or (not na(currentWeekEntryQuantity)) or (not na(currentMonthEntryQuantity)) )
+        p_entryQuantity:= 0.0
+    [p_entryQuantity, currentDay, p_currentDayCapital, currentWeek, p_currentWeekCapital, currentMonth, p_currentMonthCapital]
