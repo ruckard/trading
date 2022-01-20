@@ -174,6 +174,8 @@
 
 strategy('Zignaly Risk M. A065', shorttitle='A065ZigRisk', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
+import ruckard/RiskManagementBeta/1 as rm
+
 // INPUTS - BEGIN
 
 // Strategy - Inputs
@@ -301,35 +303,6 @@ f_priceDecimalDigitsZeroString () =>
         for _digit = 1 to i_priceDecimalDigits by 1
             _zeroString += '0'
             _zeroString
-
-// —————————— PineCoders MTF Selection Framework functions
-// ————— Converts current "timeframe.multiplier" plus the TF into minutes of type float.
-f_resInMinutes() =>
-    _resInMinutes = timeframe.multiplier * (
-      timeframe.isseconds ? 1. / 60. :
-      timeframe.isminutes ? 1.       :
-      timeframe.isdaily   ? 1440.    :
-      timeframe.isweekly  ? 10080.   :
-      timeframe.ismonthly ? 43800.   : na)
-
-var currentResInMinutes = f_resInMinutes() // We need to calculate it only once
-
-f_getResolutionBarMinutes(resolution) =>
-    minutes = resolution == '1' ? (1 * 1) :
-     resolution == '3' ? (3 * 1) :
-     resolution == '5' ? (5 * 1) :
-     resolution == '15' ? (15 * 1) :
-     resolution == '30' ? (30 * 1) :
-     resolution == '45' ? (45 * 1) :
-     resolution == '60' ? (60 * 1) :
-     resolution == '120' ? (2 * 60) :
-     resolution == '180' ? (3 * 60) :
-     resolution == '240' ? (4 * 60) :
-     resolution == '1D' ? (24 * 60) :
-     resolution == '1W' ? (7 * 24 * 60) :
-     resolution == '1M' ? (4 * 7 * 24 * 60) :
-     currentResInMinutes // Equal to current symbol
-    minutes
 
 // Zignalye - Functions - BEGIN
 f_getZignalyLongAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
@@ -528,21 +501,6 @@ f_getTooRecentOrderNotOpenAdvice () =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
-f_getCurrentPeriod (_period) =>
-    periodMinutes = f_getResolutionBarMinutes(_period)
-    barMinutes = f_getResolutionBarMinutes(timeframe.period)
-    barMinutesToNow = bar_index * barMinutes
-    currentPeriod = math.floor(barMinutesToNow / periodMinutes)
-
-f_getCurrentDay () =>
-    f_getCurrentPeriod ('1D')
-
-f_getCurrentWeek () =>
-    f_getCurrentPeriod ('1W')
-
-f_getCurrentMonth () =>
-    f_getCurrentPeriod ('1M')
-
 f_getRiskManagementAdvisedEntryQuantity (_entryQuantity, _currentCapital, _currentDay, _currentDayCapital, _currentDayLoss, _currentWeek, _currentWeekCapital, _currentWeekLoss, _currentMonth, _currentMonthCapital, _currentMonthLoss) =>
     p_entryQuantity = _entryQuantity
     p_currentDayCapital = _currentDayCapital
@@ -700,9 +658,9 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
     var currentMonthCapital = 0.0
     var currentMonth = 0
 
-    currentDay := f_getCurrentDay ()
-    currentWeek := f_getCurrentWeek ()
-    currentMonth := f_getCurrentMonth ()
+    currentDay := rm.getCurrentDay ()
+    currentWeek := rm.getCurrentWeek ()
+    currentMonth := rm.getCurrentMonth ()
 
     float tmpEntryQuantity = na
 
