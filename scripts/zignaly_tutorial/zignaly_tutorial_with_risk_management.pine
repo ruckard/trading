@@ -174,7 +174,7 @@
 
 strategy('Zignaly Risk M. A065', shorttitle='A065ZigRisk', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
-import ruckard/RiskManagementBeta/1 as rm
+import ruckard/RiskManagementBeta/2 as rm
 
 // INPUTS - BEGIN
 
@@ -501,62 +501,6 @@ f_getTooRecentOrderNotOpenAdvice () =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
-f_getRiskManagementAdvisedEntryQuantity (_entryQuantity, _currentCapital, _currentDay, _currentDayCapital, _currentDayLoss, _currentWeek, _currentWeekCapital, _currentWeekLoss, _currentMonth, _currentMonthCapital, _currentMonthLoss) =>
-    p_entryQuantity = _entryQuantity
-    p_currentDayCapital = _currentDayCapital
-    p_currentDayLoss = _currentDayLoss
-    p_currentWeekCapital = _currentWeekCapital
-    p_currentWeekLoss = _currentWeekLoss
-    p_currentMonthCapital = _currentMonthCapital
-    p_currentMonthLoss = _currentMonthLoss
-
-    float currentDayEntryQuantity = na
-    float currentWeekEntryQuantity = na
-    float currentMonthEntryQuantity = na
-    // DAY
-    if (_currentDay[1] != _currentDay)
-        p_currentDayLoss := 0.0
-        p_currentDayCapital := _currentCapital
-    else
-        if (_currentCapital < p_currentDayCapital)
-            p_currentDayLoss := p_currentDayCapital - _currentCapital
-        else
-            p_currentDayLoss := 0.0
-        tmpCurrentDayLossPerOne = p_currentDayLoss / p_currentDayCapital
-        if (tmpCurrentDayLossPerOne >= i_riskManagementMaximumLossPerDay)
-            currentDayEntryQuantity:= 0.0 // Avoid entering a position
-
-    // WEEK
-    if (_currentWeek[1] != _currentWeek)
-        p_currentWeekLoss := 0.0
-        p_currentWeekCapital := _currentCapital
-    else
-        if (_currentCapital < p_currentWeekCapital)
-            p_currentWeekLoss := p_currentWeekCapital - _currentCapital
-        else
-            p_currentWeekLoss := 0.0
-        tmpCurrentWeekLossPerOne = p_currentWeekLoss / p_currentWeekCapital
-        if (tmpCurrentWeekLossPerOne >= i_riskManagementMaximumLossPerWeek)
-            currentWeekEntryQuantity:= 0.0 // Avoid entering a position
-
-    // MONTH
-    if (_currentMonth[1] != _currentMonth)
-        p_currentMonthLoss := 0.0
-        p_currentMonthCapital := _currentCapital
-    else
-        if (_currentCapital < p_currentMonthCapital)
-            p_currentMonthLoss := p_currentMonthCapital - _currentCapital
-        else
-            p_currentMonthLoss := 0.0
-        tmpCurrentMonthLossPerOne = p_currentMonthLoss / p_currentMonthCapital
-        if (tmpCurrentMonthLossPerOne >= i_riskManagementMaximumLossPerMonth)
-            currentMonthEntryQuantity:= 0.0 // Avoid entering a position
-
-    // Avoid to enter a position overall logic
-    if ( (not na(currentDayEntryQuantity)) or (not na(currentWeekEntryQuantity)) or (not na(currentMonthEntryQuantity)) )
-        p_entryQuantity:= 0.0
-    [p_entryQuantity, _currentDay, p_currentDayCapital, p_currentDayLoss, _currentWeek, p_currentWeekCapital, p_currentWeekLoss, _currentMonth, p_currentMonthCapital, p_currentMonthLoss]
-
 // FUNCTIONS - END
 
 
@@ -648,13 +592,10 @@ else // _ZIGSIGNALPROVIDER_
     entryQuantity := i_CapitalQuote
 
 if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only implemented for CopyTrader Providers
-    var currentDayLoss = 0.0
     var currentDayCapital = 0.0
     var currentDay = 0
-    var currentWeekLoss = 0.0
     var currentWeekCapital = 0.0
     var currentWeek = 0
-    var currentMonthLoss = 0.0
     var currentMonthCapital = 0.0
     var currentMonth = 0
 
@@ -684,14 +625,11 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
     else
         entryQuantity := tmpEntryQuantity
 
-    [__entryQuantity, __currentDay, __currentDayCapital, __currentDayLoss, __currentWeek, __currentWeekCapital, __currentWeekLoss, __currentMonth, __currentMonthCapital, __currentMonthLoss] = f_getRiskManagementAdvisedEntryQuantity (entryQuantity, currentCapital, currentDay, currentDayCapital, currentDayLoss, currentWeek, currentWeekCapital, currentWeekLoss, currentMonth, currentMonthCapital, currentMonthLoss)
+    [__entryQuantity, __currentDay, __currentDayCapital, __currentWeek, __currentWeekCapital, __currentMonth, __currentMonthCapital] = rm.advisedEntryQuantity (entryQuantity, currentCapital, currentDay, currentDayCapital, currentWeek, currentWeekCapital, currentMonth, currentMonthCapital, i_riskManagementMaximumLossPerDay, i_riskManagementMaximumLossPerWeek, i_riskManagementMaximumLossPerMonth)
 
     entryQuantity := __entryQuantity
-    currentDayLoss := __currentDayLoss
     currentDayCapital := __currentDayCapital
-    currentWeekLoss := __currentWeekLoss
     currentWeekCapital := __currentWeekCapital
-    currentMonthLoss := __currentMonthLoss
     currentMonthCapital := __currentMonthCapital
 
 float entryQuantityContractsReducer = 0.99
