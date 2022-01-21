@@ -59,7 +59,7 @@
 // [/LIST]
 // [B]____ SETTINGS - Risk Management [/B]
 // [list]
-// [*] (RISKM) Risk Management Type: 'Safe', 'Somewhat safe compound' or 'Unsafe compound'. '[b]Safe[/b]': Calculations are always done with the initial capital (1000) in mind. The maximum losses per trade/day/week/month are taken into account. '[b]Somewhat safe compound[/b]': Calculations are done with initial capital (1000) or a higher capital if it increases. The maximum losses per trade/day/week/month are taken into account. '[b]Unsafe compound[/b]': In each order all the current capital is gambled and only the default stop loss per order is taken into account. That means that the maximum losses per trade/day/week/month are not taken into account. [b]Default[/b]: 'Somewhat safe compound'.
+// [*] (RISKM) Risk Management Type: 'Safe', 'Somewhat safe compound' or 'None'. '[b]Safe[/b]': Calculations are always done with the initial capital (1000) in mind. The maximum losses per trade/day/week/month are taken into account. '[b]Somewhat safe compound[/b]': Calculations are done with initial capital (1000) or a higher capital if it increases. The maximum losses per trade/day/week/month are taken into account. '[b]None[/b]': In each order all the current capital is gambled and only the default stop loss per order is taken into account. That means that the maximum losses per trade/day/week/month are not taken into account. [b]Default[/b]: 'Somewhat safe compound'.
 // [*] (RISKM) Maximum loss per trade % {1.0}.
 // [*] (RISKM) Maximum loss per day % {6.0}.
 // [*] (RISKM) Maximum loss per week % {8.0}.
@@ -217,8 +217,8 @@ i_tooRecentMinutesNumber = input.int(6, '(RECENT) Number of minutes to wait to o
 i_CapitalQuote = input.float(100.0, title='(CAPITAL) Capital quote invested per order in USDT units {100.0}')
 i_CapitalPercentage = input.float(25.0, title='(CAPITAL) Capital percentage invested per order (%) {25.0}', minval=0, step=0.01) * 0.01
 // Risk Management - Inputs
-_SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _UCOMPOUND_ = 'Unsafe compound'
-i_riskManagementType = input.string(_SCOMPOUND_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _UCOMPOUND_])
+_SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None'
+i_riskManagementType = input.string(_SCOMPOUND_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_])
 i_riskManagementMaximumLossPerTrade = input.float(1.0, title='(RISKM) Maximum loss per trade % {1.0}') / 100
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='(RISKM) Maximum loss per day % {6.0}') / 100
 i_riskManagementMaximumLossPerWeek = input.float(8.0, title='(RISKM) Maximum loss per week % {8.0}') / 100
@@ -615,7 +615,7 @@ if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only
         // but we try to follow risk management rules
         tmpEntryQuantity:= (currentCapital * i_riskManagementMaximumLossPerTrade) / orderStopLoss
 
-    else if (i_riskManagementType == _UCOMPOUND_)
+    else if (i_riskManagementType == _NONE_)
         // Unsafe compound means that we are gambling always everything we have
         tmpEntryQuantity := currentCapital
 
