@@ -64,19 +64,45 @@ export getCurrentMonth () =>
 // @param maximumLossPerDay Maximum required loss per day (per unit)
 // @param maximumLossPerWeek Maximum required loss per week (per unit)
 // @param maximumLossPerMonth Maximum required loss per month (per unit)
+// @param maximumLossPerTrade Maximum Percentual Loss of our Capital Per Trade ( E.g. 0.01 for 1%)
+// @param orderStopLoss Maximum Stop Loss that an order might have. ( E.g. 0.07 for 7% )
+// @param type Risk Management type. 'SAFE': Safe, 'SCOMPOUND': Somewhat Safe Compound, 'NONE': None.
 // @returns Advised entry quantity and extra needed variables
-export advisedEntryQuantity (float entryQuantity, float currentCapital, int currentDay, float currentDayCapital, int currentWeek, float currentWeekCapital, int currentMonth, float currentMonthCapital, float maximumLossPerDay, float maximumLossPerWeek, float maximumLossPerMonth) =>
-    float p_entryQuantity = entryQuantity
+export advisedEntryQuantity (float currentCapital, int currentDay, float currentDayCapital, int currentWeek, float currentWeekCapital, int currentMonth, float currentMonthCapital, float maximumLossPerDay, float maximumLossPerWeek, float maximumLossPerMonth, float maximumLossPerTrade, float orderStopLoss, string type) =>
     float p_currentDayCapital = currentDayCapital
     float p_currentWeekCapital = currentWeekCapital
     float p_currentMonthCapital = currentMonthCapital
 
+    float entryQuantity = na
     float currentDayLoss = na
     float currentWeekLoss = na
     float currentMonthLoss = na
     float currentDayEntryQuantity = na
     float currentWeekEntryQuantity = na
     float currentMonthEntryQuantity = na
+
+    float tmpEntryQuantity = na
+
+    if (type == 'SAFE')
+        // Safe means we stick to the original initial capital
+        // to enforce our risk management policy
+        tmpEntryQuantity := (strategy.initial_capital * maximumLossPerTrade) / orderStopLoss
+
+    else if (type == 'SCOMPOUND')
+        // Safe compound means that we are gambling everything we have
+        // but we try to follow risk management rules
+        tmpEntryQuantity:= (currentCapital * maximumLossPerTrade) / orderStopLoss
+
+    else if (type == 'NONE')
+        // None means that we are gambling always everything we have
+        tmpEntryQuantity := currentCapital
+
+    if (tmpEntryQuantity > currentCapital)
+        // Avoid being stuck when numbers don't match
+        entryQuantity := currentCapital
+    else
+        entryQuantity := tmpEntryQuantity
+
     // DAY
     if (currentDay[1] != currentDay)
         currentDayLoss := 0.0
@@ -118,5 +144,5 @@ export advisedEntryQuantity (float entryQuantity, float currentCapital, int curr
 
     // Avoid to enter a position overall logic
     if ( (not na(currentDayEntryQuantity)) or (not na(currentWeekEntryQuantity)) or (not na(currentMonthEntryQuantity)) )
-        p_entryQuantity:= 0.0
-    [p_entryQuantity, currentDay, p_currentDayCapital, currentWeek, p_currentWeekCapital, currentMonth, p_currentMonthCapital]
+        entryQuantity:= 0.0
+    [entryQuantity, currentDay, p_currentDayCapital, currentWeek, p_currentWeekCapital, currentMonth, p_currentMonthCapital]
