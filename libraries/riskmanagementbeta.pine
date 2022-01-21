@@ -143,6 +143,7 @@ export advisedEntryQuantity (float currentCapital, int currentDay, float current
             currentMonthEntryQuantity:= 0.0 // Avoid entering a position
 
     // Avoid to enter a position overall logic
-    if ( (not na(currentDayEntryQuantity)) or (not na(currentWeekEntryQuantity)) or (not na(currentMonthEntryQuantity)) )
-        entryQuantity:= 0.0
+    if (not (type == 'NONE'))
+        if ( (not na(currentDayEntryQuantity)) or (not na(currentWeekEntryQuantity)) or (not na(currentMonthEntryQuantity)) )
+            entryQuantity:= 0.0
     [entryQuantity, currentDay, p_currentDayCapital, currentWeek, p_currentWeekCapital, currentMonth, p_currentMonthCapital]
