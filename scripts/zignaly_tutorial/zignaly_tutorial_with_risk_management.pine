@@ -175,7 +175,7 @@
 strategy('Zignaly Risk M. A066', shorttitle='A066ZigRisk', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/3 as rm
-import ruckard/ZignalyBeta/1 as zig
+import ruckard/ZignalyBeta/2 as zig
 
 // INPUTS - BEGIN
 
@@ -324,71 +324,6 @@ f_getZignalyLongCloseAlertMessage() =>
 
     var string _message = ''
     _message := zignalyCommonAlertMessage + zignalySeparator + _zignalyLongCloseCommonAlertMessage
-    _message
-
-f_getZignalyShortAlertMessage(_entryQuantityContractsUSDT, _currentCapital) =>
-    // Dependencies: zignalyQuote
-    // Dependencies: zignalyEquals
-    // Dependencies: zignalySeparator
-    // Dependencies: zignalyCommonAlertMessage
-
-    // Dependencies: i_enableStopLoss (initialized in inputs).
-    // Dependencies: i_enableTakeProfit (initialized in inputs).
-    // Dependencies: i_takeProfit (initialized in inputs).
-    // Dependencies: i_enableTrailingTakeProfit (initialized in inputs).
-    // Dependencies: i_trailingTakeProfitPercentageOffset (initialized in inputs).
-    // Dependencies: i_trailingTakeProfitPercentageTrigger (initialized in inputs).
-    // Dependencies: i_zignalyIntegrationType (initialized in inputs).
-    
-    // Function Dependencies: f_priceDecimalDigitsZeroString()
-
-    var string _zignaleStopLossCombo = ''
-    var string _zignaleTakeProfitCombo = ''
-    var string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyLongCloseCommonAlertMessage = zignalyQuote + 'type' + zignalyQuote + zignalyEquals + zignalyQuote + 'entry' + zignalyQuote + zignalySeparator + zignalyQuote + 'side' + zignalyQuote + zignalyEquals + zignalyQuote + 'short' + zignalyQuote + zignalySeparator + zignalyQuote + 'orderType' + zignalyQuote + zignalyEquals + zignalyQuote + 'market' + zignalyQuote + zignalySeparator + zignalyQuote + 'signalId' + zignalyQuote + zignalyEquals + zignalyQuote + 'SHORT-' + exchangeTickerID + zignalyQuote
-    float _floatEntryQuantityContractsUSDT = _entryQuantityContractsUSDT
-    _entryQuantityContractsUSDTStr = str.tostring(_entryQuantityContractsUSDT, '0.' + f_priceDecimalDigitsZeroString())
-    float _floatCurrentCapital = _currentCapital
-    float _entryQuantityContractsPercent = _floatEntryQuantityContractsUSDT / _floatCurrentCapital * 100.00
-    _entryQuantityContractsPercentStr = str.tostring(_entryQuantityContractsPercent, '0.' + f_priceDecimalDigitsZeroString())
-
-    if i_enableStopLoss and i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_
-        _zignaleStopLossCombo := zignalySeparator + zignalyQuote + 'stopLossPercentage' + zignalyQuote + zignalyEquals + zignalyQuote + '' + str.tostring(nz(orderStopLossPerOne) * 100, '0.' + f_priceDecimalDigitsZeroString()) + zignalyQuote
-    else
-        _zignaleStopLossCombo := ''
-    if i_enableTakeProfit and i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_
-        _zignaleTakeProfitCombo := zignalySeparator + zignalyQuote + 'takeProfitPercentage1' + zignalyQuote + zignalyEquals + zignalyQuote + '-' + str.tostring(i_takeProfitPerOne * 100, '0.' + f_priceDecimalDigitsZeroString()) + zignalyQuote
-    else
-        _zignaleTakeProfitCombo := ''
-    if i_enableTrailingTakeProfit and i_zignalyIntegrationType == _ZIGHYBRIDINTEGRATION_
-        _zignaleTrailingTakeProfitCombo := zignalySeparator + zignalyQuote + 'trailingStopDistancePercentage' + zignalyQuote + zignalyEquals + zignalyQuote + '' + str.tostring(i_trailingTakeProfitPercentageOffsetPerOne * 100, '0.' + f_priceDecimalDigitsZeroString()) + zignalyQuote + zignalySeparator + zignalyQuote + 'trailingStopTriggerPercentage' + zignalyQuote + zignalyEquals + zignalyQuote + '-' + str.tostring(i_trailingTakeProfitPercentageTriggerPerOne * 100, '0.' + f_priceDecimalDigitsZeroString()) + zignalyQuote
-    else
-        _zignaleTrailingTakeProfitCombo := ''
-
-
-
-    var string _message = ''
-    if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_)
-        _message := 
-             zignalyCommonAlertMessage + 
-             zignalySeparator + 
-             _zignalyLongCloseCommonAlertMessage + 
-             zignalySeparator + 
-             zignalyQuote + 'positionSizePercentage' + zignalyQuote + zignalyEquals + zignalyQuote + '' +  _entryQuantityContractsPercentStr + zignalyQuote +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
-    else // _ZIGSIGNALPROVIDER_
-        _message := 
-             zignalyCommonAlertMessage + 
-             zignalySeparator + 
-             _zignalyLongCloseCommonAlertMessage + 
-             zignalySeparator + 
-             zignalyQuote + 'positionSizeQuote' + zignalyQuote + zignalyEquals + zignalyQuote + '' +  _entryQuantityContractsUSDTStr + zignalyQuote +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
-
     _message
 
 f_getZignalyShortCloseAlertMessage() =>
@@ -593,7 +528,7 @@ if (i_strategyType == _L_)
 if (i_strategyType == _S_)
     if SHORT
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
-        tmpOrderAlertMessage := f_getZignalyShortAlertMessage(entryQuantityContractsUSDT, currentCapital)
+        tmpOrderAlertMessage := zig.shortEntry(positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=i_takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss)
         tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
         strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
@@ -636,7 +571,7 @@ if (i_strategyType == L_S)
         insideABuyOrder := false
     if SHORT
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
-        tmpOrderAlertMessage := f_getZignalyShortAlertMessage(entryQuantityContractsUSDT, currentCapital)
+        tmpOrderAlertMessage := zig.shortEntry(positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=i_takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss)
         tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
         strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
