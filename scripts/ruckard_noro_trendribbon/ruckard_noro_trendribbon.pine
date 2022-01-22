@@ -186,8 +186,8 @@ i_zignalyIntegrationType = (i_zignalyIntegrationTypePre == _ZIGHYBRIDINTEGRATION
 _ZIGSIGNALPROVIDER_ = 'Signal Provider', _ZIGCOPYTRADERPROVIDER_ = 'Profit Sharing/Copy Trader Provider'
 i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider type', options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
 i_zignalyProviderType = (i_zignalyProviderTypePre == _ZIGCOPYTRADERPROVIDER_) ? 'copytrader' : 'signalprovider'
-L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only'
-i_strategyType = input.string(L_S, '(STRAT) Strategy Type', options=[L_S, _L_, _S_])
+L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
+i_strategyType = input.string(L_S, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
 i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Start Time {2021-01-01 00:00:00}')
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
@@ -603,6 +603,48 @@ if (i_strategyType == L_S)
         strategy.close("[S]", alert_message=i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
         insideASellOrder := false
 // GO LONG and SHORT logic - END
+
+// Reverse logic - BEGIN
+if (i_strategyType == _REVERSE_)
+// Asumption: Above we have:
+// if LONG_CLOSE
+//    LONG := false
+// if SHORT_CLOSE
+//    SHORT := false
+
+    // LONG and SHORT cannot be true at the same time
+    // Anyways we will take it into account
+    if (LONG == true) and (SHORT == true)
+        LONG := true
+        SHORT := false
+    LONG_CLOSE := offStopTimeInterval
+    SHORT_CLOSE := offStopTimeInterval
+
+    if (LONG and (not LONG_CLOSE))
+        tmpPositionBeforeOpeningOrder := strategy.position_avg_price
+        tmpOrderAlertMessage := zig.reverseLongEntry(positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=i_takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss)
+        tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+        strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
+            buyOrderOpenBarIndex := bar_index + 1
+        insideABuyOrder := true
+    if LONG_CLOSE
+        tmpOrderComment := f_getOrderComment("close", strategy.long, f_getZignalyLongCloseAlertMessage())
+        strategy.close("[L]", alert_message=i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
+        insideABuyOrder := false
+    if (SHORT and (not SHORT_CLOSE))
+        tmpPositionBeforeOpeningOrder := strategy.position_avg_price
+        tmpOrderAlertMessage := zig.reverseShortEntry(positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=i_takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss)
+        tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+        strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
+            sellOrderOpenBarIndex := bar_index + 1
+        insideASellOrder := true
+    if SHORT_CLOSE
+        tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
+        insideASellOrder := false
+// Reverse logic - END
 
 // Handle STOP LOSS (and similar) order exits - BEGIN
 
