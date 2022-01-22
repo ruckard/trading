@@ -69,7 +69,7 @@ export longEntry (string providerType = 'copytrader', string exchange, string ex
         p_positionSizeQuote := p_currentCapital
 
     [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
-    
+
     bool p_stopLoss = stopLoss
     bool p_takeProfit = takeProfit
     bool p_trailingStopLoss = trailingStopLoss
@@ -134,21 +134,21 @@ export longEntry (string providerType = 'copytrader', string exchange, string ex
 
     var string _message = ''
     if (providerType == 'copytrader')
-        _message := 
-             zignalyCommonAlertMessage + 
-             zigsep + 
-             _zignalyLongCommonAlertMessage + 
-             zigsep + 
+        _message :=
+             zignalyCommonAlertMessage +
+             zigsep +
+             _zignalyLongCommonAlertMessage +
+             zigsep +
              zigquote + 'positionSizePercentage' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
     else // 'signalprovider'
-        _message := 
-             zignalyCommonAlertMessage + 
-             zigsep + 
-             _zignalyLongCommonAlertMessage + 
-             zigsep + 
+        _message :=
+             zignalyCommonAlertMessage +
+             zigsep +
+             _zignalyLongCommonAlertMessage +
+             zigsep +
              zigquote + 'positionSizeQuote' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsUSDTStr + zigquote +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
