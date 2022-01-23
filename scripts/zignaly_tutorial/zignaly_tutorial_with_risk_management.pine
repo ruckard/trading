@@ -270,21 +270,6 @@ else
 
 // Zignaly
 exchangeTickerID = syminfo.basecurrency + syminfo.currency
-var string zignalySeparator = ','
-var string zignalyQuote = '"'
-var string zignalyEquals = '='
-if i_zignalyAlertType == _ZIGNALYE_
-    zignalySeparator := '||'
-    zignalyQuote := ''
-    zignalyEquals := '='
-    zignalyEquals
-else
-    zignalySeparator := ','
-    zignalyQuote := '"'
-    zignalyEquals := ':'
-    zignalyEquals
-
-zignalyCommonAlertMessage = zignalyQuote + 'exchange' + zignalyQuote + zignalyEquals + zignalyQuote + i_zignalyExchange + zignalyQuote + zignalySeparator + zignalyQuote + 'exchangeAccountType' + zignalyQuote + zignalyEquals + zignalyQuote + i_zignalyExchangeType + zignalyQuote + zignalySeparator + zignalyQuote + 'pair' + zignalyQuote + zignalyEquals + zignalyQuote + '' + exchangeTickerID + zignalyQuote + zignalySeparator + zignalyQuote + 'leverage' + zignalyQuote + zignalyEquals + zignalyQuote + i_zignalyLeverage_str + zignalyQuote
 
 var string tmpOrderComment = na
 var string tmpOrderAlertMessage = na
