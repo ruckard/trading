@@ -522,3 +522,24 @@ export reverseShortEntry (string providerType = 'copytrader', string exchange, s
              _zignaleTrailingTakeProfitCombo
 
     _message
+
+// @function Returns partial alert_message for closing long entries in Zignaly
+// @param exchange Exchange where to submit the position. Defaults to 'binance' (which it's also ok for ProfitSharing because it's the same as zignaly).
+// @param exchangeAccountType Either 'futures' or 'spot'. Defaults to 'futures'.
+// @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
+// @param leverage Futures leverage. Defaults to 1.
+// @param alertType Alert type. Defaults to 'webhook'.
+// @returns Partial alert_message for closing long entries in Zignaly
+export longExit (string exchange, string exchangeAccountType, string pair, int leverage, string alertType) =>
+
+    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+
+
+    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
+
+    _zignalyLongExitCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'exit' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + 'LONG-' + pair + zigquote
+
+    var string _message = ''
+    _message := zignalyCommonAlertMessage + zigsep + _zignalyLongExitCommonAlertMessage
+
+    _message
