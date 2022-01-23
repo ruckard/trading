@@ -305,14 +305,6 @@ f_getContractMultiplier(_contractMaximumDecimalNumber) =>
             _contractMultiplier:= _contractMultiplier * 10
         _contractMultiplier
 
-f_priceDecimalDigitsZeroString () =>
-    // Dependencies: i_priceDecimalDigits (initialized in inputs).
-    _zeroString = ''
-    if not(i_priceDecimalDigits == 0)
-        for _digit = 1 to i_priceDecimalDigits by 1
-            _zeroString += '0'
-    _zeroString
-
 // Zignalye - Functions - BEGIN
 f_getZignalyLongCloseAlertMessage() =>
     // Dependencies: zignalyQuote
