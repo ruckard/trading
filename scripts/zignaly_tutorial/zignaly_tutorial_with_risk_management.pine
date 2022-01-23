@@ -305,21 +305,6 @@ f_getContractMultiplier(_contractMaximumDecimalNumber) =>
             _contractMultiplier:= _contractMultiplier * 10
         _contractMultiplier
 
-// Zignalye - Functions - BEGIN
-f_getZignalyShortCloseAlertMessage() =>
-    // Dependencies: zignalyQuote
-    // Dependencies: zignalyEquals
-    // Dependencies: zignalySeparator
-    // Dependencies: zignalyCommonAlertMessage
-
-    zignalyShortCloseCommonAlertMessage = zignalyQuote + 'type' + zignalyQuote + zignalyEquals + zignalyQuote + 'exit' + zignalyQuote + zignalySeparator + zignalyQuote + 'side' + zignalyQuote + zignalyEquals + zignalyQuote + 'short' + zignalyQuote + zignalySeparator + zignalyQuote + 'orderType' + zignalyQuote + zignalyEquals + zignalyQuote + 'market' + zignalyQuote + zignalySeparator + zignalyQuote + 'signalId' + zignalyQuote + zignalyEquals + zignalyQuote + 'SHORT-' + exchangeTickerID + zignalyQuote
-
-    var string _message = ''
-    _message := zignalyCommonAlertMessage + zignalySeparator + zignalyShortCloseCommonAlertMessage
-    _message
-
-// Zignalye - Functions - END
-
 // Order comment - Functions - BEGIN
 
 f_getOrderComment(_typeOrder, _side, _alertMessage) =>
@@ -522,8 +507,8 @@ if (i_strategyType == _S_)
         insideASellOrder := true
         0 // Workaround for making every if branch to return the same type of value
     else if SHORT_CLOSE
-        tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
-        strategy.close("[S]", alert_message=i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
+        tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
         insideASellOrder := false
         0 // Workaround for making every if branch to return the same type of value
 // GO SHORT only logic - END
@@ -564,8 +549,8 @@ if (i_strategyType == L_S)
             sellOrderOpenBarIndex := bar_index + 1
         insideASellOrder := true
     if SHORT_CLOSE
-        tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
-        strategy.close("[S]", alert_message=i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
+        tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
         insideASellOrder := false
 // GO LONG and SHORT logic - END
 
@@ -606,8 +591,8 @@ if (i_strategyType == _REVERSE_)
             sellOrderOpenBarIndex := bar_index + 1
         insideASellOrder := true
     if SHORT_CLOSE
-        tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
-        strategy.close("[S]", alert_message=i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
+        tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
         insideASellOrder := false
 // Reverse logic - END
 
@@ -649,8 +634,8 @@ else
 
 tmpOrderComment := f_getOrderComment("close", strategy.long, zig.longExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
 strategy.exit("[SL/TP]", "[L]", stop= i_enableStopLoss ? LongStopLoss : na, limit= i_enableTakeProfit ? LongTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? longTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? longTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? zig.longExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
-tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
-strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, limit= i_enableTakeProfit ? ShortTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? shortTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? shortTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
+tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
+strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, limit= i_enableTakeProfit ? ShortTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? shortTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? shortTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
 
 // Handle STOP LOSS (and similar) order exits - END
 
