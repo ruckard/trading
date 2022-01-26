@@ -762,3 +762,25 @@ export updateShortEntry (string exchange, string exchangeAccountType, string pai
          _zignaleTrailingTakeProfitCombo
 
     _message
+
+// @function Returns partial alert_message for updating reverse long entries in Zignaly
+// @param exchange Exchange where to submit the position. Defaults to 'binance' (which it's also ok for ProfitSharing because it's the same as zignaly).
+// @param exchangeAccountType Either 'futures' or 'spot'. Defaults to 'futures'.
+// @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
+// @param leverage Futures leverage. Defaults to 1.
+// @param takeProfit Take Profit switch. Defaults to false if no takeProfitPercentage1 has been given.
+// @param takeProfitPercentage1 Take Profit Percentage from average entry price. If used while takeProfit is undefined then takeProfit is turned on.
+// @param stopLoss Stop Loss switch. Defaults to false if no stopLossPercentage has been given.
+// @param stopLossPercentage Stop Loss Percentage from average entry price. If used while stopLoss is undefined then stopLoss is turned on.
+// @param trailingStopLoss Trailing Stop Loss switch. Defaults to false if neither trailingStopTriggerPercentage nor trailingStopDistancePercentage has been given.
+// @param trailingStopTriggerPercentage Trailing Stop Loss Trigger Percentage. If used while trailingStopLoss is undefined then trailingStopLoss is turned on.
+// @param trailingStopDistancePercentage Trailing Stop Loss Trigger Distance. If used while trailingStopLoss is undefined then trailingStopLoss is turned on.
+// @param alertType Alert type. Defaults to 'webhook'.
+// @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
+// @returns Partial alert_message for updating reverse long entries in Zignaly
+export updateReverseLongEntry (string exchange, string exchangeAccountType, string pair, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, string alertType, int priceDecimalDigits) =>
+
+    signalId = 'REVERSE-' + getZignalyPair(pair)
+    var string _message = updateLongEntry (exchange, exchangeAccountType, pair, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, alertType, priceDecimalDigits, signalId)
+
+    _message
