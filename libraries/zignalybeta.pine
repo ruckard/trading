@@ -18,12 +18,16 @@ getZignalySeparators (string alertType='webhook') =>
 
     [zigsep, zigquote, zigequals]
 
-getZignalyCommonAlertMessage (string exchange='binance', string exchangeAccountType='futures', string pair = na, int leverage = 1, string alertType) =>
-
-    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
+getZignalyPair(string pair = na) =>
     string p_pair = pair
     if (na(p_pair))
         p_pair := syminfo.basecurrency + syminfo.currency
+    p_pair
+
+getZignalyCommonAlertMessage (string exchange='binance', string exchangeAccountType='futures', string pair = na, int leverage = 1, string alertType) =>
+
+    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
+    string p_pair = getZignalyPair(pair)
 
     leverage_str = str.tostring(leverage)
 
@@ -59,6 +63,7 @@ priceDecimalDigitsZeroString (int priceDecimalDigits=2) =>
 export longEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, string integration = 'hybrid', int priceDecimalDigits) =>
 
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    string signalId = 'LONG-' + getZignalyPair(pair)
 
     float p_currentCapital = currentCapital
     if (na(p_currentCapital))
@@ -110,7 +115,7 @@ export longEntry (string providerType = 'copytrader', string exchange, string ex
     var string _zignaleStopLossCombo = ''
     var string _zignaleTakeProfitCombo = ''
     var string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyLongCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'entry' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + 'LONG-' + pair + zigquote
+    _zignalyLongCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'entry' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + signalId + zigquote
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -178,6 +183,7 @@ export longEntry (string providerType = 'copytrader', string exchange, string ex
 export shortEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, string integration = 'hybrid', int priceDecimalDigits) =>
 
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    string signalId = 'SHORT-' + getZignalyPair(pair)
 
     float p_currentCapital = currentCapital
     if (na(p_currentCapital))
@@ -229,7 +235,7 @@ export shortEntry (string providerType = 'copytrader', string exchange, string e
     var string _zignaleStopLossCombo = ''
     var string _zignaleTakeProfitCombo = ''
     var string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'entry' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + 'SHORT-' + pair + zigquote
+    _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'entry' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + signalId + zigquote
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -297,6 +303,7 @@ export shortEntry (string providerType = 'copytrader', string exchange, string e
 export reverseLongEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, string integration = 'hybrid', int priceDecimalDigits) =>
 
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    string signalId = 'REVERSE-' + getZignalyPair(pair)
 
     float p_currentCapital = currentCapital
     if (na(p_currentCapital))
@@ -349,7 +356,7 @@ export reverseLongEntry (string providerType = 'copytrader', string exchange, st
     var string _zignaleTakeProfitCombo = ''
     var string _zignaleTrailingTakeProfitCombo = ''
     _zignalyReverseExitCommonAlertMessage = zigquote + 'exitSide' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'exitOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote
-    _zignalyLongCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'reverse' + zigquote + zigsep + zigquote + 'entrySide' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'entryOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + 'REVERSE-' + pair + zigquote
+    _zignalyLongCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'reverse' + zigquote + zigsep + zigquote + 'entrySide' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'entryOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + signalId + zigquote
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -421,6 +428,7 @@ export reverseLongEntry (string providerType = 'copytrader', string exchange, st
 export reverseShortEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, string integration = 'hybrid', int priceDecimalDigits) =>
 
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    string signalId = 'REVERSE-' + getZignalyPair(pair)
 
     float p_currentCapital = currentCapital
     if (na(p_currentCapital))
@@ -473,7 +481,7 @@ export reverseShortEntry (string providerType = 'copytrader', string exchange, s
     var string _zignaleTakeProfitCombo = ''
     var string _zignaleTrailingTakeProfitCombo = ''
     _zignalyReverseExitCommonAlertMessage = zigquote + 'exitSide' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'exitOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote
-    _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'reverse' + zigquote + zigsep + zigquote + 'entrySide' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'entryOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + 'REVERSE-' + pair + zigquote
+    _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'reverse' + zigquote + zigsep + zigquote + 'entrySide' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'entryOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + signalId + zigquote
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -533,11 +541,12 @@ export reverseShortEntry (string providerType = 'copytrader', string exchange, s
 export longExit (string exchange, string exchangeAccountType, string pair, int leverage, string alertType) =>
 
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    string signalId = 'LONG-' + getZignalyPair(pair)
 
 
     [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
 
-    _zignalyLongExitCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'exit' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + 'LONG-' + pair + zigquote
+    _zignalyLongExitCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'exit' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + signalId + zigquote
 
     var string _message = ''
     _message := zignalyCommonAlertMessage + zigsep + _zignalyLongExitCommonAlertMessage
@@ -554,11 +563,12 @@ export longExit (string exchange, string exchangeAccountType, string pair, int l
 export shortExit (string exchange, string exchangeAccountType, string pair, int leverage, string alertType) =>
 
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    string signalId = 'SHORT-' + getZignalyPair(pair)
 
 
     [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
 
-    _zignalyShortExitCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'exit' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + 'SHORT-' + pair + zigquote
+    _zignalyShortExitCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'exit' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + signalId + zigquote
 
     var string _message = ''
     _message := zignalyCommonAlertMessage + zigsep + _zignalyShortExitCommonAlertMessage
@@ -584,6 +594,7 @@ export updateLongEntry (string exchange, string exchangeAccountType, string pair
 
     integration = 'hybrid' // Force default integration to be hybrid
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    string signalId = 'LONG-' + getZignalyPair(pair)
 
     [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
 
@@ -627,7 +638,7 @@ export updateLongEntry (string exchange, string exchangeAccountType, string pair
     var string _zignaleStopLossCombo = ''
     var string _zignaleTakeProfitCombo = ''
     var string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyLongCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'update' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + 'LONG-' + pair + zigquote
+    _zignalyLongCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'update' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + signalId + zigquote
 
     if p_stopLoss and integration == 'hybrid'
         _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
@@ -674,6 +685,7 @@ export updateShortEntry (string exchange, string exchangeAccountType, string pai
 
     integration = 'hybrid' // Force default integration to be hybrid
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    string signalId = 'SHORT-' + getZignalyPair(pair)
 
     [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
 
@@ -717,7 +729,7 @@ export updateShortEntry (string exchange, string exchangeAccountType, string pai
     var string _zignaleStopLossCombo = ''
     var string _zignaleTakeProfitCombo = ''
     var string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'update' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + 'SHORT-' + pair + zigquote
+    _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'update' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + signalId + zigquote
 
     if p_stopLoss and integration == 'hybrid'
         _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
