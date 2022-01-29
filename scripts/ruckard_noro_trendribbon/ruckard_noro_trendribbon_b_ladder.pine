@@ -196,6 +196,7 @@ i_maType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'],
 i_maLength = input.int(20, minval = 5,  title = '(STRAT) MA Length (min. 5) [20]')
 i_maSource = input.source(ohlc4, title = '(STRAT) MA Source [ohlc4]')
 i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohcl4]')
+i_minimumTakeProfit = input.float(0.20, title='(STRAT) Minimum Take Profit % {0.20}')
 i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
 i_showBackground = input.bool(true, title = 'Show color [true]')
 // Order comments based debug
@@ -341,6 +342,23 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
+
+// Low band and High band calculation - BEGIN
+HighCandle = high
+HighOpenCloseCandle = max(close, open)
+float HighHalfCandle = ( HighCandle + HighOpenCloseCandle ) / 2.0
+HighHalfCandleEMA3 = ta.ema(HighHalfCandle, 3)
+
+LowCandle = low
+LowOpenCloseCandle = min(close, open)
+float LowHalfCandle = ( LowCandle + LowOpenCloseCandle ) / 2.0
+LowHalfCandleEMA3 = ta.ema(LowHalfCandle, 3)
+
+LongDistance = HighHalfCandleEMA3 - LowHalfCandleEMA3
+LongDistancePercentage = ( HighHalfCandleEMA3/LowHalfCandleEMA3 - 1 ) * 100
+
+// Low band and High band calculation - END
+
 ma = i_maType == "SMA" ? ta.sma(i_maSource, i_maLength) : i_maType == "EMA" ? ta.ema(i_maSource, i_maLength) : i_maType == "VWMA" ? ta.vwma(i_maSource, i_maLength) : ta.rma(i_maSource, i_maLength)
 //Price Channel
 highestMA = ta.highest(ma, i_maLength)
