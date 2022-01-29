@@ -21,7 +21,8 @@ getZignalySeparators (string alertType='webhook') =>
 getZignalyPair(string pair = na) =>
     string p_pair = pair
     if (na(p_pair))
-        p_pair := syminfo.basecurrency + syminfo.currency
+//         p_pair := syminfo.basecurrency + syminfo.currency
+        p_pair := syminfo.ticker
     p_pair
 
 getZignalyCommonAlertMessage (string exchange='binance', string exchangeAccountType='futures', string pair = na, int leverage = 1, string alertType) =>
