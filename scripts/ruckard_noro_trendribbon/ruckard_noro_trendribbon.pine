@@ -494,12 +494,12 @@ ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
 
-if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_)
+if (i_zignalyProviderType == 'copytrader')
     entryQuantity := i_CapitalPercentage * currentCapital
 else // _ZIGSIGNALPROVIDER_
     entryQuantity := i_CapitalQuote
 
-if (i_zignalyProviderType == _ZIGCOPYTRADERPROVIDER_) // Risk management is only implemented for CopyTrader Providers
+if (i_zignalyProviderType == 'copytrader') // Risk management is only implemented for CopyTrader Providers
     var currentDayCapital = 0.0
     var currentDay = 0
     var currentWeekCapital = 0.0
