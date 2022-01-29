@@ -3,13 +3,15 @@
 
 //@version=5
 
-// Current version: v20220129 ( A004 )
+// Current version: v20220121 ( A066 )
 // Tradingview Public description - BEGIN
 // 
 // This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
 // This specific strategy also includes Risk Management.
 // 
-// It was originally tested at BTCUSDT pair and 4H timeframe.
+// It was originally tested at BTCUSDT pair and 1D timeframe.
+// The strategy is a slightly modified copy of default TradingView strategy that appears when you create a blank new strategy.
+// It decides to go long when 14-period SMA crosses over 28-period SMA and goes short when 14-period SMA crosses under 28-period SMA.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
@@ -170,7 +172,7 @@
 
 // Tradingview Public description - END
 
-strategy('Ruckard Noro TrendRibbon A004', shorttitle='A004RNoroTRibbon', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Zignaly Risk M. A066', shorttitle='A066ZigRisk', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/3 as rm
 import ruckard/ZignalyBeta/7 as zig
@@ -187,22 +189,16 @@ _ZIGSIGNALPROVIDER_ = 'Signal Provider', _ZIGCOPYTRADERPROVIDER_ = 'Profit Shari
 i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider type', options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
 i_zignalyProviderType = (i_zignalyProviderTypePre == _ZIGCOPYTRADERPROVIDER_) ? 'copytrader' : 'signalprovider'
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
-i_strategyType = input.string(_REVERSE_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
+i_strategyType = input.string(_L_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
 i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Start Time {2021-01-01 00:00:00}')
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
-i_maType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) MA Type [SMA]')
-i_maLength = input.int(20, minval = 5,  title = '(STRAT) MA Length (min. 5) [20]')
-i_maSource = input.source(ohlc4, title = '(STRAT) MA Source [ohlc4]')
-i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohcl4]')
-i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
-i_showBackground = input.bool(true, title = 'Show color [true]')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
-i_enableStopLoss = input.bool(false, '(STOPTAKE) Stop Loss? {False}')
-i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
+i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
+i_enableTrailingTakeProfit = input.bool(true, title='(TRAILING) Enable Trailing Take Profit (%) {True}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
 i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
@@ -219,17 +215,17 @@ _ZIGEXZIGNALY_ = 'Zignaly', _ZIGEXBINANCE_ = 'Binance', _ZIGEXKUCOIN_ = 'Kucoin'
 i_zignalyExchange = input.string(_ZIGEXZIGNALY_, '(ZIG) Exchange {Zignaly}', options=[_ZIGEXZIGNALY_, _ZIGEXBINANCE_, _ZIGEXKUCOIN_])
 _ZIGEXTYPESPOT_ = 'spot', _ZIGEXFUTURES_ = 'futures'
 i_zignalyExchangeType = input.string(_ZIGEXFUTURES_, '(ZIG) Exchange Type {Futures}', options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_])
-i_zignalyLeverage = input.int(2, '(ZIG) Leverage {2}', minval=1, step=1, maxval=125)
+i_zignalyLeverage = input.int(1, '(ZIG) Leverage {1}', minval=1, step=1, maxval=125)
 var i_zignalyLeverage_str = str.tostring(i_zignalyLeverage)  // It needs to run only once
 i_priceDecimalDigits = input.int(2, 'Number of decimal digits for Prices {2}', minval=0, maxval=10, step=1)
 // Decimal - Inputs
 i_contractMaximumDecimalNumber = input.int(3, title='(DECIMAL) Maximum number of decimal for contracts {3}', minval=0)
-i_tooRecentMinutesNumber = input.int(0, '(RECENT) Number of minutes to wait to open a new order after the previous one has been opened {0}', minval=0, maxval=100, step=1)
+i_tooRecentMinutesNumber = input.int(6, '(RECENT) Number of minutes to wait to open a new order after the previous one has been opened {6}', minval=0, maxval=100, step=1)
 i_CapitalQuote = input.float(100.0, title='(CAPITAL) Capital quote invested per order in USDT units {100.0}')
 i_CapitalPercentage = input.float(25.0, title='(CAPITAL) Capital percentage invested per order (%) {25.0}', minval=0, step=0.01) * 0.01
 // Risk Management - Inputs
 _SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None'
-i_riskManagementTypePre = input.string(_NONE_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_])
+i_riskManagementTypePre = input.string(_SCOMPOUND_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_])
 i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : 'NONE'
 i_riskManagementMaximumLossPerTrade = input.float(1.0, title='(RISKM) Maximum loss per trade % {1.0}') / 100
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='(RISKM) Maximum loss per day % {6.0}') / 100
@@ -274,21 +270,6 @@ else
 
 // Zignaly
 exchangeTickerID = syminfo.ticker
-var string zignalySeparator = ','
-var string zignalyQuote = '"'
-var string zignalyEquals = '='
-if i_zignalyAlertType == _ZIGNALYE_
-    zignalySeparator := '||'
-    zignalyQuote := ''
-    zignalyEquals := '='
-    zignalyEquals
-else
-    zignalySeparator := ','
-    zignalyQuote := '"'
-    zignalyEquals := ':'
-    zignalyEquals
-
-zignalyCommonAlertMessage = zignalyQuote + 'exchange' + zignalyQuote + zignalyEquals + zignalyQuote + i_zignalyExchange + zignalyQuote + zignalySeparator + zignalyQuote + 'exchangeAccountType' + zignalyQuote + zignalyEquals + zignalyQuote + i_zignalyExchangeType + zignalyQuote + zignalySeparator + zignalyQuote + 'pair' + zignalyQuote + zignalyEquals + zignalyQuote + '' + exchangeTickerID + zignalyQuote + zignalySeparator + zignalyQuote + 'leverage' + zignalyQuote + zignalyEquals + zignalyQuote + i_zignalyLeverage_str + zignalyQuote
 
 var string tmpOrderComment = na
 var string tmpOrderAlertMessage = na
@@ -308,41 +289,6 @@ f_getContractMultiplier(_contractMaximumDecimalNumber) =>
         for _counter = 1 to _contractMaximumDecimalNumber
             _contractMultiplier:= _contractMultiplier * 10
         _contractMultiplier
-
-f_priceDecimalDigitsZeroString () =>
-    // Dependencies: i_priceDecimalDigits (initialized in inputs).
-    _zeroString = ''
-    if not(i_priceDecimalDigits == 0)
-        for _digit = 1 to i_priceDecimalDigits by 1
-            _zeroString += '0'
-    _zeroString
-
-// Zignalye - Functions - BEGIN
-f_getZignalyLongCloseAlertMessage() =>
-    // Dependencies: zignalyQuote
-    // Dependencies: zignalyEquals
-    // Dependencies: zignalySeparator
-    // Dependencies: zignalyCommonAlertMessage
-
-    _zignalyLongCloseCommonAlertMessage = zignalyQuote + 'type' + zignalyQuote + zignalyEquals + zignalyQuote + 'exit' + zignalyQuote + zignalySeparator + zignalyQuote + 'side' + zignalyQuote + zignalyEquals + zignalyQuote + 'long' + zignalyQuote + zignalySeparator + zignalyQuote + 'orderType' + zignalyQuote + zignalyEquals + zignalyQuote + 'market' + zignalyQuote + zignalySeparator + zignalyQuote + 'signalId' + zignalyQuote + zignalyEquals + zignalyQuote + 'LONG-' + exchangeTickerID + zignalyQuote
-
-    var string _message = ''
-    _message := zignalyCommonAlertMessage + zignalySeparator + _zignalyLongCloseCommonAlertMessage
-    _message
-
-f_getZignalyShortCloseAlertMessage() =>
-    // Dependencies: zignalyQuote
-    // Dependencies: zignalyEquals
-    // Dependencies: zignalySeparator
-    // Dependencies: zignalyCommonAlertMessage
-
-    zignalyShortCloseCommonAlertMessage = zignalyQuote + 'type' + zignalyQuote + zignalyEquals + zignalyQuote + 'exit' + zignalyQuote + zignalySeparator + zignalyQuote + 'side' + zignalyQuote + zignalyEquals + zignalyQuote + 'short' + zignalyQuote + zignalySeparator + zignalyQuote + 'orderType' + zignalyQuote + zignalyEquals + zignalyQuote + 'market' + zignalyQuote + zignalySeparator + zignalyQuote + 'signalId' + zignalyQuote + zignalyEquals + zignalyQuote + 'SHORT-' + exchangeTickerID + zignalyQuote
-
-    var string _message = ''
-    _message := zignalyCommonAlertMessage + zignalySeparator + zignalyShortCloseCommonAlertMessage
-    _message
-
-// Zignalye - Functions - END
 
 // Order comment - Functions - BEGIN
 
@@ -391,29 +337,12 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-ma = i_maType == "SMA" ? ta.sma(i_maSource, i_maLength) : i_maType == "EMA" ? ta.ema(i_maSource, i_maLength) : i_maType == "VWMA" ? ta.vwma(i_maSource, i_maLength) : ta.rma(i_maSource, i_maLength)
-//Price Channel
-highestMA = ta.highest(ma, i_maLength)
-lowestMA = ta.lowest(ma, i_maLength)
-
-//Trend
-trend = 0
-trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 : trend[1]
-
-//Trading
-longCondition = (trend == 1)
-shortCondition = (trend == -1)
+// longCondition = crossover(sma(close, 14), sma(close, 28))
+// shortCondition = crossunder(sma(close, 14), sma(close, 28))
+longCondition = ta.sma(close, 14) >= ta.sma(close, 28)
+shortCondition = ta.sma(close, 14) < ta.sma(close, 28)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
-MAColor = i_showRibbon ? color.black : na
-MAPlot = plot(ma, color = MAColor, title = "MA")
-highestLowestColor = i_showRibbon ? color.blue : na
-highestMAPlot = plot(highestMA, color = highestLowestColor, title = "Upper line")
-lowestMAPlot = plot(lowestMA, color = highestLowestColor, title = "Lower Line")
-highestMABackgroundColor = i_showBackground ? color.red : na
-lowestMABackgroundColor = i_showBackground ? color.blue : na
-fill(highestMAPlot, MAPlot, color = color.new(highestMABackgroundColor, 50))
-fill(lowestMAPlot, MAPlot, color = color.new(lowestMABackgroundColor, 50))
 
 // Position price calculation - BEGIN
 float positionPrice = na
@@ -545,8 +474,8 @@ if (i_strategyType == _L_)
         insideABuyOrder := true
         0 // Workaround for making every if branch to return the same type of value
     else if LONG_CLOSE
-        tmpOrderComment := f_getOrderComment("close", strategy.long, f_getZignalyLongCloseAlertMessage())
-        strategy.close("[L]", alert_message=i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
+        tmpOrderComment := f_getOrderComment("close", strategy.long, zig.longExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
+        strategy.close("[L]", alert_message=i_enableZignalyAlert ? zig.longExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
         insideABuyOrder := false
         0 // Workaround for making every if branch to return the same type of value
 // GO LONG only logic - END
@@ -563,8 +492,8 @@ if (i_strategyType == _S_)
         insideASellOrder := true
         0 // Workaround for making every if branch to return the same type of value
     else if SHORT_CLOSE
-        tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
-        strategy.close("[S]", alert_message=i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
+        tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
         insideASellOrder := false
         0 // Workaround for making every if branch to return the same type of value
 // GO SHORT only logic - END
@@ -593,8 +522,8 @@ if (i_strategyType == L_S)
             buyOrderOpenBarIndex := bar_index + 1
         insideABuyOrder := true
     if LONG_CLOSE
-        tmpOrderComment := f_getOrderComment("close", strategy.long, f_getZignalyLongCloseAlertMessage())
-        strategy.close("[L]", alert_message=i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
+        tmpOrderComment := f_getOrderComment("close", strategy.long, zig.longExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
+        strategy.close("[L]", alert_message=i_enableZignalyAlert ? zig.longExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
         insideABuyOrder := false
     if SHORT
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
@@ -605,8 +534,8 @@ if (i_strategyType == L_S)
             sellOrderOpenBarIndex := bar_index + 1
         insideASellOrder := true
     if SHORT_CLOSE
-        tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
-        strategy.close("[S]", alert_message=i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
+        tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
         insideASellOrder := false
 // GO LONG and SHORT logic - END
 
@@ -635,8 +564,8 @@ if (i_strategyType == _REVERSE_)
             buyOrderOpenBarIndex := bar_index + 1
         insideABuyOrder := true
     if LONG_CLOSE
-        tmpOrderComment := f_getOrderComment("close", strategy.long, f_getZignalyLongCloseAlertMessage())
-        strategy.close("[L]", alert_message=i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
+        tmpOrderComment := f_getOrderComment("close", strategy.long, zig.longExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
+        strategy.close("[L]", alert_message=i_enableZignalyAlert ? zig.longExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
         insideABuyOrder := false
     if (SHORT and (not SHORT_CLOSE))
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
@@ -647,8 +576,8 @@ if (i_strategyType == _REVERSE_)
             sellOrderOpenBarIndex := bar_index + 1
         insideASellOrder := true
     if SHORT_CLOSE
-        tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
-        strategy.close("[S]", alert_message=i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
+        tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
         insideASellOrder := false
 // Reverse logic - END
 
@@ -688,10 +617,10 @@ else
 // This might trigger additional close orders than needed in zignaly
 // Better close an existing order twice than regreting zignaly not having closed it.
 
-tmpOrderComment := f_getOrderComment("close", strategy.long, f_getZignalyLongCloseAlertMessage())
-strategy.exit("[SL/TP]", "[L]", stop= i_enableStopLoss ? LongStopLoss : na, limit= i_enableTakeProfit ? LongTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? longTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? longTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? f_getZignalyLongCloseAlertMessage() : na, comment=tmpOrderComment)
-tmpOrderComment := f_getOrderComment("close", strategy.short, f_getZignalyShortCloseAlertMessage())
-strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, limit= i_enableTakeProfit ? ShortTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? shortTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? shortTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? f_getZignalyShortCloseAlertMessage() : na, comment=tmpOrderComment)
+tmpOrderComment := f_getOrderComment("close", strategy.long, zig.longExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
+strategy.exit("[SL/TP]", "[L]", stop= i_enableStopLoss ? LongStopLoss : na, limit= i_enableTakeProfit ? LongTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? longTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? longTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? zig.longExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
+tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType))
+strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, limit= i_enableTakeProfit ? ShortTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? shortTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? shortTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? zig.shortExit(exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType) : na, comment=tmpOrderComment)
 
 // Handle STOP LOSS (and similar) order exits - END
 
