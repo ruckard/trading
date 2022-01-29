@@ -269,7 +269,7 @@ else
     lastOrderOpenBarTime := time_close
 
 // Zignaly
-exchangeTickerID = syminfo.basecurrency + syminfo.currency
+exchangeTickerID = syminfo.ticker
 
 var string tmpOrderComment = na
 var string tmpOrderAlertMessage = na
