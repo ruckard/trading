@@ -9,7 +9,7 @@
 // This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
 // This specific strategy also includes Risk Management.
 // 
-// It was originally tested at BTCUSDT pair and 4H timeframe.
+// It was originally tested at 1000SHIBUSDT pair and 30m timeframe.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
