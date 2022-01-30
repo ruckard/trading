@@ -366,7 +366,7 @@ obvRsiSourceChange = ta.change(i_obvRsiSource)
 obv = ta.cum(obvRsiSourceChange > 0 ? volume : obvRsiSourceChange < 0 ? -volume : 0*volume)
 
 obv_rsi = ta.rsi(obv, i_obvRsiLength)
-// obvBuy = ta.crossover(obv_rsi, i_obvLongEntryCrossOver)
+obvBuy = ta.crossover(obv_rsi, i_obvLongEntryCrossOver)
 obvSell = ta.crossunder(obv_rsi, i_obvLongExitCrossUnder)
 
 // RSI
@@ -374,13 +374,18 @@ rsi1 = ta.rsi(i_rsiSource, i_rsiLength)
 
 // Conditions
 longRsi = ta.crossover(rsi1, i_rsiLongEntryCrossOver)
-// longcloseRsi = ta.crossunder(rsi1, i_rsiLongExitCrossUnder)
+longcloseRsi = ta.crossunder(rsi1, i_rsiLongExitCrossUnder)
 // stopRsi= ta.crossunder(rsi, i_AcilCikisNoktasi)
 
 longCondition = (obvSell[1] or obvSell[2] or obvSell[3] or obvSell[4]) and longRsi
 shortCondition = false // We don't short in this strategy.
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
+
+plotshape(obvBuy ,title ='Obv Al', text='', style=shape.cross, location=location.abovebar, color=color.new(color.lime, 0), offset=0, size=size.small)
+plotshape(obvSell ,title ='Obv Sat', text='', style=shape.cross, location=location.abovebar, color=color.new(color.red, 0), offset=0, size=size.small)
+plotshape(longRsi,  title = "RSI AL",  text = '✔',  style = shape.labelup,   location = location.belowbar, color= color.green, textcolor = color.white,  size = size.tiny)
+plotshape(longcloseRsi, title = "RSI SAT", text = '!', style = shape.labeldown, location = location.abovebar, color= color.red,   textcolor = color.white, size = size.tiny)
 
 
 // Position price calculation - BEGIN
