@@ -399,10 +399,10 @@ tooRecentOrderNotOpenAdvice = f_getTooRecentOrderNotOpenAdvice ()
 // Decide if we are going to LONG/Go LONG - BEGIN
 PRE_LONG = false
 ladderLong = false
-if ( (LongDistancePercentage > i_minimumLongDistancePercentage) and (close < LowHalfCandleEMA) )
+if ( (LongDistancePercentage > i_minimumLongDistancePercentage) )
     ladderLong := true
 ladderShort = false
-if ( (LongDistancePercentage > i_minimumLongDistancePercentage) and (close > HighHalfCandleEMA) )
+if ( (LongDistancePercentage > i_minimumLongDistancePercentage) )
     ladderShort := true
 i_takeProfit = ((i_minimumDistanceProfitPercentage / 100.0) * i_minimumLongDistancePercentage)
 i_takeProfitPerOne = i_takeProfit / 100
