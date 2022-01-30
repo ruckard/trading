@@ -214,7 +214,7 @@ i_zignalyAlertType = (i_zignalyAlertTypePre == _ZIGNALYW_) ? 'webhook' : 'email'
 _ZIGEXZIGNALY_ = 'Zignaly', _ZIGEXBINANCE_ = 'Binance', _ZIGEXKUCOIN_ = 'Kucoin'
 i_zignalyExchange = input.string(_ZIGEXZIGNALY_, '(ZIG) Exchange {Zignaly}', options=[_ZIGEXZIGNALY_, _ZIGEXBINANCE_, _ZIGEXKUCOIN_])
 _ZIGEXTYPESPOT_ = 'spot', _ZIGEXFUTURES_ = 'futures'
-i_zignalyExchangeType = input.string(_ZIGEXFUTURES_, '(ZIG) Exchange Type {Futures}', options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_])
+i_zignalyExchangeType = input.string(_ZIGEXTYPESPOT_, '(ZIG) Exchange Type {Spot}', options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_])
 i_zignalyLeverage = input.int(1, '(ZIG) Leverage {1}', minval=1, step=1, maxval=125)
 var i_zignalyLeverage_str = str.tostring(i_zignalyLeverage)  // It needs to run only once
 i_priceDecimalDigits = input.int(2, 'Number of decimal digits for Prices {2}', minval=0, maxval=10, step=1)
