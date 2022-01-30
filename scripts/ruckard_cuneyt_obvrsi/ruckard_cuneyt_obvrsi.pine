@@ -194,12 +194,27 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+
+i_obvRsiLength = input.int(title='(STRAT) Obv Rsi Length [14]', defval=14)
+i_obvRsiSource = input.source(close, title = '(STRAT) Obv Rsi Source [close]')
+i_obvLongExitCrossUnder = input.float(30.0, '(STRAT) OBV Sell CrossUnder (%) {30.0}', minval=0, step=0.01)
+i_obvLongEntryCrossOver = input.float(70.0, '(STRAT) OBV Buy CrossOver (%) {70.0}', minval=0, step=0.01)
+
+i_rsiLength = input.int(title='(STRAT) RSI Value', defval=14)
+i_rsiSource = input.source(close, title = '(STRAT) Rsi Source [close]')
+i_rsiLongEntryCrossOver = input.float(29.0, '(STRAT) RSI Buy CrossOver (%) {29.0}', minval=0, step=0.01)
+i_rsiLongExitCrossUnder = input.float(75.0, '(STRAT) RSI Sell CrossUnder (%) {75.0}', minval=0, step=0.01)
+
+// AcilCikis = input(false, "Stop ?")
+// i_AcilCikisNoktasi = input(10, "(STRAT) RSI Stop Point")
+// pyramidCount = input(title="Pyramid Value", type=input.integer, defval=10)
+
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
-i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
+i_enableTakeProfit = input.bool(true, '(STOPTAKE) Take Profit? {true}')
 i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
 i_enableTrailingTakeProfit = input.bool(true, title='(TRAILING) Enable Trailing Take Profit (%) {True}')
-i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
+i_takeProfit = input.float(1.0, title='(STOPTAKE) Take Profit % {1.0}')
 i_takeProfitPerOne = i_takeProfit / 100
 i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 // Trailing Take Profit - Inputs
@@ -339,10 +354,32 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = crossover(sma(close, 14), sma(close, 28))
-// shortCondition = crossunder(sma(close, 14), sma(close, 28))
-longCondition = ta.sma(close, 14) >= ta.sma(close, 28)
-shortCondition = ta.sma(close, 14) < ta.sma(close, 28)
+// var float[] buyObvRsiArray = array.new_float(0)
+// var float[] buyObvRsiArrayConfirmed = array.new_float(0)
+
+// OBV RSI
+var priceObvRsi = 0.0
+var prcObvRsi = 0.0
+
+//obv = to volume if change > 0, else obv = -volume or 0 if no change.
+obvRsiSourceChange = ta.change(i_obvRsiSource)
+obv = ta.cum(obvRsiSourceChange > 0 ? volume : obvRsiSourceChange < 0 ? -volume : 0*volume)
+
+obv_rsi = ta.rsi(obv, i_obvRsiLength)
+// obvBuy = ta.crossover(obv_rsi, i_obvLongEntryCrossOver)
+obvSell = ta.crossunder(obv_rsi, i_obvLongExitCrossUnder)
+
+// RSI
+rsi1 = ta.rsi(i_rsiSource, i_rsiLength)
+
+// Conditions
+longRsi = ta.crossover(rsi1, i_rsiLongEntryCrossOver)
+// longcloseRsi = ta.crossunder(rsi1, i_rsiLongExitCrossUnder)
+// stopRsi= ta.crossunder(rsi, i_AcilCikisNoktasi)
+
+longCondition = (obvSell[1] or obvSell[2] or obvSell[3] or obvSell[4]) and longRsi
+shortCondition = false // We don't short in this strategy.
+
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
@@ -383,7 +420,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or (not (longCondition))
+LONG_CLOSE := offStopTimeInterval
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
