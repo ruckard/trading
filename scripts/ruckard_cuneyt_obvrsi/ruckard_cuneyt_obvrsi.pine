@@ -190,7 +190,7 @@ i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider
 i_zignalyProviderType = (i_zignalyProviderTypePre == _ZIGCOPYTRADERPROVIDER_) ? 'copytrader' : 'signalprovider'
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
 i_strategyType = input.string(_L_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
-i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Start Time {2021-01-01 00:00:00}')
+i_strategyStartTime = input.time(timestamp('01 Nov 2021'), '(STRAT) Strategy Start Time {2021-11-01 00:00:00}')
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
