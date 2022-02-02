@@ -205,7 +205,7 @@ i_rsiSource = input.source(close, title = '(STRAT) Rsi Source [close]')
 i_rsiLongEntryCrossOver = input.float(29.0, '(STRAT) RSI Buy CrossOver (%) {29.0}', minval=0, step=0.01)
 i_rsiLongExitCrossUnder = input.float(75.0, '(STRAT) RSI Sell CrossUnder (%) {75.0}', minval=0, step=0.01)
 
-i_pyramidingMaximum = input.int(title='(STRAT) Pyramiding Maximum {1}', defval=1)
+i_pyramidingMaximum = input.int(title='(STRAT) Pyramiding Maximum {10}', defval=10)
 
 // AcilCikis = input(false, "Stop ?")
 // i_AcilCikisNoktasi = input(10, "(STRAT) RSI Stop Point")
