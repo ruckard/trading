@@ -205,6 +205,8 @@ i_rsiSource = input.source(close, title = '(STRAT) Rsi Source [close]')
 i_rsiLongEntryCrossOver = input.float(29.0, '(STRAT) RSI Buy CrossOver (%) {29.0}', minval=0, step=0.01)
 i_rsiLongExitCrossUnder = input.float(75.0, '(STRAT) RSI Sell CrossUnder (%) {75.0}', minval=0, step=0.01)
 
+i_pyramidingMaximum = input.int(title='(STRAT) Pyramiding Maximum {1}', defval=1)
+
 // AcilCikis = input(false, "Stop ?")
 // i_AcilCikisNoktasi = input(10, "(STRAT) RSI Stop Point")
 // pyramidCount = input(title="Pyramid Value", type=input.integer, defval=10)
@@ -266,6 +268,12 @@ float orderStopLoss = orderStopLossPerOne
 
 var int buyOrderOpenBarIndex = na
 var int sellOrderOpenBarIndex = na
+
+// Pyramiding accounting - Variables
+var int longPyramidingLevel = 0
+var int shortPyramidingLevel = 0
+var bool longPyramidingLevelReached = false
+var bool shortPyramidingLevelReached = false
 
 // Handle to avoid two long and short orders being too next to each other
 var bool _oldInsideABuyOrder = false
@@ -394,6 +402,11 @@ if (insideASellOrder or insideABuyOrder)
     positionPrice := strategy.position_avg_price
 else
     positionPrice := close
+    // Make sure to reset pyramiding if we are not in an order
+    longPyramidingLevel := 0
+    shortPyramidingLevel := 0
+    longPyramidingLevelReached := false
+    shortPyramidingLevelReached := false
     
 // Position price calculation - END
 
@@ -451,6 +464,36 @@ else
     orderStopLossPerOne := i_stopLoss
     orderStopLoss := orderStopLossPerOne * 100
 
+// Pyramiding accounting - BEGIN
+
+if LONG
+    longPyramidingLevel := longPyramidingLevel + 1
+if SHORT
+    shortPyramidingLevel := shortPyramidingLevel + 1
+if LONG_CLOSE
+    longPyramidingLevel := 0
+if SHORT_CLOSE
+    shortPyramidingLevel := 0
+
+// Handle Pyramiding maximum
+if (longPyramidingLevel >= i_pyramidingMaximum)
+    longPyramidingLevelReached := true
+else
+    longPyramidingLevelReached := false
+
+if (shortPyramidingLevel >= i_pyramidingMaximum)
+    shortPyramidingLevelReached := true
+else
+    shortPyramidingLevelReached := false
+
+// Handle Pyramiding overrun
+if (longPyramidingLevel > i_pyramidingMaximum)
+    LONG := false
+
+if (shortPyramidingLevel > i_pyramidingMaximum)
+    SHORT := false
+
+// Pyramiding accounting - END
 
 // How much to LONG/GO LONG/SHORT/GO SHORT - BEGIN
 
