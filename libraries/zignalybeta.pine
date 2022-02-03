@@ -716,9 +716,11 @@ export updateLongEntry (string providerType = 'copytrader', string exchange, str
     _message
 
 // @function Returns partial alert_message for updating short entries in Zignaly
+// @param providerType Provide type. Either 'copytrader' (for both copytrader and profitsharing) or 'signalprovider'. Defaults to 'copytrader'.
 // @param exchange Exchange where to submit the position. Defaults to 'binance' (which it's also ok for ProfitSharing because it's the same as zignaly).
 // @param exchangeAccountType Either 'futures' or 'spot'. Defaults to 'futures'.
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
+// @param positionSizeQuote Entry Quantity that has already been calculated in USDT or base pair. Defaults to full currentCapital. ( Ignored for Signal Provider. )
 // @param leverage Futures leverage. Defaults to 1.
 // @param takeProfit Take Profit switch. Defaults to false if no takeProfitPercentage1 has been given.
 // @param takeProfitPercentage1 Take Profit Percentage from average entry price. If used while takeProfit is undefined then takeProfit is turned on.
@@ -727,17 +729,26 @@ export updateLongEntry (string providerType = 'copytrader', string exchange, str
 // @param trailingStopLoss Trailing Stop Loss switch. Defaults to false if neither trailingStopTriggerPercentage nor trailingStopDistancePercentage has been given.
 // @param trailingStopTriggerPercentage Trailing Stop Loss Trigger Percentage. If used while trailingStopLoss is undefined then trailingStopLoss is turned on.
 // @param trailingStopDistancePercentage Trailing Stop Loss Trigger Distance. If used while trailingStopLoss is undefined then trailingStopLoss is turned on.
+// @param currentCapital Current capital of your account. It defaults to strategy.initial_capital + strategy.netprofit .
 // @param alertType Alert type. Defaults to 'webhook'.
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId (Used internally).
 // @returns Partial alert_message for updating short entries in Zignaly
-export updateShortEntry (string exchange, string exchangeAccountType, string pair, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, string alertType, int priceDecimalDigits, string signalId = na) =>
+export updateShortEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na) =>
 
     integration = 'hybrid' // Force default integration to be hybrid
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'SHORT-' + getZignalyPair(pair)
+
+    float p_currentCapital = currentCapital
+    if (na(p_currentCapital))
+        p_currentCapital := strategy.initial_capital + strategy.netprofit
+
+    float p_positionSizeQuote = positionSizeQuote
+    if (na(p_positionSizeQuote))
+        p_positionSizeQuote := p_currentCapital
 
     [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
 
@@ -782,6 +793,11 @@ export updateShortEntry (string exchange, string exchangeAccountType, string pai
     var string _zignaleTakeProfitCombo = ''
     var string _zignaleTrailingTakeProfitCombo = ''
     _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'update' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
+    float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
+    _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
+    float _floatCurrentCapital = p_currentCapital
+    float _entryQuantityContractsPercent = _floatEntryQuantityContractsUSDT / _floatCurrentCapital * 100.00
+    _entryQuantityContractsPercentStr = str.tostring(_entryQuantityContractsPercent, '0.' + priceDecimalDigitsString)
 
     if p_stopLoss and integration == 'hybrid'
         _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
@@ -799,13 +815,24 @@ export updateShortEntry (string exchange, string exchangeAccountType, string pai
 
 
     var string _message = ''
-    _message :=
-         zignalyCommonAlertMessage +
-         zigsep +
-         _zignalyShortCommonAlertMessage +
-         _zignaleStopLossCombo +
-         _zignaleTakeProfitCombo +
-         _zignaleTrailingTakeProfitCombo
+    if (providerType == 'copytrader')
+        _message :=
+             zignalyCommonAlertMessage +
+             zigsep +
+             _zignalyShortCommonAlertMessage +
+             zigsep +
+             zigquote + 'positionSizePercentage' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
+             _zignaleStopLossCombo +
+             _zignaleTakeProfitCombo +
+             _zignaleTrailingTakeProfitCombo
+    else // 'signalprovider'
+        _message :=
+             zignalyCommonAlertMessage +
+             zigsep +
+             _zignalyShortCommonAlertMessage +
+             _zignaleStopLossCombo +
+             _zignaleTakeProfitCombo +
+             _zignaleTrailingTakeProfitCombo
 
     _message
 
@@ -838,9 +865,11 @@ export updateReverseLongEntry (string providerType = 'copytrader', string exchan
     _message
 
 // @function Returns partial alert_message for updating reverse short entries in Zignaly
+// @param providerType Provide type. Either 'copytrader' (for both copytrader and profitsharing) or 'signalprovider'. Defaults to 'copytrader'.
 // @param exchange Exchange where to submit the position. Defaults to 'binance' (which it's also ok for ProfitSharing because it's the same as zignaly).
 // @param exchangeAccountType Either 'futures' or 'spot'. Defaults to 'futures'.
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
+// @param positionSizeQuote Entry Quantity that has already been calculated in USDT or base pair. Defaults to full currentCapital. ( Ignored for Signal Provider. )
 // @param leverage Futures leverage. Defaults to 1.
 // @param takeProfit Take Profit switch. Defaults to false if no takeProfitPercentage1 has been given.
 // @param takeProfitPercentage1 Take Profit Percentage from average entry price. If used while takeProfit is undefined then takeProfit is turned on.
@@ -849,15 +878,16 @@ export updateReverseLongEntry (string providerType = 'copytrader', string exchan
 // @param trailingStopLoss Trailing Stop Loss switch. Defaults to false if neither trailingStopTriggerPercentage nor trailingStopDistancePercentage has been given.
 // @param trailingStopTriggerPercentage Trailing Stop Loss Trigger Percentage. If used while trailingStopLoss is undefined then trailingStopLoss is turned on.
 // @param trailingStopDistancePercentage Trailing Stop Loss Trigger Distance. If used while trailingStopLoss is undefined then trailingStopLoss is turned on.
+// @param currentCapital Current capital of your account. It defaults to strategy.initial_capital + strategy.netprofit .
 // @param alertType Alert type. Defaults to 'webhook'.
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId Defaults to REVERSE-pair.
 // @returns Partial alert_message for updating reverse short entries in Zignaly
-export updateReverseShortEntry (string exchange, string exchangeAccountType, string pair, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, string alertType, int priceDecimalDigits, string signalId = na) =>
+export updateReverseShortEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na) =>
 
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    var string _message = updateShortEntry (exchange, exchangeAccountType, pair, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, alertType, priceDecimalDigits, p_signalId)
+    var string _message = updateShortEntry (providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId)
 
     _message
