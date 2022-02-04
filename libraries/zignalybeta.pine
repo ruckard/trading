@@ -626,8 +626,6 @@ export updateLongEntry (string providerType = 'copytrader', string exchange, str
         p_currentCapital := strategy.initial_capital + strategy.netprofit
 
     float p_positionSizeQuote = positionSizeQuote
-    if (na(p_positionSizeQuote))
-        p_positionSizeQuote := p_currentCapital
 
     [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
 
@@ -694,7 +692,7 @@ export updateLongEntry (string providerType = 'copytrader', string exchange, str
 
 
     var string _message = ''
-    if (providerType == 'copytrader')
+    if ((providerType == 'copytrader') and (not(na(p_positionSizeQuote))))
         _message :=
              zignalyCommonAlertMessage +
              zigsep +
@@ -747,8 +745,6 @@ export updateShortEntry (string providerType = 'copytrader', string exchange, st
         p_currentCapital := strategy.initial_capital + strategy.netprofit
 
     float p_positionSizeQuote = positionSizeQuote
-    if (na(p_positionSizeQuote))
-        p_positionSizeQuote := p_currentCapital
 
     [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
 
@@ -815,7 +811,7 @@ export updateShortEntry (string providerType = 'copytrader', string exchange, st
 
 
     var string _message = ''
-    if (providerType == 'copytrader')
+    if ((providerType == 'copytrader') and (not(na(p_positionSizeQuote))))
         _message :=
              zignalyCommonAlertMessage +
              zigsep +
