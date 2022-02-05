@@ -3,7 +3,7 @@
 
 //@version=5
 
-// Current version: v20220130 ( A001 )
+// Current version: v20220205 ( A002 )
 // Tradingview Public description - BEGIN
 // 
 // This specific strategy also includes Risk Management.
@@ -172,7 +172,7 @@
 
 // Tradingview Public description - END
 
-strategy('Ruckard Cuneyt OBVRSI A001', shorttitle='A001RCOBVRSI', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=10, initial_capital=1200, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Ruckard Cuneyt OBVRSI A002', shorttitle='A002RCOBVRSI', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=10, initial_capital=1200, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/ZignalyBeta/10 as zig
