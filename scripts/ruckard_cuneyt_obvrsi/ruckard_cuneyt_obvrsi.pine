@@ -6,12 +6,12 @@
 // Current version: v20220130 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at ATOMUSDT pair and 15m timeframe.
-// The strategy is a slightly modified copy of default TradingView strategy that appears when you create a blank new strategy.
-// It decides to go long when 14-period SMA crosses over 28-period SMA and goes short when 14-period SMA crosses under 28-period SMA.
+// This strategy plays with different RSI levels so that it knows when to enter or rebuy a position.
+// With the default settings (Gambling 100 USDT on each pyramiding level, you must ensure that you follow yourself with 1200 USDT).
+// Otherwise change strategy initial capital in settings and also 'Capital percentage invested per order' setting.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
