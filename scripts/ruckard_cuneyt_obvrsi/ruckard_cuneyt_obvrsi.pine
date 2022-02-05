@@ -241,9 +241,9 @@ i_tooRecentMinutesNumber = input.int(0, '(RECENT) Number of minutes to wait to o
 i_CapitalQuote = input.float(100.0, title='(CAPITAL) Capital quote invested per order in USDT units {100.0}')
 i_CapitalPercentage = input.float(25.0, title='(CAPITAL) Capital percentage invested per order (%) {25.0}', minval=0, step=0.01) * 0.01
 // Risk Management - Inputs
-_SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None'
-i_riskManagementTypePre = input.string(_SAFE_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_])
-i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : 'NONE'
+_SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None', _CUSTOM_ = 'Custom', _FORCED_ = 'Forced'
+i_riskManagementTypePre = input.string(_SCOMPOUND_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
+i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
 i_riskManagementMaximumLossPerTrade = input.float(1.0, title='(RISKM) Maximum loss per trade % {1.0}') / 100
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='(RISKM) Maximum loss per day % {6.0}') / 100
 i_riskManagementMaximumLossPerWeek = input.float(8.0, title='(RISKM) Maximum loss per week % {8.0}') / 100
@@ -510,10 +510,18 @@ ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
 
+var float customQuantity = na
+
+
 if (i_zignalyProviderType == 'copytrader')
     entryQuantity := i_CapitalPercentage * currentCapital
 else // _ZIGSIGNALPROVIDER_
     entryQuantity := i_CapitalQuote
+
+if ( (i_riskManagementType == 'CUSTOM') or (i_riskManagementType == 'FORCED') )
+    customQuantity := entryQuantity
+else
+    customQuantity := na
 
 if (i_zignalyProviderType == 'copytrader') // Risk management is only implemented for CopyTrader Providers
     var currentDayCapital = 0.0
@@ -527,7 +535,7 @@ if (i_zignalyProviderType == 'copytrader') // Risk management is only implemente
     currentWeek := rm.getCurrentWeek ()
     currentMonth := rm.getCurrentMonth ()
 
-    [__entryQuantity, __currentDay, __currentDayCapital, __currentWeek, __currentWeekCapital, __currentMonth, __currentMonthCapital] = rm.advisedEntryQuantity (currentCapital, currentDay, currentDayCapital, currentWeek, currentWeekCapital, currentMonth, currentMonthCapital, i_riskManagementMaximumLossPerDay, i_riskManagementMaximumLossPerWeek, i_riskManagementMaximumLossPerMonth, i_riskManagementMaximumLossPerTrade, orderStopLossPerOne, i_riskManagementType)
+    [__entryQuantity, __currentDay, __currentDayCapital, __currentWeek, __currentWeekCapital, __currentMonth, __currentMonthCapital] = rm.advisedEntryQuantity (currentCapital, currentDay, currentDayCapital, currentWeek, currentWeekCapital, currentMonth, currentMonthCapital, i_riskManagementMaximumLossPerDay, i_riskManagementMaximumLossPerWeek, i_riskManagementMaximumLossPerMonth, i_riskManagementMaximumLossPerTrade, orderStopLossPerOne, i_riskManagementType, customQuantity)
 
     entryQuantity := __entryQuantity
     currentDayCapital := __currentDayCapital
