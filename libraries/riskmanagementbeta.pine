@@ -66,9 +66,10 @@ export getCurrentMonth () =>
 // @param maximumLossPerMonth Maximum required loss per month (per unit)
 // @param maximumLossPerTrade Maximum Percentual Loss of our Capital Per Trade ( E.g. 0.01 for 1%)
 // @param orderStopLoss Maximum Stop Loss that an order might have. ( E.g. 0.07 for 7% )
-// @param type Risk Management type. 'SAFE': Safe, 'SCOMPOUND': Somewhat Safe Compound, 'NONE': None.
+// @param type Risk Management type. 'SAFE': Safe, 'SCOMPOUND': Somewhat Safe Compound, 'NONE': None, 'CUSTOM': Use customQuantity with risk management, 'FORCED': Use customQuantity without risk management.
+// @param customQuantity Custom quantity suggested or enforced.
 // @returns Advised entry quantity and extra needed variables
-export advisedEntryQuantity (float currentCapital, int currentDay, float currentDayCapital, int currentWeek, float currentWeekCapital, int currentMonth, float currentMonthCapital, float maximumLossPerDay, float maximumLossPerWeek, float maximumLossPerMonth, float maximumLossPerTrade, float orderStopLoss, string type) =>
+export advisedEntryQuantity (float currentCapital, int currentDay, float currentDayCapital, int currentWeek, float currentWeekCapital, int currentMonth, float currentMonthCapital, float maximumLossPerDay, float maximumLossPerWeek, float maximumLossPerMonth, float maximumLossPerTrade, float orderStopLoss, string type, float customQuantity = na) =>
     float p_currentDayCapital = currentDayCapital
     float p_currentWeekCapital = currentWeekCapital
     float p_currentMonthCapital = currentMonthCapital
@@ -96,6 +97,14 @@ export advisedEntryQuantity (float currentCapital, int currentDay, float current
     else if (type == 'NONE')
         // None means that we are gambling always everything we have
         tmpEntryQuantity := currentCapital
+
+    else if (type == 'CUSTOM')
+        // Custom means we want to take into account our custom quantity
+        tmpEntryQuantity := customQuantity
+
+    else if (type == 'FORCED')
+        // Forced means we want to take into account our custom quantity
+        tmpEntryQuantity := customQuantity
 
     if (tmpEntryQuantity > currentCapital)
         // Avoid being stuck when numbers don't match
@@ -143,7 +152,7 @@ export advisedEntryQuantity (float currentCapital, int currentDay, float current
             currentMonthEntryQuantity:= 0.0 // Avoid entering a position
 
     // Avoid to enter a position overall logic
-    if (not (type == 'NONE'))
+    if (not ((type == 'NONE') or (type == 'FORCED')) )
         if ( (not na(currentDayEntryQuantity)) or (not na(currentWeekEntryQuantity)) or (not na(currentMonthEntryQuantity)) )
             entryQuantity:= 0.0
     [entryQuantity, currentDay, p_currentDayCapital, currentWeek, p_currentWeekCapital, currentMonth, p_currentMonthCapital]
