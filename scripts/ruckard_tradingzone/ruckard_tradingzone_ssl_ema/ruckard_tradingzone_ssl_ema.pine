@@ -358,6 +358,9 @@ longCondition = ((close >= ma) and (ta.crossover(sslUp, sslDown)))
 shortCondition = ((close < ma) and (ta.crossover(sslDown, sslUp)))
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+plot(sslUp, color = color.lime, title = "sslUp")
+plot(sslDown, color = color.red, title = "sslDown")
+plot(ma, color = color.yellow, title = "MA")
 
 // Position price calculation - BEGIN
 float positionPrice = na
