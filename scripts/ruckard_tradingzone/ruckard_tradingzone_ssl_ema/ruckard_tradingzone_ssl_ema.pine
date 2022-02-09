@@ -192,6 +192,11 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+i_maLength = input.int(200, minval = 1,  title = '(STRAT) MA Length [200]')
+i_maType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) MA Type [EMA]')
+i_maSource = input.source(close, title = '(STRAT) MA Source [close]')
+i_sslSmaLength = input.int(10, minval = 1,  title = '(STRAT) SSL SMA Length [10]')
+
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -199,7 +204,9 @@ i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
 i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
-i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
+// i_stopLoss_DISABLED = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
+i_breakeven = input.float(0.09, title='(STOPTAKE) Breakeven % {0.09}')
+i_breakevenPerOne = i_breakeven / 100
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -337,10 +344,18 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = crossover(sma(close, 14), sma(close, 28))
-// shortCondition = crossunder(sma(close, 14), sma(close, 28))
-longCondition = ta.sma(close, 14) >= ta.sma(close, 28)
-shortCondition = ta.sma(close, 14) < ta.sma(close, 28)
+
+smaHigh=ta.sma(high, i_sslSmaLength)
+smaLow=ta.sma(low, i_sslSmaLength)
+int Hlv = na
+Hlv := close > smaHigh ? 1 : close < smaLow ? -1 : Hlv[1]
+sslDown = Hlv < 0 ? smaHigh: smaLow
+sslUp   = Hlv < 0 ? smaLow : smaHigh
+
+ma = i_maType == "SMA" ? ta.sma(i_maSource, i_maLength) : i_maType == "EMA" ? ta.ema(i_maSource, i_maLength) : i_maType == "VWMA" ? ta.vwma(i_maSource, i_maLength) : ta.rma(i_maSource, i_maLength)
+
+longCondition = ((close >= ma) and (ta.crossover(sslUp, sslDown)))
+shortCondition = ((close < ma) and (ta.crossover(sslDown, sslUp)))
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
@@ -380,8 +395,15 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 // Decide if we are going to SHORT/Go SHORT - END
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
+var float longBreakEven = na
+var float shortBreakEven = na
+if (not insideABuyOrder)
+    longBreakEven := (close * (1 + i_breakevenPerOne))
+if (not insideASellOrder)
+    shortBreakEven := (close * (1 - i_breakevenPerOne))
+
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or (not (longCondition))
+LONG_CLOSE := offStopTimeInterval or ((ta.crossunder(sslUp, sslDown)) and (close > longBreakEven) )
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -390,7 +412,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or (not (shortCondition))
+SHORT_CLOSE := offStopTimeInterval or ((ta.crossunder(sslDown, sslUp)) and (close < shortBreakEven) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
@@ -401,10 +423,10 @@ if SHORT_CLOSE
 // we implement i_longStopLoss and i_shortStopLoss
 // in the future
 if LONG
-    orderStopLossPerOne := i_stopLoss
+    orderStopLossPerOne := (close - sslDown) / close
     orderStopLoss := orderStopLossPerOne * 100
 else
-    orderStopLossPerOne := i_stopLoss
+    orderStopLossPerOne := (sslDown - close) / sslDown
     orderStopLoss := orderStopLossPerOne * 100
 
 
@@ -414,11 +436,13 @@ else
 LongTakeProfit = positionPrice * (1 + i_takeProfitPerOne)
 ShortTakeProfit = positionPrice * (1 - i_takeProfitPerOne)
 
-float LongStopLoss = na
-float ShortStopLoss = na
+var float LongStopLoss = na
+var float ShortStopLoss = na
 
-LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
-ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+if (not insideABuyOrder)
+    LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+if (not insideASellOrder)
+    ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
