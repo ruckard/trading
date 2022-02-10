@@ -3,13 +3,15 @@
 
 //@version=5
 
-// Current version: v20220210 ( A003 )
+// Current version: v20220121 ( A066 )
 // Tradingview Public description - BEGIN
 // 
 // This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
 // This specific strategy also includes Risk Management.
 // 
-// It was originally tested at BTCUSDT pair and 5m timeframe.
+// It was originally tested at BTCUSDT pair and 1D timeframe.
+// The strategy is a slightly modified copy of default TradingView strategy that appears when you create a blank new strategy.
+// It decides to go long when 14-period SMA crosses over 28-period SMA and goes short when 14-period SMA crosses under 28-period SMA.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
@@ -170,7 +172,7 @@
 
 // Tradingview Public description - END
 
-strategy('Ruckard TradingZone SSL EMA A003', shorttitle='A003RTZSE', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Zignaly Risk M. A066', shorttitle='A066ZigRisk', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/ZignalyBeta/10 as zig
@@ -187,26 +189,19 @@ _ZIGSIGNALPROVIDER_ = 'Signal Provider', _ZIGCOPYTRADERPROVIDER_ = 'Profit Shari
 i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider type', options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
 i_zignalyProviderType = (i_zignalyProviderTypePre == _ZIGCOPYTRADERPROVIDER_) ? 'copytrader' : 'signalprovider'
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
-i_strategyType = input.string(L_S, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
+i_strategyType = input.string(_L_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
 i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Start Time {2021-01-01 00:00:00}')
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
-i_maLength = input.int(200, minval = 1,  title = '(STRAT) MA Length [200]')
-i_maType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) MA Type [EMA]')
-i_maSource = input.source(close, title = '(STRAT) MA Source [close]')
-i_sslSmaLength = input.int(10, minval = 1,  title = '(STRAT) SSL SMA Length [10]')
-
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
 i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
-i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
+i_enableTrailingTakeProfit = input.bool(true, title='(TRAILING) Enable Trailing Take Profit (%) {True}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
-// i_stopLoss_DISABLED = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
-i_breakeven = input.float(0.09, title='(STOPTAKE) Breakeven % {0.09}')
-i_breakevenPerOne = i_breakeven / 100
+i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -344,23 +339,12 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-
-smaHigh=ta.sma(high, i_sslSmaLength)
-smaLow=ta.sma(low, i_sslSmaLength)
-int Hlv = na
-Hlv := close > smaHigh ? 1 : close < smaLow ? -1 : Hlv[1]
-sslDown = Hlv < 0 ? smaHigh: smaLow
-sslUp   = Hlv < 0 ? smaLow : smaHigh
-
-ma = i_maType == "SMA" ? ta.sma(i_maSource, i_maLength) : i_maType == "EMA" ? ta.ema(i_maSource, i_maLength) : i_maType == "VWMA" ? ta.vwma(i_maSource, i_maLength) : ta.rma(i_maSource, i_maLength)
-
-longCondition = ((close >= ma) and (ta.crossover(sslUp, sslDown)))
-shortCondition = ((close < ma) and (ta.crossover(sslDown, sslUp)))
+// longCondition = crossover(sma(close, 14), sma(close, 28))
+// shortCondition = crossunder(sma(close, 14), sma(close, 28))
+longCondition = ta.sma(close, 14) >= ta.sma(close, 28)
+shortCondition = ta.sma(close, 14) < ta.sma(close, 28)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
-plot(sslUp, color = color.lime, title = "sslUp")
-plot(sslDown, color = color.red, title = "sslDown")
-plot(ma, color = color.yellow, title = "MA")
 
 // Position price calculation - BEGIN
 float positionPrice = na
@@ -398,15 +382,8 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 // Decide if we are going to SHORT/Go SHORT - END
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
-var float longBreakEven = na
-var float shortBreakEven = na
-if (not insideABuyOrder)
-    longBreakEven := (close * (1 + i_breakevenPerOne))
-if (not insideASellOrder)
-    shortBreakEven := (close * (1 - i_breakevenPerOne))
-
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or ((ta.crossunder(sslUp, sslDown)) and (close > longBreakEven) )
+LONG_CLOSE := offStopTimeInterval or (not (longCondition))
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -415,7 +392,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or ((ta.crossunder(sslDown, sslUp)) and (close < shortBreakEven) )
+SHORT_CLOSE := offStopTimeInterval or (not (shortCondition))
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
@@ -426,10 +403,10 @@ if SHORT_CLOSE
 // we implement i_longStopLoss and i_shortStopLoss
 // in the future
 if LONG
-    orderStopLossPerOne := (close - sslDown) / close
+    orderStopLossPerOne := i_stopLoss
     orderStopLoss := orderStopLossPerOne * 100
 else
-    orderStopLossPerOne := (sslDown - close) / sslDown
+    orderStopLossPerOne := i_stopLoss
     orderStopLoss := orderStopLossPerOne * 100
 
 
@@ -439,13 +416,11 @@ else
 LongTakeProfit = positionPrice * (1 + i_takeProfitPerOne)
 ShortTakeProfit = positionPrice * (1 - i_takeProfitPerOne)
 
-var float LongStopLoss = na
-var float ShortStopLoss = na
+float LongStopLoss = na
+float ShortStopLoss = na
 
-if (not insideABuyOrder)
-    LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
-if (not insideASellOrder)
-    ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
