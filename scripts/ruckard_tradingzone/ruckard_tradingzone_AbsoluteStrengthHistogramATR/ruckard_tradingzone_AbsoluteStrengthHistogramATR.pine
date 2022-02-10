@@ -192,14 +192,28 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+i_maLength = input.int(200, minval = 1,  title = '(STRAT) MA Length [200]')
+i_maType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) MA Type [EMA]')
+i_maSource = input.source(close, title = '(STRAT) MA Source [close]')
+i_atrStopLossLength = input.int(14, minval = 1,  title = '(STRAT) ATR Stop Loss Length [14]')
+i_atrStopLossSource = input.source(close, title = '(STRAT) ATR Stop Loss Source [close]')
+i_atrStopLossMultiplier = input.float(1.5, title='(STRAT) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+i_ashLength = input.int(9, minval = 1,  title = '(STRAT) Absolute Strength Histogram Length [9]')
+i_ashSmooth = input.int(3, minval = 1,  title = '(STRAT) Absolute Strength Histogram Smoothing Period [3]')
+i_ashSource = input.source(close, title = '(STRAT) Absolute Strength Histogram Source [close]')
+i_ashMode = input.string(title='(STRAT) Absolute Strength Histogram Indicator Method [RSI]', defval='RSI', options=['RSI', 'STOCHASTIC','ADX'])
+i_ashMAType = input.string(title='(STRAT) Absolute Strength Histogram MA Type [WMA]', defval='WMA', options=['ALMA', 'EMA', 'WMA', 'SMA', 'SMMA', 'HMA'])
+i_ashAlmaOffset  = input.float(defval=0.85, title='(STRAT) ASH Arnaud Legoux (ALMA) Only - Offset Value', minval=0, step=0.01)
+i_ashAlmaSigma   = input.float(defval=6, title='(STRAT) ASH Arnaud Legoux (ALMA) Only - Sigma Value', minval=0)
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
-i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
+i_enableTakeProfit = input.bool(true, '(STOPTAKE) Take Profit? {True}')
 i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
 i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
-i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
-i_takeProfitPerOne = i_takeProfit / 100
-i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
+// i_takeProfit_DISABLED = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
+// i_takeProfitPerOne_DISABLED = i_takeProfit / 100
+// i_stopLoss_DISABLED = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
+i_positionRatio = input.float(1.5, title='(STRAT) Risk/Reward Ratio % {1.5}', minval=0.01)
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -330,6 +344,28 @@ f_getTooRecentOrderNotOpenAdvice () =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
+// Absolute Strength Histogram - Functions - BEGIN
+
+f_ashMA(p_type, p_src, p_len, p_alma_offset, p_alma_sigma) =>
+    float _result = 0
+    _tmpSma = ta.sma(p_src, p_len)
+    if p_type=="SMA" // Simple
+        _result := _tmpSma
+    if p_type=="EMA" // Exponential
+        _result := ta.ema(p_src, p_len)
+    if p_type=="WMA" // Weighted
+        _result := ta.wma(p_src, p_len)
+    if p_type=="SMMA" // Smoothed
+        _w = ta.wma(p_src, p_len)
+        _result := na(_w[1]) ? _tmpSma : (_w[1] * (p_len - 1) + p_src) / p_len
+    if p_type=="HMA" // Hull
+        _result := ta.wma(2 * ta.wma(p_src, p_len / 2) - ta.wma(p_src, p_len), math.round(math.sqrt(p_len)))
+    if p_type=="ALMA" // Arnaud Legoux
+        _result := ta.alma(p_src, p_len, p_alma_offset, p_alma_sigma)
+    _result
+
+// Absolute Strength Histogram - Functions - END
+
 // FUNCTIONS - END
 
 
@@ -337,10 +373,42 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = crossover(sma(close, 14), sma(close, 28))
-// shortCondition = crossunder(sma(close, 14), sma(close, 28))
-longCondition = ta.sma(close, 14) >= ta.sma(close, 28)
-shortCondition = ta.sma(close, 14) < ta.sma(close, 28)
+Price1 = f_ashMA('SMA',i_ashSource,1, i_ashAlmaOffset, i_ashAlmaSigma)
+Price2 = f_ashMA('SMA',i_ashSource[1],1, i_ashAlmaOffset, i_ashAlmaSigma)
+
+//RSI
+Bulls0 = 0.5*(math.abs(Price1-Price2)+(Price1-Price2))
+Bears0 = 0.5*(math.abs(Price1-Price2)-(Price1-Price2))
+
+//STOCHASTIC
+Bulls1 = Price1 - ta.lowest(Price1,i_ashLength)
+Bears1 = ta.highest(Price1,i_ashLength) - Price1
+
+//ADX
+Bulls2 = 0.5*(math.abs(high-high[1])+(high-high[1]))
+Bears2 = 0.5*(math.abs(low[1]-low)+(low[1]-low))
+
+//
+Bulls = i_ashMode == 'RSI' ? Bulls0 : i_ashMode == 'STOCHASTIC' ? Bulls1 : Bulls2
+Bears = i_ashMode == 'RSI' ? Bears0 : i_ashMode == 'STOCHASTIC' ? Bears1 : Bears2
+AvgBulls=f_ashMA(i_ashMAType,Bulls,i_ashLength, i_ashAlmaOffset, i_ashAlmaSigma)
+AvgBears=f_ashMA(i_ashMAType,Bears,i_ashLength, i_ashAlmaOffset, i_ashAlmaSigma)
+
+//----
+SmthBulls=f_ashMA(i_ashMAType,AvgBulls,i_ashSmooth, i_ashAlmaOffset, i_ashAlmaSigma)
+SmthBears=f_ashMA(i_ashMAType,AvgBears,i_ashSmooth, i_ashAlmaOffset, i_ashAlmaSigma)
+
+difference = math.abs(SmthBulls - SmthBears)
+
+ASHistogramLongLowStrength = (not (difference > SmthBulls)) and (difference > SmthBears) and (SmthBulls<SmthBulls[1])
+ASHistogramLongHighStrength = (not (difference > SmthBulls)) and (difference > SmthBears) and (not (SmthBulls<SmthBulls[1]))
+ASHistogramShortLowStrength = (difference > SmthBulls) and (SmthBears<SmthBears[1])
+ASHistogramShortHighStrength = (difference > SmthBulls) and (not (SmthBears<SmthBears[1]))
+
+ma = i_maType == 'SMA' ? ta.sma(i_maSource, i_maLength) : i_maType == 'EMA' ? ta.ema(i_maSource, i_maLength) : i_maType == 'VWMA' ? ta.vwma(i_maSource, i_maLength) : ta.rma(i_maSource, i_maLength)
+
+longCondition = ((close >= ma) and (ASHistogramLongLowStrength or ASHistogramLongHighStrength))
+shortCondition = ((close < ma) and (ASHistogramShortLowStrength or ASHistogramShortHighStrength))
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
@@ -381,7 +449,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or (not (longCondition))
+LONG_CLOSE := offStopTimeInterval
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -390,7 +458,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or (not (shortCondition))
+SHORT_CLOSE := offStopTimeInterval
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
@@ -400,25 +468,36 @@ if SHORT_CLOSE
 // orderStopLoss is just here just in case
 // we implement i_longStopLoss and i_shortStopLoss
 // in the future
+atrLongStopLossPrice = i_atrStopLossSource - (ta.atr(i_atrStopLossLength) * i_atrStopLossMultiplier)
+atrShortStopLossPrice = i_atrStopLossSource + (ta.atr(i_atrStopLossLength) * i_atrStopLossMultiplier)
 if LONG
-    orderStopLossPerOne := i_stopLoss
+    orderStopLossPerOne := (close - atrLongStopLossPrice) / close
     orderStopLoss := orderStopLossPerOne * 100
 else
-    orderStopLossPerOne := i_stopLoss
+    orderStopLossPerOne := (atrShortStopLossPrice - close) / atrShortStopLossPrice
     orderStopLoss := orderStopLossPerOne * 100
 
 
 // How much to LONG/GO LONG/SHORT/GO SHORT - BEGIN
 
 // Custom take profit and stop loss
-LongTakeProfit = positionPrice * (1 + i_takeProfitPerOne)
-ShortTakeProfit = positionPrice * (1 - i_takeProfitPerOne)
+var float LongStopLoss = na
+var float ShortStopLoss = na
 
-float LongStopLoss = na
-float ShortStopLoss = na
+if (not insideABuyOrder)
+    LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+if (not insideASellOrder)
+    ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 
-LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
-ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+i_takeProfit = orderStopLoss * i_positionRatio
+i_takeProfitPerOne = i_takeProfit / 100
+var float LongTakeProfit = na
+var float ShortTakeProfit = na
+
+if (not insideABuyOrder)
+    LongTakeProfit := positionPrice * (1 + i_takeProfitPerOne)
+if (not insideASellOrder)
+    ShortTakeProfit := positionPrice * (1 - i_takeProfitPerOne)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
