@@ -398,8 +398,13 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 // Decide if we are going to SHORT/Go SHORT - END
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
-longBreakEven = (positionPrice * (1 + i_breakevenPerOne))
-shortBreakEven = (positionPrice * (1 - i_breakevenPerOne))
+var float longBreakEven = na
+var float shortBreakEven = na
+if (not insideABuyOrder)
+    longBreakEven := (close * (1 + i_breakevenPerOne))
+if (not insideASellOrder)
+    shortBreakEven := (close * (1 - i_breakevenPerOne))
+
 LONG_CLOSE = true
 LONG_CLOSE := offStopTimeInterval or ((ta.crossunder(sslUp, sslDown)) and (close > longBreakEven) )
 
