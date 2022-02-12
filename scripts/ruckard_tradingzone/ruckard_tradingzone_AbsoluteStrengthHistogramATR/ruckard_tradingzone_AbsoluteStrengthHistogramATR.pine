@@ -205,6 +205,14 @@ i_ashMode = input.string(title='(STRAT) Absolute Strength Histogram Indicator Me
 i_ashMAType = input.string(title='(STRAT) Absolute Strength Histogram MA Type [WMA]', defval='WMA', options=['ALMA', 'EMA', 'WMA', 'SMA', 'SMMA', 'HMA'])
 i_ashAlmaOffset  = input.float(defval=0.85, title='(STRAT) ASH Arnaud Legoux (ALMA) Only - Offset Value', minval=0, step=0.01)
 i_ashAlmaSigma   = input.float(defval=6, title='(STRAT) ASH Arnaud Legoux (ALMA) Only - Sigma Value', minval=0)
+i_LongEntersWhen_ASHLongLow = input.bool(true, '(STRAT) Long when ASH Long (Low) {True}')
+i_LongEntersWhen_ASHLongHigh = input.bool(true, '(STRAT) Long when ASH Long (High) {True}')
+i_LongEntersWhen_ASHShortLow = input.bool(false, '(STRAT) Long when ASH Short (Low) {False}')
+i_LongEntersWhen_ASHShortHigh = input.bool(false, '(STRAT) Long when ASH Short (High) {False}')
+i_ShortEntersWhen_ASHLongLow = input.bool(false, '(STRAT) Short when ASH Long (Low) {False}')
+i_ShortEntersWhen_ASHLongHigh = input.bool(false, '(STRAT) Short when ASH Long (High) {False}')
+i_ShortEntersWhen_ASHShortLow = input.bool(true, '(STRAT) Short when ASH Short (Low) {True}')
+i_ShortEntersWhen_ASHShortHigh = input.bool(true, '(STRAT) Short when ASH Short (High) {True}')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(true, '(STOPTAKE) Take Profit? {True}')
@@ -407,8 +415,20 @@ ASHistogramShortHighStrength = (difference > SmthBulls) and (not (SmthBears<Smth
 
 ma = i_maType == 'SMA' ? ta.sma(i_maSource, i_maLength) : i_maType == 'EMA' ? ta.ema(i_maSource, i_maLength) : i_maType == 'VWMA' ? ta.vwma(i_maSource, i_maLength) : ta.rma(i_maSource, i_maLength)
 
-longCondition = ((close >= ma) and (ASHistogramLongLowStrength or ASHistogramLongHighStrength))
-shortCondition = ((close < ma) and (ASHistogramShortLowStrength or ASHistogramShortHighStrength))
+longCondition = ((close >= ma) and (
+     (i_LongEntersWhen_ASHLongLow and ASHistogramLongLowStrength) or
+     (i_LongEntersWhen_ASHLongHigh and ASHistogramLongHighStrength) or
+     (i_LongEntersWhen_ASHShortLow and ASHistogramShortLowStrength) or
+     (i_LongEntersWhen_ASHShortHigh and ASHistogramShortHighStrength)
+     )
+     )
+shortCondition = ((close < ma) and (
+     (i_ShortEntersWhen_ASHLongLow and ASHistogramLongLowStrength) or
+     (i_ShortEntersWhen_ASHLongHigh and ASHistogramLongHighStrength) or
+     (i_ShortEntersWhen_ASHShortLow and ASHistogramShortLowStrength) or
+     (i_ShortEntersWhen_ASHShortHigh and ASHistogramShortHighStrength)
+     )
+     )
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
