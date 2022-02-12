@@ -519,6 +519,11 @@ if (not insideABuyOrder)
 if (not insideASellOrder)
     ShortTakeProfit := positionPrice * (1 - i_takeProfitPerOne)
 
+plot(ma, color=color.yellow, linewidth=2)
+plot(insideABuyOrder ? LongTakeProfit : ShortStopLoss, color=insideABuyOrder ? color.green : insideASellOrder ? color.red : color.blue, linewidth=1, style=plot.style_stepline, title="High (TP/SL)")
+plot(insideASellOrder ? ShortTakeProfit : LongStopLoss, color=insideASellOrder ? color.green : insideABuyOrder ? color.red : color.blue, linewidth=1, style=plot.style_stepline, title="Low (TP/SL)")
+
+
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
 
