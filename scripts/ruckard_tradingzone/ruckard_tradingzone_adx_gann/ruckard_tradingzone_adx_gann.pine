@@ -192,6 +192,17 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+i_maLength = input.int(200, minval = 1,  title = '(STRAT) MA Length [200]')
+i_maType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) MA Type [EMA]')
+i_maSource = input.source(close, title = '(STRAT) MA Source [close]')
+i_atrStopLossLength = input.int(14, minval = 1,  title = '(STRAT) ATR Stop Loss Length [14]')
+i_atrStopLossSource = input.source(close, title = '(STRAT) ATR Stop Loss Source [close]')
+i_atrStopLossMultiplier = input.float(1.5, title='(STRAT) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
+i_diLen = input.int(14, title='(ADX) DI Length {14}')
+i_adxKeyLevel = input.int(20, title='(ADX) key level {20}')
+i_gannHighPeriod = input.int(13,'(Gann) HIGH Period {13}')
+i_gannLowPeriod = input.int(21,'(Gann) LOW Period {21}')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -330,6 +341,24 @@ f_getTooRecentOrderNotOpenAdvice () =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
+// ADX - Functions - BEGIN
+
+dirmov(_len) =>
+    up = ta.change(high)
+    down = -ta.change(low)
+    truerange = ta.rma(ta.tr, _len)
+    plus = fixnan(100 * ta.rma(up > down and up > 0 ? up : 0, _len) / truerange)
+    minus = fixnan(100 * ta.rma(down > up and down > 0 ? down : 0, _len) / truerange)
+    [plus, minus]
+
+adx(_dilen, _adxlen) =>
+    [plus, minus] = dirmov(_dilen)
+    sum = plus + minus
+    adx = 100 * ta.rma(math.abs(plus - minus) / (sum == 0 ? 1 : sum), _adxlen)
+    [adx, plus, minus]
+
+// ADX - Functions - END
+
 // FUNCTIONS - END
 
 
@@ -337,10 +366,22 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = crossover(sma(close, 14), sma(close, 28))
-// shortCondition = crossunder(sma(close, 14), sma(close, 28))
-longCondition = ta.sma(close, 14) >= ta.sma(close, 28)
-shortCondition = ta.sma(close, 14) < ta.sma(close, 28)
+// Gann - BEGIN
+taSmaHigh = ta.sma(high,i_gannHighPeriod)
+taSmaLow = ta.sma(low,i_gannLowPeriod)
+HLd= close>nz(taSmaHigh)[1] ? 1 : (close<nz(taSmaLow)[1] ? -1 : 0)
+HLv= ta.valuewhen(HLd!=0,HLd,0)
+HiLo= HLv==-1 ? taSmaHigh : taSmaLow
+gannShortAdvice = HLv==-1
+gannLongAdvice = not (gannShortAdvice)
+// Gann - END
+
+[adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
+
+ma = i_maType == 'SMA' ? ta.sma(i_maSource, i_maLength) : i_maType == 'EMA' ? ta.ema(i_maSource, i_maLength) : i_maType == 'VWMA' ? ta.vwma(i_maSource, i_maLength) : ta.rma(i_maSource, i_maLength)
+
+longCondition = ((close >= ma) and (adx_sig > i_adxKeyLevel) and gannLongAdvice)
+shortCondition = ((close < ma) and (adx_sig > i_adxKeyLevel) and gannShortAdvice)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
@@ -381,7 +422,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or (not (longCondition))
+LONG_CLOSE := offStopTimeInterval or gannShortAdvice
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -390,7 +431,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or (not (shortCondition))
+SHORT_CLOSE := offStopTimeInterval or gannLongAdvice
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
@@ -400,11 +441,13 @@ if SHORT_CLOSE
 // orderStopLoss is just here just in case
 // we implement i_longStopLoss and i_shortStopLoss
 // in the future
+atrLongStopLossPrice = i_atrStopLossSource - (ta.atr(i_atrStopLossLength) * i_atrStopLossMultiplier)
+atrShortStopLossPrice = i_atrStopLossSource + (ta.atr(i_atrStopLossLength) * i_atrStopLossMultiplier)
 if LONG
-    orderStopLossPerOne := i_stopLoss
+    orderStopLossPerOne := (close - atrLongStopLossPrice) / close
     orderStopLoss := orderStopLossPerOne * 100
 else
-    orderStopLossPerOne := i_stopLoss
+    orderStopLossPerOne := (atrShortStopLossPrice - close) / atrShortStopLossPrice
     orderStopLoss := orderStopLossPerOne * 100
 
 
@@ -414,11 +457,13 @@ else
 LongTakeProfit = positionPrice * (1 + i_takeProfitPerOne)
 ShortTakeProfit = positionPrice * (1 - i_takeProfitPerOne)
 
-float LongStopLoss = na
-float ShortStopLoss = na
+var float LongStopLoss = na
+var float ShortStopLoss = na
 
-LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
-ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+if (not insideABuyOrder)
+    LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+if (not insideASellOrder)
+    ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
