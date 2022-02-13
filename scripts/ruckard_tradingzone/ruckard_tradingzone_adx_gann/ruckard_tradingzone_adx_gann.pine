@@ -6,7 +6,18 @@
 // Current version: v20220213 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
+// This strategy is an attempt to translate into PineScript
+// the strategy named 'Estrategia De Scalping de Criptomonedas de 5 minutos Con ADX y Gann | Probada 100 Veces'
+// from Trading Zone youtuber which was shown on his video on 2021-10-04.
+// Video url: https://www.youtube.com/watch?v=5iDobBaTJu4
+//
+// Price being above EMA200 determines all the trades should be long.
+// Price being below EMA200 determines all the trades should be short.
+// Gann aqua colour and adx being greater than 20 triggers a buy in long mode.
+// Gann brown colour and adx being greater than 20 triggers a buy in short mode.
+// The default Stop Loss is 1.5 times ATR.
+// Gann colour change closes current trade if it is open.
+
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 5m timeframe.
