@@ -372,6 +372,7 @@ taSmaLow = ta.sma(low,i_gannLowPeriod)
 HLd= close>nz(taSmaHigh)[1] ? 1 : (close<nz(taSmaLow)[1] ? -1 : 0)
 HLv= ta.valuewhen(HLd!=0,HLd,0)
 HiLo= HLv==-1 ? taSmaHigh : taSmaLow
+gannHiLo = HiLo
 gannShortAdvice = HLv==-1
 gannLongAdvice = not (gannShortAdvice)
 // Gann - END
@@ -464,6 +465,12 @@ if (not insideABuyOrder)
     LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
 if (not insideASellOrder)
     ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+
+plot(ma, color=color.yellow, linewidth=2)
+plot(insideABuyOrder ? LongStopLoss : na, color=insideABuyOrder ? color.red : insideASellOrder ? color.green : color.blue, linewidth=1, style=plot.style_stepline, title='Long Stop Loss')
+plot(insideASellOrder ? ShortStopLoss : na, color=insideASellOrder ? color.red : insideABuyOrder ? color.green : color.blue, linewidth=1, style=plot.style_stepline, title='Short Stop Loss')
+gannHiLoColor = gannLongAdvice ? color.aqua : color.maroon
+plot(gannHiLo,linewidth=2, color=gannHiLoColor)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
