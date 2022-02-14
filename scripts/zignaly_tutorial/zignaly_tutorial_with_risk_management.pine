@@ -28,6 +28,7 @@
 // [B]__ SETTINGS - Misc[/B]
 // [LIST]
 // [*] (ZIG) Enable Alert message {True}: Whether to enable alert message or not.
+// [*] (ZIG) Service Secret Key {MYSECRETKEY}: Your service secret key. You can find it in your service Edit tab.
 // [*] (DEBUG) Enable debug on order comments {False}: Whether to show alerts on order comments or not.
 // [*] Number of decimal digits for Prices {2}.
 // [*] (DECIMAL) Maximum number of decimal for contracts {3}.
@@ -131,7 +132,7 @@
 // [B] __ ALERTS SETUP - WebHook[/B]
 // [LIST]
 // [*] Webhook URL: https : // zignaly . com / api / signals.php?key=MYSECRETKEY
-// [*] Message: { {{strategy.order.alert_message}} , "key" : "MYSECRETKEY" }
+// [*] Message: {{strategy.order.alert_message}}
 // [/LIST]
 // [B] __ ALERTS SETUP - Email[/B]
 // [LIST]
@@ -140,7 +141,7 @@
 // [*] Confirm your own the email address
 // [*] Create a rule in your Hotmail account that 'Redirects' (not forwards) emails to 'signals @ zignaly . email' when (1): 'Subject' includes 'Alert', (2): 'Email body' contains string 'MYZIGNALYREDIRECTTRIGGER' and (3): 'From' contains 'noreply @ tradingview . com'.
 // [*] In 'More Actions' check: Send Email-to-SMS
-// [*] Message: ||{{strategy.order.alert_message}}||key=MYSECRETKEY||
+// [*] Message: {{strategy.order.alert_message}}
 // MYZIGNALYREDIRECTTRIGGER
 // [/LIST]
 
