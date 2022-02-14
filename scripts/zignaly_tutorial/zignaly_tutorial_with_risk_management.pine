@@ -446,11 +446,13 @@ if SHORT_CLOSE
 LongTakeProfit = positionPrice * (1 + i_takeProfitPerOne)
 ShortTakeProfit = positionPrice * (1 - i_takeProfitPerOne)
 
-float LongStopLoss = na
-float ShortStopLoss = na
+var float LongStopLoss = na
+var float ShortStopLoss = na
 
-LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
-ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+if (not insideABuyOrder)
+    LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+if (not insideASellOrder)
+    ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
