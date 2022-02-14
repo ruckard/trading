@@ -612,8 +612,9 @@ export shortExit (string exchange, string exchangeAccountType, string pair, int 
 // @param alertType Alert type. Defaults to 'webhook'.
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId (Used internally).
+// @param breakEvenPercentage Break Even Percentage from average entry price. If used while stopLoss is undefined then stopLoss is turned on.
 // @returns Partial alert_message for updating long entries in Zignaly
-export updateLongEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na) =>
+export updateLongEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na, float breakEvenPercentage = na) =>
 
     integration = 'hybrid' // Force default integration to be hybrid
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
@@ -636,8 +637,11 @@ export updateLongEntry (string providerType = 'copytrader', string exchange, str
     // Turn on stopLoss automatically if stopLossPercentage has been provided
     if ((na(p_stopLoss)) and (not na (stopLossPercentage)) and (not (stopLossPercentage == 0.0)))
         p_stopLoss := true
-    // Turn off stopLoss if stopLossPercentage is empty or na
-    if ( p_stopLoss and ((na (stopLossPercentage)) or (stopLossPercentage == 0.0)) )
+    // Turn on stopLoss automatically if breakEvenPercentage has been provided
+    if ((na(p_stopLoss)) and (not na (breakEvenPercentage)))
+        p_stopLoss := true
+    // Turn off stopLoss if stopLossPercentage is empty or na and also breakEvenPercentage has to be na
+    if ( p_stopLoss and ((na (stopLossPercentage)) or (stopLossPercentage == 0.0)) and (na(breakEvenPercentage)) )
         p_stopLoss := false
     // Turn off stopLoss if it's set to na
     if (na(p_stopLoss))
@@ -677,7 +681,10 @@ export updateLongEntry (string providerType = 'copytrader', string exchange, str
     _entryQuantityContractsPercentStr = str.tostring(_entryQuantityContractsPercent, '0.' + priceDecimalDigitsString)
 
     if p_stopLoss and integration == 'hybrid'
-        _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
+        if (na(breakEvenPercentage))
+            _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
+        else
+            _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '' + str.tostring(nz(breakEvenPercentage), '0.' + priceDecimalDigitsString) + zigquote
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
@@ -731,8 +738,9 @@ export updateLongEntry (string providerType = 'copytrader', string exchange, str
 // @param alertType Alert type. Defaults to 'webhook'.
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId (Used internally).
+// @param breakEvenPercentage Break Even Percentage from average entry price. If used while stopLoss is undefined then stopLoss is turned on.
 // @returns Partial alert_message for updating short entries in Zignaly
-export updateShortEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na) =>
+export updateShortEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na, float breakEvenPercentage = na) =>
 
     integration = 'hybrid' // Force default integration to be hybrid
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
@@ -755,8 +763,11 @@ export updateShortEntry (string providerType = 'copytrader', string exchange, st
     // Turn on stopLoss automatically if stopLossPercentage has been provided
     if ((na(p_stopLoss)) and (not na (stopLossPercentage)) and (not (stopLossPercentage == 0.0)))
         p_stopLoss := true
-    // Turn off stopLoss if stopLossPercentage is empty or na
-    if ( p_stopLoss and ((na (stopLossPercentage)) or (stopLossPercentage == 0.0)) )
+    // Turn on stopLoss automatically if breakEvenPercentage has been provided
+    if ((na(p_stopLoss)) and (not na (breakEvenPercentage)))
+        p_stopLoss := true
+    // Turn off stopLoss if stopLossPercentage is empty or na and also breakEvenPercentage has to be na
+    if ( p_stopLoss and ((na (stopLossPercentage)) or (stopLossPercentage == 0.0)) and (na(breakEvenPercentage)) )
         p_stopLoss := false
     // Turn off stopLoss if it's set to na
     if (na(p_stopLoss))
@@ -796,7 +807,10 @@ export updateShortEntry (string providerType = 'copytrader', string exchange, st
     _entryQuantityContractsPercentStr = str.tostring(_entryQuantityContractsPercent, '0.' + priceDecimalDigitsString)
 
     if p_stopLoss and integration == 'hybrid'
-        _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
+        if (na(breakEvenPercentage))
+            _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
+        else
+            _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
@@ -850,13 +864,14 @@ export updateShortEntry (string providerType = 'copytrader', string exchange, st
 // @param alertType Alert type. Defaults to 'webhook'.
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId Defaults to REVERSE-pair.
+// @param breakEvenPercentage Break Even Percentage from average entry price. If used while stopLoss is undefined then stopLoss is turned on.
 // @returns Partial alert_message for updating reverse long entries in Zignaly
-export updateReverseLongEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na) =>
+export updateReverseLongEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na, float breakEvenPercentage = na) =>
 
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    var string _message = updateLongEntry (providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId)
+    var string _message = updateLongEntry (providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage)
 
     _message
 
@@ -878,12 +893,13 @@ export updateReverseLongEntry (string providerType = 'copytrader', string exchan
 // @param alertType Alert type. Defaults to 'webhook'.
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId Defaults to REVERSE-pair.
+// @param breakEvenPercentage Break Even Percentage from average entry price. If used while stopLoss is undefined then stopLoss is turned on.
 // @returns Partial alert_message for updating reverse short entries in Zignaly
-export updateReverseShortEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na) =>
+export updateReverseShortEntry (string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na, float breakEvenPercentage = na) =>
 
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    var string _message = updateShortEntry (providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId)
+    var string _message = updateShortEntry (providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage)
 
     _message
