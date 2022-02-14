@@ -42,6 +42,17 @@ priceDecimalDigitsZeroString (int priceDecimalDigits=2) =>
             _zeroString += '0'
     _zeroString
 
+getMessageWithKey (string message='', string key='NON_DEFINED_SECRET_KEY', bool partial = false, string alertType) =>
+    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
+    partialMessage = message + zigsep + zigquote + 'key' + zigquote + zigequals + zigquote + key + zigquote
+    if (partial)
+        partialMessage
+    else // Complete message
+        if (alertType == 'email')
+            '||' + partialMessage + '||'
+        else
+            '{' + partialMessage + '}'
+
 // @function Returns partial alert_message for opening long entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
 // @param providerType Provide type. Either 'copytrader' (for both copytrader and profitsharing) or 'signalprovider'. Defaults to 'copytrader'.
@@ -62,8 +73,9 @@ priceDecimalDigitsZeroString (int priceDecimalDigits=2) =>
 // @param integration Integration mode. 'hybrid': Both TradingView and Zignaly handle StopLoss and alike. 'nonhybrid': TradingView only handles entries and exits. Defaults to 'hybrid'.
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId Defaults to LONG-pair.
-// @returns Partial alert_message for opening long entries in Zignaly
-export longEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, string integration = 'hybrid', int priceDecimalDigits, string signalId = na) =>
+// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
+// @returns alert_message for opening long entries in Zignaly
+export longEntry (string key = na, string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, string integration = 'hybrid', int priceDecimalDigits, string signalId = na, bool partial = na) =>
 
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
     string p_signalId = signalId
@@ -164,7 +176,7 @@ export longEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerType = '
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
 
-    _message + zigsep + zigquote + 'key' + zigquote + zigequals + zigquote + key + zigquote
+    getMessageWithKey (_message, key, partial, alertType)
 
 // @function Returns partial alert_message for opening short entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -186,8 +198,9 @@ export longEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerType = '
 // @param integration Integration mode. 'hybrid': Both TradingView and Zignaly handle StopLoss and alike. 'nonhybrid': TradingView only handles entries and exits. Defaults to 'hybrid'.
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId Defaults to SHORT-pair.
-// @returns Partial alert_message for opening short entries in Zignaly
-export shortEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, string integration = 'hybrid', int priceDecimalDigits, string signalId = na) =>
+// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
+// @returns alert_message for opening short entries in Zignaly
+export shortEntry (string key = na, string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, string integration = 'hybrid', int priceDecimalDigits, string signalId = na, bool partial = na) =>
 
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
     string p_signalId = signalId
@@ -288,7 +301,7 @@ export shortEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerType = 
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
 
-    _message + zigsep + zigquote + 'key' + zigquote + zigequals + zigquote + key + zigquote
+    getMessageWithKey (_message, key, partial, alertType)
 
 // @function Returns partial alert_message for opening reverse long entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -310,8 +323,9 @@ export shortEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerType = 
 // @param integration Integration mode. 'hybrid': Both TradingView and Zignaly handle StopLoss and alike. 'nonhybrid': TradingView only handles entries and exits. Defaults to 'hybrid'.
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId Defaults to REVERSE-pair.
-// @returns Partial alert_message for opening reverse long entries in Zignaly
-export reverseLongEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, string integration = 'hybrid', int priceDecimalDigits, string signalId = na) =>
+// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
+// @returns alert_message for opening reverse long entries in Zignaly
+export reverseLongEntry (string key = na, string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, string integration = 'hybrid', int priceDecimalDigits, string signalId = na, bool partial = na) =>
 
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
     string p_signalId = signalId
@@ -417,7 +431,7 @@ export reverseLongEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerT
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
 
-    _message + zigsep + zigquote + 'key' + zigquote + zigequals + zigquote + key + zigquote
+    getMessageWithKey (_message, key, partial, alertType)
 
 // @function Returns partial alert_message for opening reverse short entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -439,8 +453,9 @@ export reverseLongEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerT
 // @param integration Integration mode. 'hybrid': Both TradingView and Zignaly handle StopLoss and alike. 'nonhybrid': TradingView only handles entries and exits. Defaults to 'hybrid'.
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId Defaults to REVERSE-pair.
-// @returns Partial alert_message for opening reverse short entries in Zignaly
-export reverseShortEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, string integration = 'hybrid', int priceDecimalDigits, string signalId = na) =>
+// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
+// @returns alert_message for opening reverse short entries in Zignaly
+export reverseShortEntry (string key = na, string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, string integration = 'hybrid', int priceDecimalDigits, string signalId = na, bool partial = na) =>
 
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
     string p_signalId = signalId
@@ -546,7 +561,7 @@ export reverseShortEntry (string key = 'NON_DEFINED_SECRET_KEY', string provider
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
 
-    _message + zigsep + zigquote + 'key' + zigquote + zigequals + zigquote + key + zigquote
+    getMessageWithKey (_message, key, partial, alertType)
 
 // @function Returns partial alert_message for closing long entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -556,8 +571,9 @@ export reverseShortEntry (string key = 'NON_DEFINED_SECRET_KEY', string provider
 // @param leverage Futures leverage. Defaults to 1.
 // @param alertType Alert type. Defaults to 'webhook'.
 // @param signalId Defaults to LONG-pair.
-// @returns Partial alert_message for closing long entries in Zignaly
-export longExit (string key = 'NON_DEFINED_SECRET_KEY', string exchange, string exchangeAccountType, string pair, int leverage, string alertType, string signalId = na) =>
+// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
+// @returns alert_message for closing long entries in Zignaly
+export longExit (string key = na, string exchange, string exchangeAccountType, string pair, int leverage, string alertType, string signalId = na, bool partial = na) =>
 
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
     string p_signalId = signalId
@@ -572,7 +588,7 @@ export longExit (string key = 'NON_DEFINED_SECRET_KEY', string exchange, string 
     var string _message = ''
     _message := zignalyCommonAlertMessage + zigsep + _zignalyLongExitCommonAlertMessage
 
-    _message + zigsep + zigquote + 'key' + zigquote + zigequals + zigquote + key + zigquote
+    getMessageWithKey (_message, key, partial, alertType)
 
 // @function Returns partial alert_message for closing short entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -582,8 +598,9 @@ export longExit (string key = 'NON_DEFINED_SECRET_KEY', string exchange, string 
 // @param leverage Futures leverage. Defaults to 1.
 // @param alertType Alert type. Defaults to 'webhook'.
 // @param signalId Defaults to SHORT-pair.
-// @returns Partial alert_message for closing short entries in Zignaly
-export shortExit (string key = 'NON_DEFINED_SECRET_KEY', string exchange, string exchangeAccountType, string pair, int leverage, string alertType, string signalId = na) =>
+// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
+// @returns alert_message for closing short entries in Zignaly
+export shortExit (string key = na, string exchange, string exchangeAccountType, string pair, int leverage, string alertType, string signalId = na, bool partial = na) =>
 
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
     string p_signalId = signalId
@@ -598,7 +615,7 @@ export shortExit (string key = 'NON_DEFINED_SECRET_KEY', string exchange, string
     var string _message = ''
     _message := zignalyCommonAlertMessage + zigsep + _zignalyShortExitCommonAlertMessage
 
-    _message + zigsep + zigquote + 'key' + zigquote + zigequals + zigquote + key + zigquote
+    getMessageWithKey (_message, key, partial, alertType)
 
 // @function Returns partial alert_message for updating long entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -620,8 +637,9 @@ export shortExit (string key = 'NON_DEFINED_SECRET_KEY', string exchange, string
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId (Used internally).
 // @param breakEvenPercentage Break Even Percentage from average entry price. If used while stopLoss is undefined then stopLoss is turned on.
-// @returns Partial alert_message for updating long entries in Zignaly
-export updateLongEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na, float breakEvenPercentage = na) =>
+// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
+// @returns alert_message for updating long entries in Zignaly
+export updateLongEntry (string key = na, string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na, float breakEvenPercentage = na, bool partial = na) =>
 
     integration = 'hybrid' // Force default integration to be hybrid
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
@@ -725,7 +743,7 @@ export updateLongEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerTy
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
 
-    _message + zigsep + zigquote + 'key' + zigquote + zigequals + zigquote + key + zigquote
+    getMessageWithKey (_message, key, partial, alertType)
 
 // @function Returns partial alert_message for updating short entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -747,8 +765,9 @@ export updateLongEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerTy
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId (Used internally).
 // @param breakEvenPercentage Break Even Percentage from average entry price. If used while stopLoss is undefined then stopLoss is turned on.
-// @returns Partial alert_message for updating short entries in Zignaly
-export updateShortEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na, float breakEvenPercentage = na) =>
+// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
+// @returns alert_message for updating short entries in Zignaly
+export updateShortEntry (string key = na, string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na, float breakEvenPercentage = na, bool partial = na) =>
 
     integration = 'hybrid' // Force default integration to be hybrid
     zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
@@ -852,7 +871,7 @@ export updateShortEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerT
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
 
-    _message + zigsep + zigquote + 'key' + zigquote + zigequals + zigquote + key + zigquote
+    getMessageWithKey (_message, key, partial, alertType)
 
 // @function Returns partial alert_message for updating reverse long entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -874,13 +893,14 @@ export updateShortEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerT
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId Defaults to REVERSE-pair.
 // @param breakEvenPercentage Break Even Percentage from average entry price. If used while stopLoss is undefined then stopLoss is turned on.
-// @returns Partial alert_message for updating reverse long entries in Zignaly
-export updateReverseLongEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na, float breakEvenPercentage = na) =>
+// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
+// @returns alert_message for updating reverse long entries in Zignaly
+export updateReverseLongEntry (string key = na, string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na, float breakEvenPercentage = na, bool partial = na) =>
 
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    var string _message = updateLongEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage)
+    var string _message = updateLongEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage, partial)
 
     _message
 
@@ -904,12 +924,13 @@ export updateReverseLongEntry (string key = 'NON_DEFINED_SECRET_KEY', string pro
 // @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
 // @param signalId Defaults to REVERSE-pair.
 // @param breakEvenPercentage Break Even Percentage from average entry price. If used while stopLoss is undefined then stopLoss is turned on.
-// @returns Partial alert_message for updating reverse short entries in Zignaly
-export updateReverseShortEntry (string key = 'NON_DEFINED_SECRET_KEY', string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na, float breakEvenPercentage = na) =>
+// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
+// @returns alert_message for updating reverse short entries in Zignaly
+export updateReverseShortEntry (string key = na, string providerType = 'copytrader', string exchange, string exchangeAccountType, string pair, float positionSizeQuote = na, int leverage, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType, int priceDecimalDigits, string signalId = na, float breakEvenPercentage = na, bool partial = na) =>
 
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    var string _message = updateShortEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage)
+    var string _message = updateShortEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage, partial)
 
     _message
