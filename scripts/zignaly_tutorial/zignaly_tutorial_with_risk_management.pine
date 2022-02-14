@@ -263,6 +263,7 @@ var int sellOrderOpenBarIndex = na
 
 // Breakeven accounting - Variables
 var bool breakEvenTriggered = false
+var bool breakEvenNeedsTrigger = false
 
 // Handle to avoid two long and short orders being too next to each other
 var bool _oldInsideABuyOrder = false
@@ -366,6 +367,7 @@ else
     positionPrice := close
     // Make sure to reset breakeven triggered if we are not in an order
     breakEvenTriggered := false
+    breakEvenNeedsTrigger := false
     
 // Position price calculation - END
 
@@ -433,15 +435,17 @@ if (not insideASellOrder)
 
 if insideABuyOrder
     if (close >= LongBreakEven)
-        breakEvenTriggered := true
+        breakEvenNeedsTrigger := true
 if insideASellOrder
     if (close <= ShortBreakEven)
-        breakEvenTriggered := true
+        breakEvenNeedsTrigger := true
 
 if LONG_CLOSE
     breakEvenTriggered := false
+    breakEvenNeedsTrigger := false
 if SHORT_CLOSE
     breakEvenTriggered := false
+    breakEvenNeedsTrigger := false
 
 // How much to LONG/GO LONG/SHORT/GO SHORT - BEGIN
 
