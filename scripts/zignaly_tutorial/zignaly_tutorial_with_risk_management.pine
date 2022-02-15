@@ -560,9 +560,15 @@ if (i_strategyType == _L_)
 if (i_strategyType == _S_)
     if SHORT
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
-        tmpOrderAlertMessage := zig.shortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, partial=false)
-        tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
-        strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if not (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered)))
+            tmpOrderAlertMessage := zig.shortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, partial=false)
+            tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        else // Update Breakeven
+            tmpOrderAlertMessage := zig.updateShortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, breakEvenPercentage = i_breakEvenTrigger, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            alert(message=i_enableZignalyAlert ? tmpOrderAlertMessage : na)
+            breakEvenTriggered := true
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             sellOrderOpenBarIndex := bar_index + 1
         insideASellOrder := true
@@ -591,9 +597,15 @@ if (i_strategyType == L_S)
 
     if LONG
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
-        tmpOrderAlertMessage := zig.longEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, partial=false)
-        tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
-        strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if not (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered)))
+            tmpOrderAlertMessage := zig.longEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, partial=false)
+            tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        else // Update Breakeven
+            tmpOrderAlertMessage := zig.updateLongEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, breakEvenPercentage = i_breakEvenTrigger, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            alert(message=i_enableZignalyAlert ? tmpOrderAlertMessage : na)
+            breakEvenTriggered := true
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
         insideABuyOrder := true
@@ -603,9 +615,15 @@ if (i_strategyType == L_S)
         insideABuyOrder := false
     if SHORT
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
-        tmpOrderAlertMessage := zig.shortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, partial=false)
-        tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
-        strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if not (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered)))
+            tmpOrderAlertMessage := zig.shortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, partial=false)
+            tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        else // Update Breakeven
+            tmpOrderAlertMessage := zig.updateShortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, breakEvenPercentage = i_breakEvenTrigger, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            alert(message=i_enableZignalyAlert ? tmpOrderAlertMessage : na)
+            breakEvenTriggered := true
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             sellOrderOpenBarIndex := bar_index + 1
         insideASellOrder := true
@@ -633,9 +651,15 @@ if (i_strategyType == _REVERSE_)
 
     if (LONG and (not LONG_CLOSE))
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
-        tmpOrderAlertMessage := zig.reverseLongEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, partial=false)
-        tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
-        strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if not (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered)))
+            tmpOrderAlertMessage := zig.reverseLongEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, partial=false)
+            tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        else // Update Breakeven
+            tmpOrderAlertMessage := zig.updateLongEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, breakEvenPercentage = i_breakEvenTrigger, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            alert(message=i_enableZignalyAlert ? tmpOrderAlertMessage : na)
+            breakEvenTriggered := true
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
         insideABuyOrder := true
@@ -645,9 +669,15 @@ if (i_strategyType == _REVERSE_)
         insideABuyOrder := false
     if (SHORT and (not SHORT_CLOSE))
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
-        tmpOrderAlertMessage := zig.reverseShortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, partial=false)
-        tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
-        strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if not (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered)))
+            tmpOrderAlertMessage := zig.reverseShortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, partial=false)
+            tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        else // Update Breakeven
+            tmpOrderAlertMessage := zig.updateShortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=stringNA, breakEvenPercentage = i_breakEvenTrigger, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            alert(message=i_enableZignalyAlert ? tmpOrderAlertMessage : na)
+            breakEvenTriggered := true
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             sellOrderOpenBarIndex := bar_index + 1
         insideASellOrder := true
