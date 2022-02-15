@@ -353,10 +353,10 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = crossover(sma(close, 14), sma(close, 28))
-// shortCondition = crossunder(sma(close, 14), sma(close, 28))
-longCondition = ta.sma(close, 14) >= ta.sma(close, 28)
-shortCondition = ta.sma(close, 14) < ta.sma(close, 28)
+// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
+// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
+shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
@@ -400,7 +400,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or (not (longCondition))
+LONG_CLOSE := offStopTimeInterval or shortCondition
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -409,7 +409,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or (not (shortCondition))
+SHORT_CLOSE := offStopTimeInterval or longCondition
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
