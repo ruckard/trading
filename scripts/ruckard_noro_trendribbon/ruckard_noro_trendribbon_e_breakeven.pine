@@ -376,8 +376,8 @@ trend = 0
 trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 : trend[1]
 
 //Trading
-longCondition = (trend == 1)
-shortCondition = (trend == -1)
+longCondition = (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
+shortCondition = (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 MAColor = i_showRibbon ? color.black : na
@@ -431,7 +431,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or (not (longCondition))
+LONG_CLOSE := offStopTimeInterval or shortCondition
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -440,7 +440,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or (not (shortCondition))
+SHORT_CLOSE := offStopTimeInterval or longCondition
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
