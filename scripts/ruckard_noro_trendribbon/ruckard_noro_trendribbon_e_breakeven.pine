@@ -6,7 +6,10 @@
 // Current version: v20220216 ( E001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
+// This strategy uses Noro Trendribbon side change to know if the positions need to be long and short.
+// In addition to the former a corridor is defined using high and low prices from latest candles.
+// When the price is below that corridor (and we are longing) a long position is open with a certain percentage of the usual corridor.
+// When the price is above that corridor (and we are shorting) a short position is open with a certain percentage of the usual corridor.
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at 1000SHIBUSDT pair and 30m timeframe.
