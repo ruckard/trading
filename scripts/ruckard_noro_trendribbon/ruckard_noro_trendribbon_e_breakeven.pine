@@ -296,6 +296,13 @@ if (strategy.position_size == 0.0)
 else
     lastOrderOpenBarTime := time_close
 
+if (strategy.position_size > 0.0)
+    insideABuyOrder := true
+    insideASellOrder := false
+if (strategy.position_size < 0.0)
+    insideABuyOrder := false
+    insideASellOrder := true
+
 // Zignaly
 exchangeTickerID = syminfo.ticker
 
@@ -457,19 +464,19 @@ else
     orderStopLossPerOne := i_stopLoss
     orderStopLoss := orderStopLossPerOne * 100
 
-var float LongBreakEven = na
-var float ShortBreakEven = na
+var float LongBreakEvenTrigger = na
+var float ShortBreakEvenTrigger = na
 
-if (not insideABuyOrder)
-    LongBreakEven := positionPrice * (1 + i_breakEvenPerOne)
-if (not insideASellOrder)
-    ShortBreakEven := positionPrice * (1 - i_breakEvenPerOne)
+if ((not insideABuyOrder[2]) and insideABuyOrder[1] and insideABuyOrder)
+    LongBreakEvenTrigger := positionPrice * (1 + i_breakEvenTriggerPerOne)
+if ((not insideASellOrder[2]) and insideASellOrder[1] and insideASellOrder)
+    ShortBreakEvenTrigger := positionPrice * (1 - i_breakEvenTriggerPerOne)
 
 if insideABuyOrder
-    if (close >= LongBreakEven)
+    if (close >= LongBreakEvenTrigger)
         breakEvenNeedsTrigger := true
 if insideASellOrder
-    if (close <= ShortBreakEven)
+    if (close <= ShortBreakEvenTrigger)
         breakEvenNeedsTrigger := true
 
 if (insideABuyOrder and LONG_CLOSE)
