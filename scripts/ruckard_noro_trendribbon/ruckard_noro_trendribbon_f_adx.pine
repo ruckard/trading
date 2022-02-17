@@ -208,6 +208,10 @@ i_highestMaLength = input.int(24, minval = 1,  title = '(STRAT) Highest MA Lengt
 i_lowestMaLength = input.int(24, minval = 1,  title = '(STRAT) Lowest MA Length [24]')
 i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
 i_showBackground = input.bool(true, title = 'Show color [true]')
+i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
+i_diLen = input.int(14, title='(ADX) DI Length {14}')
+i_adxKeyLevel = input.int(23, title='(ADX) key level {23}')
+i_detectAdxKeyLevelChange = input.bool(false, title = '(STRAT) KeyLevel changes side. [false]')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -365,6 +369,24 @@ f_getTooRecentOrderNotOpenAdvice () =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
+// ADX - Functions - BEGIN
+
+dirmov(_len) =>
+    up = ta.change(high)
+    down = -ta.change(low)
+    truerange = ta.rma(ta.tr, _len)
+    plus = fixnan(100 * ta.rma(up > down and up > 0 ? up : 0, _len) / truerange)
+    minus = fixnan(100 * ta.rma(down > up and down > 0 ? down : 0, _len) / truerange)
+    [plus, minus]
+
+adx(_dilen, _adxlen) =>
+    [plus, minus] = dirmov(_dilen)
+    sum = plus + minus
+    adx = 100 * ta.rma(math.abs(plus - minus) / (sum == 0 ? 1 : sum), _adxlen)
+    [adx, plus, minus]
+
+// ADX - Functions - END
+
 // FUNCTIONS - END
 
 
@@ -382,9 +404,32 @@ lowestMA = ta.lowest(lowMa, i_lowestMaLength)
 trend = 0
 trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 : trend[1]
 
+[adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
+
 //Trading
-longCondition = (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
-shortCondition = (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
+longCondition = false
+shortCondition = false
+// When ADX is greater than ADX key level we go towards the main tendency
+// Otherwise we go against the main tendency because we are in a range
+if (adx_sig > i_adxKeyLevel)
+    longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
+else
+    longCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
+
+if (adx_sig > i_adxKeyLevel)
+    shortCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
+else
+    shortCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
+
+// Make sure to change our position side when ADX cross over or under the ADX key level
+if (i_detectAdxKeyLevelChange)
+    if (ta.crossover(adx_sig, i_adxKeyLevel))
+        longCondition := (trend == 1)
+        shortCondition := (trend == -1)
+    if (ta.crossunder(adx_sig, i_adxKeyLevel))
+        longCondition := (trend == -1)
+        shortCondition := (trend == 1)
+
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 MAColor = i_showRibbon ? color.black : na
