@@ -267,13 +267,8 @@ var bool breakEvenTriggered = false
 var bool breakEvenNeedsTrigger = false
 
 // Handle to avoid two long and short orders being too next to each other
-var bool _oldInsideABuyOrder = false
-var bool oldInsideASellOrder = false
 var bool insideABuyOrder = false
 var bool insideASellOrder = false
-
-_oldInsideABuyOrder := insideABuyOrder
-oldInsideASellOrder := insideASellOrder
 
 var int lastOrderOpenBarTime = na
 
@@ -436,9 +431,9 @@ else
 var float LongBreakEvenTrigger = na
 var float ShortBreakEvenTrigger = na
 
-if ((not insideABuyOrder[2]) and insideABuyOrder[1] and insideABuyOrder)
+if ((not insideABuyOrder[1]) and insideABuyOrder)
     LongBreakEvenTrigger := positionPrice * (1 + i_breakEvenTriggerPerOne)
-if ((not insideASellOrder[2]) and insideASellOrder[1] and insideASellOrder)
+if ((not insideASellOrder[1]) and insideASellOrder)
     ShortBreakEvenTrigger := positionPrice * (1 - i_breakEvenTriggerPerOne)
 
 if insideABuyOrder
@@ -554,12 +549,10 @@ if (i_strategyType == _L_)
             breakEvenTriggered := true
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
-        insideABuyOrder := true
         0 // Workaround for making every if branch to return the same type of value
     else if LONG_CLOSE
         tmpOrderComment := f_getOrderComment("close", strategy.long, zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false))
         strategy.close("[L]", alert_message=i_enableZignalyAlert ? zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false) : na, comment=tmpOrderComment)
-        insideABuyOrder := false
         0 // Workaround for making every if branch to return the same type of value
 // GO LONG only logic - END
 
@@ -578,12 +571,10 @@ if (i_strategyType == _S_)
             breakEvenTriggered := true
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             sellOrderOpenBarIndex := bar_index + 1
-        insideASellOrder := true
         0 // Workaround for making every if branch to return the same type of value
     else if SHORT_CLOSE
         tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false))
         strategy.close("[S]", alert_message=i_enableZignalyAlert ? zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false) : na, comment=tmpOrderComment)
-        insideASellOrder := false
         0 // Workaround for making every if branch to return the same type of value
 // GO SHORT only logic - END
 
@@ -615,11 +606,9 @@ if (i_strategyType == L_S)
             breakEvenTriggered := true
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
-        insideABuyOrder := true
     if LONG_CLOSE
         tmpOrderComment := f_getOrderComment("close", strategy.long, zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false))
         strategy.close("[L]", alert_message=i_enableZignalyAlert ? zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false) : na, comment=tmpOrderComment)
-        insideABuyOrder := false
     if SHORT
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
         if not (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered)))
@@ -633,11 +622,9 @@ if (i_strategyType == L_S)
             breakEvenTriggered := true
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             sellOrderOpenBarIndex := bar_index + 1
-        insideASellOrder := true
     if SHORT_CLOSE
         tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false))
         strategy.close("[S]", alert_message=i_enableZignalyAlert ? zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false) : na, comment=tmpOrderComment)
-        insideASellOrder := false
 // GO LONG and SHORT logic - END
 
 // Reverse logic - BEGIN
@@ -669,11 +656,9 @@ if (i_strategyType == _REVERSE_)
             breakEvenTriggered := true
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
-        insideABuyOrder := true
     if LONG_CLOSE
         tmpOrderComment := f_getOrderComment("close", strategy.long, zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false))
         strategy.close("[L]", alert_message=i_enableZignalyAlert ? zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false) : na, comment=tmpOrderComment)
-        insideABuyOrder := false
     if (SHORT and (not SHORT_CLOSE))
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
         if not (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered)))
@@ -687,11 +672,9 @@ if (i_strategyType == _REVERSE_)
             breakEvenTriggered := true
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             sellOrderOpenBarIndex := bar_index + 1
-        insideASellOrder := true
     if SHORT_CLOSE
         tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false))
         strategy.close("[S]", alert_message=i_enableZignalyAlert ? zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false) : na, comment=tmpOrderComment)
-        insideASellOrder := false
 // Reverse logic - END
 
 // Handle STOP LOSS (and similar) order exits - BEGIN
