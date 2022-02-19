@@ -456,11 +456,19 @@ if (insideASellOrder and SHORT_CLOSE)
 var float LongStopLoss = na
 var float ShortStopLoss = na
 
+// Initial StopLoss value based on last closed candle
 if (not insideABuyOrder)
-    LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+    LongStopLoss := close * (1 - orderStopLossPerOne)
 if (not insideASellOrder)
+    ShortStopLoss := close * (1 + orderStopLossPerOne)
+
+// Final StopLoss value based on actual position price
+if ((not insideABuyOrder[1]) and (insideABuyOrder))
+    LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+if ((not insideASellOrder[1]) and (insideASellOrder))
     ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 
+// Override StopLoss with BreakEven if needed
 if ( i_enableBreakEven and insideABuyOrder and (not breakEvenTriggered) and breakEvenNeedsTrigger )
     LongStopLoss := positionPrice * (1 + i_breakEvenPerOne)
 if ( i_enableBreakEven and insideASellOrder and (not breakEvenTriggered) and breakEvenNeedsTrigger )
@@ -479,9 +487,16 @@ else
 var float LongTakeProfit = na
 var float ShortTakeProfit = na
 
+// Initial TakeProfit value based on last closed candle
 if (not insideABuyOrder)
-    LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
+    LongTakeProfit := close * (1 + takeProfitPerOne)
 if (not insideASellOrder)
+    ShortTakeProfit := close * (1 - takeProfitPerOne)
+
+// Final TakeProfit value based on actual position price
+if ((not insideABuyOrder[1]) and (insideABuyOrder))
+    LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
+if ((not insideASellOrder[1]) and (insideASellOrder))
     ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
 
 float entryQuantity = na
