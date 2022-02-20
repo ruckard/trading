@@ -214,6 +214,7 @@ i_adxKeyLevel = input.float(23.0, title='(ADX) key level {23.0}')
 i_adxRangeKeyLevel = input.float(17.0, title='(ADX) Range key level {17}')
 i_detectAdxKeyLevelChange = input.bool(false, title = '(STRAT) KeyLevel changes side. [false]')
 i_tradeRanges = input.bool(true, title = '(STRAT) Trade ranges. [true]')
+i_tradeStrongTrades = input.bool(true, title = '(STRAT) Trade strong trades. [true]')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -419,11 +420,11 @@ shortCondition = false
 //     shortCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
 
 // This is going up with strength - Let's long
-if ((adx_up >= i_adxKeyLevel) and (adx_down < adx_up))
+if (i_tradeStrongTrades and (adx_up >= i_adxKeyLevel) and (adx_down < adx_up))
     longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
     shortCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
 // This is going down with strength - Let's short
-if ((adx_down >= i_adxKeyLevel) and (adx_down >= adx_up))
+if (i_tradeStrongTrades and (adx_down >= i_adxKeyLevel) and (adx_down >= adx_up))
     longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
     shortCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
 // This is going down without strength - Let's long
