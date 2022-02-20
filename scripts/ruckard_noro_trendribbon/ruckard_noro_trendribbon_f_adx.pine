@@ -513,10 +513,10 @@ if ((not insideASellOrder[1]) and insideASellOrder)
     ShortBreakEvenTrigger := positionPrice * (1 - i_breakEvenTriggerPerOne)
 
 if insideABuyOrder
-    if (close >= LongBreakEvenTrigger)
+    if (high >= LongBreakEvenTrigger)
         breakEvenNeedsTrigger := true
 if insideASellOrder
-    if (close <= ShortBreakEvenTrigger)
+    if (low <= ShortBreakEvenTrigger)
         breakEvenNeedsTrigger := true
 
 if (insideABuyOrder and LONG_CLOSE)
