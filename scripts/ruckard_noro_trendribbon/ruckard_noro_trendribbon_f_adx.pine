@@ -406,24 +406,41 @@ longCondition = false
 shortCondition = false
 // When ADX is greater than ADX key level we go towards the main tendency
 // Otherwise we go against the main tendency because we are in a range
-if (adx_sig > i_adxKeyLevel)
-    longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
-else
-    longCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
+// if (adx_up > i_adxKeyLevel)
+//     longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
+// else
+//     longCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
+// 
+// if (adx_down > i_adxKeyLevel)
+//     shortCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
+// else
+//     shortCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
 
-if (adx_sig > i_adxKeyLevel)
+// This is going up with strength - Let's long
+if ((adx_up >= i_adxKeyLevel) and (adx_down < adx_up))
+    longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
     shortCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
-else
+// This is going down with strength - Let's short
+if ((adx_down >= i_adxKeyLevel) and (adx_down >= adx_up))
+    longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
+    shortCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
+// This is going down without strength - Let's long
+if ((adx_up < i_adxKeyLevel) and (adx_up < adx_down))
+    longCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
+    shortCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
+// This is going up without strength - Let's short
+if ((adx_down < i_adxKeyLevel) and (adx_down < adx_up))
+    longCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
     shortCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
 
 // Make sure to change our position side when ADX cross over or under the ADX key level
 if (i_detectAdxKeyLevelChange)
-    if (ta.crossover(adx_sig, i_adxKeyLevel))
+    if (ta.crossover(adx_up, i_adxKeyLevel))
         longCondition := (trend == 1)
         shortCondition := (trend == -1)
-    if (ta.crossunder(adx_sig, i_adxKeyLevel))
-        longCondition := (trend == -1)
-        shortCondition := (trend == 1)
+    if (ta.crossover(adx_down, i_adxKeyLevel))
+        shortCondition := (trend == -1)
+        longCondition := (trend == 1)
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
