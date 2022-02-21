@@ -655,8 +655,6 @@ if (i_strategyType == _REVERSE_)
     if (LONG == true) and (SHORT == true)
         LONG := true
         SHORT := false
-    LONG_CLOSE := offStopTimeInterval
-    SHORT_CLOSE := offStopTimeInterval
 
     if (LONG and (not LONG_CLOSE))
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
