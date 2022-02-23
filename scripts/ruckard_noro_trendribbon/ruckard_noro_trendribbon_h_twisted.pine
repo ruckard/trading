@@ -474,6 +474,9 @@ highestClosingLowestColor = i_showRibbon ? color.yellow : na
 highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = "Upper Closing line")
 lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
 
+plotshape((trend[1] == -1) and (trend == 1), style=shape.arrowup, title="Long Side change", location=location.top, color=color.blue)
+plotshape((trend[1] == 1) and (trend == -1), style=shape.arrowdown, title="Short Side change", location=location.bottom, color=color.blue)
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
