@@ -425,7 +425,6 @@ shortCondition = false
 
 strongLongTrade = (adx_up >= i_adxKeyLevel) and (adx_sig >= i_adxKeyLevel)
 strongShortTrade = (adx_down >= i_adxKeyLevel) and (adx_sig >= i_adxKeyLevel)
-
 // This is going up with strength - Let's long
 if (i_tradeStrongTrades and strongLongTrade)
     longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
@@ -434,14 +433,6 @@ if (i_tradeStrongTrades and strongLongTrade)
 if (i_tradeStrongTrades and strongShortTrade)
     longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
     shortCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
-// // This is going down without strength - Let's long
-// if (i_tradeRanges and (adx_up < i_adxKeyLevel) and (adx_up < adx_down) and (adx_sig < i_adxKeyLevel) and (adx_down < i_adxRangeKeyLevel))
-//     longCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
-//     shortCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
-// // This is going up without strength - Let's short
-// if (i_tradeRanges and (adx_down < i_adxKeyLevel) and (adx_down < adx_up) and (adx_sig < i_adxKeyLevel) and (adx_up < i_adxRangeKeyLevel))
-//     longCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
-//     shortCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
 
 rangeLongTrade = (adx_sig < i_adxRangeKeyLevel) and (adx_down > adx_up)
 rangeShortTrade = (adx_sig < i_adxRangeKeyLevel) and (adx_up > adx_down)
