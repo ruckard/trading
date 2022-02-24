@@ -456,10 +456,10 @@ if (i_tradeRanges and rangeShortTrade)
 
 // Make sure to change our position side when ADX cross over or under the ADX key level
 if (i_detectAdxKeyLevelChange)
-    if (ta.crossover(adx_up, i_adxKeyLevel))
+    if (ta.crossover(adx_sig, i_adxKeyLevel))
         longCondition := (trend == 1)
         shortCondition := (trend == -1)
-    if (ta.crossover(adx_down, i_adxKeyLevel))
+    if (ta.crossunder(adx_sig, i_adxRangeKeyLevel))
         shortCondition := (trend == -1)
         longCondition := (trend == 1)
 
