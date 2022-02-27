@@ -222,8 +222,8 @@ i_diLen = input.int(14, title='(ADX) DI Length {14}')
 i_adxKeyLevel = input.float(23.0, title='(ADX) key level {23.0}')
 i_adxRangeKeyLevel = input.float(17.0, title='(ADX) Range key level {17}')
 i_detectAdxKeyLevelChange = input.bool(true, title = '(STRAT) KeyLevel changes side. [true]')
-i_tradeRanges = input.bool(true, title = '(STRAT) Trade ranges. [true]')
-i_tradeStrongTrades = input.bool(true, title = '(STRAT) Trade strong trades. [true]')
+i_tradeRanges = input.bool(false, title = '(STRAT) Trade ranges. [false]')
+i_tradeStrongTrades = input.bool(false, title = '(STRAT) Trade strong trades. [false]')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -242,7 +242,7 @@ i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Lo
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
 _RevolveNo_ = 'No revolve', _RevolveAlways_ = 'On each close', _RevolveWithADX_ = 'On each close with ADX',  _RevolveWithRange_ = 'On each close trade ranges'
-i_revolveTypePre = input.string(_RevolveNo_, '(STRAT) Revolve type', options=[_RevolveNo_, _RevolveAlways_, _RevolveWithADX_, _RevolveWithRange_])
+i_revolveTypePre = input.string(_RevolveWithADX_, '(STRAT) Revolve type', options=[_RevolveNo_, _RevolveAlways_, _RevolveWithADX_, _RevolveWithRange_])
 i_revolveType = (i_revolveTypePre == _RevolveNo_) ? 'no' : (i_revolveTypePre == _RevolveAlways_) ? 'always' : (i_revolveTypePre == _RevolveWithADX_) ? 'adx' : (i_revolveTypePre == _RevolveWithRange_) ? 'range' : ''
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
