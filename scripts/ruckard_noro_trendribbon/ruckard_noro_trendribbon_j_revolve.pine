@@ -241,6 +241,9 @@ i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossT
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+_RevolveNo_ = 'No revolve', _RevolveAlways_ = 'On each close', _RevolveWithADX_ = 'On each close with ADX'
+i_revolveTypePre = input.string(_RevolveNo_, '(STRAT) Revolve type', options=[_RevolveNo_, _RevolveAlways_, _RevolveWithADX_])
+i_revolveType = (i_revolveTypePre == _RevolveNo_) ? 'no' : (i_revolveTypePre == _RevolveAlways_) ? 'always' : (i_revolveTypePre == _RevolveWithADX_) ? 'adx' : ''
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -428,6 +431,8 @@ trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 :
 //Trading
 longCondition = false
 shortCondition = false
+LONG_CLOSE = true
+SHORT_CLOSE = true
 
 strongLongTrade = (adx_up >= i_adxKeyLevel) and (adx_sig >= i_adxKeyLevel)
 strongShortTrade = (adx_down >= i_adxKeyLevel) and (adx_sig >= i_adxKeyLevel)
@@ -459,6 +464,14 @@ if (i_detectAdxKeyLevelChange)
     if (ta.crossunder(adx_sig, i_adxRangeKeyLevel))
         shortCondition := (trend == -1)
         longCondition := (trend == 1)
+
+if (i_revolveType == 'always')
+    // Not in an open order or it's not going to open an order by itself
+    if ( (not (insideABuyOrder)) and (not (insideASellOrder)) and (not (longCondition)) and (not (shortCondition)) )
+        if ( (not (LONG_CLOSE[2]) and LONG_CLOSE[1])) // The previous order was closed // Long -> Short
+            shortCondition := true
+        else if ( (not (SHORT_CLOSE[2]) and SHORT_CLOSE[1])) // The previous order was closed // Short -> Long
+            longCondition := true
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
@@ -519,7 +532,6 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 // Decide if we are going to SHORT/Go SHORT - END
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
-LONG_CLOSE = true
 LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
@@ -528,7 +540,6 @@ if LONG_CLOSE
 // Decide if a LONG/LONG entry should be closed - END
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
-SHORT_CLOSE = true
 SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
