@@ -484,6 +484,17 @@ if (i_revolveType == 'range')
                 longCondition := false
                 shortCondition := true
 
+if (i_revolveType == 'adx')
+    // Not in an open order or it's not going to open an order by itself
+    if ( (not (insideABuyOrder)) and (not (insideASellOrder)) and (not (longCondition)) and (not (shortCondition)) )
+        if ( (not (LONG_CLOSE[2]) and LONG_CLOSE[1]) or (not (SHORT_CLOSE[2]) and SHORT_CLOSE[1]) ) // The previous order was closed. Do whatever it's best for operating a range.
+            if (strongLongTrade and (trend == 1))
+                longCondition := true
+                shortCondition := false
+            else if (strongShortTrade and (trend == -1))
+                longCondition := false
+                shortCondition := true
+
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 MAColor = i_showRibbon ? color.black : na
