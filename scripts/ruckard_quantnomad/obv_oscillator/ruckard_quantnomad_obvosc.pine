@@ -211,6 +211,10 @@ i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossT
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+i_obvLength = input.int(20,    title = '(STRAT) OBV Length {20}')
+i_obvSource = input.source(close, title = '(STRAT) OBV Source {close}')
+i_obvFastEMALength = input.int(12, title = '(STRAT) Fast EMA Length {12}')
+i_obvSlowEMALength = input.int(26, title = '(STRAT) Slow EMA Length {26}')
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -359,10 +363,13 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
-longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+obv      = math.sum(volume * math.sign(ta.change(i_obvSource)), i_obvLength)
+obvOscillator  = obv / math.sum(volume, i_obvLength)
+obvFastEMA = ta.ema(obvOscillator, i_obvFastEMALength)
+obvSlowEMA = ta.ema(obvOscillator, i_obvSlowEMALength)
+
+longCondition = ta.crossover(obvFastEMA, obvSlowEMA)
+shortCondition = ta.crossunder(obvFastEMA, obvSlowEMA)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
