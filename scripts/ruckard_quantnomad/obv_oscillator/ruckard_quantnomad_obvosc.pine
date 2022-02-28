@@ -6,7 +6,7 @@
 // Current version: v20220228 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
+// This strategy uses two emas based on an OBV oscillator in order to decide going long or short.
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at XRPUSDT pair and 1H timeframe.
