@@ -215,6 +215,7 @@ i_obvLength = input.int(20,    title = '(STRAT) OBV Length {20}')
 i_obvSource = input.source(close, title = '(STRAT) OBV Source {close}')
 i_obvFastEMALength = input.int(12, title = '(STRAT) Fast EMA Length {12}')
 i_obvSlowEMALength = input.int(26, title = '(STRAT) Slow EMA Length {26}')
+i_obvShowEMAs = input.bool(true, title = '(PLOT) Show OBV EMAs {true}')
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -372,6 +373,10 @@ longCondition = ta.crossover(obvFastEMA, obvSlowEMA)
 shortCondition = ta.crossunder(obvFastEMA, obvSlowEMA)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+plot(0, color = color.gray, title = "0 line")
+plot(obvOscillator, color = color.blue, title = "OBV Oscillator", linewidth = 2)
+plot(i_obvShowEMAs ? obvFastEMA : na, color = color.orange, title = "OBV Fast EMA", linewidth = 2)
+plot(i_obvShowEMAs ? obvSlowEMA : na, color = color.green , title = "OBV Slow EMA", linewidth = 2)
 
 // Position price calculation - BEGIN
 float positionPrice = na
