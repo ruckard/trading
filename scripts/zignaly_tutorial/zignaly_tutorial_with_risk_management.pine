@@ -686,8 +686,8 @@ if (i_strategyType == _REVERSE_)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
     if LONG_CLOSE
-        tmpOrderComment := f_getOrderComment("close", strategy.long, zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false))
-        strategy.close("[L]", alert_message=i_enableZignalyAlert ? zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false) : na, comment=tmpOrderComment)
+        tmpOrderComment := f_getOrderComment("close", strategy.long, zig.reverseLongExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false))
+        strategy.close("[L]", alert_message=i_enableZignalyAlert ? zig.reverseLongExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false) : na, comment=tmpOrderComment)
     if (SHORT and (not SHORT_CLOSE))
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
         if not (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered)))
@@ -702,8 +702,8 @@ if (i_strategyType == _REVERSE_)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             sellOrderOpenBarIndex := bar_index + 1
     if SHORT_CLOSE
-        tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false))
-        strategy.close("[S]", alert_message=i_enableZignalyAlert ? zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false) : na, comment=tmpOrderComment)
+        tmpOrderComment := f_getOrderComment("close", strategy.short, zig.reverseShortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false))
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? zig.reverseShortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false) : na, comment=tmpOrderComment)
 // Reverse logic - END
 
 // Handle STOP LOSS (and similar) order exits - BEGIN
@@ -742,10 +742,19 @@ else
 // This might trigger additional close orders than needed in zignaly
 // Better close an existing order twice than regreting zignaly not having closed it.
 
-tmpOrderComment := f_getOrderComment("close", strategy.long, zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false))
-strategy.exit("[SL/TP]", "[L]", stop= i_enableStopLoss ? LongStopLoss : na, limit= i_enableTakeProfit ? LongTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? longTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? longTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false) : na, comment=tmpOrderComment)
-tmpOrderComment := f_getOrderComment("close", strategy.short, zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false))
-strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, limit= i_enableTakeProfit ? ShortTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? shortTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? shortTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false) : na, comment=tmpOrderComment)
+if (not (i_strategyType == _REVERSE_))
+    tmpOrderAlertMessage := zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false)
+else // REVERSE
+    tmpOrderAlertMessage := zig.reverseLongExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false)
+tmpOrderComment := f_getOrderComment("close", strategy.long, tmpOrderAlertMessage)
+strategy.exit("[SL/TP]", "[L]", stop= i_enableStopLoss ? LongStopLoss : na, limit= i_enableTakeProfit ? LongTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? longTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? longTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+
+if (not (i_strategyType == _REVERSE_))
+    tmpOrderAlertMessage := zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false)
+else // REVERSE
+    tmpOrderAlertMessage := zig.reverseShortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=stringNA, partial=false)
+tmpOrderComment := f_getOrderComment("close", strategy.short, tmpOrderAlertMessage)
+strategy.exit("[SL/TP]", "[S]", stop= i_enableStopLoss ? ShortStopLoss : na, limit= i_enableTakeProfit ? ShortTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? shortTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? shortTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
 
 // Handle STOP LOSS (and similar) order exits - END
 
