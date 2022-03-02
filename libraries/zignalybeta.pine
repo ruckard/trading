@@ -934,3 +934,41 @@ export updateReverseShortEntry (string key = na, string providerType = 'copytrad
     var string _message = updateShortEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage, partial)
 
     _message
+
+// @function Returns partial alert_message for closing reverse long entries in Zignaly
+// @param key Service secret key (It is found in the Edit tab of your service.)
+// @param exchange Exchange where to submit the position. Defaults to 'binance' (which it's also ok for ProfitSharing because it's the same as zignaly).
+// @param exchangeAccountType Either 'futures' or 'spot'. Defaults to 'futures'.
+// @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
+// @param leverage Futures leverage. Defaults to 1.
+// @param alertType Alert type. Defaults to 'webhook'.
+// @param signalId Defaults to LONG-pair.
+// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
+// @returns alert_message for closing reverse long entries in Zignaly
+export reverseLongExit (string key = na, string exchange, string exchangeAccountType, string pair, int leverage, string alertType, string signalId = na, bool partial = na) =>
+
+    string p_signalId = signalId
+    if (na(p_signalId))
+        p_signalId := 'REVERSE-' + getZignalyPair(pair)
+    var string _message = longExit (key, exchange, exchangeAccountType, pair, leverage, alertType, p_signalId, partial)
+
+    _message
+
+// @function Returns partial alert_message for closing reverse short entries in Zignaly
+// @param key Service secret key (It is found in the Edit tab of your service.)
+// @param exchange Exchange where to submit the position. Defaults to 'binance' (which it's also ok for ProfitSharing because it's the same as zignaly).
+// @param exchangeAccountType Either 'futures' or 'spot'. Defaults to 'futures'.
+// @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
+// @param leverage Futures leverage. Defaults to 1.
+// @param alertType Alert type. Defaults to 'webhook'.
+// @param signalId Defaults to SHORT-pair.
+// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
+// @returns alert_message for closing reverse short entries in Zignaly
+export reverseShortExit (string key = na, string exchange, string exchangeAccountType, string pair, int leverage, string alertType, string signalId = na, bool partial = na) =>
+
+    string p_signalId = signalId
+    if (na(p_signalId))
+        p_signalId := 'REVERSE-' + getZignalyPair(pair)
+    var string _message = shortExit (key, exchange, exchangeAccountType, pair, leverage, alertType, p_signalId, partial)
+
+    _message
