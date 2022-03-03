@@ -497,6 +497,23 @@ if (i_revolveType == 'adx')
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+MAColor = i_showRibbon ? color.black : na
+highCenterMAPlot = plot(highMa, color = MAColor, title = "(High) MA")
+lowCenterMAPlot = plot(lowMa, color = MAColor, title = "(Low) MA")
+highestLowestColor = i_showRibbon ? color.blue : na
+highestMAPlot = plot(highestMA, color = highestLowestColor, title = "Upper line")
+lowestMAPlot = plot(lowestMA, color = highestLowestColor, title = "Lower Line")
+highestMABackgroundColor = i_showBackground ? color.red : na
+lowestMABackgroundColor = i_showBackground ? color.blue : na
+fill(highestMAPlot, highCenterMAPlot, color = color.new(highestMABackgroundColor, 50))
+fill(lowestMAPlot, lowCenterMAPlot, color = color.new(lowestMABackgroundColor, 50))
+
+highestClosingLowestColor = i_showRibbon ? color.yellow : na
+highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = "Upper Closing line")
+lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
+
+plotshape((trend[1] == -1) and (trend == 1), style=shape.arrowup, title="Long Side change", location=location.top, color=color.blue)
+plotshape((trend[1] == 1) and (trend == -1), style=shape.arrowdown, title="Short Side change", location=location.bottom, color=color.blue)
 
 // Position price calculation - BEGIN
 float positionPrice = na
