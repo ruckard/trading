@@ -645,6 +645,12 @@ if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
 if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
     ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 
+// Make sure LongStopLoss and ShortStopLoss are undefined
+// by default when i_enableStopLoss is set to false
+if (not i_enableStopLoss)
+    LongStopLoss := na
+    ShortStopLoss := na
+
 // Override StopLoss with BreakEven if needed
 if ( i_enableBreakEven and insideABuyOrder and (not breakEvenTriggered) and breakEvenNeedsTrigger )
     LongStopLoss := positionPrice * (1 + i_breakEvenPerOne)
