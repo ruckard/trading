@@ -634,15 +634,15 @@ var float LongStopLoss = na
 var float ShortStopLoss = na
 
 // Initial StopLoss value based on last closed candle
-if (not insideABuyOrder)
+if (i_enableStopLoss and (not insideABuyOrder))
     LongStopLoss := close * (1 - orderStopLossPerOne)
-if (not insideASellOrder)
+if (i_enableStopLoss and (not insideASellOrder))
     ShortStopLoss := close * (1 + orderStopLossPerOne)
 
 // Final StopLoss value based on actual position price
-if ((not insideABuyOrder[1]) and (insideABuyOrder))
+if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
     LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
-if ((not insideASellOrder[1]) and (insideASellOrder))
+if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
     ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 
 // Override StopLoss with BreakEven if needed
