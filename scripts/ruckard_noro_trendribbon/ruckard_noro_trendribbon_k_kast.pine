@@ -572,10 +572,6 @@ if SHORT_CLOSE
 // orderStopLoss is just here just in case
 // we implement i_longStopLoss and i_shortStopLoss
 // in the future
-
-var float previousLongOrderStopLossPerOne = na
-var float previousShortOrderStopLossPerOne = na
-
 atrLongStopLossPrice = i_atrStopLossSource - (ta.atr(i_atrStopLossLength) * i_atrStopLossMultiplier)
 atrShortStopLossPrice = i_atrStopLossSource + (ta.atr(i_atrStopLossLength) * i_atrStopLossMultiplier)
 if LONG
@@ -584,16 +580,6 @@ if LONG
     else if ( i_stopLossType == 'atr' )
         orderStopLossPerOne := (close - atrLongStopLossPrice) / close
 
-    // FastEMA StopLoss Overwrite
-    if ( (close >= (positionPrice * (1 + i_breakEvenPerOne))) and (close >= (highestClosingMA * (1 + i_breakEvenPerOne))) )
-        highestClosingMAStopLossPerOne = (positionPrice - highestClosingMA) / positionPrice
-        if (highestClosingMAStopLossPerOne >= orderStopLossPerOne)
-            orderStopLossPerOne := highestClosingMAStopLossPerOne
-            if (orderStopLossPerOne != previousLongOrderStopLossPerOne[1])
-                breakEvenTriggered := false
-                breakEvenNeedsTrigger := false
-
-    previousLongOrderStopLossPerOne := orderStopLossPerOne
     orderStopLoss := orderStopLossPerOne * 100
 else
     if ( i_stopLossType == 'constant' )
@@ -601,16 +587,6 @@ else
     else if ( i_stopLossType == 'atr' )
         orderStopLossPerOne := (atrShortStopLossPrice - close) / atrShortStopLossPrice
 
-    // FastEMA StopLoss Overwrite
-    if ( (close <= (positionPrice * (1 - i_breakEvenPerOne))) and (close <= (lowestClosingMA * (1 - i_breakEvenPerOne))) )
-        lowestClosingMAStopLossPerOne = (lowestClosingMA - positionPrice) / lowestClosingMA
-        if (lowestClosingMAStopLossPerOne <= orderStopLossPerOne)
-            orderStopLossPerOne := lowestClosingMAStopLossPerOne
-            if (orderStopLossPerOne != previousShortOrderStopLossPerOne[1])
-                breakEvenTriggered := false
-                breakEvenNeedsTrigger := false
-
-    previousShortOrderStopLossPerOne := orderStopLossPerOne
     orderStopLoss := orderStopLossPerOne * 100
 
 var float LongBreakEvenTrigger = na
