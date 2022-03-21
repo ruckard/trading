@@ -6,8 +6,9 @@
 // Current version: v20220321 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
-// This specific strategy also includes Risk Management.
+// This Strategy makes use of two Donchian Channels , the first one is used to open the position when a new Highest High or Lowest Low is present.
+// A second 10 periods Donchian Channel is used to set the trailing Stop Loss.
+// As an option we can use a 200 EMA to trade with the trend only.
 // 
 // It was originally tested at ZILUSDT pair and 4H timeframe.
 //
