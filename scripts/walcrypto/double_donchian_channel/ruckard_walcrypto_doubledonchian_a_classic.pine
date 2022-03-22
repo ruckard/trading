@@ -526,6 +526,38 @@ if (not i_enableStopLoss)
     LongStopLoss := na
     ShortStopLoss := na
 
+// Strategy Plot - BEGIN
+mainDonchianChannelColor = color.new(#0094FF, transp=90)
+mainDonchianChannelUpperPlot = plot(mainDonchianChannelUpper, "DC Upper", color=color.new(color.green, transp=70))
+mainDonchianChannelLowerPlot = plot(mainDonchianChannelLower, "DC Lower", color=color.new(color.green, transp=70))
+fill(mainDonchianChannelUpperPlot, mainDonchianChannelLowerPlot, color=mainDonchianChannelColor, title="DC Background")
+
+SLDonchianChannelColor = color.new(#009400,90)
+SLDonchianChannelUpperPlot = plot(SLDonchianChannelUpper, "SL Upper", color=#0094FF)
+SLDonchianChannelLowerPlot = plot(SLDonchianChannelLower, "SL Lower", color=#0094FF)
+fill(SLDonchianChannelUpperPlot, SLDonchianChannelLowerPlot, color=SLDonchianChannelColor, title="SL Background")
+
+stopLossColor = color.new(color.blue, transp=0)
+plot(LONG ? LongStopLoss : SHORT ? ShortStopLoss : na, color=stopLossColor, linewidth=2, style=plot.style_circles, title="Stop Loss")
+
+upTrend = true
+downTrend = false
+if (i_emaFilterEnabled)
+    upTrend := (high >= mainDonchianChannelUpper) and (close > slowEMA)
+    downTrend := (low <= mainDonchianChannelLower) and (close < slowEMA)
+else // not i_emaFilterEnabled
+    upTrend := (high >= mainDonchianChannelUpper)
+    downTrend := (low <= mainDonchianChannelLower)
+
+upTrendColor = color.new(color.green, transp=0)
+downTrendColor = color.new(color.red, transp=0)
+plotshape(upTrend ? mainDonchianChannelUpper : na, title="UpTrend", location=location.top, style=shape.triangleup, size=size.tiny, color=upTrendColor, display=display.none)
+plotshape(downTrend ? mainDonchianChannelLower : na, title="DownTrend", location=location.top, style=shape.triangledown, size=size.tiny, color=downTrendColor, display=display.none)
+
+slowEMAColor = color.new(#fc4c2a, transp=0)
+plot(slowEMA, title="EMA", color=slowEMAColor, linewidth=2)
+// Strategy Plot - END
+
 // Override StopLoss with BreakEven if needed
 if ( i_enableBreakEven and insideABuyOrder and (not breakEvenTriggered) and breakEvenNeedsTrigger )
     LongStopLoss := positionPrice * (1 + i_breakEvenPerOne)
