@@ -184,7 +184,7 @@ import ruckard/ZignalyBeta/14 as zig
 i_enableZignalyAlert = input(true, '(ZIG) Enable Alert message {True}')
 i_zignalyServiceSecretKey = input.string('MYSECRETKEY', '(ZIG) Service Secret Key {MYSECRETKEY}')
 _ZIGHYBRIDINTEGRATION_ = 'Hybrid', _ZIGTVONLYINTEGRATION_ = 'TradingView only'
-i_zignalyIntegrationTypePre = input.string(_ZIGTVONLYINTEGRATION_, '(ZIG) Integration type', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
+i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, '(ZIG) Integration type', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
 i_zignalyIntegrationType = (i_zignalyIntegrationTypePre == _ZIGHYBRIDINTEGRATION_) ? 'hybrid' : 'nonhybrid'
 _ZIGSIGNALPROVIDER_ = 'Signal Provider', _ZIGCOPYTRADERPROVIDER_ = 'Profit Sharing/Copy Trader Provider'
 i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider type', options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
@@ -213,6 +213,10 @@ i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossT
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+i_mainDonchianChannelLength = input.int(20, title = '(STRAT) Main Donchian Channel Length', minval=1)
+i_SLDonchianChannelLength = input.int(10, title = '(STRAT) StopLoss Donchian Channel Length', minval=1)
+i_emaFilterEnabled = input.bool(title = '(STRAT) EMA Filter', defval = false)
+i_emaInput        = input.int(title = '(STRAT) EMA', defval = 200, minval = 10, maxval = 400, step = 1)
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -365,10 +369,21 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
-longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+slowEMA = ta.ema(close, i_emaInput)
+
+mainDonchianChannelLower = ta.lowest(i_mainDonchianChannelLength)
+mainDonchianChannelUpper = ta.highest(i_mainDonchianChannelLength)
+
+longCondition = true
+shortCondition = false
+
+if (i_emaFilterEnabled)
+    longCondition := (close >= mainDonchianChannelUpper[1]) and (close > slowEMA)
+    shortCondition := (close <= mainDonchianChannelLower[1]) and (close < slowEMA)
+else // not i_emaFilterEnabled
+    longCondition := (close >= mainDonchianChannelUpper[1])
+    shortCondition := (close <= mainDonchianChannelLower[1])
+
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
@@ -497,6 +512,13 @@ if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
     LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
 if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
     ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+
+// DonChian channel Stop Loss
+SLDonchianChannelUpper = ta.highest(i_SLDonchianChannelLength)
+SLDonchianChannelLower = ta.lowest(i_SLDonchianChannelLength)
+if (i_enableStopLoss)
+    LongStopLoss := SLDonchianChannelLower
+    ShortStopLoss := SLDonchianChannelUpper
 
 // Make sure LongStopLoss and ShortStopLoss are undefined
 // by default when i_enableStopLoss is set to false
