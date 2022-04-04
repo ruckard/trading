@@ -538,7 +538,7 @@ SLDonchianChannelLowerPlot = plot(SLDonchianChannelLower, "SL Lower", color=#009
 fill(SLDonchianChannelUpperPlot, SLDonchianChannelLowerPlot, color=SLDonchianChannelColor, title="SL Background")
 
 stopLossColor = color.new(color.blue, transp=0)
-plot(LONG ? LongStopLoss : SHORT ? ShortStopLoss : na, color=stopLossColor, linewidth=2, style=plot.style_circles, title="Stop Loss")
+plot(insideABuyOrder ? LongStopLoss : insideASellOrder ? ShortStopLoss : na, color=stopLossColor, linewidth=2, style=plot.style_circles, title="Stop Loss")
 
 upTrend = true
 downTrend = false
