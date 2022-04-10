@@ -224,6 +224,10 @@ i_adxRangeKeyLevel = input.float(17.0, title='(ADX) Range key level {17}')
 i_detectAdxKeyLevelChange = input.bool(true, title = '(STRAT) KeyLevel changes side. [true]')
 i_tradeRanges = input.bool(true, title = '(STRAT) Trade ranges. [true]')
 i_tradeStrongTrades = input.bool(true, title = '(STRAT) Trade strong trades. [true]')
+i_highestClosingMaMinimum = input.float(0.25, title='(STRAT) Highest Closing MA Minimum [0.25]') * 0.01
+i_highestClosingMaMaximum = input.float(1.00, title='(STRAT) Highest Closing MA Maximum [1.00]') * 0.01
+i_lowestClosingMaMinimum = input.float(0.25, title='(STRAT) Highest Closing MA Minimum [0.25]') * 0.01
+i_lowestClosingMaMaximum = input.float(1.00, title='(STRAT) Highest Closing MA Maximum [1.00]') * 0.01
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -439,11 +443,11 @@ shortCondition = false
 LONG_CLOSE = true
 SHORT_CLOSE = true
 
-highestClosingMAWithMinimumDistance = (highestClosingMA + (0.01 * highestClosingMA))
-highestClosingMAWithMaximumDistance = (highestClosingMA + (0.02 * highestClosingMA))
+highestClosingMAWithMinimumDistance = (highestClosingMA + (i_highestClosingMaMinimum * highestClosingMA))
+highestClosingMAWithMaximumDistance = (highestClosingMA + (i_highestClosingMaMaximum * highestClosingMA))
 
-lowestClosingMAWithMinimumDistance = (lowestClosingMA - (0.01 * lowestClosingMA))
-lowestClosingMAWithMaximumDistance = (lowestClosingMA - (0.02 * lowestClosingMA))
+lowestClosingMAWithMinimumDistance = (lowestClosingMA - (i_lowestClosingMaMinimum * lowestClosingMA))
+lowestClosingMAWithMaximumDistance = (lowestClosingMA - (i_lowestClosingMaMaximum * lowestClosingMA))
 
 if not(longCondition[1])
     longCondition:= (highestClosingMAWithMinimumDistance >= highestMA) and (close >= highestClosingMAWithMinimumDistance) and (close <= highestClosingMAWithMaximumDistance)
