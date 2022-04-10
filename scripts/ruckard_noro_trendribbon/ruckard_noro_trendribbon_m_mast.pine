@@ -559,10 +559,10 @@ if ((not insideASellOrder[1]) and insideASellOrder)
     ShortBreakEvenTrigger := positionPrice * (1 - i_breakEvenTriggerPerOne)
 
 if (insideABuyOrder and insideABuyOrder[1])
-    if ( (close >= (positionPrice * (1 + i_breakEvenPerOne))) and (i_signalSource > highestClosingMA) )
+    if (close >= (positionPrice * (1 + i_breakEvenPerOne)))
         customBreakEvenNeedsTrigger := true
 if (insideASellOrder and insideASellOrder[1])
-    if ( (close <= (positionPrice * (1 - i_breakEvenPerOne))) and (i_signalSource < lowestClosingMA) )
+    if (close <= (positionPrice * (1 - i_breakEvenPerOne)))
         customBreakEvenNeedsTrigger := true
 
 if insideABuyOrder
