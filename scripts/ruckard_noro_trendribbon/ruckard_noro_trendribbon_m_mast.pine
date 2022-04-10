@@ -198,13 +198,39 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+i_highMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High MA Type [SMA]')
+i_highMaLength = input.int(20, minval = 1,  title = '(STRAT) High MA Length [20]')
+i_highMaSource = input.source(ohlc4, title = '(STRAT) High MA Source [ohlc4]')
+i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High Closing MA Type [SMA]')
+i_highClosingMaLength = input.int(10, minval = 1,  title = '(STRAT) High Closing MA Length [10]')
+i_highClosingMaSource = input.source(ohlc4, title = '(STRAT) High Closing MA Source [ohlc4]')
+i_lowMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low MA Type [SMA]')
+i_lowMaLength = input.int(20, minval = 1,  title = '(STRAT) Low MA Length [20]')
+i_lowMaSource = input.source(ohlc4, title = '(STRAT) Low MA Source [ohlc4]')
+i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
+i_lowClosingMaLength = input.int(10, minval = 1,  title = '(STRAT) Low Closing MA Length [10]')
+i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
+i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
+i_highestMaLength = input.int(20, minval = 1,  title = '(STRAT) Highest MA Length [20]')
+i_highestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Highest Closing MA Length [20]')
+i_lowestMaLength = input.int(20, minval = 1,  title = '(STRAT) Lowest MA Length [20]')
+i_lowestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Lowest Closing MA Length [20]')
+i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
+i_showBackground = input.bool(true, title = 'Show color [true]')
+i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
+i_diLen = input.int(14, title='(ADX) DI Length {14}')
+i_adxKeyLevel = input.float(23.0, title='(ADX) key level {23.0}')
+i_adxRangeKeyLevel = input.float(17.0, title='(ADX) Range key level {17}')
+i_detectAdxKeyLevelChange = input.bool(true, title = '(STRAT) KeyLevel changes side. [true]')
+i_tradeRanges = input.bool(true, title = '(STRAT) Trade ranges. [true]')
+i_tradeStrongTrades = input.bool(true, title = '(STRAT) Trade strong trades. [true]')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
-i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
-i_enableTrailingTakeProfit = input.bool(true, title='(TRAILING) Enable Trailing Take Profit (%) {True}')
+i_enableStopLoss = input.bool(false, '(STOPTAKE) Stop Loss? {False}')
+i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
-i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
+i_enableCustomBreakEven = input.bool(true, title='(BREAKEVEN) Enable Custom Break Even (%) {True}')
 i_enableRiskRewardRatio = input.bool(false, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {False}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
@@ -216,6 +242,9 @@ i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossT
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+_RevolveNo_ = 'No revolve', _RevolveAlways_ = 'On each close', _RevolveWithADX_ = 'On each close with ADX',  _RevolveWithRange_ = 'On each close trade ranges'
+i_revolveTypePre = input.string(_RevolveNo_, '(STRAT) Revolve type', options=[_RevolveNo_, _RevolveAlways_, _RevolveWithADX_, _RevolveWithRange_])
+i_revolveType = (i_revolveTypePre == _RevolveNo_) ? 'no' : (i_revolveTypePre == _RevolveAlways_) ? 'always' : (i_revolveTypePre == _RevolveWithADX_) ? 'adx' : (i_revolveTypePre == _RevolveWithRange_) ? 'range' : ''
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -244,7 +273,7 @@ i_CapitalQuote = input.float(100.0, title='(CAPITAL) Capital quote invested per 
 i_CapitalPercentage = input.float(25.0, title='(CAPITAL) Capital percentage invested per order (%) {25.0}', minval=0, step=0.01) * 0.01
 // Risk Management - Inputs
 _SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None', _CUSTOM_ = 'Custom', _FORCED_ = 'Forced'
-i_riskManagementTypePre = input.string(_SCOMPOUND_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
+i_riskManagementTypePre = input.string(_NONE_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
 i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
 i_riskManagementMaximumLossPerTrade = input.float(1.0, title='(RISKM) Maximum loss per trade % {1.0}') / 100
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='(RISKM) Maximum loss per day % {6.0}') / 100
@@ -361,6 +390,24 @@ f_getTooRecentOrderNotOpenAdvice () =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
+// ADX - Functions - BEGIN
+
+dirmov(_len) =>
+    up = ta.change(high)
+    down = -ta.change(low)
+    truerange = ta.rma(ta.tr, _len)
+    plus = fixnan(100 * ta.rma(up > down and up > 0 ? up : 0, _len) / truerange)
+    minus = fixnan(100 * ta.rma(down > up and down > 0 ? down : 0, _len) / truerange)
+    [plus, minus]
+
+adx(_dilen, _adxlen) =>
+    [plus, minus] = dirmov(_dilen)
+    sum = plus + minus
+    adx = 100 * ta.rma(math.abs(plus - minus) / (sum == 0 ? 1 : sum), _adxlen)
+    [adx, plus, minus]
+
+// ADX - Functions - END
+
 // FUNCTIONS - END
 
 
@@ -368,10 +415,91 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
-longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+highMa = i_highMaType == "SMA" ? ta.sma(i_highMaSource, i_highMaLength) : i_highMaType == "EMA" ? ta.ema(i_highMaSource, i_highMaLength) : i_highMaType == "VWMA" ? ta.vwma(i_highMaSource, i_highMaLength) : ta.rma(i_highMaSource, i_highMaLength)
+lowMa = i_lowMaType == "SMA" ? ta.sma(i_lowMaSource, i_lowMaLength) : i_lowMaType == "EMA" ? ta.ema(i_lowMaSource, i_lowMaLength) : i_lowMaType == "VWMA" ? ta.vwma(i_lowMaSource, i_lowMaLength) : ta.rma(i_lowMaSource, i_lowMaLength)
+
+highClosingMa = i_highClosingMaType == "SMA" ? ta.sma(i_highClosingMaSource, i_highClosingMaLength) : i_highClosingMaType == "EMA" ? ta.ema(i_highClosingMaSource, i_highClosingMaLength) : i_highClosingMaType == "VWMA" ? ta.vwma(i_highClosingMaSource, i_highClosingMaLength) : ta.rma(i_highClosingMaSource, i_highClosingMaLength)
+lowClosingMa = i_lowClosingMaType == "SMA" ? ta.sma(i_lowClosingMaSource, i_lowClosingMaLength) : i_lowClosingMaType == "EMA" ? ta.ema(i_lowClosingMaSource, i_lowClosingMaLength) : i_lowClosingMaType == "VWMA" ? ta.vwma(i_lowClosingMaSource, i_lowClosingMaLength) : ta.rma(i_lowClosingMaSource, i_lowClosingMaLength)
+//Price Channel
+highestMA = ta.highest(highMa, i_highestMaLength)
+lowestMA = ta.lowest(lowMa, i_lowestMaLength)
+
+highestClosingMA = ta.highest(highClosingMa, i_highestClosingMaLength)
+lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
+
+//Trend
+trend = 0
+trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 : trend[1]
+
+[adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
+
+//Trading
+longCondition = false
+shortCondition = false
+LONG_CLOSE = true
+SHORT_CLOSE = true
+
+strongLongTrade = (adx_up >= i_adxKeyLevel) and (adx_sig >= i_adxKeyLevel)
+strongShortTrade = (adx_down >= i_adxKeyLevel) and (adx_sig >= i_adxKeyLevel)
+// This is going up with strength - Let's long
+if (i_tradeStrongTrades and strongLongTrade)
+    longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
+    shortCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
+// This is going down with strength - Let's short
+if (i_tradeStrongTrades and strongShortTrade)
+    longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
+    shortCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
+
+rangeLongTrade = (adx_sig < i_adxRangeKeyLevel) and (adx_down > adx_up)
+rangeShortTrade = (adx_sig < i_adxRangeKeyLevel) and (adx_up > adx_down)
+// This is going down without strength - Let's long
+if (i_tradeRanges and rangeLongTrade)
+    longCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
+    shortCondition := false
+// This is going up without strength - Let's short
+if (i_tradeRanges and rangeShortTrade)
+    longCondition := false
+    shortCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
+
+// Make sure to change our position side when ADX cross over or under the ADX key level
+if (i_detectAdxKeyLevelChange)
+    if (ta.crossover(adx_sig, i_adxKeyLevel))
+        longCondition := (trend == 1)
+        shortCondition := (trend == -1)
+    if (ta.crossunder(adx_sig, i_adxRangeKeyLevel))
+        shortCondition := (trend == -1)
+        longCondition := (trend == 1)
+
+if (i_revolveType == 'always')
+    // Not in an open order or it's not going to open an order by itself
+    if ( (not (insideABuyOrder)) and (not (insideASellOrder)) and (not (longCondition)) and (not (shortCondition)) )
+        if ( (not (LONG_CLOSE[2]) and LONG_CLOSE[1])) // The previous order was closed // Long -> Short
+            shortCondition := true
+        else if ( (not (SHORT_CLOSE[2]) and SHORT_CLOSE[1])) // The previous order was closed // Short -> Long
+            longCondition := true
+
+if (i_revolveType == 'range')
+    // Not in an open order or it's not going to open an order by itself
+    if ( (not (insideABuyOrder)) and (not (insideASellOrder)) and (not (longCondition)) and (not (shortCondition)) )
+        if ( (not (LONG_CLOSE[2]) and LONG_CLOSE[1]) or (not (SHORT_CLOSE[2]) and SHORT_CLOSE[1]) ) // The previous order was closed. Do whatever it's best for operating a range.
+            if (rangeLongTrade and (trend == -1))
+                longCondition := true
+                shortCondition := false
+            else if (rangeShortTrade and (trend == 1))
+                longCondition := false
+                shortCondition := true
+
+if (i_revolveType == 'adx')
+    // Not in an open order or it's not going to open an order by itself
+    if ( (not (insideABuyOrder)) and (not (insideASellOrder)) and (not (longCondition)) and (not (shortCondition)) )
+        if ( (not (LONG_CLOSE[2]) and LONG_CLOSE[1]) or (not (SHORT_CLOSE[2]) and SHORT_CLOSE[1]) ) // The previous order was closed. Do whatever it's best for operating a range.
+            if (strongLongTrade and (trend == 1))
+                longCondition := true
+                shortCondition := false
+            else if (strongShortTrade and (trend == -1))
+                longCondition := false
+                shortCondition := true
+
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
@@ -415,8 +543,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 // Decide if we are going to SHORT/Go SHORT - END
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
-LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or shortCondition
+LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -424,8 +551,7 @@ if LONG_CLOSE
 // Decide if a LONG/LONG entry should be closed - END
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
-SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or longCondition
+SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
@@ -461,10 +587,10 @@ if ((not insideASellOrder[1]) and insideASellOrder)
     ShortBreakEvenTrigger := positionPrice * (1 - i_breakEvenTriggerPerOne)
 
 if (insideABuyOrder and insideABuyOrder[1])
-    if ( false )
+    if ( (close >= (positionPrice * (1 + i_breakEvenPerOne))) and (i_signalSource > highestClosingMA) )
         customBreakEvenNeedsTrigger := true
 if (insideASellOrder and insideASellOrder[1])
-    if ( false )
+    if ( (close <= (positionPrice * (1 - i_breakEvenPerOne))) and (i_signalSource < lowestClosingMA) )
         customBreakEvenNeedsTrigger := true
 
 if insideABuyOrder
@@ -514,11 +640,11 @@ if ( i_enableBreakEven and insideASellOrder and (not breakEvenTriggered) and bre
     ShortStopLoss := positionPrice * (1 - i_breakEvenPerOne)
 
 if ( i_enableCustomBreakEven and insideABuyOrder and customBreakEvenNeedsTrigger )
-    LongStopLoss := positionPrice * (1 + i_breakEvenPerOne)
+    LongStopLoss := highestClosingMA
     customBreakEvenPerOne := (LongStopLoss - close) / close
     customBreakEven := customBreakEvenPerOne * 100
 if ( i_enableCustomBreakEven and insideASellOrder and customBreakEvenNeedsTrigger )
-    ShortStopLoss := positionPrice * (1 - i_breakEvenPerOne)
+    ShortStopLoss := lowestClosingMA
     customBreakEvenPerOne := (close - ShortStopLoss) / ShortStopLoss
     customBreakEven := customBreakEvenPerOne * 100
 
