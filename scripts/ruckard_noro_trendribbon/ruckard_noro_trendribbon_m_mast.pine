@@ -439,66 +439,21 @@ shortCondition = false
 LONG_CLOSE = true
 SHORT_CLOSE = true
 
-strongLongTrade = (adx_up >= i_adxKeyLevel) and (adx_sig >= i_adxKeyLevel)
-strongShortTrade = (adx_down >= i_adxKeyLevel) and (adx_sig >= i_adxKeyLevel)
-// This is going up with strength - Let's long
-if (i_tradeStrongTrades and strongLongTrade)
-    longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
-    shortCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
-// This is going down with strength - Let's short
-if (i_tradeStrongTrades and strongShortTrade)
-    longCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
-    shortCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
+highestClosingMAWithMinimumDistance = (highestClosingMA + (0.01 * highestClosingMA))
+highestClosingMAWithMaximumDistance = (highestClosingMA + (0.02 * highestClosingMA))
 
-rangeLongTrade = (adx_sig < i_adxRangeKeyLevel) and (adx_down > adx_up)
-rangeShortTrade = (adx_sig < i_adxRangeKeyLevel) and (adx_up > adx_down)
-// This is going down without strength - Let's long
-if (i_tradeRanges and rangeLongTrade)
-    longCondition := (na(trend[1]) and (trend == -1)) or ((trend[1] == 1) and (trend == -1))
-    shortCondition := false
-// This is going up without strength - Let's short
-if (i_tradeRanges and rangeShortTrade)
-    longCondition := false
-    shortCondition := (na(trend[1]) and (trend == 1)) or ((trend[1] == -1) and (trend == 1))
+lowestClosingMAWithMinimumDistance = (lowestClosingMA - (0.01 * lowestClosingMA))
+lowestClosingMAWithMaximumDistance = (lowestClosingMA - (0.02 * lowestClosingMA))
 
-// Make sure to change our position side when ADX cross over or under the ADX key level
-if (i_detectAdxKeyLevelChange)
-    if (ta.crossover(adx_sig, i_adxKeyLevel))
-        longCondition := (trend == 1)
-        shortCondition := (trend == -1)
-    if (ta.crossunder(adx_sig, i_adxRangeKeyLevel))
-        shortCondition := (trend == -1)
-        longCondition := (trend == 1)
+if not(longCondition[1])
+    longCondition:= (highestClosingMAWithMinimumDistance >= highestMA) and (close >= highestClosingMAWithMinimumDistance) and (close <= highestClosingMAWithMaximumDistance)
+else
+    longCondition:= (close >= highestClosingMAWithMinimumDistance)
 
-if (i_revolveType == 'always')
-    // Not in an open order or it's not going to open an order by itself
-    if ( (not (insideABuyOrder)) and (not (insideASellOrder)) and (not (longCondition)) and (not (shortCondition)) )
-        if ( (not (LONG_CLOSE[2]) and LONG_CLOSE[1])) // The previous order was closed // Long -> Short
-            shortCondition := true
-        else if ( (not (SHORT_CLOSE[2]) and SHORT_CLOSE[1])) // The previous order was closed // Short -> Long
-            longCondition := true
-
-if (i_revolveType == 'range')
-    // Not in an open order or it's not going to open an order by itself
-    if ( (not (insideABuyOrder)) and (not (insideASellOrder)) and (not (longCondition)) and (not (shortCondition)) )
-        if ( (not (LONG_CLOSE[2]) and LONG_CLOSE[1]) or (not (SHORT_CLOSE[2]) and SHORT_CLOSE[1]) ) // The previous order was closed. Do whatever it's best for operating a range.
-            if (rangeLongTrade and (trend == -1))
-                longCondition := true
-                shortCondition := false
-            else if (rangeShortTrade and (trend == 1))
-                longCondition := false
-                shortCondition := true
-
-if (i_revolveType == 'adx')
-    // Not in an open order or it's not going to open an order by itself
-    if ( (not (insideABuyOrder)) and (not (insideASellOrder)) and (not (longCondition)) and (not (shortCondition)) )
-        if ( (not (LONG_CLOSE[2]) and LONG_CLOSE[1]) or (not (SHORT_CLOSE[2]) and SHORT_CLOSE[1]) ) // The previous order was closed. Do whatever it's best for operating a range.
-            if (strongLongTrade and (trend == 1))
-                longCondition := true
-                shortCondition := false
-            else if (strongShortTrade and (trend == -1))
-                longCondition := false
-                shortCondition := true
+if not(shortCondition[1])
+    shortCondition:= (lowestClosingMAWithMinimumDistance <= lowestMA) and (close <= lowestClosingMAWithMinimumDistance) and (close >= lowestClosingMAWithMaximumDistance)
+else
+    shortCondition:= (close <= lowestClosingMAWithMinimumDistance)
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
