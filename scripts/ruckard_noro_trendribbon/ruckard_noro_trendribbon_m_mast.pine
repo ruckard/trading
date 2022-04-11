@@ -226,8 +226,8 @@ i_tradeRanges = input.bool(true, title = '(STRAT) Trade ranges. [true]')
 i_tradeStrongTrades = input.bool(true, title = '(STRAT) Trade strong trades. [true]')
 i_highestClosingMaMinimum = input.float(0.25, title='(STRAT) Highest Closing MA Minimum [0.25]') * 0.01
 i_highestClosingMaMaximum = input.float(1.00, title='(STRAT) Highest Closing MA Maximum [1.00]') * 0.01
-i_lowestClosingMaMinimum = input.float(0.25, title='(STRAT) Highest Closing MA Minimum [0.25]') * 0.01
-i_lowestClosingMaMaximum = input.float(1.00, title='(STRAT) Highest Closing MA Maximum [1.00]') * 0.01
+i_lowestClosingMaMinimum = input.float(0.25, title='(STRAT) Lowest Closing MA Minimum [0.25]') * 0.01
+i_lowestClosingMaMaximum = input.float(1.00, title='(STRAT) Lowest Closing MA Maximum [1.00]') * 0.01
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
