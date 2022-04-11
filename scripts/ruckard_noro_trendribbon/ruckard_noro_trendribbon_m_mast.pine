@@ -437,6 +437,9 @@ trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 :
 
 [adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
 
+strongLongTrade = (adx_up >= i_adxKeyLevel)
+strongShortTrade = (adx_down >= i_adxKeyLevel)
+
 //Trading
 longCondition = false
 shortCondition = false
@@ -450,12 +453,12 @@ lowestClosingMAWithMinimumDistance = (lowestClosingMA - (i_lowestClosingMaMinimu
 lowestClosingMAWithMaximumDistance = (lowestClosingMA - (i_lowestClosingMaMaximum * lowestClosingMA))
 
 if not(longCondition[1])
-    longCondition:= (highestClosingMAWithMinimumDistance >= highestMA) and (close >= highestClosingMAWithMinimumDistance) and (close <= highestClosingMAWithMaximumDistance)
+    longCondition:= (highestClosingMAWithMinimumDistance >= highestMA) and (close >= highestClosingMAWithMinimumDistance) and (close <= highestClosingMAWithMaximumDistance) and strongLongTrade
 else
     longCondition:= (close >= highestClosingMAWithMinimumDistance)
 
 if not(shortCondition[1])
-    shortCondition:= (lowestClosingMAWithMinimumDistance <= lowestMA) and (close <= lowestClosingMAWithMinimumDistance) and (close >= lowestClosingMAWithMaximumDistance)
+    shortCondition:= (lowestClosingMAWithMinimumDistance <= lowestMA) and (close <= lowestClosingMAWithMinimumDistance) and (close >= lowestClosingMAWithMaximumDistance) and strongShortTrade
 else
     shortCondition:= (close <= lowestClosingMAWithMinimumDistance)
 
