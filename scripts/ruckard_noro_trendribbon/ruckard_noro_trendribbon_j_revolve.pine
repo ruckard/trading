@@ -462,8 +462,8 @@ if (i_detectAdxKeyLevelChange)
         longCondition := (trend == 1)
         shortCondition := (trend == -1)
     if (ta.crossunder(adx_sig, i_adxRangeKeyLevel))
-        longCondition := (trend == -1)
-        shortCondition := (trend == 1)
+        longCondition := (trend == 1)
+        shortCondition := (trend == -1)
 
 if (i_revolveType == 'always')
     // Not in an open order or it's not going to open an order by itself
