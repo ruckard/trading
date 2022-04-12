@@ -461,7 +461,7 @@ if (i_detectAdxKeyLevelChange)
     if (ta.crossover(adx_sig, i_adxKeyLevel))
         longCondition := (trend == -1)
         shortCondition := (trend == 1)
-    if (ta.crossunder(adx_sig, i_adxRangeKeyLevel))
+    if (ta.crossunder(adx_sig, i_adxRangeKeyLevel)) or (ta.crossover(adx_sig, i_adxRangeKeyLevel))
         longCondition := (trend == 1)
         shortCondition := (trend == -1)
 
