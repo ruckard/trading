@@ -219,19 +219,12 @@ i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
 i_showBackground = input.bool(true, title = 'Show color [true]')
 i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
 i_diLen = input.int(14, title='(ADX) DI Length {14}')
-i_adxKeyLevel = input.float(23.0, title='(ADX) key level {23.0}')
+i_adxKeyLevel = input.float(29.0, title='(ADX) key level {29.0}')
 i_adxRangeKeyLevel = input.float(17.0, title='(ADX) Range key level {17}')
-i_detectAdxKeyLevelChange = input.bool(true, title = '(STRAT) KeyLevel changes side. [true]')
-i_tradeRanges = input.bool(true, title = '(STRAT) Trade ranges. [true]')
-i_tradeStrongTrades = input.bool(true, title = '(STRAT) Trade strong trades. [true]')
-i_highestClosingMaMinimum = input.float(0.25, title='(STRAT) Highest Closing MA Minimum [0.25]') * 0.01
-i_highestClosingMaMaximum = input.float(1.00, title='(STRAT) Highest Closing MA Maximum [1.00]') * 0.01
-i_lowestClosingMaMinimum = input.float(0.25, title='(STRAT) Lowest Closing MA Minimum [0.25]') * 0.01
-i_lowestClosingMaMaximum = input.float(1.00, title='(STRAT) Lowest Closing MA Maximum [1.00]') * 0.01
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
-i_enableStopLoss = input.bool(false, '(STOPTAKE) Stop Loss? {False}')
+i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
 i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
 i_enableCustomBreakEven = input.bool(true, title='(BREAKEVEN) Enable Custom Break Even (%) {True}')
@@ -239,7 +232,7 @@ i_enableRiskRewardRatio = input.bool(false, title='(STOPTAKE) Calculate Take Pro
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
 i_positionRatio = input.float(1.5, title='(STRAT) Risk/Reward Ratio % {1.5}', minval=0.01)
-i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
+i_stopLoss = input.float(5.0, title='(STOPTAKE) Stop Loss % {5.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLConstant_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
@@ -264,17 +257,17 @@ _ZIGEXZIGNALY_ = 'Zignaly', _ZIGEXBINANCE_ = 'Binance', _ZIGEXKUCOIN_ = 'Kucoin'
 i_zignalyExchange = input.string(_ZIGEXZIGNALY_, '(ZIG) Exchange {Zignaly}', options=[_ZIGEXZIGNALY_, _ZIGEXBINANCE_, _ZIGEXKUCOIN_])
 _ZIGEXTYPESPOT_ = 'spot', _ZIGEXFUTURES_ = 'futures'
 i_zignalyExchangeType = input.string(_ZIGEXFUTURES_, '(ZIG) Exchange Type {Futures}', options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_])
-i_zignalyLeverage = input.int(1, '(ZIG) Leverage {1}', minval=1, step=1, maxval=125)
+i_zignalyLeverage = input.int(38, '(ZIG) Leverage {38}', minval=1, step=1, maxval=125)
 var i_zignalyLeverage_str = str.tostring(i_zignalyLeverage)  // It needs to run only once
 i_priceDecimalDigits = input.int(2, 'Number of decimal digits for Prices {2}', minval=0, maxval=10, step=1)
 // Decimal - Inputs
 i_contractMaximumDecimalNumber = input.int(3, title='(DECIMAL) Maximum number of decimal for contracts {3}', minval=0)
 i_tooRecentMinutesNumber = input.int(0, '(RECENT) Number of minutes to wait to open a new order after the previous one has been opened {0}', minval=0, maxval=100, step=1)
 i_CapitalQuote = input.float(100.0, title='(CAPITAL) Capital quote invested per order in USDT units {100.0}')
-i_CapitalPercentage = input.float(25.0, title='(CAPITAL) Capital percentage invested per order (%) {25.0}', minval=0, step=0.01) * 0.01
+i_CapitalPercentage = input.float(10.0, title='(CAPITAL) Capital percentage invested per order (%) {10.0}', minval=0, step=0.01) * 0.01
 // Risk Management - Inputs
 _SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None', _CUSTOM_ = 'Custom', _FORCED_ = 'Forced'
-i_riskManagementTypePre = input.string(_NONE_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
+i_riskManagementTypePre = input.string(_CUSTOM_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
 i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
 i_riskManagementMaximumLossPerTrade = input.float(1.0, title='(RISKM) Maximum loss per trade % {1.0}') / 100
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='(RISKM) Maximum loss per day % {6.0}') / 100
@@ -434,30 +427,18 @@ trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 :
 
 [adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
 
-strongLongTrade = (adx_up >= i_adxKeyLevel)
-strongShortTrade = (adx_down >= i_adxKeyLevel)
-
 //Trading
 longCondition = false
 shortCondition = false
 LONG_CLOSE = true
 SHORT_CLOSE = true
 
-highestClosingMAWithMinimumDistance = (highestClosingMA + (i_highestClosingMaMinimum * highestClosingMA))
-highestClosingMAWithMaximumDistance = (highestClosingMA + (i_highestClosingMaMaximum * highestClosingMA))
-
-lowestClosingMAWithMinimumDistance = (lowestClosingMA - (i_lowestClosingMaMinimum * lowestClosingMA))
-lowestClosingMAWithMaximumDistance = (lowestClosingMA - (i_lowestClosingMaMaximum * lowestClosingMA))
-
-if not(longCondition[1])
-    longCondition:= (highestClosingMAWithMinimumDistance >= highestMA) and (close >= highestClosingMAWithMinimumDistance) and (close <= highestClosingMAWithMaximumDistance) and strongLongTrade
-else
-    longCondition:= (close >= highestClosingMAWithMinimumDistance)
-
-if not(shortCondition[1])
-    shortCondition:= (lowestClosingMAWithMinimumDistance <= lowestMA) and (close <= lowestClosingMAWithMinimumDistance) and (close >= lowestClosingMAWithMaximumDistance) and strongShortTrade
-else
-    shortCondition:= (close <= lowestClosingMAWithMinimumDistance)
+if (ta.crossover(adx_sig, i_adxKeyLevel))
+    longCondition := (trend == -1)
+    shortCondition := (trend == 1)
+if (ta.crossunder(adx_sig, i_adxRangeKeyLevel)) or (ta.crossover(adx_sig, i_adxRangeKeyLevel))
+    longCondition := (trend == 1)
+    shortCondition := (trend == -1)
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
@@ -519,7 +500,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 // Decide if we are going to SHORT/Go SHORT - END
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
-LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(close, highestClosingMA))
+LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -527,7 +508,7 @@ if LONG_CLOSE
 // Decide if a LONG/LONG entry should be closed - END
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
-SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(close, lowestClosingMA))
+SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
