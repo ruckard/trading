@@ -435,8 +435,21 @@ sqzmom(length, mult, lengthKC, multKC, useTrueRange) =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-fastMa = i_fastMaType == "SMA" ? ta.sma(i_fastMaSource, i_fastMaLength) : i_fastMaType == "EMA" ? ta.ema(i_fastMaSource, i_fastMaLength) : i_fastMaType == "VWMA" ? ta.vwma(i_fastMaSource, i_fastMaLength) : ta.rma(i_fastMaSource, i_fastMaLength)
-slowMa = i_slowMaType == "SMA" ? ta.sma(i_slowMaSource, i_slowMaLength) : i_slowMaType == "EMA" ? ta.ema(i_slowMaSource, i_slowMaLength) : i_slowMaType == "VWMA" ? ta.vwma(i_slowMaSource, i_slowMaLength) : ta.rma(i_slowMaSource, i_slowMaLength)
+// fastMa = i_fastMaType == "SMA" ? ta.sma(i_fastMaSource, i_fastMaLength) : i_fastMaType == "EMA" ? ta.ema(i_fastMaSource, i_fastMaLength) : i_fastMaType == "VWMA" ? ta.vwma(i_fastMaSource, i_fastMaLength) : ta.rma(i_fastMaSource, i_fastMaLength)
+// slowMa = i_slowMaType == "SMA" ? ta.sma(i_slowMaSource, i_slowMaLength) : i_slowMaType == "EMA" ? ta.ema(i_slowMaSource, i_slowMaLength) : i_slowMaType == "VWMA" ? ta.vwma(i_slowMaSource, i_slowMaLength) : ta.rma(i_slowMaSource, i_slowMaLength)
+
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : ta.rma(_maSource, _maLength)
+
+fastMa = f_Ma (i_fastMaType, i_fastMaSource, i_fastMaLength)
+slowMa = f_Ma (i_slowMaType, i_slowMaSource, i_slowMaLength)
+
+
+fastMa4H = request.security(syminfo.tickerid, '240', f_Ma (i_fastMaType, i_fastMaSource, i_fastMaLength))
+slowMa4H = request.security(syminfo.tickerid, '240', f_Ma (i_slowMaType, i_slowMaSource, i_slowMaLength))
+fastMa1D = request.security(syminfo.tickerid, '1D', f_Ma (i_fastMaType, i_fastMaSource, i_fastMaLength))
+slowMa1D = request.security(syminfo.tickerid, '1D', f_Ma (i_slowMaType, i_slowMaSource, i_slowMaLength))
+
 
 [adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
 [sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
@@ -444,8 +457,8 @@ slowMa = i_slowMaType == "SMA" ? ta.sma(i_slowMaSource, i_slowMaLength) : i_slow
 upTrendSqzmom = (sqzmom_bcolor == color.maroon) or (sqzmom_bcolor == color.lime)
 downTrendSqzmom = (sqzmom_bcolor == color.green) or (sqzmom_bcolor == color.red)
 
-longCondition = (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and upTrendSqzmom
-shortCondition = (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and downTrendSqzmom
+longCondition = (fastMa1D >= slowMa1D) and (fastMa4H >= slowMa4H) and (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and (sqzmom_bcolor == color.lime)
+shortCondition = (fastMa1D <= slowMa1D) and (fastMa4H <= slowMa4H) and (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and (sqzmom_bcolor == color.red)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 marronColor=#800000
@@ -494,7 +507,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or shortCondition
+LONG_CLOSE := offStopTimeInterval or shortCondition or ( downTrendSqzmom and (adx_sig <= adx_sig[1]) )
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -503,7 +516,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or longCondition
+SHORT_CLOSE := offStopTimeInterval or longCondition or ( upTrendSqzmom and (adx_sig <= adx_sig[1]) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
