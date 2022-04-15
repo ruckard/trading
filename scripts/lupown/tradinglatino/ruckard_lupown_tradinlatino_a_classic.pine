@@ -437,6 +437,36 @@ longCondition = lowWithLessStrengthLongEntry or darkRedLongEntry
 shortCondition = highWithLessStrengthShortEntry or darkGreenShortEntry
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+f_truncate(_number, _decimalPlaces) =>
+    _factor = math.pow(10, _decimalPlaces)
+    int(_number * _factor) / _factor
+
+// Prepare stats table
+f_fillCell(_table, _column, _row, _title, _value, _bgcolor, _txtcolor) =>
+    _cellText = _title + "\n" + _value
+    table.cell(_table, _column, _row, _cellText, bgcolor=_bgcolor, text_color=_txtcolor)
+
+var table performanceTable = table.new(position.top_right, 5, 2, border_width=1)
+
+// Draw stats table
+var performanceTableBackgroundColor = color.new(color.black,0)
+var performanceTableForegroundColor = color.new(color.white,0)
+var performanceTablePositiveProfit = color.new(color.green,0)
+var performanceTableNegativeProfit = color.new(color.red,0)
+if i_showTable
+    if barstate.islastconfirmedhistory
+        profitPercent = strategy.netprofit * 100 / strategy.initial_capital
+        f_fillCell(performanceTable, 0, 0, "Total Trades:", str.tostring(strategy.closedtrades), performanceTableBackgroundColor, performanceTableForegroundColor)
+        f_fillCell(performanceTable, 0, 1, "Win Rate:", str.tostring(f_truncate((strategy.wintrades/strategy.closedtrades)*100,2)) + "%", performanceTableBackgroundColor, performanceTableForegroundColor)
+        f_fillCell(performanceTable, 1, 0, "Starting:", "$" + str.tostring(strategy.initial_capital), performanceTableBackgroundColor, performanceTableForegroundColor)
+        f_fillCell(performanceTable, 1, 1, "Ending:", "$" + str.tostring(f_truncate(strategy.initial_capital+strategy.netprofit,2)), performanceTableBackgroundColor, performanceTableForegroundColor)
+        f_fillCell(performanceTable, 2, 0, "Return:", "$" + str.tostring(f_truncate(strategy.netprofit,2)), strategy.netprofit > 0 ? performanceTablePositiveProfit : performanceTableNegativeProfit, performanceTableForegroundColor)
+        f_fillCell(performanceTable, 2, 1, "% return:", (profitPercent > 0 ? "+" : "") + str.tostring(f_truncate(profitPercent,2)), profitPercent > 0 ? performanceTablePositiveProfit : performanceTableNegativeProfit, performanceTableForegroundColor)
+        //f_fillCell(performanceTable, 3, 0, "Return:", (dollarReturn > 0 ? "+" : "") + str.tostring(f_truncate((dollarReturn / startBalance)*100,2)) + "%", dollarReturn > 0 ? performanceTablePositiveProfit : performanceTableNegativeProfit, performanceTableForegroundColor)
+        //f_fillCell(performanceTable, 3, 1, "Max DD:", str.tostring(f_truncate(maxDrawdown*100,2)) + "%", performanceTableNegativeProfit, performanceTableForegroundColor)
+// --- END TESTER CODE --- //
+//plot(bar_index)
+//plot(media, color=color.red, title="media", style=plot.style_line, linewidth=2)
 
 // Position price calculation - BEGIN
 float positionPrice = na
