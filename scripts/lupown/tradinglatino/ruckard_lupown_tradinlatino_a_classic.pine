@@ -212,6 +212,19 @@ i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossT
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+
+i_useHeikin = input.bool (false, title='Use Heikin')
+i_enableMomentumExit = input.bool (true, title='Enable exit based on momentum exit')
+i_showTable = input.bool(true, title = 'Show table')
+i_momentumLength = input.int(20, title="Momentum Length", minval=1, step=1)
+i_momentumSource = input.source(close, title="Momentum Source")
+i_PivotLookbackRight = input.int(title="Pivot Lookback Right", defval=1)
+i_PivotLookbackLeft = input.int(title="Pivot Lookback Left", defval=1)
+i_structureLookback = input.int(1, title = "Structure Lookback")
+i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
+i_diLen = input.int(14, title='(ADX) DI Length {14}')
+i_adxKeyLevel = input.float(23.0, title='(ADX) key level {23.0}')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -364,10 +377,64 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
-longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+
+heikinClose = request.security(ticker.heikinashi(syminfo.tickerid), timeframe.period, i_momentumSource)
+heikinHigh = request.security(ticker.heikinashi(syminfo.tickerid), timeframe.period, high)
+heikinLow = request.security(ticker.heikinashi(syminfo.tickerid), timeframe.period, low)
+heikinTR = request.security(ticker.heikinashi(syminfo.tickerid), timeframe.period, ta.tr)
+
+f_lowPivotFind(osc) =>
+    na(ta.pivotlow(osc, i_PivotLookbackLeft, i_PivotLookbackRight)) ? false : true
+
+f_highPivotFind(osc) =>
+    na(ta.pivothigh(osc, i_PivotLookbackLeft, i_PivotLookbackRight)) ? false : true
+
+heikinDirmov(_len) =>
+    up = ta.change(heikinHigh)
+    down = -ta.change(heikinLow)
+    truerange = ta.rma(heikinTR, _len)
+    plus = fixnan(100 * ta.rma(up > down and up > 0 ? up : 0, _len) / truerange)
+    minus = fixnan(100 * ta.rma(down > up and down > 0 ? down : 0, _len) / truerange)
+    [plus, minus]
+
+heikinAdx(_dilen, _adxlen) =>
+    [plus, minus] = heikinDirmov(_dilen)
+    sum = plus + minus
+    adx = 100 * ta.rma(math.abs(plus - minus) / (sum == 0 ? 1 : sum), _adxlen)
+    [adx, plus, minus]
+
+nonHeikinDirmov(_len) =>
+    up = ta.change(high)
+    down = -ta.change(low)
+    truerange = ta.rma(ta.tr, _len)
+    plus = fixnan(100 * ta.rma(up > down and up > 0 ? up : 0, _len) / truerange)
+    minus = fixnan(100 * ta.rma(down > up and down > 0 ? down : 0, _len) / truerange)
+    [plus, minus]
+
+nonHeikinAdx(_dilen, _adxlen) =>
+    [plus, minus] = nonHeikinDirmov(_dilen)
+    sum = plus + minus
+    adx = 100 * ta.rma(math.abs(plus - minus) / (sum == 0 ? 1 : sum), _adxlen)
+    [adx, plus, minus]
+
+heikinSz  = ta.linreg(heikinClose - math.avg(math.avg(ta.highest(heikinHigh, i_momentumLength), ta.lowest(heikinLow, i_momentumLength)), ta.sma(heikinClose, i_momentumLength)), i_momentumLength, 0)
+nonHeikinSz  = ta.linreg(i_momentumSource - math.avg(math.avg(ta.highest(high, i_momentumLength), ta.lowest(low, i_momentumLength)), ta.sma(close, i_momentumLength)), i_momentumLength, 0)
+sz = i_useHeikin ? heikinSz : nonHeikinSz
+
+[heikinAdxValue, heikinDiplus, heikinDiminus] = heikinAdx(i_diLen, i_adxLen)
+[nonHeikinAdxValue, nonHeikinDiplus, nonHeikinDiminus] = nonHeikinAdx(i_diLen, i_adxLen)
+adxValue = i_useHeikin ? heikinAdxValue : nonHeikinAdxValue
+diplus = i_useHeikin ? heikinDiplus : nonHeikinDiplus
+diminus = i_useHeikin ? heikinDiminus : nonHeikinDiminus
+
+lowWithLessStrengthLongEntry = f_lowPivotFind(sz) and adxValue < adxValue[1]
+darkRedLongEntry = f_highPivotFind(adxValue) and sz >= sz[1] and sz<0
+
+highWithLessStrengthShortEntry = f_highPivotFind(sz) and adxValue < adxValue[1]
+darkGreenShortEntry = f_highPivotFind(adxValue) and sz < sz[1] and sz>0
+
+longCondition = lowWithLessStrengthLongEntry or darkRedLongEntry
+shortCondition = highWithLessStrengthShortEntry or darkGreenShortEntry
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
@@ -412,7 +479,10 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or shortCondition
+if i_enableMomentumExit
+    LONG_CLOSE := offStopTimeInterval or shortCondition or f_highPivotFind(sz)
+else
+    LONG_CLOSE := offStopTimeInterval or shortCondition
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -421,7 +491,10 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or longCondition
+if i_enableMomentumExit
+    SHORT_CLOSE := offStopTimeInterval or longCondition or f_lowPivotFind(sz)
+else
+    SHORT_CLOSE := offStopTimeInterval or longCondition
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
