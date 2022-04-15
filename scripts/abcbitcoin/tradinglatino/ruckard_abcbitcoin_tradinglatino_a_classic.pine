@@ -448,6 +448,10 @@ longCondition = (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and upTrendSqzmom
 shortCondition = (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and downTrendSqzmom
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+marronColor=#800000
+plot(fastMa, color=color.blue, title="Fast EMA[10]")
+plot(slowMa, color=marronColor, title="Slow EMA [55]")
+
 
 // Position price calculation - BEGIN
 float positionPrice = na
