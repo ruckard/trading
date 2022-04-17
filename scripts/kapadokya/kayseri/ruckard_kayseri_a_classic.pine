@@ -213,10 +213,20 @@ i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Lo
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
 
-i_mainMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Main MA Type [EMA]')
+i_mainMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
 i_mainMaLength = input.int(60, minval = 1,  title = '(STRAT) Main MA Length [60]')
 i_mainMaSource = input.source(close, title = '(STRAT) Main MA Source [close]')
 i_mainMaSmooth = input.int(2, minval = 1,  title = '(STRAT) Main MA Smooth [2]')
+
+i_firstMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) First MA Type [WMA]')
+i_firstMaLength = input.int(3, minval = 1,  title = '(STRAT) First MA Length [3]')
+i_firstMaSource = input.source(close, title = '(STRAT) First MA Source [close]')
+i_secondMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Second MA Type [WMA]')
+i_secondMaLength = input.int(5, minval = 1,  title = '(STRAT) Second MA Length [5]')
+i_thirdMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Third MA Type [WMA]')
+i_fourthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Fourth MA Type [WMA]')
+i_fifthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Fifth MA Type [WMA]')
+i_sixthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Sixth MA Type [WMA]')
 
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
@@ -370,17 +380,36 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
+// mainMa substrategy
 f_Ma (_maType, _maSource, _maLength) =>
-    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : ta.rma(_maSource, _maLength)
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : ta.wma(_maSource, _maLength)
 
 mainMa = f_Ma (i_mainMaType, i_mainMaSource, i_mainMaLength)
 
 bool mainMaLong = mainMa >= mainMa[i_mainMaSmooth]  ? true: mainMa < mainMa[i_mainMaSmooth] ? false : na
 bool mainMaShort = not (mainMaLong)
 
+// sixthMa substrategy
 
-longCondition = mainMaLong
-shortCondition = mainMaShort
+thirdMaLength = i_firstMaLength + i_secondMaLength
+fourthMaLength = i_secondMaLength + thirdMaLength
+fifthMaLength = thirdMaLength + fourthMaLength
+sixthMaLength = fourthMaLength + fifthMaLength
+
+firstMa = f_Ma (i_firstMaType, i_firstMaSource, i_firstMaLength)
+secondMa = f_Ma (i_secondMaType, firstMa, i_secondMaLength)
+thirdMa = f_Ma (i_thirdMaType, secondMa, thirdMaLength)
+fourthMa = f_Ma (i_fourthMaType, thirdMa, fourthMaLength)
+fifthMa = f_Ma (i_fifthMaType, fourthMa, fifthMaLength)
+sixthMa = f_Ma (i_sixthMaType, fifthMa, sixthMaLength)
+
+sixthMaLong = ta.crossover(sixthMa, sixthMa[1])
+sixthMaShort = ta.crossunder(sixthMa, sixthMa[1])
+
+// Final logic
+
+longCondition = mainMaLong and sixthMaLong
+shortCondition = mainMaShort and sixthMaShort
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 mainMaColor = mainMaLong  ? color.lime : mainMaShort ? color.red : na
