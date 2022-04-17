@@ -472,6 +472,12 @@ t3NeutralColor = color.yellow
 t3Color = (t3Price > t3Price[1]) ? t3PositiveColor : (t3Price < t3Price[1]) ? t3NegativeColor : t3NeutralColor
 plot(t3Price, color=t3Color, linewidth=3, title="T3")
 
+wavetrendOverSoldColor = color.green
+wavetrendOverBoughtColor = color.red
+wavetrendColor = (smoothedWavetrend < i_wavetrendOverSoldLevel) ? wavetrendOverSoldColor : (smoothedWavetrend > i_wavetrendOverBoughtLevel) ? wavetrendOverBoughtColor : na
+wavetrendPlot = (smoothedWavetrend < i_wavetrendOverSoldLevel) ? true : (smoothedWavetrend > i_wavetrendOverBoughtLevel) ? true : false
+plotshape(wavetrendPlot, color=wavetrendColor, style=shape.square, title="waveTrend section", location=location.bottom)
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
