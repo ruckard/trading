@@ -415,6 +415,12 @@ shortCondition = mainMaShort and sixthMaShort
 mainMaColor = mainMaLong  ? color.lime : mainMaShort ? color.red : na
 plot(mainMa, title="Main EMA", style=plot.style_line, linewidth=3, color = mainMaColor)
 
+sixthMaPositiveColor = color.blue
+sixthMaNegativeColor = color.red
+sixthMaNeutralColor = color.yellow
+sixthMaColor = (sixthMa>sixthMa[1]) ? sixthMaPositiveColor : (sixthMa<sixthMa[1]) ? sixthMaNegativeColor : sixthMaNeutralColor
+plot(sixthMa, color=sixthMaColor, linewidth=2, title="sixthMa")
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
