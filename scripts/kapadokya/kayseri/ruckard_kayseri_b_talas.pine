@@ -235,15 +235,15 @@ i_t3Ema1Source = input.source(hlcc4, title = '(STRAT) T3 MA1 Source [hlcc4]')
 
 i_wavetrendSmoothLength = input.int(4, 'WaveTrend Smooth Length')
 i_wavetrendAverageLength = input.int(21, 'WaveTrend Average Length')
-i_wavetrendOverBoughtLevel = input.float(50, 'WaveTrend Over Bought Level')
-i_wavetrendOverSoldLevel = input.float(-50, 'WaveTrend Over Sold Level')
+i_wavetrendOverBoughtLevel = input.float(65, 'WaveTrend Over Bought Level')
+i_wavetrendOverSoldLevel = input.float(-65, 'WaveTrend Over Sold Level')
 
 i_wavetrendMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Wavetrend MA Type [EMA]')
 i_wavetrendMaLength = input.int(10, minval = 1,  title = '(STRAT) Wavetrend MA Channel Length [10]')
 i_wavetrendMaSource = input.source(hlc3, title = '(STRAT) Wavetrend MA Source [hlc3]')
 
-i_subStrategiesLookback = input.int(9, title='(STRAT) Substrategies Lookback [9]')
-i_subStrategiesMinimum = input.int(3, title='(STRAT) Substrategies minimum [3]')
+i_subStrategiesLookback = input.int(3, title='(STRAT) Substrategies Lookback [3]')
+i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
 
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
@@ -451,8 +451,8 @@ wavetrendTci = ta.ema(wavetrendCi, i_wavetrendAverageLength)
 wavetrend = wavetrendTci
 smoothedWavetrend = ta.sma(wavetrend,i_wavetrendSmoothLength)
 
-wavetrendLong = ta.crossunder (smoothedWavetrend, i_wavetrendOverSoldLevel)
-wavetrendShort = ta.crossover (smoothedWavetrend, i_wavetrendOverBoughtLevel)
+wavetrendOverSold = ta.crossunder (smoothedWavetrend, i_wavetrendOverSoldLevel)
+wavetrendOverBought = ta.crossover (smoothedWavetrend, i_wavetrendOverBoughtLevel)
 
 // Final logic
 longConditions = 0
@@ -464,15 +464,11 @@ for i = (i_subStrategiesLookback - 1) to 0
         longConditions := longConditions + 1
     if t3Long[i]
         longConditions := longConditions + 1
-    if wavetrendLong[i]
-        longConditions := longConditions + 1
     if mainMaShort[i]
         shortConditions := shortConditions + 1
     if sixthMaShort[i]
         shortConditions := shortConditions + 1
     if t3Short[i]
-        shortConditions := shortConditions + 1
-    if wavetrendShort[i]
         shortConditions := shortConditions + 1
 
 longCondition = longConditions >= i_subStrategiesMinimum
@@ -541,7 +537,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or shortCondition
+LONG_CLOSE := offStopTimeInterval or shortCondition or wavetrendOverBought
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -550,7 +546,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or longCondition
+SHORT_CLOSE := offStopTimeInterval or longCondition or wavetrendOverSold
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
