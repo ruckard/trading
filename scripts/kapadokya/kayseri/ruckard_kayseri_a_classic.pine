@@ -242,7 +242,7 @@ i_wavetrendMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA'
 i_wavetrendMaLength = input.int(10, minval = 1,  title = '(STRAT) Wavetrend MA Channel Length [10]')
 i_wavetrendMaSource = input.source(hlc3, title = '(STRAT) Wavetrend MA Source [hlc3]')
 
-i_subStrategiesLookback = input.int(9, title='(STRAT) Substrategies Lookback [9]')
+i_subStrategiesLookback = input.int(10, title='(STRAT) Substrategies Lookback [10]')
 i_subStrategiesMinimum = input.int(3, title='(STRAT) Substrategies minimum [3]')
 
 // Trailing Take Profit - Inputs
