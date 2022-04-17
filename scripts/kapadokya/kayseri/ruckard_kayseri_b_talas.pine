@@ -479,6 +479,26 @@ longCondition = longConditions >= i_subStrategiesMinimum
 shortCondition = shortConditions >= i_subStrategiesMinimum
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
+plot(mainMa, title="Main EMA", style=plot.style_line, linewidth=3, color = mainMaColor)
+
+sixthMaPositiveColor = color.blue
+sixthMaNegativeColor = color.red
+sixthMaNeutralColor = color.yellow
+sixthMaColor = (sixthMa>sixthMa[1]) ? sixthMaPositiveColor : (sixthMa<sixthMa[1]) ? sixthMaNegativeColor : sixthMaNeutralColor
+plot(sixthMa, color=sixthMaColor, linewidth=2, title="sixthMa")
+
+t3PositiveColor = color.green
+t3NegativeColor = color.red
+t3NeutralColor = color.yellow
+t3Color = (t3Price > t3Price[1]) ? t3PositiveColor : (t3Price < t3Price[1]) ? t3NegativeColor : t3NeutralColor
+plot(t3Price, color=t3Color, linewidth=3, title="T3")
+
+wavetrendOverSoldColor = color.green
+wavetrendOverBoughtColor = color.red
+wavetrendColor = (smoothedWavetrend < i_wavetrendOverSoldLevel) ? wavetrendOverSoldColor : (smoothedWavetrend > i_wavetrendOverBoughtLevel) ? wavetrendOverBoughtColor : na
+wavetrendPlot = (smoothedWavetrend < i_wavetrendOverSoldLevel) ? true : (smoothedWavetrend > i_wavetrendOverBoughtLevel) ? true : false
+plotshape(wavetrendPlot, color=wavetrendColor, style=shape.square, title="waveTrend section", location=location.bottom)
 
 // Position price calculation - BEGIN
 float positionPrice = na
