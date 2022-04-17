@@ -228,6 +228,11 @@ i_fourthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', '
 i_fifthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Fifth MA Type [WMA]')
 i_sixthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Sixth MA Type [WMA]')
 
+i_t3VolumeFactor = input.float(0.7, '(STRAT) T3 Volume Factor [0.7]')
+i_t3Ema1Type = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
+i_t3Ema1Length = input.int(8, minval = 1,  title = '(STRAT) T3 MA1 Length [8]')
+i_t3Ema1Source = input.source(hlcc4, title = '(STRAT) T3 MA1 Source [hlcc4]')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -406,10 +411,28 @@ sixthMa = f_Ma (i_sixthMaType, fifthMa, sixthMaLength)
 sixthMaLong = ta.crossover(sixthMa, sixthMa[1])
 sixthMaShort = ta.crossunder(sixthMa, sixthMa[1])
 
+// T3 substrategy
+
+t3Ema1 = f_Ma (i_t3Ema1Type, i_t3Ema1Source, i_t3Ema1Length)
+t3Ema2 = f_Ma (i_t3Ema1Type, t3Ema1, i_t3Ema1Length)
+t3Ema3 = f_Ma (i_t3Ema1Type, t3Ema2, i_t3Ema1Length)
+t3Ema4 = f_Ma (i_t3Ema1Type, t3Ema3, i_t3Ema1Length)
+t3Ema5 = f_Ma (i_t3Ema1Type, t3Ema4, i_t3Ema1Length)
+t3Ema6 = f_Ma (i_t3Ema1Type, t3Ema5, i_t3Ema1Length)
+
+t3C1 = -i_t3VolumeFactor * i_t3VolumeFactor * i_t3VolumeFactor
+t3C2 = 3 * i_t3VolumeFactor * i_t3VolumeFactor + 3 * i_t3VolumeFactor * i_t3VolumeFactor * i_t3VolumeFactor
+t3C3 = -6 * i_t3VolumeFactor * i_t3VolumeFactor - 3 * i_t3VolumeFactor - 3 * i_t3VolumeFactor * i_t3VolumeFactor * i_t3VolumeFactor
+t3C4 = 1 + 3 * i_t3VolumeFactor + i_t3VolumeFactor * i_t3VolumeFactor * i_t3VolumeFactor + 3 * i_t3VolumeFactor * i_t3VolumeFactor
+t3Price = t3C1 * t3Ema6 + t3C2 * t3Ema5 + t3C3 * t3Ema4 + t3C4 * t3Ema3
+
+t3Long = ta.crossover(t3Price, t3Price[1])
+t3Short = ta.crossunder(t3Price, t3Price[1])
+
 // Final logic
 
-longCondition = mainMaLong and sixthMaLong
-shortCondition = mainMaShort and sixthMaShort
+longCondition = mainMaLong and sixthMaLong and t3Long
+shortCondition = mainMaShort and sixthMaShort and t3Short
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 mainMaColor = mainMaLong  ? color.lime : mainMaShort ? color.red : na
