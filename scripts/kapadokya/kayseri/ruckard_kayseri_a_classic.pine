@@ -242,6 +242,9 @@ i_wavetrendMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA'
 i_wavetrendMaLength = input.int(10, minval = 1,  title = '(STRAT) Wavetrend MA Channel Length [10]')
 i_wavetrendMaSource = input.source(hlc3, title = '(STRAT) Wavetrend MA Source [hlc3]')
 
+i_subStrategiesLookback = input.int(9, title='(STRAT) Substrategies Lookback [9]')
+i_subStrategiesMinimum = input.int(3, title='(STRAT) Substrategies minimum [3]')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -452,9 +455,28 @@ wavetrendLong = ta.crossunder (smoothedWavetrend, i_wavetrendOverSoldLevel)
 wavetrendShort = ta.crossover (smoothedWavetrend, i_wavetrendOverBoughtLevel)
 
 // Final logic
+longConditions = 0
+shortConditions = 0
+for i = (i_subStrategiesLookback - 1) to 0
+    if mainMaLong[i]
+        longConditions := longConditions + 1
+    if sixthMaLong[i]
+        longConditions := longConditions + 1
+    if t3Long[i]
+        longConditions := longConditions + 1
+    if wavetrendLong[i]
+        longConditions := longConditions + 1
+    if mainMaShort[i]
+        shortConditions := shortConditions + 1
+    if sixthMaShort[i]
+        shortConditions := shortConditions + 1
+    if t3Short[i]
+        shortConditions := shortConditions + 1
+    if wavetrendShort[i]
+        shortConditions := shortConditions + 1
 
-longCondition = mainMaLong and sixthMaLong and t3Long and wavetrendLong
-shortCondition = mainMaShort and sixthMaShort and t3Short and wavetrendShort
+longCondition = longConditions >= i_subStrategiesMinimum
+shortCondition = shortConditions >= i_subStrategiesMinimum
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
