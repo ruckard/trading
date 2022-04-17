@@ -383,6 +383,8 @@ longCondition = mainMaLong
 shortCondition = mainMaShort
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+mainMaColor = mainMaLong  ? color.lime : mainMaShort ? color.red : na
+plot(mainMa, title="Main EMA", style=plot.style_line, linewidth=3, color = mainMaColor)
 
 // Position price calculation - BEGIN
 float positionPrice = na
