@@ -9,7 +9,7 @@
 // This strategy implements Kayseri strategy.
 // This specific strategy also includes Risk Management.
 // 
-// It was originally tested at EOSUSDT, SOLUSDT, AVAXUSDT pairs and 1H, 4H, 1D timeframes.
+// It was originally tested at EOSUSDT and 4H timeframe.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
