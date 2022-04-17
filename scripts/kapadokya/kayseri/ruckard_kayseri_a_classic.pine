@@ -6,7 +6,7 @@
 // Current version: v20220417 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
+// This strategy implements Kayseri strategy.
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at EOSUSDT, SOLUSDT, AVAXUSDT pairs and 1H, 4H, 1D timeframes.
