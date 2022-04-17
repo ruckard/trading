@@ -391,8 +391,9 @@ f_Ma (_maType, _maSource, _maLength) =>
 
 mainMa = f_Ma (i_mainMaType, i_mainMaSource, i_mainMaLength)
 
-bool mainMaLong = mainMa >= mainMa[i_mainMaSmooth]  ? true: mainMa < mainMa[i_mainMaSmooth] ? false : na
-bool mainMaShort = not (mainMaLong)
+bool mainMaBool = mainMa >= mainMa[i_mainMaSmooth]  ? true: mainMa < mainMa[i_mainMaSmooth] ? false : na
+bool mainMaLong = (mainMaBool[1] == false) and (mainMaBool[0] == true)
+bool mainMaShort = (mainMaBool[1] == true) and (mainMaBool[0] == false)
 
 // sixthMa substrategy
 
@@ -435,7 +436,7 @@ longCondition = mainMaLong and sixthMaLong and t3Long
 shortCondition = mainMaShort and sixthMaShort and t3Short
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
-mainMaColor = mainMaLong  ? color.lime : mainMaShort ? color.red : na
+mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
 plot(mainMa, title="Main EMA", style=plot.style_line, linewidth=3, color = mainMaColor)
 
 sixthMaPositiveColor = color.blue
