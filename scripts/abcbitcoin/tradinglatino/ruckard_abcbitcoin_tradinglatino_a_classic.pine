@@ -7,6 +7,30 @@
 // Tradingview Public description - BEGIN
 // 
 // This strategy implements TradingLatino strategy as ABCBitcoin understands it.
+// Video: LA ESTRATEGIA DE TRADINGLATINO PARTE III V42
+// * Timeframe de la operativa
+// ** 1 hora
+// * Entradas en long
+// ** Ema10 cruzando o por arriba de la ema55 en 1 hora
+// ** Ema10 cruzando o por arriba de la ema55 en 4 horas
+// ** Ema10 cruzando o por arriba de la ema55 en 1 dia
+// ** ADX con pendiente positiva.
+// ** Monitor con direccionalidad alcista.
+// ** Precio por arriba del punto de control (400 barras de 1 horas).
+// * Salidas en long
+// ** Monitor con direccionalidad bajista.
+// ** ADX con pendiente negativa.
+// * Entradas en short
+// ** Ema10 cruzando o por debajo de la ema55 en 1 hora
+// ** Ema10 cruzando o por debajo de la ema55 en 4 horas
+// ** Ema10 cruzando o por debajo de la ema55 en 1 dia
+// ** ADX con pendiente positiva.
+// ** Monitor con direccionalidad bajista.
+// ** Precio por debajo del punto de control (400 barras de 1 horas).
+// * Salidas en short
+// ** Monitor con direccionalidad alcista.
+// ** ADX con pendiente negativa.
+//
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 1H timeframe.
