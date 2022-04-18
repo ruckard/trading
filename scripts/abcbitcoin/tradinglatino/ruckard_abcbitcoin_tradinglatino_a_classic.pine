@@ -466,7 +466,7 @@ float vp_vpvr_highest_recent_lvl_value = na
 float vp_recent_lvl_value_tmp = na
 float vp_vpvr_recent_highest_lvl_value = na
 
-vp_level_value(from_i, to_i, row_low, row_high) =>
+vp_level_value(VPPriceLevels, from_i, to_i, row_low, row_high) =>
     float actual_low = na
     float actual_high = na
     val = 0.0
@@ -482,10 +482,10 @@ vp_level_value(from_i, to_i, row_low, row_high) =>
             else
                 actual_high := row_high
 
-            val := val + volume[i] * (math.max(actual_high - actual_low, 1) / math.max((row_high - row_low) * i_VPPriceLevels, 1) )
+            val := val + volume[i] * (math.max(actual_high - actual_low, 1) / math.max((row_high - row_low) * VPPriceLevels, 1) )
     val
 
-vp_level_price(from_i, to_i, row_low, row_high) =>
+vp_level_price(VPPriceLevels, from_i, to_i, row_low, row_high) =>
     float actual_low = na
     float actual_high = na
     float volume_ponderated = 0.0
@@ -509,7 +509,7 @@ vp_level_price(from_i, to_i, row_low, row_high) =>
             else
                 actual_high := row_high
 
-            volume_ponderated := volume[i] * (math.max(actual_high - actual_low, 1) / math.max((row_high - row_low) * i_VPPriceLevels, 1))
+            volume_ponderated := volume[i] * (math.max(actual_high - actual_low, 1) / math.max((row_high - row_low) * VPPriceLevels, 1))
 
             total_volume := total_volume + volume_ponderated
             price_ponderated := ((actual_high + actual_low) / 2)
@@ -522,17 +522,17 @@ vp_level_price(from_i, to_i, row_low, row_high) =>
 
     return_price
 
-vp_level_value_wrapper(vp_recent_lvl_height, vp_recent_low, vp_level_number, from_i, to_i) =>
+vp_level_value_wrapper(VPPriceLevels, vp_recent_lvl_height, vp_recent_low, vp_level_number, from_i, to_i) =>
     recent_lvl_low = vp_recent_low + vp_recent_lvl_height * (0 + vp_level_number)
     recent_lvl_high = vp_recent_low + vp_recent_lvl_height * (1 + vp_level_number)
-    recent_lvl_value = vp_level_value(0, to_i, recent_lvl_low, recent_lvl_high)
+    recent_lvl_value = vp_level_value(VPPriceLevels, 0, to_i, recent_lvl_low, recent_lvl_high)
     recent_lvl_value
 
-vp_level_price_wrapper(vp_recent_lvl_height, vp_recent_low, vp_level_number, vp_n_bars) =>
+vp_level_price_wrapper(VPPriceLevels, vp_recent_lvl_height, vp_recent_low, vp_level_number, vp_n_bars) =>
     recent_lvl_low = vp_recent_low + vp_recent_lvl_height * (0 + vp_level_number)
     recent_lvl_high = vp_recent_low + vp_recent_lvl_height * (1 + vp_level_number)
 
-    recent_lvl_price = vp_level_price(0, vp_n_bars, recent_lvl_low, recent_lvl_high)
+    recent_lvl_price = vp_level_price(VPPriceLevels, 0, vp_n_bars, recent_lvl_low, recent_lvl_high)
     tick_based_lvl_price = 0.0
 //     if (vp_enable_show_ticks and (syminfo.mintick > 0))
 //         tick_based_lvl_price := floor(recent_lvl_price / syminfo.mintick) * syminfo.mintick
@@ -550,13 +550,13 @@ vp_vpvr_highest_recent_lvl_value := na
 vp_vpvr_recent_highest_lvl_value := na
 vp_vpvr_vpoc_price_level_number := na
 for vp_level_number = 0 to (i_VPPriceLevels - 1)
-    vp_recent_lvl_value_tmp := vp_level_value_wrapper(vp_vpvr_recent_lvl_height, vp_vpvr_recent_low, vp_level_number, 0, i_VPVRVpocNBars)
+    vp_recent_lvl_value_tmp := vp_level_value_wrapper(i_VPPriceLevels, vp_vpvr_recent_lvl_height, vp_vpvr_recent_low, vp_level_number, 0, i_VPVRVpocNBars)
     vp_vpvr_recent_highest_lvl_value := math.max(nz(vp_vpvr_recent_highest_lvl_value), vp_recent_lvl_value_tmp)
     if nz(vp_vpvr_highest_recent_lvl_value) < vp_vpvr_recent_highest_lvl_value
         vp_vpvr_highest_recent_lvl_value := vp_vpvr_recent_highest_lvl_value
         vp_vpvr_vpoc_price_level_number := vp_level_number
 
-vp_recent_vpvr_vpoc_price = (vp_level_price_wrapper(vp_vpvr_recent_lvl_height, vp_vpvr_recent_low, vp_vpvr_vpoc_price_level_number, i_VPVRVpocNBars))
+vp_recent_vpvr_vpoc_price = (vp_level_price_wrapper(i_VPPriceLevels, vp_vpvr_recent_lvl_height, vp_vpvr_recent_low, vp_vpvr_vpoc_price_level_number, i_VPVRVpocNBars))
 
 
 
