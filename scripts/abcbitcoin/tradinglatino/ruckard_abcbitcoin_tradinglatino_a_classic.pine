@@ -528,8 +528,8 @@ downTrend1D = (adx_sig1D >= adx_sig1D[1]) and downTrendSqzmom1D and (fastMa1D <=
 int barsNumber1D = int(math.floor(get_resolution_bar_minutes('1D') / currentResInMinutes))
 VPocPrice1D = vol.vpoc(i_VPPriceLevels, barsNumber1D)
 
-longCondition = (fastMa4H >= slowMa4H) and (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and upTrendSqzmom and (close >= VPVRPocPrice) and upTrend1D and (close >= VPocPrice1D)
-shortCondition = (fastMa4H <= slowMa4H) and (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and downTrendSqzmom and (close <= VPVRPocPrice) and downTrend1D and (close <= VPocPrice1D)
+longCondition = (fastMa4H >= slowMa4H) and (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and upTrendSqzmom and (close >= VPVRPocPrice) and upTrend1D and (close >= VPocPrice1D) and (close >= fastMa)
+shortCondition = (fastMa4H <= slowMa4H) and (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and downTrendSqzmom and (close <= VPVRPocPrice) and downTrend1D and (close <= VPocPrice1D) and (close <= fastMa)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 marronColor=#800000
