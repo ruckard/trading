@@ -536,6 +536,7 @@ marronColor=#800000
 plot(fastMa, color=color.blue, title="Fast EMA[10]")
 plot(slowMa, color=marronColor, title="Slow EMA [55]")
 plot(VPVRPocPrice, color=color.yellow, style=plot.style_stepline, title="VPVR VPoC")
+plot(VPocPrice1D, color=color.orange, style=plot.style_stepline, title="1 day VPoC")
 
 
 // Position price calculation - BEGIN
