@@ -493,9 +493,6 @@ get_resolution_bar_minutes(resolution) =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// fastMa = i_fastMaType == "SMA" ? ta.sma(i_fastMaSource, i_fastMaLength) : i_fastMaType == "EMA" ? ta.ema(i_fastMaSource, i_fastMaLength) : i_fastMaType == "VWMA" ? ta.vwma(i_fastMaSource, i_fastMaLength) : ta.rma(i_fastMaSource, i_fastMaLength)
-// slowMa = i_slowMaType == "SMA" ? ta.sma(i_slowMaSource, i_slowMaLength) : i_slowMaType == "EMA" ? ta.ema(i_slowMaSource, i_slowMaLength) : i_slowMaType == "VWMA" ? ta.vwma(i_slowMaSource, i_slowMaLength) : ta.rma(i_slowMaSource, i_slowMaLength)
-
 f_Ma (_maType, _maSource, _maLength) =>
     _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : ta.rma(_maSource, _maLength)
 
