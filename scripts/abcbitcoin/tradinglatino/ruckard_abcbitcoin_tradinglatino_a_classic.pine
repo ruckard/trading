@@ -31,6 +31,32 @@
 // ** Monitor con direccionalidad alcista.
 // ** ADX con pendiente negativa.
 //
+//
+// Video: LOS FILTROS DE LA ESTRATEGIA DE TRADINGLATINO V95
+// * Entrada en long - Tendencia en diario
+// ** ADX con pendiente positiva en 1D.
+// ** Monitor con direccionalidad alcista en 1D
+// ** Ema10 cruzando o por arriba de la ema55 en 1 dia
+// ** Precio por encima de Ema10-1dia y por encima de Ema55-1dia.
+// ** Volatilidad (Cruz del Squeeze gris en 1 dia).
+// * Entrada en long - VPVR y VPVS
+// ** Precio por arriba del punto de control (400 barras de 1 horas).
+// ** Precio por encima de VPVS
+// * Entrada en long - EMAs
+// ** Precio por encima de Ema10 y por encima de Ema55.
+//
+// * Entrada en short - Tendencia en diario
+// ** ADX con pendiente positiva en 1D.
+// ** Monitor con direccionalidad bajista en 1D
+// ** Ema10 cruzando o por abajo de la ema55 en 1 dia
+// ** Precio por debajo de Ema10-1dia y por debajo de Ema55-1dia.
+// ** Volatilidad (Cruz del Squeeze gris en 1 dia).
+// * Entrada en short - VPVR y VPVS
+// ** Precio por abajo del punto de control (400 barras de 1 horas).
+// ** Precio por abajo de VPVS
+// * Entrada en short - EMAs
+// ** Precio por abajo de Ema10 y por abajo de Ema55.
+
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 1H timeframe.
