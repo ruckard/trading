@@ -486,8 +486,19 @@ downTrendSqzmom = (sqzmom_bcolor == color.green) or (sqzmom_bcolor == color.red)
 
 VPVRPocPrice = vol.vpoc(i_VPPriceLevels, i_VPVRVpocNBars)
 
-longCondition = (fastMa1D >= slowMa1D) and (fastMa4H >= slowMa4H) and (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and upTrendSqzmom and (close >= VPVRPocPrice)
-shortCondition = (fastMa1D <= slowMa1D) and (fastMa4H <= slowMa4H) and (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and downTrendSqzmom and (close <= VPVRPocPrice)
+[adx_sig1D, adx_up1D, adx_down1D] = request.security(syminfo.tickerid, '1D', adx(i_diLen, i_adxLen))
+
+[sqzmom_val1D, sqzmom_bcolor1D, sqzmom_scolor1D, sqz_percentage1D] = request.security(syminfo.tickerid, '1D', sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
+upTrendSqzmom1D = (sqzmom_bcolor1D == color.maroon) or (sqzmom_bcolor1D == color.lime)
+downTrendSqzmom1D = (sqzmom_bcolor1D == color.green) or (sqzmom_bcolor1D == color.red)
+
+volatility1D = (sqzmom_scolor1D == color.gray)
+
+upTrend1D = (adx_sig1D >= adx_sig1D[1]) and upTrendSqzmom1D and (fastMa1D >= slowMa1D) and (close >= fastMa1D) and volatility1D
+downTrend1D = (adx_sig1D >= adx_sig1D[1]) and downTrendSqzmom1D and (fastMa1D <= slowMa1D) and (close <= fastMa1D) and volatility1D
+
+longCondition = (fastMa4H >= slowMa4H) and (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and upTrendSqzmom and (close >= VPVRPocPrice) and upTrend1D
+shortCondition = (fastMa4H <= slowMa4H) and (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and downTrendSqzmom and (close <= VPVRPocPrice) and downTrend1D
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 marronColor=#800000
