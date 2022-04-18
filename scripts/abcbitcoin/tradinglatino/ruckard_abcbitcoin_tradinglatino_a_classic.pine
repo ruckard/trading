@@ -44,6 +44,9 @@
 // ** Precio por encima de VPVS
 // * Entrada en long - EMAs
 // ** Precio por encima de Ema10 y por encima de Ema55.
+// * Entrada en long con cambio de color y debilidad
+// ** Cambiamos de tendencia bajista del monitor a tendencia alcista del monitor
+// ** El ADX no tiene fuerza (por debajo del punto 23)
 //
 // * Entrada en short - Tendencia en diario
 // ** ADX con pendiente positiva en 1D.
@@ -56,6 +59,9 @@
 // ** Precio por abajo de VPVS
 // * Entrada en short - EMAs
 // ** Precio por abajo de Ema10 y por abajo de Ema55.
+// * Entrada en short con cambio de color y debilidad
+// ** Cambiamos de tendencia alcista del monitor a tendencia bajista del monitor
+// ** El ADX no tiene fuerza (por debajo del punto 23)
 
 // This specific strategy also includes Risk Management.
 // 
