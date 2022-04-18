@@ -457,8 +457,8 @@ slowMa1D = request.security(syminfo.tickerid, '1D', f_Ma (i_slowMaType, i_slowMa
 upTrendSqzmom = (sqzmom_bcolor == color.maroon) or (sqzmom_bcolor == color.lime)
 downTrendSqzmom = (sqzmom_bcolor == color.green) or (sqzmom_bcolor == color.red)
 
-longCondition = (fastMa1D >= slowMa1D) and (fastMa4H >= slowMa4H) and (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and (sqzmom_bcolor == color.lime)
-shortCondition = (fastMa1D <= slowMa1D) and (fastMa4H <= slowMa4H) and (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and (sqzmom_bcolor == color.red)
+longCondition = (fastMa1D >= slowMa1D) and (fastMa4H >= slowMa4H) and (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and upTrendSqzmom
+shortCondition = (fastMa1D <= slowMa1D) and (fastMa4H <= slowMa4H) and (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and downTrendSqzmom
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 marronColor=#800000
