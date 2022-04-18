@@ -1,0 +1,102 @@
+//@version=5
+
+// @description Provides Volume related functions.
+library("VolumeBeta", true)
+
+vp_level_value(VPPriceLevels, from_i, to_i, row_low, row_high) =>
+    float actual_low = na
+    float actual_high = na
+    val = 0.0
+    for i = from_i to to_i
+        if low[i] < row_high and high[i] > row_low
+            if low[i] > row_low
+                actual_low := low[i]
+            else
+                actual_low := row_low // Should not happen
+
+            if high[i] < row_high
+                actual_high := high[i]
+            else
+                actual_high := row_high
+
+            val := val + volume[i] * (math.max(actual_high - actual_low, 1) / math.max((row_high - row_low) * VPPriceLevels, 1) )
+    val
+
+vp_level_price(VPPriceLevels, from_i, to_i, row_low, row_high) =>
+    float actual_low = na
+    float actual_high = na
+    float volume_ponderated = 0.0
+    float price_ponderated = 0.0
+    float total_volume = 0.0
+    float price_ponderated_top_sum = 0.0
+    float return_price = 0.0
+
+    for i = from_i to to_i
+        actual_high := row_high // Default value for the loop
+        actual_low := row_low // Default values for the loop
+        volume_ponderated := 0.0 // Default value for the loop
+        if low[i] < row_high and high[i] > row_low
+            if low[i] > row_low
+                actual_low := low[i]
+            else
+                actual_low := row_low // Should not happen
+
+            if high[i] < row_high
+                actual_high := high[i]
+            else
+                actual_high := row_high
+
+            volume_ponderated := volume[i] * (math.max(actual_high - actual_low, 1) / math.max((row_high - row_low) * VPPriceLevels, 1))
+
+            total_volume := total_volume + volume_ponderated
+            price_ponderated := ((actual_high + actual_low) / 2)
+            price_ponderated_top_sum := price_ponderated_top_sum + (price_ponderated * volume_ponderated)
+
+    if (total_volume != 0)
+        return_price := price_ponderated_top_sum / total_volume
+    else
+        return_price := ((row_low + row_high ) / 2)
+
+    return_price
+
+vp_level_value_wrapper(VPPriceLevels, vp_recent_lvl_height, vp_recent_low, vp_level_number, from_i, to_i) =>
+    recent_lvl_low = vp_recent_low + vp_recent_lvl_height * (0 + vp_level_number)
+    recent_lvl_high = vp_recent_low + vp_recent_lvl_height * (1 + vp_level_number)
+    recent_lvl_value = vp_level_value(VPPriceLevels, 0, to_i, recent_lvl_low, recent_lvl_high)
+    recent_lvl_value
+
+vp_level_price_wrapper(VPPriceLevels, vp_recent_lvl_height, vp_recent_low, vp_level_number, vp_n_bars) =>
+    recent_lvl_low = vp_recent_low + vp_recent_lvl_height * (0 + vp_level_number)
+    recent_lvl_high = vp_recent_low + vp_recent_lvl_height * (1 + vp_level_number)
+
+    recent_lvl_price = vp_level_price(VPPriceLevels, 0, vp_n_bars, recent_lvl_low, recent_lvl_high)
+    tick_based_lvl_price = 0.0
+//     if (vp_enable_show_ticks and (syminfo.mintick > 0))
+//         tick_based_lvl_price := floor(recent_lvl_price / syminfo.mintick) * syminfo.mintick
+//     else
+//         tick_based_lvl_price := recent_lvl_price
+    tick_based_lvl_price := recent_lvl_price
+
+    tick_based_lvl_price
+
+// @function Returns VPoC price given levels number and historic bars number
+// @param VPPriceLevels VPoC levels number
+// @param VPVRVpocNBars Historic bars number to use for VPoC calculation
+// @returns VPoC price
+export vpoc (int VPPriceLevels, int VPVRVpocNBars) =>
+    float vp_vpvr_recent_high = ta.highest(high, VPVRVpocNBars)
+    float vp_vpvr_recent_low = ta.lowest(low, VPVRVpocNBars)
+    float vp_vpvr_recent_lvl_height = (vp_vpvr_recent_high - vp_vpvr_recent_low) / VPPriceLevels
+
+    float vp_vpvr_highest_recent_lvl_value = na
+    float vp_vpvr_recent_highest_lvl_value = na
+    float vp_recent_lvl_value_tmp = na
+    int vp_vpvr_vpoc_price_level_number = na
+    for vp_level_number = 0 to (VPPriceLevels - 1)
+        vp_recent_lvl_value_tmp := vp_level_value_wrapper(VPPriceLevels, vp_vpvr_recent_lvl_height, vp_vpvr_recent_low, vp_level_number, 0, VPVRVpocNBars)
+        vp_vpvr_recent_highest_lvl_value := math.max(nz(vp_vpvr_recent_highest_lvl_value), vp_recent_lvl_value_tmp)
+        if nz(vp_vpvr_highest_recent_lvl_value) < vp_vpvr_recent_highest_lvl_value
+            vp_vpvr_highest_recent_lvl_value := vp_vpvr_recent_highest_lvl_value
+            vp_vpvr_vpoc_price_level_number := vp_level_number
+
+    vp_recent_vpvr_vpoc_price = (vp_level_price_wrapper(VPPriceLevels, vp_vpvr_recent_lvl_height, vp_vpvr_recent_low, vp_vpvr_vpoc_price_level_number, VPVRVpocNBars))
