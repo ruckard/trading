@@ -455,6 +455,37 @@ sqzmom(length, mult, lengthKC, multKC, useTrueRange) =>
     [val, bcolor, scolor, sqz_percentage]
 // SMILB functions - END
 
+// TIME functions - BEGIN
+// —————————— PineCoders MTF Selection Framework functions
+// ————— Converts current "timeframe.multiplier" plus the TF into minutes of type float.
+f_resInMinutes() =>
+    _resInMinutes = timeframe.multiplier * (
+      timeframe.isseconds ? 1. / 60. :
+      timeframe.isminutes ? 1.       :
+      timeframe.isdaily   ? 1440.    :
+      timeframe.isweekly  ? 10080.   :
+      timeframe.ismonthly ? 43800.   : na)
+
+var currentResInMinutes = f_resInMinutes() // We need to calculate it only once
+
+get_resolution_bar_minutes(resolution) =>
+    minutes = resolution == '1' ? (1 * 1) :
+     resolution == '3' ? (3 * 1) :
+     resolution == '5' ? (5 * 1) :
+     resolution == '15' ? (15 * 1) :
+     resolution == '30' ? (30 * 1) :
+     resolution == '45' ? (45 * 1) :
+     resolution == '60' ? (60 * 1) :
+     resolution == '120' ? (2 * 60) :
+     resolution == '180' ? (3 * 60) :
+     resolution == '240' ? (4 * 60) :
+     resolution == '1D' ? (24 * 60) :
+     resolution == '1W' ? (7 * 24 * 60) :
+     resolution == '1M' ? (4 * 7 * 24 * 60) :
+     currentResInMinutes // Equal to current symbol
+    minutes
+// TIME functions - END
+
 // FUNCTIONS - END
 
 
@@ -497,8 +528,11 @@ volatility1D = (sqzmom_scolor1D == color.gray)
 upTrend1D = (adx_sig1D >= adx_sig1D[1]) and upTrendSqzmom1D and (fastMa1D >= slowMa1D) and (close >= fastMa1D) and volatility1D
 downTrend1D = (adx_sig1D >= adx_sig1D[1]) and downTrendSqzmom1D and (fastMa1D <= slowMa1D) and (close <= fastMa1D) and volatility1D
 
-longCondition = (fastMa4H >= slowMa4H) and (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and upTrendSqzmom and (close >= VPVRPocPrice) and upTrend1D
-shortCondition = (fastMa4H <= slowMa4H) and (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and downTrendSqzmom and (close <= VPVRPocPrice) and downTrend1D
+int barsNumber1D = int(math.floor(get_resolution_bar_minutes('1D') / currentResInMinutes))
+VPocPrice1D = vol.vpoc(i_VPPriceLevels, barsNumber1D)
+
+longCondition = (fastMa4H >= slowMa4H) and (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and upTrendSqzmom and (close >= VPVRPocPrice) and upTrend1D and (close >= VPocPrice1D)
+shortCondition = (fastMa4H <= slowMa4H) and (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and downTrendSqzmom and (close <= VPVRPocPrice) and downTrend1D and (close <= VPocPrice1D)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 marronColor=#800000
