@@ -567,6 +567,7 @@ shortCondition = (fastMa1D <= slowMa1D) and (fastMa4H <= slowMa4H) and (fastMa <
 marronColor=#800000
 plot(fastMa, color=color.blue, title="Fast EMA[10]")
 plot(slowMa, color=marronColor, title="Slow EMA [55]")
+plot(vp_recent_vpvr_vpoc_price, color=color.yellow, style=plot.style_stepline, title="VPVR VPoC")
 
 
 // Position price calculation - BEGIN
