@@ -459,13 +459,6 @@ slowMa1D = request.security(syminfo.tickerid, '1D', f_Ma (i_slowMaType, i_slowMa
 upTrendSqzmom = (sqzmom_bcolor == color.maroon) or (sqzmom_bcolor == color.lime)
 downTrendSqzmom = (sqzmom_bcolor == color.green) or (sqzmom_bcolor == color.red)
 
-int vp_vpvr_vpoc_price_level_number = na
-float vp_vpvr_recent_high = na
-float vp_vpvr_recent_low = na
-float vp_vpvr_highest_recent_lvl_value = na
-float vp_recent_lvl_value_tmp = na
-float vp_vpvr_recent_highest_lvl_value = na
-
 vp_level_value(VPPriceLevels, from_i, to_i, row_low, row_high) =>
     float actual_low = na
     float actual_high = na
@@ -542,32 +535,36 @@ vp_level_price_wrapper(VPPriceLevels, vp_recent_lvl_height, vp_recent_low, vp_le
 
     tick_based_lvl_price
 
-vp_vpvr_recent_high := ta.highest(high, i_VPVRVpocNBars)
-vp_vpvr_recent_low := ta.lowest(low, i_VPVRVpocNBars)
-vp_vpvr_recent_lvl_height = (vp_vpvr_recent_high - vp_vpvr_recent_low) / i_VPPriceLevels
+vp_vpoc (VPPriceLevels, VPVRVpocNBars) =>
+    float vp_vpvr_recent_high = ta.highest(high, VPVRVpocNBars)
+    float vp_vpvr_recent_low = ta.lowest(low, VPVRVpocNBars)
+    float vp_vpvr_recent_lvl_height = (vp_vpvr_recent_high - vp_vpvr_recent_low) / VPPriceLevels
 
-vp_vpvr_highest_recent_lvl_value := na
-vp_vpvr_recent_highest_lvl_value := na
-vp_vpvr_vpoc_price_level_number := na
-for vp_level_number = 0 to (i_VPPriceLevels - 1)
-    vp_recent_lvl_value_tmp := vp_level_value_wrapper(i_VPPriceLevels, vp_vpvr_recent_lvl_height, vp_vpvr_recent_low, vp_level_number, 0, i_VPVRVpocNBars)
-    vp_vpvr_recent_highest_lvl_value := math.max(nz(vp_vpvr_recent_highest_lvl_value), vp_recent_lvl_value_tmp)
-    if nz(vp_vpvr_highest_recent_lvl_value) < vp_vpvr_recent_highest_lvl_value
-        vp_vpvr_highest_recent_lvl_value := vp_vpvr_recent_highest_lvl_value
-        vp_vpvr_vpoc_price_level_number := vp_level_number
+    float vp_vpvr_highest_recent_lvl_value = na
+    float vp_vpvr_recent_highest_lvl_value = na
+    float vp_recent_lvl_value_tmp = na
+    int vp_vpvr_vpoc_price_level_number = na
+    for vp_level_number = 0 to (VPPriceLevels - 1)
+        vp_recent_lvl_value_tmp := vp_level_value_wrapper(VPPriceLevels, vp_vpvr_recent_lvl_height, vp_vpvr_recent_low, vp_level_number, 0, VPVRVpocNBars)
+        vp_vpvr_recent_highest_lvl_value := math.max(nz(vp_vpvr_recent_highest_lvl_value), vp_recent_lvl_value_tmp)
+        if nz(vp_vpvr_highest_recent_lvl_value) < vp_vpvr_recent_highest_lvl_value
+            vp_vpvr_highest_recent_lvl_value := vp_vpvr_recent_highest_lvl_value
+            vp_vpvr_vpoc_price_level_number := vp_level_number
 
-vp_recent_vpvr_vpoc_price = (vp_level_price_wrapper(i_VPPriceLevels, vp_vpvr_recent_lvl_height, vp_vpvr_recent_low, vp_vpvr_vpoc_price_level_number, i_VPVRVpocNBars))
+    vp_recent_vpvr_vpoc_price = (vp_level_price_wrapper(VPPriceLevels, vp_vpvr_recent_lvl_height, vp_vpvr_recent_low, vp_vpvr_vpoc_price_level_number, VPVRVpocNBars))
+
+VPVRPocPrice = vp_vpoc(i_VPPriceLevels, i_VPVRVpocNBars)
 
 
 
-longCondition = (fastMa1D >= slowMa1D) and (fastMa4H >= slowMa4H) and (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and upTrendSqzmom and (close >= vp_recent_vpvr_vpoc_price)
-shortCondition = (fastMa1D <= slowMa1D) and (fastMa4H <= slowMa4H) and (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and downTrendSqzmom and (close <= vp_recent_vpvr_vpoc_price)
+longCondition = (fastMa1D >= slowMa1D) and (fastMa4H >= slowMa4H) and (fastMa >= slowMa) and (adx_sig >= adx_sig[1]) and upTrendSqzmom and (close >= VPVRPocPrice)
+shortCondition = (fastMa1D <= slowMa1D) and (fastMa4H <= slowMa4H) and (fastMa <= slowMa) and (adx_sig >= adx_sig[1]) and downTrendSqzmom and (close <= VPVRPocPrice)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 marronColor=#800000
 plot(fastMa, color=color.blue, title="Fast EMA[10]")
 plot(slowMa, color=marronColor, title="Slow EMA [55]")
-plot(vp_recent_vpvr_vpoc_price, color=color.yellow, style=plot.style_stepline, title="VPVR VPoC")
+plot(VPVRPocPrice, color=color.yellow, style=plot.style_stepline, title="VPVR VPoC")
 
 
 // Position price calculation - BEGIN
