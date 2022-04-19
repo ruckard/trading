@@ -286,6 +286,8 @@ i_sqzmomMultKC = input.float(1.5, title='(SQZMOM) KC MultFactor {1.5}')
 i_sqzmomUseTrueRange = input.bool(true, title='(SQZMOM) Use TrueRange (KC) {True}')
 i_VPVRVpocNBars = input.int(400, '(VP) Number of bars for VPVR VPOC {400}', minval=1, maxval=500)
 i_VPPriceLevels = input.int(24, '(VP) Price levels {24}', minval=10, maxval=500)
+i_subStrategiesLookback = input.int(2, title='(STRAT) Substrategies Lookback [2]')
+i_subStrategiesMinimum = input.int(8, title='(STRAT) Substrategies minimum [8]')
 
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
@@ -563,8 +565,114 @@ downTrend1D = (adx_sig1D >= adx_sig1D[1]) and downTrendSqzmom1D and (fastMa1D <=
 int barsNumber1D = int(math.floor(get_resolution_bar_minutes('1D') / currentResInMinutes))
 VPocPrice1D = vol.vpoc(i_VPPriceLevels, barsNumber1D)
 
-longCondition = (fastMa4H >= slowMa4H) and (fastMa >= slowMa) and (adx_sig < 23.0) and newUpTrendSqzmom and (close >= VPVRPocPrice) and upTrend1D and (close >= VPocPrice1D) and (close >= fastMa)
-shortCondition = (fastMa4H <= slowMa4H) and (fastMa <= slowMa) and (adx_sig < 23.0) and newDownTrendSqzmom and (close <= VPVRPocPrice) and downTrend1D and (close <= VPocPrice1D) and (close <= fastMa)
+// Final logic
+bool longCondition1 = (fastMa4H >= slowMa4H)
+bool longCondition2 = (fastMa >= slowMa)
+bool longCondition3 = (adx_sig < 23.0)
+bool longCondition4 = newUpTrendSqzmom
+bool longCondition5 = (close >= VPVRPocPrice)
+bool longCondition6 = upTrend1D
+bool longCondition7 = (close >= VPocPrice1D)
+bool longCondition8 = (close >= fastMa)
+
+bool longCondition1Found = false
+bool longCondition2Found = false
+bool longCondition3Found = false
+bool longCondition4Found = false
+bool longCondition5Found = false
+bool longCondition6Found = false
+bool longCondition7Found = false
+bool longCondition8Found = false
+
+bool shortCondition1 = (fastMa4H <= slowMa4H)
+bool shortCondition2 = (fastMa <= slowMa)
+bool shortCondition3 = (adx_sig < 23.0)
+bool shortCondition4 = newDownTrendSqzmom
+bool shortCondition5 = (close <= VPVRPocPrice)
+bool shortCondition6 = downTrend1D
+bool shortCondition7 = (close <= VPocPrice1D)
+bool shortCondition8 = (close <= fastMa)
+
+bool shortCondition1Found = false
+bool shortCondition2Found = false
+bool shortCondition3Found = false
+bool shortCondition4Found = false
+bool shortCondition5Found = false
+bool shortCondition6Found = false
+bool shortCondition7Found = false
+bool shortCondition8Found = false
+
+longConditions = 0
+shortConditions = 0
+for i = (i_subStrategiesLookback - 1) to 0
+    if longCondition1[i]
+        longCondition1Found := true
+    if longCondition2[i]
+        longCondition2Found := true
+    if longCondition3[i]
+        longCondition3Found := true
+    if longCondition4[i]
+        longCondition4Found := true
+    if longCondition5[i]
+        longCondition5Found := true
+    if longCondition6[i]
+        longCondition6Found := true
+    if longCondition7[i]
+        longCondition7Found := true
+    if longCondition8[i]
+        longCondition8Found := true
+    if shortCondition1[i]
+        shortCondition1Found := true
+    if shortCondition2[i]
+        shortCondition2Found := true
+    if shortCondition3[i]
+        shortCondition3Found := true
+    if shortCondition4[i]
+        shortCondition4Found := true
+    if shortCondition5[i]
+        shortCondition5Found := true
+    if shortCondition6[i]
+        shortCondition6Found := true
+    if shortCondition7[i]
+        shortCondition7Found := true
+    if shortCondition8[i]
+        shortCondition8Found := true
+
+if longCondition1Found
+    longConditions := longConditions + 1
+if longCondition2Found
+    longConditions := longConditions + 1
+if longCondition3Found
+    longConditions := longConditions + 1
+if longCondition4Found
+    longConditions := longConditions + 1
+if longCondition5Found
+    longConditions := longConditions + 1
+if longCondition6Found
+    longConditions := longConditions + 1
+if longCondition7Found
+    longConditions := longConditions + 1
+if longCondition8Found
+    longConditions := longConditions + 1
+if shortCondition1Found
+    shortConditions := shortConditions + 1
+if shortCondition2Found
+    shortConditions := shortConditions + 1
+if shortCondition3Found
+    shortConditions := shortConditions + 1
+if shortCondition4Found
+    shortConditions := shortConditions + 1
+if shortCondition5Found
+    shortConditions := shortConditions + 1
+if shortCondition6Found
+    shortConditions := shortConditions + 1
+if shortCondition7Found
+    shortConditions := shortConditions + 1
+if shortCondition8Found
+    shortConditions := shortConditions + 1
+
+longCondition = longConditions >= i_subStrategiesMinimum
+shortCondition = shortConditions >= i_subStrategiesMinimum
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 marronColor=#800000
