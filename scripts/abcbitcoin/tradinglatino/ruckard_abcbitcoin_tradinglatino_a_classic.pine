@@ -62,6 +62,9 @@
 // * Entrada en short con cambio de color y debilidad
 // ** Cambiamos de tendencia alcista del monitor a tendencia bajista del monitor
 // ** El ADX no tiene fuerza (por debajo del punto 23)
+//
+// Para entrar en largo se han de cumplir las 8 condiciones en las últimas 2 barras.
+// Para entrar en corto se han de cumplir las 8 condiciones en las últimas 2 barras.
 
 // This specific strategy also includes Risk Management.
 // 
