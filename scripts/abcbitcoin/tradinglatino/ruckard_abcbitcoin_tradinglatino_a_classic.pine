@@ -684,6 +684,24 @@ plot(slowMa, color=marronColor, title="Slow EMA [55]")
 plot(VPVRPocPrice, color=color.yellow, style=plot.style_stepline, title="VPVR VPoC")
 plot(VPocPrice1D, color=color.orange, style=plot.style_stepline, title="1 day VPoC")
 
+plotchar(fastMa4H >= slowMa4H, "l1: fastMa4H >= slowMa4H", "", location = location.top)
+plotchar(fastMa >= slowMa, "l2: fastMa >= slowMa", "", location = location.top)
+plotchar(adx_sig < 23.0, "l3: adx_sig < 23.0", "", location = location.top)
+plotchar(newUpTrendSqzmom, "l4 = newUpTrendSqzmom", "", location = location.top)
+plotchar(close >= VPVRPocPrice, "l5: close >= VPVRPocPrice", "", location = location.top)
+plotchar(upTrend1D, "l6 = upTrend1D", "", location = location.top)
+plotchar(close >= VPocPrice1D, "l7: close >= VPocPrice1D", "", location = location.top)
+plotchar(close >= fastMa, "l8: close >= fastMa", "", location = location.top)
+
+plotchar(fastMa4H <= slowMa4H, "s1: fastMa4H <= slowMa4H", "", location = location.top)
+plotchar(fastMa <= slowMa, "s2: fastMa <= slowMa", "", location = location.top)
+plotchar(adx_sig < 23.0, "s3: adx_sig < 23.0", "", location = location.top)
+plotchar(newDownTrendSqzmom, "s4: newDownTrendSqzmom", "", location = location.top)
+plotchar(close <= VPVRPocPrice, "s5: close <= VPVRPocPrice", "", location = location.top)
+plotchar(downTrend1D, "s6: downTrend1D", "", location = location.top)
+plotchar(close <= VPocPrice1D, "s7: close <= VPocPrice1D", "", location = location.top)
+plotchar(close <= fastMa, "s8: close <= fastMa", "", location = location.top)
+
 
 // Position price calculation - BEGIN
 float positionPrice = na
