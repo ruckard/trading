@@ -433,12 +433,17 @@ shortCondition = false
 LONG_CLOSE = true
 SHORT_CLOSE = true
 
-if (ta.crossover(adx_sig, i_adxKeyLevel))
-    longCondition := (trend == -1)
-    shortCondition := (trend == 1)
-if (ta.crossunder(adx_sig, i_adxRangeKeyLevel)) or (ta.crossover(adx_sig, i_adxRangeKeyLevel))
-    longCondition := (trend == 1)
-    shortCondition := (trend == -1)
+// if (ta.crossover(adx_sig, i_adxKeyLevel))
+//     longCondition := (trend == -1)
+//     shortCondition := (trend == 1)
+// if (ta.crossunder(adx_sig, i_adxRangeKeyLevel)) or (ta.crossover(adx_sig, i_adxRangeKeyLevel))
+//     longCondition := (trend == 1)
+//     shortCondition := (trend == -1)
+
+if (ta.crossover(adx_up, i_adxKeyLevel))
+    longCondition := true
+if (ta.crossover(adx_down, i_adxKeyLevel))
+    shortCondition := true
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
@@ -500,7 +505,8 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 // Decide if we are going to SHORT/Go SHORT - END
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
-LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
+// LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
+LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or (ta.crossunder(adx_up, i_adxKeyLevel))
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -508,7 +514,8 @@ if LONG_CLOSE
 // Decide if a LONG/LONG entry should be closed - END
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
-SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
+// SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
+SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or (ta.crossunder(adx_down, i_adxKeyLevel))
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
