@@ -201,8 +201,8 @@ i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {Fa
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
-i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
-i_enableTrailingTakeProfit = input.bool(true, title='(TRAILING) Enable Trailing Take Profit (%) {True}')
+i_enableStopLoss = input.bool(false, '(STOPTAKE) Stop Loss? {False}')
+i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
 i_enableRiskRewardRatio = input.bool(false, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {False}')
@@ -216,6 +216,39 @@ i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossT
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+
+i_mainMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
+i_mainMaLength = input.int(60, minval = 1,  title = '(STRAT) Main MA Length [60]')
+i_mainMaSource = input.source(close, title = '(STRAT) Main MA Source [close]')
+i_mainMaSmooth = input.int(2, minval = 1,  title = '(STRAT) Main MA Smooth [2]')
+
+i_firstMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) First MA Type [WMA]')
+i_firstMaLength = input.int(3, minval = 1,  title = '(STRAT) First MA Length [3]')
+i_firstMaSource = input.source(close, title = '(STRAT) First MA Source [close]')
+i_secondMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Second MA Type [WMA]')
+i_secondMaLength = input.int(5, minval = 1,  title = '(STRAT) Second MA Length [5]')
+i_thirdMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Third MA Type [WMA]')
+i_fourthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Fourth MA Type [WMA]')
+i_fifthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Fifth MA Type [WMA]')
+i_sixthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Sixth MA Type [WMA]')
+
+i_t3VolumeFactor = input.float(0.7, '(STRAT) T3 Volume Factor [0.7]')
+i_t3Ema1Type = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
+i_t3Ema1Length = input.int(8, minval = 1,  title = '(STRAT) T3 MA1 Length [8]')
+i_t3Ema1Source = input.source(hlcc4, title = '(STRAT) T3 MA1 Source [hlcc4]')
+
+i_wavetrendSmoothLength = input.int(4, 'WaveTrend Smooth Length')
+i_wavetrendAverageLength = input.int(21, 'WaveTrend Average Length')
+i_wavetrendOverBoughtLevel = input.float(50, 'WaveTrend Over Bought Level')
+i_wavetrendOverSoldLevel = input.float(-50, 'WaveTrend Over Sold Level')
+
+i_wavetrendMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Wavetrend MA Type [EMA]')
+i_wavetrendMaLength = input.int(10, minval = 1,  title = '(STRAT) Wavetrend MA Channel Length [10]')
+i_wavetrendMaSource = input.source(hlc3, title = '(STRAT) Wavetrend MA Source [hlc3]')
+
+i_subStrategiesLookback = input.int(10, title='(STRAT) Substrategies Lookback [10]')
+i_subStrategiesMinimum = input.int(3, title='(STRAT) Substrategies minimum [3]')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -368,10 +401,86 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
-longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+// mainMa substrategy
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : ta.wma(_maSource, _maLength)
+
+mainMa = f_Ma (i_mainMaType, i_mainMaSource, i_mainMaLength)
+
+bool mainMaBool = mainMa >= mainMa[i_mainMaSmooth]  ? true: mainMa < mainMa[i_mainMaSmooth] ? false : na
+bool mainMaLong = (mainMaBool[1] == false) and (mainMaBool[0] == true)
+bool mainMaShort = (mainMaBool[1] == true) and (mainMaBool[0] == false)
+
+// sixthMa substrategy
+
+thirdMaLength = i_firstMaLength + i_secondMaLength
+fourthMaLength = i_secondMaLength + thirdMaLength
+fifthMaLength = thirdMaLength + fourthMaLength
+sixthMaLength = fourthMaLength + fifthMaLength
+
+firstMa = f_Ma (i_firstMaType, i_firstMaSource, i_firstMaLength)
+secondMa = f_Ma (i_secondMaType, firstMa, i_secondMaLength)
+thirdMa = f_Ma (i_thirdMaType, secondMa, thirdMaLength)
+fourthMa = f_Ma (i_fourthMaType, thirdMa, fourthMaLength)
+fifthMa = f_Ma (i_fifthMaType, fourthMa, fifthMaLength)
+sixthMa = f_Ma (i_sixthMaType, fifthMa, sixthMaLength)
+
+sixthMaLong = ta.crossover(sixthMa, sixthMa[1])
+sixthMaShort = ta.crossunder(sixthMa, sixthMa[1])
+
+// T3 substrategy
+
+t3Ema1 = f_Ma (i_t3Ema1Type, i_t3Ema1Source, i_t3Ema1Length)
+t3Ema2 = f_Ma (i_t3Ema1Type, t3Ema1, i_t3Ema1Length)
+t3Ema3 = f_Ma (i_t3Ema1Type, t3Ema2, i_t3Ema1Length)
+t3Ema4 = f_Ma (i_t3Ema1Type, t3Ema3, i_t3Ema1Length)
+t3Ema5 = f_Ma (i_t3Ema1Type, t3Ema4, i_t3Ema1Length)
+t3Ema6 = f_Ma (i_t3Ema1Type, t3Ema5, i_t3Ema1Length)
+
+t3C1 = -i_t3VolumeFactor * i_t3VolumeFactor * i_t3VolumeFactor
+t3C2 = 3 * i_t3VolumeFactor * i_t3VolumeFactor + 3 * i_t3VolumeFactor * i_t3VolumeFactor * i_t3VolumeFactor
+t3C3 = -6 * i_t3VolumeFactor * i_t3VolumeFactor - 3 * i_t3VolumeFactor - 3 * i_t3VolumeFactor * i_t3VolumeFactor * i_t3VolumeFactor
+t3C4 = 1 + 3 * i_t3VolumeFactor + i_t3VolumeFactor * i_t3VolumeFactor * i_t3VolumeFactor + 3 * i_t3VolumeFactor * i_t3VolumeFactor
+t3Price = t3C1 * t3Ema6 + t3C2 * t3Ema5 + t3C3 * t3Ema4 + t3C4 * t3Ema3
+
+t3Long = ta.crossover(t3Price, t3Price[1])
+t3Short = ta.crossunder(t3Price, t3Price[1])
+
+// Wavetrend substrategy
+wavetrendEsa = f_Ma (i_wavetrendMaType, i_wavetrendMaSource, i_wavetrendMaLength)
+wavetrendDifference = ta.ema(math.abs(i_wavetrendMaSource - wavetrendEsa), i_wavetrendMaLength)
+wavetrendCi = (i_wavetrendMaSource - wavetrendEsa) / (0.015 * wavetrendDifference)
+wavetrendTci = ta.ema(wavetrendCi, i_wavetrendAverageLength)
+
+wavetrend = wavetrendTci
+smoothedWavetrend = ta.sma(wavetrend,i_wavetrendSmoothLength)
+
+wavetrendLong = ta.crossunder (smoothedWavetrend, i_wavetrendOverSoldLevel)
+wavetrendShort = ta.crossover (smoothedWavetrend, i_wavetrendOverBoughtLevel)
+
+// Final logic
+longConditions = 0
+shortConditions = 0
+for i = (i_subStrategiesLookback - 1) to 0
+    if mainMaLong[i]
+        longConditions := longConditions + 1
+    if sixthMaLong[i]
+        longConditions := longConditions + 1
+    if t3Long[i]
+        longConditions := longConditions + 1
+    if wavetrendLong[i]
+        longConditions := longConditions + 1
+    if mainMaShort[i]
+        shortConditions := shortConditions + 1
+    if sixthMaShort[i]
+        shortConditions := shortConditions + 1
+    if t3Short[i]
+        shortConditions := shortConditions + 1
+    if wavetrendShort[i]
+        shortConditions := shortConditions + 1
+
+longCondition = longConditions >= i_subStrategiesMinimum
+shortCondition = shortConditions >= i_subStrategiesMinimum
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
