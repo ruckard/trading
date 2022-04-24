@@ -219,7 +219,11 @@ i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
 i_showBackground = input.bool(true, title = 'Show color [true]')
 i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
 i_diLen = input.int(12, title='(ADX) DI Length {12}')
+i_diPlusLen = input.int(12, title='(ADX) DI+ Length {12}')
+i_diMinusLen = input.int(12, title='(ADX) DI- Length {12}')
 i_adxKeyLevel = input.float(29.0, title='(ADX) key level {29.0}')
+i_diPlusKeyLevel = input.float(29.0, title='(ADX) DI+ key level {29.0}')
+i_diMinusKeyLevel = input.float(29.0, title='(ADX) DI- key level {29.0}')
 i_adxRangeKeyLevel = input.float(17.0, title='(ADX) Range key level {17}')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
@@ -425,7 +429,12 @@ lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
 trend = 0
 trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 : trend[1]
 
-[adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
+// [adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
+[adx_diPlus_Sig, adx_diPlus_up, adx_diPlus_down] = adx(i_diPlusLen, i_adxLen)
+[adx_diMinus_sig, adx_diMinus_up, adx_diMinus_down] = adx(i_diMinusLen, i_adxLen)
+
+adx_up = adx_diPlus_up
+adx_down = adx_diMinus_down
 
 //Trading
 longCondition = false
@@ -440,9 +449,9 @@ SHORT_CLOSE = true
 //     longCondition := (trend == 1)
 //     shortCondition := (trend == -1)
 
-if (ta.crossover(adx_up, i_adxKeyLevel))
+if (ta.crossover(adx_up, i_diPlusKeyLevel))
     longCondition := true
-if (ta.crossover(adx_down, i_adxKeyLevel))
+if (ta.crossover(adx_down, i_diMinusKeyLevel))
     shortCondition := true
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
@@ -506,7 +515,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 // LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
-LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or (ta.crossunder(adx_up, i_adxKeyLevel))
+LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or (ta.crossunder(adx_up, i_diPlusKeyLevel))
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -515,7 +524,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 // SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
-SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or (ta.crossunder(adx_down, i_adxKeyLevel))
+SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or (ta.crossunder(adx_down, i_diMinusKeyLevel))
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
