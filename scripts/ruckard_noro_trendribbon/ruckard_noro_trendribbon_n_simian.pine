@@ -433,9 +433,6 @@ shortCondition = false
 LONG_CLOSE = true
 SHORT_CLOSE = true
 
-if (ta.crossover(adx_sig, i_adxKeyLevel))
-    longCondition := (trend == -1)
-    shortCondition := (trend == 1)
 if (ta.crossunder(adx_sig, i_adxRangeKeyLevel)) or (ta.crossover(adx_sig, i_adxRangeKeyLevel))
     longCondition := (trend == 1)
     shortCondition := (trend == -1)
