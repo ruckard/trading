@@ -198,6 +198,33 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+i_highMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High MA Type [SMA]')
+i_highMaLength = input.int(20, minval = 1,  title = '(STRAT) High MA Length [20]')
+i_highMaSource = input.source(ohlc4, title = '(STRAT) High MA Source [ohlc4]')
+i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High Closing MA Type [SMA]')
+i_highClosingMaLength = input.int(5, minval = 1,  title = '(STRAT) High Closing MA Length [5]')
+i_highClosingMaSource = input.source(ohlc4, title = '(STRAT) High Closing MA Source [ohlc4]')
+i_lowMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low MA Type [SMA]')
+i_lowMaLength = input.int(20, minval = 1,  title = '(STRAT) Low MA Length [20]')
+i_lowMaSource = input.source(ohlc4, title = '(STRAT) Low MA Source [ohlc4]')
+i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
+i_lowClosingMaLength = input.int(5, minval = 1,  title = '(STRAT) Low Closing MA Length [5]')
+i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
+i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
+i_highestMaLength = input.int(20, minval = 1,  title = '(STRAT) Highest MA Length [20]')
+i_highestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Highest Closing MA Length [20]')
+i_lowestMaLength = input.int(20, minval = 1,  title = '(STRAT) Lowest MA Length [20]')
+i_lowestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Lowest Closing MA Length [20]')
+i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
+i_showBackground = input.bool(true, title = 'Show color [true]')
+i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
+i_diLen = input.int(12, title='(ADX) DI Length {12}')
+i_diPlusLen = input.int(12, title='(ADX) DI+ Length {12}')
+i_diMinusLen = input.int(8, title='(ADX) DI- Length {8}')
+i_adxKeyLevel = input.float(29.0, title='(ADX) key level {29.0}')
+i_diPlusKeyLevel = input.float(29.0, title='(ADX) DI+ key level {29.0}')
+i_diMinusKeyLevel = input.float(27.0, title='(ADX) DI- key level {27.0}')
+i_adxRangeKeyLevel = input.float(17.0, title='(ADX) Range key level {17}')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -274,10 +301,10 @@ i_priceDecimalDigits = input.int(2, 'Number of decimal digits for Prices {2}', m
 i_contractMaximumDecimalNumber = input.int(3, title='(DECIMAL) Maximum number of decimal for contracts {3}', minval=0)
 i_tooRecentMinutesNumber = input.int(0, '(RECENT) Number of minutes to wait to open a new order after the previous one has been opened {0}', minval=0, maxval=100, step=1)
 i_CapitalQuote = input.float(100.0, title='(CAPITAL) Capital quote invested per order in USDT units {100.0}')
-i_CapitalPercentage = input.float(25.0, title='(CAPITAL) Capital percentage invested per order (%) {25.0}', minval=0, step=0.01) * 0.01
+i_CapitalPercentage = input.float(10.0, title='(CAPITAL) Capital percentage invested per order (%) {10.0}', minval=0, step=0.01) * 0.01
 // Risk Management - Inputs
 _SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None', _CUSTOM_ = 'Custom', _FORCED_ = 'Forced'
-i_riskManagementTypePre = input.string(_SCOMPOUND_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
+i_riskManagementTypePre = input.string(_CUSTOM_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
 i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
 i_riskManagementMaximumLossPerTrade = input.float(1.0, title='(RISKM) Maximum loss per trade % {1.0}') / 100
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='(RISKM) Maximum loss per day % {6.0}') / 100
@@ -582,8 +609,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 // Decide if we are going to SHORT/Go SHORT - END
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
-LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or shortCondition
+LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or (ta.crossunder(adx_up, i_diPlusKeyLevel))
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -591,8 +617,7 @@ if LONG_CLOSE
 // Decide if a LONG/LONG entry should be closed - END
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
-SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or longCondition
+SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or (ta.crossunder(adx_down, i_diMinusKeyLevel))
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
