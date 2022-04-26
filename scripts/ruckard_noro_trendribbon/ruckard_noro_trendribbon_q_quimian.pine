@@ -242,7 +242,7 @@ i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
-i_atrStopLossMultiplier = input.float(1.25, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.25}', minval=0.01)
+i_atrStopLossMultiplier = input.float(1.50, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.50}', minval=0.01)
 
 i_mainMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
 i_mainMaLength = input.int(60, minval = 1,  title = '(STRAT) Main MA Length [60]')
@@ -266,7 +266,7 @@ i_t3Ema1Source = input.source(hlcc4, title = '(STRAT) T3 MA1 Source [hlcc4]')
 
 i_wavetrendSmoothLength = input.int(4, 'WaveTrend Smooth Length')
 i_wavetrendAverageLength = input.int(21, 'WaveTrend Average Length')
-i_wavetrendOverBoughtLevel = input.float(50, 'WaveTrend Over Bought Level')
+i_wavetrendOverBoughtLevel = input.float(65, 'WaveTrend Over Bought Level')
 i_wavetrendOverSoldLevel = input.float(-59, 'WaveTrend Over Sold Level')
 
 i_wavetrendMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Wavetrend MA Type [EMA]')
@@ -610,8 +610,8 @@ if shortCondition4Found
 if shortCondition5Found
     shortConditions := shortConditions + 1
 
-longCondition = (longConditions >= i_subStrategiesMinimum) or wavetrendLong
-shortCondition = (shortConditions >= i_subStrategiesMinimum) or wavetrendShort
+longCondition = (longConditions >= i_subStrategiesMinimum) or (smoothedWavetrend <= i_wavetrendOverSoldLevel)
+shortCondition = (shortConditions >= i_subStrategiesMinimum) or (smoothedWavetrend >= i_wavetrendOverBoughtLevel)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
