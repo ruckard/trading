@@ -421,6 +421,29 @@ f_getTooRecentOrderNotOpenAdvice () =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
+// ADX - Functions - BEGIN
+
+dirmov(_len) =>
+    up = ta.change(high)
+    down = -ta.change(low)
+    truerange = ta.rma(ta.tr, _len)
+    plus = fixnan(100 * ta.rma(up > down and up > 0 ? up : 0, _len) / truerange)
+    minus = fixnan(100 * ta.rma(down > up and down > 0 ? down : 0, _len) / truerange)
+    [plus, minus]
+
+adx(_dilen, _adxlen) =>
+    [plus, minus] = dirmov(_dilen)
+    sum = plus + minus
+    adx = 100 * ta.rma(math.abs(plus - minus) / (sum == 0 ? 1 : sum), _adxlen)
+    [adx, plus, minus]
+
+// ADX - Functions - END
+
+// MA - Functions - BEGIN
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : ta.wma(_maSource, _maLength)
+// MA - Functions - END
+
 // FUNCTIONS - END
 
 
@@ -428,10 +451,41 @@ f_getTooRecentOrderNotOpenAdvice () =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// mainMa substrategy
-f_Ma (_maType, _maSource, _maLength) =>
-    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : ta.wma(_maSource, _maLength)
 
+// Noro TrendRibbon substrategy
+highMa = f_Ma (i_highMaType, i_highMaSource, i_highMaLength)
+lowMa = f_Ma (i_lowMaType, i_lowMaSource, i_lowMaLength)
+
+highClosingMa = f_Ma (i_highClosingMaType, i_highClosingMaSource, i_highClosingMaLength)
+lowClosingMa = f_Ma (i_lowClosingMaType, i_lowClosingMaSource, i_lowClosingMaLength)
+
+//Price Channel
+highestMA = ta.highest(highMa, i_highestMaLength)
+lowestMA = ta.lowest(lowMa, i_lowestMaLength)
+
+highestClosingMA = ta.highest(highClosingMa, i_highestClosingMaLength)
+lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
+
+//Trend
+trend = 0
+trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 : trend[1]
+
+// [adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
+[adx_diPlus_Sig, adx_diPlus_up, adx_diPlus_down] = adx(i_diPlusLen, i_adxLen)
+[adx_diMinus_sig, adx_diMinus_up, adx_diMinus_down] = adx(i_diMinusLen, i_adxLen)
+
+adx_up = adx_diPlus_up
+adx_down = adx_diMinus_down
+
+trendRibbonLongCondition = false
+trendRibbonShortCondition = false
+
+if (ta.crossover(adx_up, i_diPlusKeyLevel))
+    trendRibbonLongCondition := true
+if (ta.crossover(adx_down, i_diMinusKeyLevel))
+    trendRibbonShortCondition := true
+
+// mainMa substrategy
 mainMa = f_Ma (i_mainMaType, i_mainMaSource, i_mainMaLength)
 
 bool mainMaBool = mainMa >= mainMa[i_mainMaSmooth]  ? true: mainMa < mainMa[i_mainMaSmooth] ? false : na
@@ -490,21 +544,25 @@ bool longCondition1 = mainMaLong
 bool longCondition2 = sixthMaLong
 bool longCondition3 = t3Long
 bool longCondition4 = wavetrendLong
+bool longCondition5 = trendRibbonLongCondition
 
 bool longCondition1Found = false
 bool longCondition2Found = false
 bool longCondition3Found = false
 bool longCondition4Found = false
+bool longCondition5Found = false
 
 bool shortCondition1 = mainMaShort
 bool shortCondition2 = sixthMaShort
 bool shortCondition3 = t3Short
 bool shortCondition4 = wavetrendShort
+bool shortCondition5 = trendRibbonShortCondition
 
 bool shortCondition1Found = false
 bool shortCondition2Found = false
 bool shortCondition3Found = false
 bool shortCondition4Found = false
+bool shortCondition5Found = false
 
 
 longConditions = 0
@@ -518,6 +576,8 @@ for i = (i_subStrategiesLookback - 1) to 0
         longCondition3Found := true
     if longCondition4[i]
         longCondition4Found := true
+    if longCondition5[i]
+        longCondition5Found := true
     if shortCondition1[i]
         shortCondition1Found := true
     if shortCondition2[i]
@@ -526,6 +586,8 @@ for i = (i_subStrategiesLookback - 1) to 0
         shortCondition3Found := true
     if shortCondition4[i]
         shortCondition4Found := true
+    if shortCondition5[i]
+        shortCondition5Found := true
 
 if longCondition1Found
     longConditions := longConditions + 1
@@ -535,6 +597,8 @@ if longCondition3Found
     longConditions := longConditions + 1
 if longCondition4Found
     longConditions := longConditions + 1
+if longCondition5Found
+    longConditions := longConditions + 1
 if shortCondition1Found
     shortConditions := shortConditions + 1
 if shortCondition2Found
@@ -542,6 +606,8 @@ if shortCondition2Found
 if shortCondition3Found
     shortConditions := shortConditions + 1
 if shortCondition4Found
+    shortConditions := shortConditions + 1
+if shortCondition5Found
     shortConditions := shortConditions + 1
 
 longCondition = longConditions >= i_subStrategiesMinimum
