@@ -201,7 +201,7 @@ i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {Fa
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
-i_enableStopLoss = input.bool(false, '(STOPTAKE) Stop Loss? {False}')
+i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
 i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
@@ -211,11 +211,11 @@ i_takeProfitPerOne = i_takeProfit / 100
 i_positionRatio = input.float(1.5, title='(STRAT) Risk/Reward Ratio % {1.5}', minval=0.01)
 i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
-i_stopLossTypePre = input.string(_SLConstant_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
+i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
-i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+i_atrStopLossMultiplier = input.float(1.25, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.25}', minval=0.01)
 
 i_mainMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
 i_mainMaLength = input.int(60, minval = 1,  title = '(STRAT) Main MA Length [60]')
