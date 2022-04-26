@@ -274,7 +274,7 @@ i_wavetrendMaLength = input.int(10, minval = 1,  title = '(STRAT) Wavetrend MA C
 i_wavetrendMaSource = input.source(hlc3, title = '(STRAT) Wavetrend MA Source [hlc3]')
 
 i_subStrategiesLookback = input.int(11, title='(STRAT) Substrategies Lookback [11]')
-i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
+i_subStrategiesMinimum = input.int(3, title='(STRAT) Substrategies minimum [3]')
 
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
@@ -695,6 +695,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 // Decide if we are going to SHORT/Go SHORT - END
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
+LONG_CLOSE = true
 LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or (ta.crossunder(adx_up, i_diPlusKeyLevel))
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
@@ -703,6 +704,7 @@ if LONG_CLOSE
 // Decide if a LONG/LONG entry should be closed - END
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
+SHORT_CLOSE = true
 SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or (ta.crossunder(adx_down, i_diMinusKeyLevel))
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
