@@ -261,7 +261,7 @@ i_sixthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'R
 
 i_t3VolumeFactor = input.float(0.7, '(STRAT) T3 Volume Factor [0.7]')
 i_t3Ema1Type = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
-i_t3Ema1Length = input.int(8, minval = 1,  title = '(STRAT) T3 MA1 Length [8]')
+i_t3Ema1Length = input.int(3, minval = 1,  title = '(STRAT) T3 MA1 Length [3]')
 i_t3Ema1Source = input.source(hlcc4, title = '(STRAT) T3 MA1 Source [hlcc4]')
 
 i_wavetrendSmoothLength = input.int(4, 'WaveTrend Smooth Length')
@@ -536,8 +536,8 @@ wavetrendTci = ta.ema(wavetrendCi, i_wavetrendAverageLength)
 wavetrend = wavetrendTci
 smoothedWavetrend = ta.sma(wavetrend,i_wavetrendSmoothLength)
 
-wavetrendLong = ta.crossunder (smoothedWavetrend, i_wavetrendOverSoldLevel)
-wavetrendShort = ta.crossover (smoothedWavetrend, i_wavetrendOverBoughtLevel)
+wavetrendLong = (smoothedWavetrend <= i_wavetrendOverSoldLevel)
+wavetrendShort = (smoothedWavetrend >= i_wavetrendOverBoughtLevel)
 
 // Final logic
 bool longCondition1 = mainMaLong
@@ -610,8 +610,8 @@ if shortCondition4Found
 if shortCondition5Found
     shortConditions := shortConditions + 1
 
-longCondition = (longConditions >= i_subStrategiesMinimum) or (smoothedWavetrend <= i_wavetrendOverSoldLevel)
-shortCondition = (shortConditions >= i_subStrategiesMinimum) or (smoothedWavetrend >= i_wavetrendOverBoughtLevel)
+longCondition = (longConditions >= i_subStrategiesMinimum)
+shortCondition = (shortConditions >= i_subStrategiesMinimum)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
