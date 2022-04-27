@@ -221,6 +221,8 @@ i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
 i_diLen = input.int(12, title='(ADX) DI Length {12}')
 i_diPlusLen = input.int(12, title='(ADX) DI+ Length {12}')
 i_diMinusLen = input.int(8, title='(ADX) DI- Length {8}')
+i_diPlusSmooth = input.int(3, title='(ADX) DI+ Smooth {3}')
+i_diMinusSmooth = input.int(3, title='(ADX) DI- Smooth {3}')
 i_adxKeyLevel = input.float(29.0, title='(ADX) key level {29.0}')
 i_diPlusKeyLevel = input.float(29.0, title='(ADX) DI+ key level {29.0}')
 i_diMinusKeyLevel = input.float(27.0, title='(ADX) DI- key level {27.0}')
@@ -471,8 +473,12 @@ trend = 0
 trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 : trend[1]
 
 // [adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
-[adx_diPlus_Sig, adx_diPlus_up, adx_diPlus_down] = adx(i_diPlusLen, i_adxLen)
-[adx_diMinus_sig, adx_diMinus_up, adx_diMinus_down] = adx(i_diMinusLen, i_adxLen)
+
+[tmp_adx_diPlus_up, tmp_adx_diPlus_down] = dirmov(i_diPlusLen)
+[tmp_adx_diMinus_up, tmp_adx_diMinus_down] = dirmov(i_diMinusLen)
+
+adx_diPlus_up = ta.rma (tmp_adx_diPlus_up, i_diPlusSmooth)
+adx_diMinus_down = ta.rma (tmp_adx_diMinus_up, i_diMinusSmooth)
 
 adx_up = adx_diPlus_up
 adx_down = adx_diMinus_down
