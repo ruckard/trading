@@ -273,8 +273,8 @@ i_wavetrendMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA'
 i_wavetrendMaLength = input.int(10, minval = 1,  title = '(STRAT) Wavetrend MA Channel Length [10]')
 i_wavetrendMaSource = input.source(hlc3, title = '(STRAT) Wavetrend MA Source [hlc3]')
 
-i_subStrategiesLookback = input.int(8, title='(STRAT) Substrategies Lookback [8]')
-i_subStrategiesMinimum = input.int(3, title='(STRAT) Substrategies minimum [3]')
+i_subStrategiesLookback = input.int(5, title='(STRAT) Substrategies Lookback [5]')
+i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
 
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
@@ -536,8 +536,8 @@ wavetrendTci = ta.ema(wavetrendCi, i_wavetrendAverageLength)
 wavetrend = wavetrendTci
 smoothedWavetrend = ta.sma(wavetrend,i_wavetrendSmoothLength)
 
-wavetrendLong = (smoothedWavetrend <= i_wavetrendOverSoldLevel)
-wavetrendShort = (smoothedWavetrend >= i_wavetrendOverBoughtLevel)
+wavetrendLong = ta.crossover(smoothedWavetrend, i_wavetrendOverSoldLevel)
+wavetrendShort = ta.crossunder(smoothedWavetrend, i_wavetrendOverBoughtLevel)
 
 // Final logic
 bool longCondition1 = mainMaLong
