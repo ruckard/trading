@@ -610,8 +610,8 @@ if shortCondition4Found
 if shortCondition5Found
     shortConditions := shortConditions + 1
 
-longCondition = (longConditions >= i_subStrategiesMinimum)
-shortCondition = (shortConditions >= i_subStrategiesMinimum)
+longCondition = (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition
+shortCondition = (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
