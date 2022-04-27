@@ -621,6 +621,46 @@ longCondition = (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCo
 shortCondition = (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
+plot(mainMa, title="Main EMA", style=plot.style_line, linewidth=3, color = mainMaColor)
+
+sixthMaPositiveColor = color.blue
+sixthMaNegativeColor = color.red
+sixthMaNeutralColor = color.yellow
+sixthMaColor = (sixthMa>sixthMa[1]) ? sixthMaPositiveColor : (sixthMa<sixthMa[1]) ? sixthMaNegativeColor : sixthMaNeutralColor
+plot(sixthMa, color=sixthMaColor, linewidth=2, title="sixthMa")
+
+t3PositiveColor = color.green
+t3NegativeColor = color.red
+t3NeutralColor = color.yellow
+t3Color = (t3Price > t3Price[1]) ? t3PositiveColor : (t3Price < t3Price[1]) ? t3NegativeColor : t3NeutralColor
+plot(t3Price, color=t3Color, linewidth=3, title="T3")
+
+wavetrendOverSoldColor = color.green
+wavetrendOverBoughtColor = color.red
+wavetrendColor = (smoothedWavetrend < i_wavetrendOverSoldLevel) ? wavetrendOverSoldColor : (smoothedWavetrend > i_wavetrendOverBoughtLevel) ? wavetrendOverBoughtColor : na
+wavetrendPlot = (smoothedWavetrend < i_wavetrendOverSoldLevel) ? true : (smoothedWavetrend > i_wavetrendOverBoughtLevel) ? true : false
+plotshape(wavetrendPlot, color=wavetrendColor, style=shape.square, title="waveTrend section", location=location.bottom)
+
+// TrendRibbon - Plot - BEGIN
+MAColor = i_showRibbon ? color.black : na
+highCenterMAPlot = plot(highMa, color = MAColor, title = "(High) MA")
+lowCenterMAPlot = plot(lowMa, color = MAColor, title = "(Low) MA")
+highestLowestColor = i_showRibbon ? color.blue : na
+highestMAPlot = plot(highestMA, color = highestLowestColor, title = "Upper line")
+lowestMAPlot = plot(lowestMA, color = highestLowestColor, title = "Lower Line")
+highestMABackgroundColor = i_showBackground ? color.red : na
+lowestMABackgroundColor = i_showBackground ? color.blue : na
+fill(highestMAPlot, highCenterMAPlot, color = color.new(highestMABackgroundColor, 50))
+fill(lowestMAPlot, lowCenterMAPlot, color = color.new(lowestMABackgroundColor, 50))
+
+highestClosingLowestColor = i_showRibbon ? color.yellow : na
+highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = "Upper Closing line")
+lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
+
+plotshape((trend[1] == -1) and (trend == 1), style=shape.arrowup, title="Long Side change", location=location.top, color=color.blue)
+plotshape((trend[1] == 1) and (trend == -1), style=shape.arrowdown, title="Short Side change", location=location.bottom, color=color.blue)
+// TrendRibbon - Plot - END
 
 // Position price calculation - BEGIN
 float positionPrice = na
