@@ -422,6 +422,13 @@ longCondition = (longConditions >= i_subStrategiesMinimum)
 shortCondition = (shortConditions >= i_subStrategiesMinimum)
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+// WaveTrend - Plot - BEGIN
+wavetrendOverSoldColor = color.green
+wavetrendOverBoughtColor = color.red
+wavetrendColor = (smoothedWavetrend < i_wavetrendOverSoldLevel) ? wavetrendOverSoldColor : (smoothedWavetrend > i_wavetrendOverBoughtLevel) ? wavetrendOverBoughtColor : na
+wavetrendPlot = (smoothedWavetrend < i_wavetrendOverSoldLevel) ? true : (smoothedWavetrend > i_wavetrendOverBoughtLevel) ? true : false
+plotshape(wavetrendPlot, color=wavetrendColor, style=shape.square, title="waveTrend section", location=location.bottom)
+// WaveTrend - Plot - END
 
 // Position price calculation - BEGIN
 float positionPrice = na
