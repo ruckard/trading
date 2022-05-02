@@ -479,7 +479,7 @@ trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 :
 [tmp_adx_diMinus_up, tmp_adx_diMinus_down] = dirmov(i_diMinusLen)
 
 adx_diPlus_up = ta.rma (tmp_adx_diPlus_up, i_diPlusSmooth)
-adx_diMinus_down = ta.rma (tmp_adx_diMinus_up, i_diMinusSmooth)
+adx_diMinus_down = ta.rma (tmp_adx_diMinus_down, i_diMinusSmooth)
 
 adx_up = adx_diPlus_up
 adx_down = adx_diMinus_down
