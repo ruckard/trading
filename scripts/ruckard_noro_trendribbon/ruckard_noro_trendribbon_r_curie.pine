@@ -548,7 +548,8 @@ wavetrendShort = ta.crossunder(smoothedWavetrend, i_wavetrendOverBoughtLevel)
 
 // Final logic
 bool longCondition1 = mainMaLong
-bool longCondition2 = sixthMaLong
+// bool longCondition2 = sixthMaLong
+bool longCondition2 = false
 bool longCondition3 = t3Long
 bool longCondition4 = wavetrendLong
 bool longCondition5 = trendRibbonLongCondition
@@ -560,7 +561,8 @@ bool longCondition4Found = false
 bool longCondition5Found = false
 
 bool shortCondition1 = mainMaShort
-bool shortCondition2 = sixthMaShort
+// bool shortCondition2 = sixthMaShort
+bool shortCondition2 = false
 bool shortCondition3 = t3Short
 bool shortCondition4 = wavetrendShort
 bool shortCondition5 = trendRibbonShortCondition
@@ -628,7 +630,7 @@ sixthMaPositiveColor = color.blue
 sixthMaNegativeColor = color.red
 sixthMaNeutralColor = color.yellow
 sixthMaColor = (sixthMa>sixthMa[1]) ? sixthMaPositiveColor : (sixthMa<sixthMa[1]) ? sixthMaNegativeColor : sixthMaNeutralColor
-plot(sixthMa, color=sixthMaColor, linewidth=2, title="sixthMa")
+// plot(sixthMa, color=sixthMaColor, linewidth=2, title="sixthMa")
 
 t3PositiveColor = color.green
 t3NegativeColor = color.red
