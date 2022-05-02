@@ -551,7 +551,8 @@ bool longCondition1 = mainMaLong
 // bool longCondition2 = sixthMaLong
 bool longCondition2 = false
 bool longCondition3 = t3Long
-bool longCondition4 = wavetrendLong
+// bool longCondition4 = wavetrendLong
+bool longCondition4 = false
 bool longCondition5 = trendRibbonLongCondition
 
 bool longCondition1Found = false
@@ -564,7 +565,8 @@ bool shortCondition1 = mainMaShort
 // bool shortCondition2 = sixthMaShort
 bool shortCondition2 = false
 bool shortCondition3 = t3Short
-bool shortCondition4 = wavetrendShort
+// bool shortCondition4 = wavetrendShort
+bool shortCondition4 = false
 bool shortCondition5 = trendRibbonShortCondition
 
 bool shortCondition1Found = false
@@ -627,9 +629,9 @@ shortCondition = (shortConditions >= i_subStrategiesMinimum)
 //plot(adx_sig, color=color.blue, title="ADX")
 plot(adx_up, color=color.green, title="+DI")
 plot(adx_down, color=color.red, title="-DI")
-plot(smoothedWavetrend,color=color.orange, title="smoothedWavetrend")
-plot(i_wavetrendOverBoughtLevel, color=color.maroon, title="OverBought")
-plot(i_wavetrendOverSoldLevel, color=color.lime, title="OverSold")
+// plot(smoothedWavetrend,color=color.orange, title="smoothedWavetrend")
+// plot(i_wavetrendOverBoughtLevel, color=color.maroon, title="OverBought")
+// plot(i_wavetrendOverSoldLevel, color=color.lime, title="OverSold")
 // Wavetrend and ADX - Plot - END
 
 // Position price calculation - BEGIN

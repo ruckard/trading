@@ -551,7 +551,8 @@ bool longCondition1 = mainMaLong
 // bool longCondition2 = sixthMaLong
 bool longCondition2 = false
 bool longCondition3 = t3Long
-bool longCondition4 = wavetrendLong
+// bool longCondition4 = wavetrendLong
+bool longCondition4 = false
 bool longCondition5 = trendRibbonLongCondition
 
 bool longCondition1Found = false
@@ -564,7 +565,8 @@ bool shortCondition1 = mainMaShort
 // bool shortCondition2 = sixthMaShort
 bool shortCondition2 = false
 bool shortCondition3 = t3Short
-bool shortCondition4 = wavetrendShort
+// bool shortCondition4 = wavetrendShort
+bool shortCondition4 = false
 bool shortCondition5 = trendRibbonShortCondition
 
 bool shortCondition1Found = false
@@ -642,7 +644,7 @@ wavetrendOverSoldColor = color.green
 wavetrendOverBoughtColor = color.red
 wavetrendColor = (smoothedWavetrend < i_wavetrendOverSoldLevel) ? wavetrendOverSoldColor : (smoothedWavetrend > i_wavetrendOverBoughtLevel) ? wavetrendOverBoughtColor : na
 wavetrendPlot = (smoothedWavetrend < i_wavetrendOverSoldLevel) ? true : (smoothedWavetrend > i_wavetrendOverBoughtLevel) ? true : false
-plotshape(wavetrendPlot, color=wavetrendColor, style=shape.square, title="waveTrend section", location=location.bottom)
+// plotshape(wavetrendPlot, color=wavetrendColor, style=shape.square, title="waveTrend section", location=location.bottom)
 
 // TrendRibbon - Plot - BEGIN
 MAColor = i_showRibbon ? color.black : na
