@@ -248,7 +248,7 @@ i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Sour
 i_atrStopLossMultiplier = input.float(1.50, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.50}', minval=0.01)
 
 i_mainMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
-i_mainMaLength = input.int(60, minval = 1,  title = '(STRAT) Main MA Length [60]')
+i_mainMaLength = input.int(6, minval = 1,  title = '(STRAT) Main MA Length [6]')
 i_mainMaSource = input.source(close, title = '(STRAT) Main MA Source [close]')
 i_mainMaSmooth = input.int(2, minval = 1,  title = '(STRAT) Main MA Smooth [2]')
 
