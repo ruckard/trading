@@ -257,7 +257,7 @@ i_t3Ema1Type = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RM
 i_t3Ema1Length = input.int(3, minval = 1,  title = '(STRAT) T3 MA1 Length [3]')
 i_t3Ema1Source = input.source(hlcc4, title = '(STRAT) T3 MA1 Source [hlcc4]')
 
-i_subStrategiesLookback = input.int(4, title='(STRAT) Substrategies Lookback [4]')
+i_subStrategiesLookback = input.int(3, title='(STRAT) Substrategies Lookback [3]')
 i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
 
 // Trailing Take Profit - Inputs
