@@ -199,25 +199,20 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
-i_highMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High MA Type [SMA]')
-i_highMaLength = input.int(20, minval = 1,  title = '(STRAT) High MA Length [20]')
-i_highMaSource = input.source(ohlc4, title = '(STRAT) High MA Source [ohlc4]')
+
 i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High Closing MA Type [SMA]')
 i_highClosingMaLength = input.int(5, minval = 1,  title = '(STRAT) High Closing MA Length [5]')
 i_highClosingMaSource = input.source(ohlc4, title = '(STRAT) High Closing MA Source [ohlc4]')
-i_lowMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low MA Type [SMA]')
-i_lowMaLength = input.int(20, minval = 1,  title = '(STRAT) Low MA Length [20]')
-i_lowMaSource = input.source(ohlc4, title = '(STRAT) Low MA Source [ohlc4]')
+i_highestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Highest Closing MA Length [20]')
+
 i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
 i_lowClosingMaLength = input.int(5, minval = 1,  title = '(STRAT) Low Closing MA Length [5]')
 i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
-i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
-i_highestMaLength = input.int(20, minval = 1,  title = '(STRAT) Highest MA Length [20]')
-i_highestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Highest Closing MA Length [20]')
-i_lowestMaLength = input.int(20, minval = 1,  title = '(STRAT) Lowest MA Length [20]')
 i_lowestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Lowest Closing MA Length [20]')
+
+i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
 i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
-i_showBackground = input.bool(true, title = 'Show color [true]')
+
 i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
 i_diLen = input.int(12, title='(ADX) DI Length {12}')
 i_diPlusLen = input.int(7, title='(ADX) DI+ Length {7}')
@@ -437,22 +432,11 @@ f_Ma (_maType, _maSource, _maLength) =>
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 
 // Noro TrendRibbon substrategy
-highMa = f_Ma (i_highMaType, i_highMaSource, i_highMaLength)
-lowMa = f_Ma (i_lowMaType, i_lowMaSource, i_lowMaLength)
-
 highClosingMa = f_Ma (i_highClosingMaType, i_highClosingMaSource, i_highClosingMaLength)
 lowClosingMa = f_Ma (i_lowClosingMaType, i_lowClosingMaSource, i_lowClosingMaLength)
 
-//Price Channel
-highestMA = ta.highest(highMa, i_highestMaLength)
-lowestMA = ta.lowest(lowMa, i_lowestMaLength)
-
 highestClosingMA = ta.highest(highClosingMa, i_highestClosingMaLength)
 lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
-
-//Trend
-trend = 0
-trend := i_signalSource > highestMA[1] ? 1 : i_signalSource < lowestMA[1] ? -1 : trend[1]
 
 // [adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
 
@@ -581,23 +565,9 @@ t3Color = (t3Price > t3Price[1]) ? t3PositiveColor : (t3Price < t3Price[1]) ? t3
 plot(t3Price, color=t3Color, linewidth=3, title="T3")
 
 // TrendRibbon - Plot - BEGIN
-MAColor = i_showRibbon ? color.black : na
-highCenterMAPlot = plot(highMa, color = MAColor, title = "(High) MA")
-lowCenterMAPlot = plot(lowMa, color = MAColor, title = "(Low) MA")
-highestLowestColor = i_showRibbon ? color.blue : na
-highestMAPlot = plot(highestMA, color = highestLowestColor, title = "Upper line")
-lowestMAPlot = plot(lowestMA, color = highestLowestColor, title = "Lower Line")
-highestMABackgroundColor = i_showBackground ? color.red : na
-lowestMABackgroundColor = i_showBackground ? color.blue : na
-fill(highestMAPlot, highCenterMAPlot, color = color.new(highestMABackgroundColor, 50))
-fill(lowestMAPlot, lowCenterMAPlot, color = color.new(lowestMABackgroundColor, 50))
-
 highestClosingLowestColor = i_showRibbon ? color.yellow : na
 highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = "Upper Closing line")
 lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
-
-plotshape((trend[1] == -1) and (trend == 1), style=shape.arrowup, title="Long Side change", location=location.top, color=color.blue)
-plotshape((trend[1] == 1) and (trend == -1), style=shape.arrowdown, title="Short Side change", location=location.bottom, color=color.blue)
 // TrendRibbon - Plot - END
 
 // Position price calculation - BEGIN
