@@ -258,7 +258,7 @@ i_t3Ema1Length = input.int(3, minval = 1,  title = '(STRAT) T3 MA1 Length [3]')
 i_t3Ema1Source = input.source(hlcc4, title = '(STRAT) T3 MA1 Source [hlcc4]')
 
 i_subStrategiesLookback = input.int(4, title='(STRAT) Substrategies Lookback [4]')
-i_subStrategiesMinimum = input.int(3, title='(STRAT) Substrategies minimum [3]')
+i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
 
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
@@ -501,7 +501,7 @@ bool longCondition1 = mainMaLong
 bool longCondition2 = false
 bool longCondition3 = t3Long
 bool longCondition4 = false
-bool longCondition5 = trendRibbonLongCondition
+bool longCondition5 = false
 
 bool longCondition1Found = false
 bool longCondition2Found = false
@@ -513,7 +513,7 @@ bool shortCondition1 = mainMaShort
 bool shortCondition2 = false
 bool shortCondition3 = t3Short
 bool shortCondition4 = false
-bool shortCondition5 = trendRibbonShortCondition
+bool shortCondition5 = false
 
 bool shortCondition1Found = false
 bool shortCondition2Found = false
@@ -567,8 +567,8 @@ if shortCondition4Found
 if shortCondition5Found
     shortConditions := shortConditions + 1
 
-longCondition = (longConditions >= i_subStrategiesMinimum)
-shortCondition = (shortConditions >= i_subStrategiesMinimum)
+longCondition = (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition
+shortCondition = (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
