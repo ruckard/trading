@@ -252,16 +252,6 @@ i_mainMaLength = input.int(6, minval = 1,  title = '(STRAT) Main MA Length [6]')
 i_mainMaSource = input.source(close, title = '(STRAT) Main MA Source [close]')
 i_mainMaSmooth = input.int(2, minval = 1,  title = '(STRAT) Main MA Smooth [2]')
 
-i_firstMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) First MA Type [WMA]')
-i_firstMaLength = input.int(3, minval = 1,  title = '(STRAT) First MA Length [3]')
-i_firstMaSource = input.source(close, title = '(STRAT) First MA Source [close]')
-i_secondMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Second MA Type [WMA]')
-i_secondMaLength = input.int(5, minval = 1,  title = '(STRAT) Second MA Length [5]')
-i_thirdMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Third MA Type [WMA]')
-i_fourthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Fourth MA Type [WMA]')
-i_fifthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Fifth MA Type [WMA]')
-i_sixthMaType = input.string(defval = 'WMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Sixth MA Type [WMA]')
-
 i_t3VolumeFactor = input.float(0.7, '(STRAT) T3 Volume Factor [0.7]')
 i_t3Ema1Type = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
 i_t3Ema1Length = input.int(3, minval = 1,  title = '(STRAT) T3 MA1 Length [3]')
@@ -499,23 +489,6 @@ bool mainMaBool = mainMa >= mainMa[i_mainMaSmooth]  ? true: mainMa < mainMa[i_ma
 bool mainMaLong = (mainMaBool[1] == false) and (mainMaBool[0] == true)
 bool mainMaShort = (mainMaBool[1] == true) and (mainMaBool[0] == false)
 
-// sixthMa substrategy
-
-thirdMaLength = i_firstMaLength + i_secondMaLength
-fourthMaLength = i_secondMaLength + thirdMaLength
-fifthMaLength = thirdMaLength + fourthMaLength
-sixthMaLength = fourthMaLength + fifthMaLength
-
-firstMa = f_Ma (i_firstMaType, i_firstMaSource, i_firstMaLength)
-secondMa = f_Ma (i_secondMaType, firstMa, i_secondMaLength)
-thirdMa = f_Ma (i_thirdMaType, secondMa, thirdMaLength)
-fourthMa = f_Ma (i_fourthMaType, thirdMa, fourthMaLength)
-fifthMa = f_Ma (i_fifthMaType, fourthMa, fifthMaLength)
-sixthMa = f_Ma (i_sixthMaType, fifthMa, sixthMaLength)
-
-sixthMaLong = ta.crossover(sixthMa, sixthMa[1])
-sixthMaShort = ta.crossunder(sixthMa, sixthMa[1])
-
 // T3 substrategy
 
 t3Ema1 = f_Ma (i_t3Ema1Type, i_t3Ema1Source, i_t3Ema1Length)
@@ -548,7 +521,6 @@ wavetrendShort = ta.crossunder(smoothedWavetrend, i_wavetrendOverBoughtLevel)
 
 // Final logic
 bool longCondition1 = mainMaLong
-// bool longCondition2 = sixthMaLong
 bool longCondition2 = false
 bool longCondition3 = t3Long
 // bool longCondition4 = wavetrendLong
@@ -562,7 +534,6 @@ bool longCondition4Found = false
 bool longCondition5Found = false
 
 bool shortCondition1 = mainMaShort
-// bool shortCondition2 = sixthMaShort
 bool shortCondition2 = false
 bool shortCondition3 = t3Short
 // bool shortCondition4 = wavetrendShort
@@ -627,12 +598,6 @@ shortCondition = (shortConditions >= i_subStrategiesMinimum)
 
 mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
 plot(mainMa, title="Main EMA", style=plot.style_line, linewidth=3, color = mainMaColor)
-
-sixthMaPositiveColor = color.blue
-sixthMaNegativeColor = color.red
-sixthMaNeutralColor = color.yellow
-sixthMaColor = (sixthMa>sixthMa[1]) ? sixthMaPositiveColor : (sixthMa<sixthMa[1]) ? sixthMaNegativeColor : sixthMaNeutralColor
-// plot(sixthMa, color=sixthMaColor, linewidth=2, title="sixthMa")
 
 t3PositiveColor = color.green
 t3NegativeColor = color.red
