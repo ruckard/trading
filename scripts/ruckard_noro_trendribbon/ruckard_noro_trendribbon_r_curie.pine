@@ -468,10 +468,8 @@ adx_down = adx_diMinus_down
 trendRibbonLongCondition = false
 trendRibbonShortCondition = false
 
-if (ta.crossover(adx_up, i_diPlusKeyLevel))
-    trendRibbonLongCondition := true
-if (ta.crossover(adx_down, i_diMinusKeyLevel))
-    trendRibbonShortCondition := true
+trendRibbonLongCondition := (adx_up >= i_diPlusKeyLevel)
+trendRibbonShortCondition := (adx_down >= i_diMinusKeyLevel)
 
 // mainMa substrategy
 mainMa = f_Ma (i_mainMaType, i_mainMaSource, i_mainMaLength)
