@@ -251,6 +251,14 @@ i_t3Ema1Source = input.source(hlcc4, title = '(STRAT) T3 MA1 Source [hlcc4]')
 i_subStrategiesLookback = input.int(3, title='(STRAT) Substrategies Lookback [3]')
 i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
 
+i_enableVolatilityProtection = input.bool(true, '(STRAT) Enable Volatility Protection? {True}')
+
+i_atrVolatilityLength = input.int(14, minval = 1,  title = '(STRAT) ATR Volatility Length [14]')
+i_atrVolatilitySource = input.source(close, title = '(STRAT) ATR Volatility Source [close]')
+i_atrVolatilityMultiplier = input.float(2.00, title='(STRAT) ATR Volatility Multiplier % {2.00}', minval=0.01)
+
+i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -476,6 +484,23 @@ t3Price = t3C1 * t3Ema6 + t3C2 * t3Ema5 + t3C3 * t3Ema4 + t3C4 * t3Ema3
 t3Long = ta.crossover(t3Price, t3Price[1])
 t3Short = ta.crossunder(t3Price, t3Price[1])
 
+// Volatility substrategy
+
+volatilityLongCondition = true
+volatilityShortCondition = true
+
+atrLongVolatilityPrice = i_atrVolatilitySource + (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
+barIsVolatileLong = (close[0] >= open[0]) and (close[0] >= atrLongVolatilityPrice[1])
+
+if barIsVolatileLong or barIsVolatileLong[1]
+    volatilityLongCondition := false
+
+atrShortVolatilityPrice = i_atrVolatilitySource - (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
+barIsVolatileShort = (close[0] <= open[0]) and (close[0] <= atrShortVolatilityPrice[1])
+
+if barIsVolatileShort or barIsVolatileShort[1]
+    volatilityShortCondition := false
+
 // Final logic
 bool longCondition1 = mainMaLong
 bool longCondition2 = false
@@ -547,8 +572,16 @@ if shortCondition4Found
 if shortCondition5Found
     shortConditions := shortConditions + 1
 
-longCondition = (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition
-shortCondition = (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition
+bool longCondition = na
+bool shortCondition = na
+
+if i_enableVolatilityProtection
+    longCondition := (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition and volatilityLongCondition
+    shortCondition := (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition and volatilityShortCondition
+else
+    longCondition := (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition
+    shortCondition := (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition
+
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
@@ -565,6 +598,10 @@ highestClosingLowestColor = i_showRibbon ? color.yellow : na
 highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = "Upper Closing line")
 lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
 // TrendRibbon - Plot - END
+
+atrVolatilityColor = i_showAtrVolatilityMultiplier ? color.maroon : na
+atrLongVolatilityPricePlot = plot(atrLongVolatilityPrice, color = atrVolatilityColor, title = "Long Volatility Price")
+atrShortVolatilityPricePlot = plot(atrShortVolatilityPrice, color = atrVolatilityColor, title = "Short Volatility Price")
 
 // Position price calculation - BEGIN
 float positionPrice = na
