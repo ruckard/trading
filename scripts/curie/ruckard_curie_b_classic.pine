@@ -583,6 +583,24 @@ else
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
+plot(mainMa, title="Main EMA", style=plot.style_line, linewidth=3, color = mainMaColor)
+
+t3PositiveColor = color.green
+t3NegativeColor = color.red
+t3NeutralColor = color.yellow
+t3Color = (t3Price > t3Price[1]) ? t3PositiveColor : (t3Price < t3Price[1]) ? t3NegativeColor : t3NeutralColor
+plot(t3Price, color=t3Color, linewidth=3, title="T3")
+
+// TrendRibbon - Plot - BEGIN
+highestClosingLowestColor = i_showRibbon ? color.yellow : na
+highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = "Upper Closing line")
+lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
+// TrendRibbon - Plot - END
+
+atrVolatilityColor = i_showAtrVolatilityMultiplier ? color.maroon : na
+atrLongVolatilityPricePlot = plot(atrLongVolatilityPrice, color = atrVolatilityColor, title = "Long Volatility Price")
+atrShortVolatilityPricePlot = plot(atrShortVolatilityPrice, color = atrVolatilityColor, title = "Short Volatility Price")
 
 // Position price calculation - BEGIN
 float positionPrice = na
