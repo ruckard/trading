@@ -259,6 +259,18 @@ i_atrVolatilityMultiplier = input.float(2.00, title='(STRAT) ATR Volatility Mult
 
 i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
 
+i_enableLongEdgeProtection = input.bool(false, '(STRAT) Enable Long Edge Protection? {False}')
+i_longEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Long Edge Length [100]')
+i_longEdgeSource = input.source(high, title = '(STRAT) Long Edge Source [high]')
+i_longEdgeMinimumDistance = input.float(3.50, title='(STRAT) Long Edge Minimum Distance % {3.50}', minval=0.01)
+
+i_enableShortEdgeProtection = input.bool(false, '(STRAT) Enable Short Edge Protection? {False}')
+i_shortEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Short Edge Length [100]')
+i_shortEdgeSource = input.source(low, title = '(STRAT) Short Edge Source [low]')
+i_shortEdgeMinimumDistance = input.float(3.50, title='(STRAT) Short Edge Minimum Distance % {3.50}', minval=0.01)
+
+i_showEdges = input.bool(false, title='(STRAT) Show Edge Minimum and Maximum {False}')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -500,6 +512,23 @@ barIsVolatileShort = (close[0] <= open[0]) and (close[0] <= atrShortVolatilityPr
 if barIsVolatileShort or barIsVolatileShort[1]
     volatilityShortCondition := false
 
+// Edge substrategy
+
+edgeLongCondition = true
+edgeShortCondition = true
+
+edgeShortPrice = ta.lowest(i_shortEdgeSource, i_shortEdgeLength)
+edgeShortMinimumPrice = edgeShortPrice + (edgeShortPrice * i_shortEdgeMinimumDistance * 0.01)
+
+edgeLongPrice = ta.highest(i_longEdgeSource, i_longEdgeLength)
+edgeLongMaximumPrice = edgeLongPrice - (edgeLongPrice * i_longEdgeMinimumDistance * 0.01)
+
+if not (close <= edgeLongMaximumPrice)
+    edgeLongCondition := false
+
+if not (close >= edgeShortMinimumPrice)
+    edgeShortCondition := false
+
 // Final logic
 bool longCondition1 = mainMaLong
 bool longCondition2 = false
@@ -575,11 +604,23 @@ bool longCondition = na
 bool shortCondition = na
 
 if i_enableVolatilityProtection
-    longCondition := (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition and volatilityLongCondition
-    shortCondition := (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition and volatilityShortCondition
+    if i_enableLongEdgeProtection
+        longCondition := (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition and volatilityLongCondition and edgeLongCondition
+    else
+        longCondition := (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition and volatilityLongCondition
+    if i_enableShortEdgeProtection
+        shortCondition := (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition and volatilityShortCondition and edgeShortCondition
+    else
+        shortCondition := (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition and volatilityShortCondition
 else
-    longCondition := (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition
-    shortCondition := (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition
+    if i_enableLongEdgeProtection
+        longCondition := (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition and edgeLongCondition
+    else
+        longCondition := (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition
+    if i_enableShortEdgeProtection
+        shortCondition := (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition and edgeShortCondition
+    else
+        shortCondition := (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
@@ -601,6 +642,10 @@ lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, t
 atrVolatilityColor = i_showAtrVolatilityMultiplier ? color.maroon : na
 atrLongVolatilityPricePlot = plot(atrLongVolatilityPrice, color = atrVolatilityColor, title = "Long Volatility Price")
 atrShortVolatilityPricePlot = plot(atrShortVolatilityPrice, color = atrVolatilityColor, title = "Short Volatility Price")
+
+edgeColor = i_showEdges ? color.purple : na
+edgeLongPricePlot = plot(edgeLongMaximumPrice, color = edgeColor, style=plot.style_stepline, title = "Long Edge Price")
+edgeShortPricePlot = plot(edgeShortMinimumPrice, color = edgeColor, style=plot.style_stepline, title = "Short Edge Price")
 
 // Position price calculation - BEGIN
 float positionPrice = na
