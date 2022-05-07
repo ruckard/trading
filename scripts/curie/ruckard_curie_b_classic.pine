@@ -184,7 +184,7 @@ import ruckard/ZignalyBeta/14 as zig
 i_enableZignalyAlert = input(true, '(ZIG) Enable Alert message {True}')
 i_zignalyServiceSecretKey = input.string('MYSECRETKEY', '(ZIG) Service Secret Key {MYSECRETKEY}')
 _ZIGHYBRIDINTEGRATION_ = 'Hybrid', _ZIGTVONLYINTEGRATION_ = 'TradingView only'
-i_zignalyIntegrationTypePre = input.string(_ZIGTVONLYINTEGRATION_, '(ZIG) Integration type', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
+i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, '(ZIG) Integration type', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
 i_zignalyIntegrationType = (i_zignalyIntegrationTypePre == _ZIGHYBRIDINTEGRATION_) ? 'hybrid' : 'nonhybrid'
 _ZIGSIGNALPROVIDER_ = 'Signal Provider', _ZIGCOPYTRADERPROVIDER_ = 'Profit Sharing/Copy Trader Provider'
 i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider type', options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
@@ -195,11 +195,35 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+
+i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High Closing MA Type [SMA]')
+i_highClosingMaLength = input.int(5, minval = 1,  title = '(STRAT) High Closing MA Length [5]')
+i_highClosingMaSource = input.source(ohlc4, title = '(STRAT) High Closing MA Source [ohlc4]')
+i_highestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Highest Closing MA Length [20]')
+
+i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
+i_lowClosingMaLength = input.int(5, minval = 1,  title = '(STRAT) Low Closing MA Length [5]')
+i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
+i_lowestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Lowest Closing MA Length [20]')
+
+i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
+i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
+
+i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
+i_diLen = input.int(12, title='(ADX) DI Length {12}')
+i_diPlusLen = input.int(7, title='(ADX) DI+ Length {7}')
+i_diMinusLen = input.int(7, title='(ADX) DI- Length {7}')
+i_diPlusSmooth = input.int(4, title='(ADX) DI+ Smooth {4}')
+i_diMinusSmooth = input.int(4, title='(ADX) DI- Smooth {4}')
+i_adxKeyLevel = input.float(29.0, title='(ADX) key level {29.0}')
+i_diPlusKeyLevel = input.float(26.0, title='(ADX) DI+ key level {26.0}')
+i_diMinusKeyLevel = input.float(24.0, title='(ADX) DI- key level {24.0}')
+i_adxRangeKeyLevel = input.float(17.0, title='(ADX) Range key level {17}')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
 i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
-i_enableTrailingTakeProfit = input.bool(true, title='(TRAILING) Enable Trailing Take Profit (%) {True}')
+i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
 i_enableRiskRewardRatio = input.bool(false, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {False}')
@@ -208,11 +232,33 @@ i_takeProfitPerOne = i_takeProfit / 100
 i_positionRatio = input.float(1.5, title='(STRAT) Risk/Reward Ratio % {1.5}', minval=0.01)
 i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
-i_stopLossTypePre = input.string(_SLConstant_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
+i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
-i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+i_atrStopLossMultiplier = input.float(1.50, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.50}', minval=0.01)
+
+i_mainMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
+i_mainMaLength = input.int(6, minval = 1,  title = '(STRAT) Main MA Length [6]')
+i_mainMaSource = input.source(close, title = '(STRAT) Main MA Source [close]')
+i_mainMaSmooth = input.int(2, minval = 1,  title = '(STRAT) Main MA Smooth [2]')
+
+i_t3VolumeFactor = input.float(0.7, '(STRAT) T3 Volume Factor [0.7]')
+i_t3Ema1Type = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
+i_t3Ema1Length = input.int(3, minval = 1,  title = '(STRAT) T3 MA1 Length [3]')
+i_t3Ema1Source = input.source(hlcc4, title = '(STRAT) T3 MA1 Source [hlcc4]')
+
+i_subStrategiesLookback = input.int(3, title='(STRAT) Substrategies Lookback [3]')
+i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
+
+i_enableVolatilityProtection = input.bool(true, '(STRAT) Enable Volatility Protection? {True}')
+
+i_atrVolatilityLength = input.int(14, minval = 1,  title = '(STRAT) ATR Volatility Length [14]')
+i_atrVolatilitySource = input.source(close, title = '(STRAT) ATR Volatility Source [close]')
+i_atrVolatilityMultiplier = input.float(2.00, title='(STRAT) ATR Volatility Multiplier % {2.00}', minval=0.01)
+
+i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -231,17 +277,17 @@ _ZIGEXZIGNALY_ = 'Zignaly', _ZIGEXBINANCE_ = 'Binance', _ZIGEXKUCOIN_ = 'Kucoin'
 i_zignalyExchange = input.string(_ZIGEXZIGNALY_, '(ZIG) Exchange {Zignaly}', options=[_ZIGEXZIGNALY_, _ZIGEXBINANCE_, _ZIGEXKUCOIN_])
 _ZIGEXTYPESPOT_ = 'spot', _ZIGEXFUTURES_ = 'futures'
 i_zignalyExchangeType = input.string(_ZIGEXFUTURES_, '(ZIG) Exchange Type {Futures}', options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_])
-i_zignalyLeverage = input.int(1, '(ZIG) Leverage {1}', minval=1, step=1, maxval=125)
+i_zignalyLeverage = input.int(3, '(ZIG) Leverage {3}', minval=1, step=1, maxval=125)
 var i_zignalyLeverage_str = str.tostring(i_zignalyLeverage)  // It needs to run only once
 i_priceDecimalDigits = input.int(2, 'Number of decimal digits for Prices {2}', minval=0, maxval=10, step=1)
 // Decimal - Inputs
 i_contractMaximumDecimalNumber = input.int(3, title='(DECIMAL) Maximum number of decimal for contracts {3}', minval=0)
 i_tooRecentMinutesNumber = input.int(0, '(RECENT) Number of minutes to wait to open a new order after the previous one has been opened {0}', minval=0, maxval=100, step=1)
 i_CapitalQuote = input.float(100.0, title='(CAPITAL) Capital quote invested per order in USDT units {100.0}')
-i_CapitalPercentage = input.float(25.0, title='(CAPITAL) Capital percentage invested per order (%) {25.0}', minval=0, step=0.01) * 0.01
+i_CapitalPercentage = input.float(10.0, title='(CAPITAL) Capital percentage invested per order (%) {10.0}', minval=0, step=0.01) * 0.01
 // Risk Management - Inputs
 _SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None', _CUSTOM_ = 'Custom', _FORCED_ = 'Forced'
-i_riskManagementTypePre = input.string(_SCOMPOUND_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
+i_riskManagementTypePre = input.string(_NONE_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
 i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
 i_riskManagementMaximumLossPerTrade = input.float(1.0, title='(RISKM) Maximum loss per trade % {1.0}') / 100
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='(RISKM) Maximum loss per day % {6.0}') / 100
@@ -357,6 +403,29 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
+// ADX - Functions - BEGIN
+
+dirmov(_len) =>
+    up = ta.change(high)
+    down = -ta.change(low)
+    truerange = ta.rma(ta.tr, _len)
+    plus = fixnan(100 * ta.rma(up > down and up > 0 ? up : 0, _len) / truerange)
+    minus = fixnan(100 * ta.rma(down > up and down > 0 ? down : 0, _len) / truerange)
+    [plus, minus]
+
+adx(_dilen, _adxlen) =>
+    [plus, minus] = dirmov(_dilen)
+    sum = plus + minus
+    adx = 100 * ta.rma(math.abs(plus - minus) / (sum == 0 ? 1 : sum), _adxlen)
+    [adx, plus, minus]
+
+// ADX - Functions - END
+
+// MA - Functions - BEGIN
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : ta.wma(_maSource, _maLength)
+// MA - Functions - END
+
 // FUNCTIONS - END
 
 
@@ -364,10 +433,154 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
-longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+
+// Noro TrendRibbon substrategy
+highClosingMa = f_Ma (i_highClosingMaType, i_highClosingMaSource, i_highClosingMaLength)
+lowClosingMa = f_Ma (i_lowClosingMaType, i_lowClosingMaSource, i_lowClosingMaLength)
+
+highestClosingMA = ta.highest(highClosingMa, i_highestClosingMaLength)
+lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
+
+// [adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
+
+[tmp_adx_diPlus_up, tmp_adx_diPlus_down] = dirmov(i_diPlusLen)
+[tmp_adx_diMinus_up, tmp_adx_diMinus_down] = dirmov(i_diMinusLen)
+
+adx_diPlus_up = ta.rma (tmp_adx_diPlus_up, i_diPlusSmooth)
+adx_diMinus_down = ta.rma (tmp_adx_diMinus_down, i_diMinusSmooth)
+
+adx_up = adx_diPlus_up
+adx_down = adx_diMinus_down
+
+trendRibbonLongCondition = false
+trendRibbonShortCondition = false
+
+trendRibbonLongCondition := (adx_up >= i_diPlusKeyLevel)
+trendRibbonShortCondition := (adx_down >= i_diMinusKeyLevel)
+
+// mainMa substrategy
+mainMa = f_Ma (i_mainMaType, i_mainMaSource, i_mainMaLength)
+
+bool mainMaBool = mainMa >= mainMa[i_mainMaSmooth]  ? true: mainMa < mainMa[i_mainMaSmooth] ? false : na
+bool mainMaLong = (mainMaBool[1] == false) and (mainMaBool[0] == true)
+bool mainMaShort = (mainMaBool[1] == true) and (mainMaBool[0] == false)
+
+// T3 substrategy
+
+t3Ema1 = f_Ma (i_t3Ema1Type, i_t3Ema1Source, i_t3Ema1Length)
+t3Ema2 = f_Ma (i_t3Ema1Type, t3Ema1, i_t3Ema1Length)
+t3Ema3 = f_Ma (i_t3Ema1Type, t3Ema2, i_t3Ema1Length)
+t3Ema4 = f_Ma (i_t3Ema1Type, t3Ema3, i_t3Ema1Length)
+t3Ema5 = f_Ma (i_t3Ema1Type, t3Ema4, i_t3Ema1Length)
+t3Ema6 = f_Ma (i_t3Ema1Type, t3Ema5, i_t3Ema1Length)
+
+t3C1 = -i_t3VolumeFactor * i_t3VolumeFactor * i_t3VolumeFactor
+t3C2 = 3 * i_t3VolumeFactor * i_t3VolumeFactor + 3 * i_t3VolumeFactor * i_t3VolumeFactor * i_t3VolumeFactor
+t3C3 = -6 * i_t3VolumeFactor * i_t3VolumeFactor - 3 * i_t3VolumeFactor - 3 * i_t3VolumeFactor * i_t3VolumeFactor * i_t3VolumeFactor
+t3C4 = 1 + 3 * i_t3VolumeFactor + i_t3VolumeFactor * i_t3VolumeFactor * i_t3VolumeFactor + 3 * i_t3VolumeFactor * i_t3VolumeFactor
+t3Price = t3C1 * t3Ema6 + t3C2 * t3Ema5 + t3C3 * t3Ema4 + t3C4 * t3Ema3
+
+t3Long = ta.crossover(t3Price, t3Price[1])
+t3Short = ta.crossunder(t3Price, t3Price[1])
+
+// Volatility substrategy
+
+volatilityLongCondition = true
+volatilityShortCondition = true
+
+atrLongVolatilityPrice = i_atrVolatilitySource + (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
+barIsVolatileLong = (close[0] >= open[0]) and (close[0] >= atrLongVolatilityPrice[1])
+
+if barIsVolatileLong or barIsVolatileLong[1]
+    volatilityLongCondition := false
+
+atrShortVolatilityPrice = i_atrVolatilitySource - (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
+barIsVolatileShort = (close[0] <= open[0]) and (close[0] <= atrShortVolatilityPrice[1])
+
+if barIsVolatileShort or barIsVolatileShort[1]
+    volatilityShortCondition := false
+
+// Final logic
+bool longCondition1 = mainMaLong
+bool longCondition2 = false
+bool longCondition3 = t3Long
+bool longCondition4 = false
+bool longCondition5 = false
+
+bool longCondition1Found = false
+bool longCondition2Found = false
+bool longCondition3Found = false
+bool longCondition4Found = false
+bool longCondition5Found = false
+
+bool shortCondition1 = mainMaShort
+bool shortCondition2 = false
+bool shortCondition3 = t3Short
+bool shortCondition4 = false
+bool shortCondition5 = false
+
+bool shortCondition1Found = false
+bool shortCondition2Found = false
+bool shortCondition3Found = false
+bool shortCondition4Found = false
+bool shortCondition5Found = false
+
+
+longConditions = 0
+shortConditions = 0
+for i = (i_subStrategiesLookback - 1) to 0
+    if longCondition1[i]
+        longCondition1Found := true
+    if longCondition2[i]
+        longCondition2Found := true
+    if longCondition3[i]
+        longCondition3Found := true
+    if longCondition4[i]
+        longCondition4Found := true
+    if longCondition5[i]
+        longCondition5Found := true
+    if shortCondition1[i]
+        shortCondition1Found := true
+    if shortCondition2[i]
+        shortCondition2Found := true
+    if shortCondition3[i]
+        shortCondition3Found := true
+    if shortCondition4[i]
+        shortCondition4Found := true
+    if shortCondition5[i]
+        shortCondition5Found := true
+
+if longCondition1Found
+    longConditions := longConditions + 1
+if longCondition2Found
+    longConditions := longConditions + 1
+if longCondition3Found
+    longConditions := longConditions + 1
+if longCondition4Found
+    longConditions := longConditions + 1
+if longCondition5Found
+    longConditions := longConditions + 1
+if shortCondition1Found
+    shortConditions := shortConditions + 1
+if shortCondition2Found
+    shortConditions := shortConditions + 1
+if shortCondition3Found
+    shortConditions := shortConditions + 1
+if shortCondition4Found
+    shortConditions := shortConditions + 1
+if shortCondition5Found
+    shortConditions := shortConditions + 1
+
+bool longCondition = na
+bool shortCondition = na
+
+if i_enableVolatilityProtection
+    longCondition := (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition and volatilityLongCondition
+    shortCondition := (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition and volatilityShortCondition
+else
+    longCondition := (longConditions >= i_subStrategiesMinimum) and trendRibbonLongCondition
+    shortCondition := (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition
+
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
@@ -412,7 +625,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or shortCondition
+LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or (ta.crossunder(adx_up, i_diPlusKeyLevel))
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -421,7 +634,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or longCondition
+SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or (ta.crossunder(adx_down, i_diMinusKeyLevel))
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
