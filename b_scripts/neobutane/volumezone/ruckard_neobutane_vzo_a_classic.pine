@@ -6,7 +6,9 @@
 // Current version: v20220508 ( bA001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
+// Strategy works the following way:
+// Go long when VZO indicates green colour and at the same time there is volume spike.
+// Go short when VZO indicates red colour and at the same time there is volume spike.
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 3m timeframe.
