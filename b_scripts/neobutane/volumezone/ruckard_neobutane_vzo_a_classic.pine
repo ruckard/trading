@@ -185,7 +185,7 @@ import ruckard/ZignalyBeta/14 as zig
 i_enableZignalyAlert = input(true, '(ZIG) Enable Alert message {True}')
 i_zignalyServiceSecretKey = input.string('MYSECRETKEY', '(ZIG) Service Secret Key {MYSECRETKEY}')
 _ZIGHYBRIDINTEGRATION_ = 'Hybrid', _ZIGTVONLYINTEGRATION_ = 'TradingView only'
-i_zignalyIntegrationTypePre = input.string(_ZIGTVONLYINTEGRATION_, '(ZIG) Integration type', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
+i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, '(ZIG) Integration type', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
 i_zignalyIntegrationType = (i_zignalyIntegrationTypePre == _ZIGHYBRIDINTEGRATION_) ? 'hybrid' : 'nonhybrid'
 _ZIGSIGNALPROVIDER_ = 'Signal Provider', _ZIGCOPYTRADERPROVIDER_ = 'Profit Sharing/Copy Trader Provider'
 i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider type', options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
@@ -199,8 +199,8 @@ i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {Fa
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
-i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
-i_enableTrailingTakeProfit = input.bool(true, title='(TRAILING) Enable Trailing Take Profit (%) {True}')
+i_enableStopLoss = input.bool(false, '(STOPTAKE) Stop Loss? {False}')
+i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
 i_enableRiskRewardRatio = input.bool(false, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {False}')
@@ -209,11 +209,28 @@ i_takeProfitPerOne = i_takeProfit / 100
 i_positionRatio = input.float(1.5, title='(STRAT) Risk/Reward Ratio % {1.5}', minval=0.01)
 i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
-i_stopLossTypePre = input.string(_SLConstant_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
+i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+
+i_vzoSource = input.source(close, '(STRAT) VZO Source')
+i_showVZO  = input.bool(true, '(STRAT) Show VZO')
+i_showPZO  = input.bool(false, '(STRAT) Show PZO')
+i_showVolumeZones = input.bool(true, '(STRAT) Show Volume Zones')
+i_showVZOHighlights  = input.bool(true, '(STRAT) Show Overbought/Oversold Highlights')
+i_showVZOOuterLevels  = input.bool(false, '(STRAT) Show Outer (80) Levels')
+i_vzoLength   = input.int(21,'(STRAT) VZO/PZO Length', minval=1)
+i_vzoSourceMaType = input.string(defval = 'NONE', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA', 'HMA', 'NONE'], title = '(STRAT) VZO Source MA Type [SMA]')
+i_vzoSourceMaLength = input.int(9, minval = 1,  title = '(STRAT) VZO Source MA Length [9]')
+i_vzoSourceMaSource = input.source(close, title = '(STRAT) VZO Source MA Source [close]')
+i_vzoAlarmThreshold = input.int(40, '(STRAT) VZO/PZO Label/Alarm Threshold', minval=0, step=5)
+i_fillBackgroundColor = input(true, '(STRAT) Fill Background Coloring')
+
+i_subStrategiesLookback = input.int(3, title='(STRAT) Substrategies Lookback [3]')
+i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -239,10 +256,10 @@ i_priceDecimalDigits = input.int(2, 'Number of decimal digits for Prices {2}', m
 i_contractMaximumDecimalNumber = input.int(3, title='(DECIMAL) Maximum number of decimal for contracts {3}', minval=0)
 i_tooRecentMinutesNumber = input.int(0, '(RECENT) Number of minutes to wait to open a new order after the previous one has been opened {0}', minval=0, maxval=100, step=1)
 i_CapitalQuote = input.float(100.0, title='(CAPITAL) Capital quote invested per order in USDT units {100.0}')
-i_CapitalPercentage = input.float(25.0, title='(CAPITAL) Capital percentage invested per order (%) {25.0}', minval=0, step=0.01) * 0.01
+i_CapitalPercentage = input.float(10.0, title='(CAPITAL) Capital percentage invested per order (%) {10.0}', minval=0, step=0.01) * 0.01
 // Risk Management - Inputs
 _SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None', _CUSTOM_ = 'Custom', _FORCED_ = 'Forced'
-i_riskManagementTypePre = input.string(_SCOMPOUND_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
+i_riskManagementTypePre = input.string(_CUSTOM_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
 i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
 i_riskManagementMaximumLossPerTrade = input.float(1.0, title='(RISKM) Maximum loss per trade % {1.0}') / 100
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='(RISKM) Maximum loss per day % {6.0}') / 100
@@ -358,6 +375,15 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
+f_zone(_src, _type, _len) =>
+    vp = _src > _src[1] ? _type : _src < _src[1] ? -_type : _src == _src[1] ? 0 : 0
+    z = 100 * (ta.ema(vp, _len) / ta.ema(_type, _len))
+
+// MA - Functions - BEGIN
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : _maType == "WMA" ? ta.wma(_maSource, _maLength) : _maType == "HMA" ? ta.hma(_maSource, _maLength) : _maSource
+// MA - Functions - END
+
 // FUNCTIONS - END
 
 
@@ -365,10 +391,96 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
-longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+
+vzoSrc = f_Ma (i_vzoSourceMaType, i_vzoSourceMaSource, i_vzoSourceMaLength)
+
+// VZO substrategy
+volumeZone    = f_zone(vzoSrc, volume, i_vzoLength)
+volumeZoneLong = volumeZone <= -i_vzoAlarmThreshold
+volumeZoneShort = volumeZone >= i_vzoAlarmThreshold
+
+// PZO substrategy
+priceZone    = f_zone(vzoSrc, vzoSrc, i_vzoLength)
+priceZoneLong = priceZone <= -i_vzoAlarmThreshold
+priceZoneShort = priceZone >= i_vzoAlarmThreshold
+
+// Final logic
+bool longCondition1 = volumeZoneLong
+bool longCondition2 = priceZoneLong
+bool longCondition3 = false
+bool longCondition4 = false
+bool longCondition5 = false
+
+bool longCondition1Found = false
+bool longCondition2Found = false
+bool longCondition3Found = false
+bool longCondition4Found = false
+bool longCondition5Found = false
+
+bool shortCondition1 = volumeZoneShort
+bool shortCondition2 = priceZoneShort
+bool shortCondition3 = false
+bool shortCondition4 = false
+bool shortCondition5 = false
+
+bool shortCondition1Found = false
+bool shortCondition2Found = false
+bool shortCondition3Found = false
+bool shortCondition4Found = false
+bool shortCondition5Found = false
+
+
+longConditions = 0
+shortConditions = 0
+for i = (i_subStrategiesLookback - 1) to 0
+    if longCondition1[i]
+        longCondition1Found := true
+    if longCondition2[i]
+        longCondition2Found := true
+    if longCondition3[i]
+        longCondition3Found := true
+    if longCondition4[i]
+        longCondition4Found := true
+    if longCondition5[i]
+        longCondition5Found := true
+    if shortCondition1[i]
+        shortCondition1Found := true
+    if shortCondition2[i]
+        shortCondition2Found := true
+    if shortCondition3[i]
+        shortCondition3Found := true
+    if shortCondition4[i]
+        shortCondition4Found := true
+    if shortCondition5[i]
+        shortCondition5Found := true
+
+if longCondition1Found
+    longConditions := longConditions + 1
+if longCondition2Found
+    longConditions := longConditions + 1
+if longCondition3Found
+    longConditions := longConditions + 1
+if longCondition4Found
+    longConditions := longConditions + 1
+if longCondition5Found
+    longConditions := longConditions + 1
+if shortCondition1Found
+    shortConditions := shortConditions + 1
+if shortCondition2Found
+    shortConditions := shortConditions + 1
+if shortCondition3Found
+    shortConditions := shortConditions + 1
+if shortCondition4Found
+    shortConditions := shortConditions + 1
+if shortCondition5Found
+    shortConditions := shortConditions + 1
+
+bool longCondition = na
+bool shortCondition = na
+
+longCondition := (longConditions >= i_subStrategiesMinimum)
+shortCondition := (shortConditions >= i_subStrategiesMinimum)
+
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
