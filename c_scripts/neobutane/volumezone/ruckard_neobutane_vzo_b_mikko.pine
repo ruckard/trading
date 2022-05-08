@@ -503,38 +503,9 @@ else
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
-vzoPlotTP     = 60
-silverColorTransp0 = color.new (color.silver, transp=0)
-silverColorTransp100 = color.new (color.silver, transp=100)
-vzoBackgroundColor = i_fillBackgroundColor == i_showVolumeZones ? silverColorTransp0 : silverColorTransp100
-vzoColor1 = color.new(color.maroon, transp=vzoPlotTP)
-vzoColor2 = color.new(#FC0445, transp=vzoPlotTP)
-vzoColor3 = color.new(#FA5B49, transp=vzoPlotTP)
-vzoColor4 = color.new(#F89748, transp=vzoPlotTP)
-vzoColor5 = color.new(#6ea0FF, transp=vzoPlotTP)
-vzoColor6 = color.new(#0080FF, transp=vzoPlotTP)
-vzoColor7 = color.new(color.blue, transp=vzoPlotTP)
-vzoColor8 = color.new(#10048B, transp=vzoPlotTP)
-
-plot(i_showVZOOuterLevels ?  80 :  60, "", vzoBackgroundColor, 1, style=plot.style_area, editable=false)
-plot(i_showVZOOuterLevels ? -80 : -60, "", vzoBackgroundColor, 1, style=plot.style_area, editable=false)
-plot(i_showVolumeZones and i_showVZOOuterLevels ?  80 : na, "80", vzoColor1, 1, style=plot.style_area, trackprice=false,   histbase=60, editable=true)
-plot(i_showVolumeZones ?  60 : na,           "60", vzoColor2, 1, style=plot.style_area, trackprice=false,  histbase=40, editable=true)
-plot(i_showVolumeZones ?  40 : na,           "40", vzoColor3, 1, style=plot.style_area, trackprice=false,  histbase=20, editable=true)
-plot(i_showVolumeZones ?  20 : na,           "20", vzoColor4, 1, style=plot.style_area, trackprice=false,  histbase= 0, editable=true)
-plot(i_showVolumeZones ?   0 : na,          "-20", vzoColor5, 1, style=plot.style_area, trackprice=false,  histbase=-20, editable=true)
-plot(i_showVolumeZones ? -20 : na,          "-40", vzoColor6, 1, style=plot.style_area, trackprice=false,  histbase=-40, editable=true)
-plot(i_showVolumeZones ? -40 : na,          "-60", vzoColor7, 1, style=plot.style_area, trackprice=false,  histbase=-60, editable=true)
-plot(i_showVolumeZones and i_showVZOOuterLevels ? -60 : na,"-80", vzoColor8, 1, style=plot.style_area, trackprice=false,  histbase=-80, editable=true)
-
-plot(i_showVZO ? volumeZone       : na, "Volume Zone Oscillator", color.new(#006767, transp=20), 2)
-plot(i_showPZO ? priceZone       : na, "Price Zone Oscillator",  color.new(#6961FF, transp=20), 2)
-
-vzoIsOverBought = i_showVZOHighlights and volumeZone >= i_vzoAlarmThreshold
-vzoIsOverSold = i_showVZOHighlights and volumeZone <= -i_vzoAlarmThreshold
-bgcolor(vzoIsOverBought ? color.maroon : na, 70, title="VZO Overbought")
-bgcolor(vzoIsOverSold ? color.green  : na, 70, title="VZO Oversold")
-
+volumeColor = (close >= open) ? color.new(color.teal, transp=50) : color.new(color.red, transp=50)
+plot(volume, style=plot.style_columns, color=volumeColor)
+plot(volumeSpikePrice, style=plot.style_stepline, color=color.new(color.orange, transp=50))
 
 // Position price calculation - BEGIN
 float positionPrice = na
