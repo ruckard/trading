@@ -231,6 +231,12 @@ i_fillBackgroundColor = input(true, '(STRAT) Fill Background Coloring')
 i_subStrategiesLookback = input.int(3, title='(STRAT) Substrategies Lookback [3]')
 i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
 
+i_enableVolumeSpikeCondition = input.bool(true, '(STRAT) Enable Volume Spike Condition? {True}')
+
+i_meanVolumeMaType = input.string(defval = 'RMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA', 'HMA', 'NONE'], title = '(STRAT) Mean Volume MA Type [SMA]')
+i_meanVolumeMaLength = input.int(14, minval = 1,  title = '(STRAT) Mean Volume MA Length [14]')
+i_volumeSpikeMultiplier = input.float(4.00, title='(STRAT) Volume Spike Multiplier % {4.00}', minval=0.01)
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -404,6 +410,16 @@ priceZone    = f_zone(vzoSrc, vzoSrc, i_vzoLength)
 priceZoneLong = priceZone <= -i_vzoAlarmThreshold
 priceZoneShort = priceZone >= i_vzoAlarmThreshold
 
+// Volume Spike substrategy
+volumeSpikeCondition = false
+
+meanVolume = f_Ma (i_meanVolumeMaType, volume, i_meanVolumeMaLength)
+volumeSpikePrice = volume[0] + (meanVolume * i_volumeSpikeMultiplier)
+volumeSpiked = (volume[0] >= volumeSpikePrice[1])
+
+if volumeSpiked or volumeSpiked[1]
+    volumeSpikeCondition := true
+
 // Final logic
 bool longCondition1 = volumeZoneLong
 bool longCondition2 = priceZoneLong
@@ -478,8 +494,12 @@ if shortCondition5Found
 bool longCondition = na
 bool shortCondition = na
 
-longCondition := (longConditions >= i_subStrategiesMinimum)
-shortCondition := (shortConditions >= i_subStrategiesMinimum)
+if i_enableVolumeSpikeCondition
+    longCondition := (longConditions >= i_subStrategiesMinimum) and volumeSpikeCondition
+    shortCondition := (shortConditions >= i_subStrategiesMinimum) and volumeSpikeCondition
+else
+    longCondition := (longConditions >= i_subStrategiesMinimum)
+    shortCondition := (shortConditions >= i_subStrategiesMinimum)
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
