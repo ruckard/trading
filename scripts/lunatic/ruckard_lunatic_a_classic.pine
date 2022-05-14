@@ -6,7 +6,7 @@
 // Current version: v20220515 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
+// Try to go long depending on a MA of 6 periods with a 4 period smoothness.
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at LUNABUSD pair and 30m timeframe.
