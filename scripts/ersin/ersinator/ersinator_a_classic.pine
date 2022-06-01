@@ -212,6 +212,11 @@ i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossT
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+
+i_mainMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
+i_mainMaLength = input.int(13, minval = 1,  title = '(STRAT) Main MA Length [13]')
+i_mainMaSource = input.source(close, title = '(STRAT) Main MA Source [close]')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -355,6 +360,11 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
     else
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
+
+// MA - Functions - BEGIN
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : _maType == "WMA" ? ta.wma(_maSource, _maLength) : _maType == "HMA" ? ta.hma(_maSource, _maLength) : _maSource
+// MA - Functions - END
 
 // FUNCTIONS - END
 
