@@ -399,6 +399,15 @@ longCondition = mainMaLong and kdjLong
 shortCondition = mainMaShort and kdjShort
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+plot(kdjpK, color=color.orange)
+plot(kdjpD, color=color.lime)
+plot(kdjpJ, color=color.fuchsia)
+
+kdjGreenBGColor = color.new(color.green, transp=70)
+kdjRedBGColor = color.new(color.red, transp=70)
+
+bgcolor(kdjpJ > kdjpD ? kdjGreenBGColor : kdjRedBGColor)
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
