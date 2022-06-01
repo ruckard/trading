@@ -217,6 +217,9 @@ i_mainMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RM
 i_mainMaLength = input.int(13, minval = 1,  title = '(STRAT) Main MA Length [13]')
 i_mainMaSource = input.source(close, title = '(STRAT) Main MA Source [close]')
 
+i_kdjLength = input.int(9, '(STRAT) KDJ Length {9}', minval=1, step=1, maxval=125)
+i_kdjSignal = input.int(3, '(STRAT) KDJ Signal {3}', minval=1, step=1, maxval=125)
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -373,8 +376,18 @@ f_Ma (_maType, _maSource, _maLength) =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+
+kdjM=1
+kdjSource = close
+kdjHighest = ta.highest(high, i_kdjLength)
+kdjLowest = ta.lowest(low,i_kdjLength)
+kdjRSV = 100*((kdjSource-kdjLowest)/(kdjHighest-kdjLowest))
+kdjpK=0.0
+kdjpD=0.0
+kdjpK:=(kdjM*kdjRSV+(i_kdjSignal-kdjM)*nz(kdjpK[1]))/i_kdjSignal
+kdjpD:= (kdjM*kdjpK+(i_kdjSignal-kdjM)*nz(kdjpD[1]))/i_kdjSignal
+kdjpJ = 3 * kdjpK-2 * kdjpD
+
 longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
 shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
