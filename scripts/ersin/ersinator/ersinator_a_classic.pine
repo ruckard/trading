@@ -399,6 +399,8 @@ longCondition = mainMaLong and kdjLong
 shortCondition = mainMaShort and kdjShort
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+mainMaColor = kdjLong  ? color.lime : (not kdjLong) ? color.red : na
+plot(mainMa, title="Main EMA", style=plot.style_line, linewidth=3, color = mainMaColor)
 
 // Position price calculation - BEGIN
 float positionPrice = na
