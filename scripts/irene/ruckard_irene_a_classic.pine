@@ -216,8 +216,8 @@ i_diMinusLen = input.int(7, title='(ADX) DI- Length {7}')
 i_diPlusSmooth = input.int(4, title='(ADX) DI+ Smooth {4}')
 i_diMinusSmooth = input.int(4, title='(ADX) DI- Smooth {4}')
 i_adxKeyLevel = input.float(29.0, title='(ADX) key level {29.0}')
-i_diPlusKeyLevel = input.float(26.0, title='(ADX) DI+ key level {26.0}')
-i_diMinusKeyLevel = input.float(24.0, title='(ADX) DI- key level {24.0}')
+i_diPlusKeyLevel = input.float(19.0, title='(ADX) DI+ key level {19.0}')
+i_diMinusKeyLevel = input.float(18.0, title='(ADX) DI- key level {18.0}')
 i_adxRangeKeyLevel = input.float(17.0, title='(ADX) Range key level {17}')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
@@ -475,8 +475,8 @@ else
 mainMa = f_Ma (i_mainMaType, i_mainMaSource, i_mainMaLength)
 
 bool mainMaBool = mainMa >= mainMa[i_mainMaSmooth]  ? true: mainMa < mainMa[i_mainMaSmooth] ? false : na
-bool mainMaLong = (mainMaBool[1] == false) and (mainMaBool[0] == true)
-bool mainMaShort = (mainMaBool[1] == true) and (mainMaBool[0] == false)
+bool mainMaLong = (mainMaBool[0] == true)
+bool mainMaShort = (mainMaBool[0] == false)
 
 // Volatility substrategy
 
