@@ -254,6 +254,8 @@ i_atrVolatilityMultiplier = input.float(2.00, title='(STRAT) ATR Volatility Mult
 
 i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
 
+i_enableADXBasedProtection = input.bool(false, title='(STRAT) Enable ADX Based Protection? {False}')
+
 i_enableLongEdgeProtection = input.bool(true, '(STRAT) Enable Long Edge Protection? {True}')
 i_longEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Long Edge Length [100]')
 i_longEdgeSource = input.source(high, title = '(STRAT) Long Edge Source [high]')
@@ -462,8 +464,12 @@ adx_down = adx_diMinus_down
 trendRibbonLongCondition = false
 trendRibbonShortCondition = false
 
-trendRibbonLongCondition := (adx_up >= i_diPlusKeyLevel)
-trendRibbonShortCondition := (adx_down >= i_diMinusKeyLevel)
+if i_enableADXBasedProtection
+    trendRibbonLongCondition := adx_up >= i_diPlusKeyLevel
+    trendRibbonShortCondition := adx_down >= i_diMinusKeyLevel
+else
+    trendRibbonLongCondition := true
+    trendRibbonShortCondition := true
 
 // mainMa substrategy
 mainMa = f_Ma (i_mainMaType, i_mainMaSource, i_mainMaLength)
