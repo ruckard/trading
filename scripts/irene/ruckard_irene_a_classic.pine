@@ -245,6 +245,7 @@ i_mainMaSmooth = input.int(4, minval = 1,  title = '(STRAT) Main MA Smooth [4]')
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+i_closedTooSoonLookback = input.int(3, title='(STRAT) Closed Too Soon Lookback [3]')
 
 i_enableVolatilityProtection = input.bool(false, '(STRAT) Enable Volatility Protection? {False}')
 
@@ -350,6 +351,21 @@ if (strategy.position_size > 0.0)
 if (strategy.position_size < 0.0)
     insideABuyOrder := false
     insideASellOrder := true
+
+buyOrderJustClosed = ((insideABuyOrder[1]) and (not insideABuyOrder))
+sellOrderJustClosed = ((insideASellOrder[1]) and (not insideASellOrder))
+
+buyOrdersClosedTooSoon = false
+for i = (i_closedTooSoonLookback - 1) to 0
+    if buyOrderJustClosed[i]
+        buyOrdersClosedTooSoon := true
+        break
+
+sellOrdersClosedTooSoon = false
+for i = (i_closedTooSoonLookback - 1) to 0
+    if sellOrderJustClosed[i]
+        sellOrdersClosedTooSoon := true
+        break
 
 // Zignaly
 exchangeTickerID = syminfo.ticker
@@ -665,7 +681,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or (ta.crossunder(adx_up, i_diPlusKeyLevel)) or mainMaShort
+LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or (ta.crossunder(adx_up, i_diPlusKeyLevel)) or mainMaShort or buyOrdersClosedTooSoon
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -674,7 +690,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or (ta.crossunder(adx_down, i_diMinusKeyLevel)) or mainMaLong
+SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or (ta.crossunder(adx_down, i_diMinusKeyLevel)) or mainMaLong or sellOrdersClosedTooSoon
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
