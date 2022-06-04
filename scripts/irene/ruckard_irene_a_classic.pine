@@ -239,9 +239,9 @@ i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Sour
 i_atrStopLossMultiplier = input.float(1.50, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.50}', minval=0.01)
 
 i_mainMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
-i_mainMaLength = input.int(6, minval = 1,  title = '(STRAT) Main MA Length [6]')
+i_mainMaLength = input.int(7, minval = 1,  title = '(STRAT) Main MA Length [7]')
 i_mainMaSource = input.source(close, title = '(STRAT) Main MA Source [close]')
-i_mainMaSmooth = input.int(2, minval = 1,  title = '(STRAT) Main MA Smooth [2]')
+i_mainMaSmooth = input.int(4, minval = 1,  title = '(STRAT) Main MA Smooth [4]')
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
@@ -254,7 +254,7 @@ i_atrVolatilityMultiplier = input.float(2.00, title='(STRAT) ATR Volatility Mult
 
 i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
 
-i_enableADXBasedProtection = input.bool(false, title='(STRAT) Enable ADX Based Protection? {False}')
+i_enableADXBasedProtection = input.bool(true, title='(STRAT) Enable ADX Based Protection? {True}')
 
 i_enableLongEdgeProtection = input.bool(false, '(STRAT) Enable Long Edge Protection? {False}')
 i_longEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Long Edge Length [100]')
