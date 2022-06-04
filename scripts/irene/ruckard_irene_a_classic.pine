@@ -216,8 +216,8 @@ i_diMinusLen = input.int(7, title='(ADX) DI- Length {7}')
 i_diPlusSmooth = input.int(4, title='(ADX) DI+ Smooth {4}')
 i_diMinusSmooth = input.int(4, title='(ADX) DI- Smooth {4}')
 i_adxKeyLevel = input.float(29.0, title='(ADX) key level {29.0}')
-i_diPlusKeyLevel = input.float(19.0, title='(ADX) DI+ key level {19.0}')
-i_diMinusKeyLevel = input.float(18.0, title='(ADX) DI- key level {18.0}')
+i_diPlusKeyLevel = input.float(32.0, title='(ADX) DI+ key level {32.0}')
+i_diMinusKeyLevel = input.float(26.0, title='(ADX) DI- key level {26.0}')
 i_adxRangeKeyLevel = input.float(17.0, title='(ADX) Range key level {17}')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
@@ -245,7 +245,7 @@ i_mainMaSmooth = input.int(4, minval = 1,  title = '(STRAT) Main MA Smooth [4]')
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
-i_closedTooSoonLookback = input.int(3, title='(STRAT) Closed Too Soon Lookback [3]')
+i_closedTooSoonLookback = input.int(17, title='(STRAT) Closed Too Soon Lookback [17]')
 
 i_enableVolatilityProtection = input.bool(false, '(STRAT) Enable Volatility Protection? {False}')
 
