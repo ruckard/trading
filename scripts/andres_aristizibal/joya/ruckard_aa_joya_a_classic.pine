@@ -432,7 +432,7 @@ supertrendShort = supertrendBuy1[1] < supertrendSell1[1]
 
 // Final logic
 bool longCondition1 = trendLong
-bool longCondition2 = false
+bool longCondition2 = supertrendLong
 bool longCondition3 = false
 bool longCondition4 = false
 bool longCondition5 = false
@@ -444,7 +444,7 @@ bool longCondition4Found = false
 bool longCondition5Found = false
 
 bool shortCondition1 = trendShort
-bool shortCondition2 = false
+bool shortCondition2 = supertrendShort
 bool shortCondition3 = false
 bool shortCondition4 = false
 bool shortCondition5 = false
