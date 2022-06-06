@@ -212,6 +212,10 @@ i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossT
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+
+i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
+i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -368,10 +372,84 @@ f_Ma (_maType, _maSource, _maLength) =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
-longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+
+// Final logic
+bool longCondition1 = false
+bool longCondition2 = false
+bool longCondition3 = false
+bool longCondition4 = false
+bool longCondition5 = false
+
+bool longCondition1Found = false
+bool longCondition2Found = false
+bool longCondition3Found = false
+bool longCondition4Found = false
+bool longCondition5Found = false
+
+bool shortCondition1 = false
+bool shortCondition2 = false
+bool shortCondition3 = false
+bool shortCondition4 = false
+bool shortCondition5 = false
+
+bool shortCondition1Found = false
+bool shortCondition2Found = false
+bool shortCondition3Found = false
+bool shortCondition4Found = false
+bool shortCondition5Found = false
+
+
+longConditions = 0
+shortConditions = 0
+for i = (i_subStrategiesLookback - 1) to 0
+    if longCondition1[i]
+        longCondition1Found := true
+    if longCondition2[i]
+        longCondition2Found := true
+    if longCondition3[i]
+        longCondition3Found := true
+    if longCondition4[i]
+        longCondition4Found := true
+    if longCondition5[i]
+        longCondition5Found := true
+    if shortCondition1[i]
+        shortCondition1Found := true
+    if shortCondition2[i]
+        shortCondition2Found := true
+    if shortCondition3[i]
+        shortCondition3Found := true
+    if shortCondition4[i]
+        shortCondition4Found := true
+    if shortCondition5[i]
+        shortCondition5Found := true
+
+if longCondition1Found
+    longConditions := longConditions + 1
+if longCondition2Found
+    longConditions := longConditions + 1
+if longCondition3Found
+    longConditions := longConditions + 1
+if longCondition4Found
+    longConditions := longConditions + 1
+if longCondition5Found
+    longConditions := longConditions + 1
+if shortCondition1Found
+    shortConditions := shortConditions + 1
+if shortCondition2Found
+    shortConditions := shortConditions + 1
+if shortCondition3Found
+    shortConditions := shortConditions + 1
+if shortCondition4Found
+    shortConditions := shortConditions + 1
+if shortCondition5Found
+    shortConditions := shortConditions + 1
+
+bool longCondition = na
+bool shortCondition = na
+
+longCondition := (longConditions >= i_subStrategiesMinimum)
+shortCondition := (shortConditions >= i_subStrategiesMinimum)
+
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
