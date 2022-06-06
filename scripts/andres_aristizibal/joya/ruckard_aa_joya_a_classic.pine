@@ -221,6 +221,12 @@ i_trendMaType = input.string(title="(Trend) MA Type", defval="VWMA", options=["E
 i_trendMaPeriod = input.int(title="(Trend) MA Period (Length)", defval=52, minval=1)
 i_trendMaPeriodSmoothing = input.int(title="(Trend) MA Period smoothing (Length)", defval=10, minval=1)
 
+// Supertrend Indicator ( KivancOzbilgic ) - Inputs
+i_supertrendATRLength = input.int(title="(Supertrend) ATR Period", defval=9, minval=1)
+i_supertrendSource = input(hl2, title="(Supertrend) Source")
+i_supertrendATRMultiplier = input.float(title="(Supertrend) ATR Multiplier", step=0.1, defval=3.9)
+i_supertrendChangeATR= input.bool(title="(Supertrend) Change ATR Calculation Method ?", defval=true)
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -398,6 +404,31 @@ trendHALowMaSmooth = f_Ma(i_trendMaType, trendHALowMa, i_trendMaPeriodSmoothing)
 
 trendLong = trendHACloseMaSmooth >= trendHAOpenMaSmooth
 trendShort = trendHACloseMaSmooth < trendHAOpenMaSmooth
+
+// Supertrend Indicator ( KivancOzbilgic ) substrategy
+
+supertrendAlternativeATR = ta.sma(ta.tr, i_supertrendATRLength)
+supertrendDefaultATR = ta.atr(i_supertrendATRLength)
+supertrendATR = i_supertrendChangeATR ? supertrendDefaultATR : supertrendAlternativeATR
+supertrendUp = i_supertrendSource-(i_supertrendATRMultiplier * supertrendATR)
+supertrendUp1 = nz(supertrendUp[1],supertrendUp)
+supertrendUp := close[1] > supertrendUp1 ? math.max(supertrendUp,supertrendUp1) : supertrendUp
+supertrendDown = i_supertrendSource + (i_supertrendATRMultiplier * supertrendATR)
+supertrendDown1 = nz(supertrendDown[1], supertrendDown)
+supertrendDown := close[1] < supertrendDown1 ? math.min(supertrendDown, supertrendDown1) : supertrendDown
+supertrendTrend = 1
+supertrendTrend := nz(supertrendTrend[1], supertrendTrend)
+supertrendTrend := supertrendTrend == -1 and close > supertrendDown1 ? 1 : supertrendTrend == 1 and close < supertrendUp1 ? -1 : supertrendTrend
+
+supertrendBuySignal = supertrendTrend == 1 and supertrendTrend[1] == -1
+supertrendSellSignal = supertrendTrend == -1 and supertrendTrend[1] == 1
+
+supertrendBuy1 = ta.barssince(supertrendBuySignal)
+supertrendSell1 = ta.barssince(supertrendSellSignal)
+supertrendColor1 = supertrendBuy1[1] < supertrendSell1[1] ? color.green : supertrendBuy1[1] > supertrendSell1[1] ? color.red : na
+
+supertrendLong = supertrendBuy1[1] > supertrendSell1[1]
+supertrendShort = supertrendBuy1[1] < supertrendSell1[1]
 
 // Final logic
 bool longCondition1 = trendLong
