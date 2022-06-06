@@ -216,6 +216,11 @@ i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multi
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(3, title='(STRAT) Substrategies minimum [3]')
 
+// Trend Indicator A-V2 ( Dziwne) - Inputs
+i_trendMaType = input.string(title="(Trend) MA Type", defval="VWMA", options=["EMA", "SMA", "SWMA", "VWMA", "WMA"])
+i_trendMaPeriod = input.int(title="(Trend) MA Period (Length)", defval=52, minval=1)
+i_trendMaPeriodSmoothing = input.int(title="(Trend) MA Period smoothing (Length)", defval=10, minval=1)
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -372,6 +377,27 @@ f_Ma (_maType, _maSource, _maLength) =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
+
+// Trend Indicator A-V2 ( Dziwne) substrategy
+
+trendOpenMa = f_Ma(i_trendMaType, open, i_trendMaPeriod)
+trendCloseMa = f_Ma(i_trendMaType, close, i_trendMaPeriod)
+trendHighMa = f_Ma(i_trendMaType, high, i_trendMaPeriod)
+trendLowMa = f_Ma(i_trendMaType, low, i_trendMaPeriod)
+
+trendHeikinAshiTicker = ticker.heikinashi(syminfo.tickerid)
+trendHAOpenMa = request.security(trendHeikinAshiTicker, timeframe.period, trendOpenMa)
+trendHACloseMa = request.security(trendHeikinAshiTicker, timeframe.period, trendCloseMa)
+trendHAHighMa = request.security(trendHeikinAshiTicker, timeframe.period, trendHighMa)
+trendHALowMa = request.security(trendHeikinAshiTicker, timeframe.period, trendLowMa)
+
+trendHAOpenMaSmooth = f_Ma(i_trendMaType, trendHAOpenMa, i_trendMaPeriodSmoothing)
+trendHACloseMaSmooth = f_Ma(i_trendMaType, trendHACloseMa, i_trendMaPeriodSmoothing)
+trendHAHighMaSmooth = f_Ma(i_trendMaType, trendHAHighMa, i_trendMaPeriodSmoothing)
+trendHALowMaSmooth = f_Ma(i_trendMaType, trendHALowMa, i_trendMaPeriodSmoothing)
+
+trendLong = trendHACloseMaSmooth >= trendHAOpenMaSmooth
+trendShort = trendHACloseMaSmooth < trendHAOpenMaSmooth
 
 // Final logic
 bool longCondition1 = false
