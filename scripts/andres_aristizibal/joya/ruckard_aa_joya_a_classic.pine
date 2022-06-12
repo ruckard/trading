@@ -213,7 +213,7 @@ i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Lo
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
 
-i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
+i_subStrategiesLookback = input.int(5, title='(STRAT) Substrategies Lookback [5]')
 i_subStrategiesMinimum = input.int(3, title='(STRAT) Substrategies minimum [3]')
 
 // Trend Indicator A-V2 ( Dziwne) - Inputs
