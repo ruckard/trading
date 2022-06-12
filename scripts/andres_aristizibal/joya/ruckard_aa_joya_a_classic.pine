@@ -197,7 +197,7 @@ i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {Fa
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
-i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
+i_enableStopLoss = input.bool(false, '(STOPTAKE) Stop Loss? {False}')
 i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
