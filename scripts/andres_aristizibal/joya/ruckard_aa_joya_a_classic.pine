@@ -450,11 +450,8 @@ supertrendTrend := supertrendTrend == -1 and close > supertrendDown1 ? 1 : super
 supertrendBuySignal = supertrendTrend == 1 and supertrendTrend[1] == -1
 supertrendSellSignal = supertrendTrend == -1 and supertrendTrend[1] == 1
 
-supertrendBuy1 = ta.barssince(supertrendBuySignal)
-supertrendSell1 = ta.barssince(supertrendSellSignal)
-
-supertrendLong = supertrendBuy1[1] > supertrendSell1[1]
-supertrendShort = supertrendBuy1[1] < supertrendSell1[1]
+supertrendLong = supertrendBuySignal
+supertrendShort = supertrendSellSignal
 
 // QQE MOD substrategy
 
