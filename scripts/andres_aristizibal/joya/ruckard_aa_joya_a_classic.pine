@@ -221,6 +221,14 @@ i_trendMaType = input.string(title="(Trend) MA Type", defval="VWMA", options=["E
 i_trendMaPeriod = input.int(title="(Trend) MA Period (Length)", defval=52, minval=1)
 i_trendMaPeriodSmoothing = input.int(title="(Trend) MA Period smoothing (Length)", defval=10, minval=1)
 
+i_trendPositiveColor = input.color(title="(Trend) Positive color (Bullish)", defval=color.new(#26A69A, 50) )
+i_trendNegativeColor = input.color(title="(Trend) Negative color (Bearish)", defval=color.new(#EF5350, 50) )
+i_trendHighAndLowColor = input.color(title="(Trend) High & Low cloud color", defval=color.new(#808080, 80) )
+
+i_trendShowLines = input.bool(title="(Trend) Show (lines)", defval=false)
+i_trendShowHighLowCloud = input.bool(title="(Trend) Show (High & Low cloud)", defval=true)
+i_trendShowOpenCloseCloud = input.bool(title="(Trend) Show (Open & Close cloud)", defval=true)
+
 // Supertrend Indicator ( KivancOzbilgic ) - Inputs
 i_supertrendATRLength = input.int(title="(Supertrend) ATR Period", defval=9, minval=1)
 i_supertrendSource = input(hl2, title="(Supertrend) Source")
@@ -557,6 +565,19 @@ longCondition := (longConditions >= i_subStrategiesMinimum)
 shortCondition := (shortConditions >= i_subStrategiesMinimum)
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
+
+trendIsTrending = trendHACloseMaSmooth >= trendHAOpenMaSmooth
+trendColor = trendIsTrending ? i_trendPositiveColor : i_trendNegativeColor
+trendShowPositiveLineColor = i_trendShowLines ? i_trendPositiveColor : na
+trendShowNegativeLineColor = i_trendShowLines ? i_trendNegativeColor : na
+trendShowHighLowCloudColor = i_trendShowHighLowCloud ? i_trendHighAndLowColor : na
+trendShowOpenCloseCloudColor = i_trendShowOpenCloseCloud ? trendColor : na
+trendOpenLine = plot(trendHAOpenMaSmooth, color=trendShowPositiveLineColor, title="(Trend) Open line")
+trendCloseLine = plot(trendHACloseMaSmooth, color=trendShowNegativeLineColor, title="(Trend) Close line")
+trendHighLine = plot(trendHAHighMaSmooth, color=trendShowPositiveLineColor, title="(Trend) High line")
+trendLowLine = plot(trendHALowMaSmooth, color=trendShowNegativeLineColor, title="(Trend) Low line")
+fill(trendOpenLine, trendCloseLine, color=trendShowOpenCloseCloudColor, title="(Trend) Open & Close Trendcloud")
+fill(trendHighLine, trendLowLine, color=trendShowHighLowCloudColor, title="(Trend) High & Low Trendcloud")
 
 
 // Position price calculation - BEGIN
