@@ -9,7 +9,7 @@
 // This strategy uses Trend Indicator A-V2, Supertrend and QQE Mod at the same time for choosing go long or short.
 // This specific strategy also includes Risk Management.
 // 
-// It was originally tested at BTCUSDT pair and 1H timeframe.
+// It was originally tested at APEUSDT pair and 30m timeframe.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
