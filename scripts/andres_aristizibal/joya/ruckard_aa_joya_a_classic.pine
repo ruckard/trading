@@ -236,8 +236,6 @@ i_supertrendATRMultiplier = input.float(title="(Supertrend) ATR Multiplier", ste
 i_supertrendChangeATR= input.bool(title="(Supertrend) Change ATR Calculation Method ?", defval=true)
 
 i_supertrendShowSignals = input.bool(title="(Supertrend) Show Buy/Sell Signals ?", defval=false)
-i_supertrendShowHighlighting = input.bool(title="(Supertrend) Show Highlighter ?", defval=true)
-i_supertrendShowBarColoring = input.bool(title="(Supertrend) Show Bar Coloring ?", defval=true)
 
 // QQE MOD - Inputs
 qqemodRSILength1 = input.int(6, title='(QQEMOD) RSI Length 1')
@@ -579,19 +577,13 @@ trendLowLine = plot(trendHALowMaSmooth, color=trendShowNegativeLineColor, title=
 fill(trendOpenLine, trendCloseLine, color=trendShowOpenCloseCloudColor, title="(Trend) Open & Close Trendcloud")
 fill(trendHighLine, trendLowLine, color=trendShowHighLowCloudColor, title="(Trend) High & Low Trendcloud")
 
-supertrendColor1 = supertrendShort ? color.green : supertrendLong ? color.red : na
-barcolor(i_supertrendShowBarColoring ? supertrendColor1 : na)
-supertrendLongFillColor = i_supertrendShowHighlighting ? (supertrendTrend == 1 ? color.green : color.white) : color.white
-supertrendShortFillColor = i_supertrendShowHighlighting ? (supertrendTrend == -1 ? color.red : color.white) : color.white
 supertrendMPlot = plot(ohlc4, title="", style=plot.style_circles, linewidth=0)
 plotshape(supertrendBuySignal ? supertrendUp : na, title="UpTrend Begins", location=location.absolute, style=shape.circle, size=size.tiny, color=color.new(color.green, transp=0))
 plotshape(supertrendBuySignal and i_supertrendShowSignals ? supertrendUp : na, title="Buy", text="Buy", location=location.absolute, style=shape.labelup, size=size.tiny, color=color.new(color.green, transp=0), textcolor=color.white)
 supertrendUpPlot = plot(supertrendTrend == 1 ? supertrendUp : na, title="Up Trend", style=plot.style_linebr, linewidth=2, color=color.green)
-fill(supertrendMPlot, supertrendUpPlot, title="UpTrend Highligter", color=supertrendLongFillColor)
 plotshape(supertrendSellSignal ? supertrendDown : na, title="DownTrend Begins", location=location.absolute, style=shape.circle, size=size.tiny, color=color.new(color.red, transp=0))
 plotshape(supertrendSellSignal and i_supertrendShowSignals ? supertrendDown : na, title="Sell", text="Sell", location=location.absolute, style=shape.labeldown, size=size.tiny, color=color.new(color.red, transp=0), textcolor=color.white)
 supertrendDownPlot = plot(supertrendTrend == 1 ? na : supertrendDown, title="Down Trend", style=plot.style_linebr, linewidth=2, color=color.red)
-fill(supertrendMPlot, supertrendDownPlot, title="DownTrend Highligter", color=supertrendShortFillColor)
 
 plotshape(qqemodLong, title="QQE Up", style=shape.arrowup, color=color.new(#00c3ff, transp=0), location=location.bottom)
 plotshape(qqemodShort, title="QQE Down", style=shape.arrowdown, color=color.new(#ff0062, transp=0), location=location.bottom)
