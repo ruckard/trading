@@ -259,12 +259,12 @@ i_atrVolatilityMultiplier = input.float(2.00, title='(STRAT) ATR Volatility Mult
 
 i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
 
-i_enableLongEdgeProtection = input.bool(true, '(STRAT) Enable Long Edge Protection? {True}')
+i_enableLongEdgeProtection = input.bool(false, '(STRAT) Enable Long Edge Protection? {False}')
 i_longEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Long Edge Length [100]')
 i_longEdgeSource = input.source(high, title = '(STRAT) Long Edge Source [high]')
 i_longEdgeMinimumDistance = input.float(3.50, title='(STRAT) Long Edge Minimum Distance % {3.50}', minval=0.01)
 
-i_enableShortEdgeProtection = input.bool(true, '(STRAT) Enable Short Edge Protection? {True}')
+i_enableShortEdgeProtection = input.bool(false, '(STRAT) Enable Short Edge Protection? {False}')
 i_shortEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Short Edge Length [100]')
 i_shortEdgeSource = input.source(low, title = '(STRAT) Short Edge Source [low]')
 i_shortEdgeMinimumDistance = input.float(3.50, title='(STRAT) Short Edge Minimum Distance % {3.50}', minval=0.01)
