@@ -10,7 +10,7 @@
 // we also make sure that there is strength thanks to DI+ and DI-.
 // This specific strategy also includes Risk Management.
 // 
-// It was originally tested at APEUSDT pair and 30m timeframe.
+// It was originally tested at BTCUSDT pair and 30m timeframe.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
