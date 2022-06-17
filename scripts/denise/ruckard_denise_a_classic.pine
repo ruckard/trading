@@ -631,6 +631,11 @@ else
     else
         shortCondition := (shortConditions >= i_subStrategiesMinimum) and trendRibbonShortCondition
 
+// Let's go long only when the main tendency is upwards (ohlc4 > EMA200)
+// Let's go down only when the main tendency is downwards (ohlc4 >= EMA200)
+longCondition := longCondition and sideMaLong
+shortCondition := shortCondition and sideMaShort
+
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
