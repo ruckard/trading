@@ -173,7 +173,7 @@
 
 // Tradingview Public description - END
 
-strategy('Ruckard Eve bA002', shorttitle='bA002REve', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Ruckard Eve bA002', shorttitle='bA002REve', overlay=false, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/ZignalyBeta/14 as zig
@@ -667,28 +667,11 @@ shortCondition := shortCondition and sideMaShort
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
-mainMaColor = mainMaBool  ? color.lime : (not mainMaBool) ? color.red : na
-plot(mainMa, title="Main EMA", style=plot.style_line, linewidth=3, color = mainMaColor)
+plot(adx_up_vol, color=color.green, title="+DI Vol")
+plot(adx_down_vol, color=color.red, title="-DI Vol")
 
-t3PositiveColor = color.green
-t3NegativeColor = color.red
-t3NeutralColor = color.yellow
-t3Color = (t3Price > t3Price[1]) ? t3PositiveColor : (t3Price < t3Price[1]) ? t3NegativeColor : t3NeutralColor
-plot(t3Price, color=t3Color, linewidth=3, title="T3")
-
-// TrendRibbon - Plot - BEGIN
-highestClosingLowestColor = i_showRibbon ? color.yellow : na
-highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = "Upper Closing line")
-lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
-// TrendRibbon - Plot - END
-
-atrVolatilityColor = i_showAtrVolatilityMultiplier ? color.maroon : na
-atrLongVolatilityPricePlot = plot(atrLongVolatilityPrice, color = atrVolatilityColor, title = "Long Volatility Price")
-atrShortVolatilityPricePlot = plot(atrShortVolatilityPrice, color = atrVolatilityColor, title = "Short Volatility Price")
-
-edgeColor = i_showEdges ? color.purple : na
-edgeLongPricePlot = plot(edgeLongMaximumPrice, color = edgeColor, style=plot.style_stepline, title = "Long Edge Price")
-edgeShortPricePlot = plot(edgeShortMinimumPrice, color = edgeColor, style=plot.style_stepline, title = "Short Edge Price")
+plot(i_diPlusKeyLevel, color=color.green, title="+DI KeyLevel")
+plot(i_diMinusKeyLevel, color=color.red, title="-DI KeyLevel")
 
 // Position price calculation - BEGIN
 float positionPrice = na
