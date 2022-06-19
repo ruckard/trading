@@ -422,6 +422,22 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
 
 // ADX - Functions - BEGIN
 
+taTrVol() =>
+    float floatNa = na
+    // Assume handle_na is false because we want ta.tr not ta.atr
+    if na(close[1])
+        floatNa
+    else
+        math.max((high*volume) - (low*volume), math.abs((high*volume) - (close[1]*volume[1])), math.abs((low*volume) - (close[1]*volume[1])))
+
+dirMovVol(_len) =>
+    up = ta.change(high*volume)
+    down = -ta.change(low*volume)
+    truerange = ta.rma(taTrVol(), _len)
+    plus = fixnan(100 * ta.rma(up > down and up > 0 ? up : 0, _len) / truerange)
+    minus = fixnan(100 * ta.rma(down > up and down > 0 ? down : 0, _len) / truerange)
+    [plus, minus]
+
 dirmov(_len) =>
     up = ta.change(high)
     down = -ta.change(low)
@@ -474,11 +490,23 @@ adx_diMinus_down = ta.rma (tmp_adx_diMinus_down, i_diMinusSmooth)
 adx_up = adx_diPlus_up
 adx_down = adx_diMinus_down
 
+[tmp_adx_diPlus_up_vol, tmp_adx_diPlus_down_vol] = dirMovVol(i_diPlusLen)
+[tmp_adx_diMinus_up_vol, tmp_adx_diMinus_down_vol] = dirMovVol(i_diMinusLen)
+
+adx_diPlus_up_vol = ta.rma (tmp_adx_diPlus_up_vol, i_diPlusSmooth)
+adx_diMinus_down_vol = ta.rma (tmp_adx_diMinus_down_vol, i_diMinusSmooth)
+
+adx_up_vol = adx_diPlus_up_vol
+adx_down_vol = adx_diMinus_down_vol
+
 trendRibbonLongCondition = false
 trendRibbonShortCondition = false
 
-trendRibbonLongCondition := (adx_up >= i_diPlusKeyLevel)
-trendRibbonShortCondition := (adx_down >= i_diMinusKeyLevel)
+// trendRibbonLongCondition := (adx_up >= i_diPlusKeyLevel)
+// trendRibbonShortCondition := (adx_down >= i_diMinusKeyLevel)
+
+trendRibbonLongCondition := (adx_up_vol >= i_diPlusKeyLevel)
+trendRibbonShortCondition := (adx_down_vol >= i_diMinusKeyLevel)
 
 // mainMa substrategy
 mainMa = f_Ma (i_mainMaType, i_mainMaSource, i_mainMaLength)
