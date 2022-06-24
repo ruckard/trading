@@ -236,7 +236,7 @@ i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
-i_atrStopLossMultiplier = input.float(1.50, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.50}', minval=0.01)
+i_atrStopLossMultiplier = input.float(1.70, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.70}', minval=0.01)
 
 i_sideMaTimeframe = input.timeframe("240",title='(STRAT) Side MA Timeframe [1 day]')
 i_sideMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Side MA Type [EMA]')
