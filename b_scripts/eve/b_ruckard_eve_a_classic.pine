@@ -213,7 +213,7 @@ i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
 i_diLen = input.int(12, title='(ADX) DI Length {12}')
 i_diPlusLen = input.int(7, title='(ADX) DI+ Length {7}')
 i_diMinusLen = input.int(7, title='(ADX) DI- Length {7}')
-i_diPlusSmooth = input.int(4, title='(ADX) DI+ Smooth {4}')
+i_diPlusSmooth = input.int(3, title='(ADX) DI+ Smooth {3}')
 i_diMinusSmooth = input.int(4, title='(ADX) DI- Smooth {4}')
 i_adxKeyLevel = input.float(29.0, title='(ADX) key level {29.0}')
 i_diPlusKeyLevel = input.float(17.0, title='(ADX) DI+ key level {17.0}')
@@ -253,7 +253,7 @@ i_t3Ema1Type = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RM
 i_t3Ema1Length = input.int(3, minval = 1,  title = '(STRAT) T3 MA1 Length [3]')
 i_t3Ema1Source = input.source(hlcc4, title = '(STRAT) T3 MA1 Source [hlcc4]')
 
-i_subStrategiesLookback = input.int(3, title='(STRAT) Substrategies Lookback [3]')
+i_subStrategiesLookback = input.int(4, title='(STRAT) Substrategies Lookback [4]')
 i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
 
 i_enableVolatilityProtection = input.bool(true, '(STRAT) Enable Volatility Protection? {True}')
