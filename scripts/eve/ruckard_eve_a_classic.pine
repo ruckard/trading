@@ -204,20 +204,20 @@ i_highestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Highest C
 i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
 i_lowClosingMaLength = input.int(5, minval = 1,  title = '(STRAT) Low Closing MA Length [5]')
 i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
-i_lowestClosingMaLength = input.int(12, minval = 1,  title = '(STRAT) Lowest Closing MA Length [12]')
+i_lowestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Lowest Closing MA Length [20]')
 
 i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
 i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
 
 i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
 i_diLen = input.int(12, title='(ADX) DI Length {12}')
-i_diPlusLen = input.int(8, title='(ADX) DI+ Length {8}')
-i_diMinusLen = input.int(8, title='(ADX) DI- Length {8}')
+i_diPlusLen = input.int(7, title='(ADX) DI+ Length {7}')
+i_diMinusLen = input.int(7, title='(ADX) DI- Length {7}')
 i_diPlusSmooth = input.int(4, title='(ADX) DI+ Smooth {4}')
-i_diMinusSmooth = input.int(2, title='(ADX) DI- Smooth {2}')
+i_diMinusSmooth = input.int(4, title='(ADX) DI- Smooth {4}')
 i_adxKeyLevel = input.float(29.0, title='(ADX) key level {29.0}')
-i_diPlusKeyLevel = input.float(20.0, title='(ADX) DI+ key level {20.0}')
-i_diMinusKeyLevel = input.float(48.0, title='(ADX) DI- key level {48.0}')
+i_diPlusKeyLevel = input.float(18.0, title='(ADX) DI+ key level {18.0}')
+i_diMinusKeyLevel = input.float(25.0, title='(ADX) DI- key level {25.0}')
 i_adxRangeKeyLevel = input.float(17.0, title='(ADX) Range key level {17}')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
@@ -234,9 +234,9 @@ i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01)
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
-i_atrStopLossLength = input.int(10, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [10]')
-i_atrStopLossSource = input.source(ohlc4, title = '(STOPTAKE) ATR Stop Loss Source [ohlc4]')
-i_atrStopLossMultiplier = input.float(1.75, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.75}', minval=0.01)
+i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
+i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
+i_atrStopLossMultiplier = input.float(1.70, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.70}', minval=0.01)
 
 i_sideMaTimeframe = input.timeframe("240",title='(STRAT) Side MA Timeframe [1 day]')
 i_sideMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Side MA Type [EMA]')
@@ -260,16 +260,16 @@ i_enableVolatilityProtection = input.bool(true, '(STRAT) Enable Volatility Prote
 
 i_atrVolatilityLength = input.int(14, minval = 1,  title = '(STRAT) ATR Volatility Length [14]')
 i_atrVolatilitySource = input.source(close, title = '(STRAT) ATR Volatility Source [close]')
-i_atrVolatilityMultiplier = input.float(1.00, title='(STRAT) ATR Volatility Multiplier % {1.00}', minval=0.01)
+i_atrVolatilityMultiplier = input.float(2.00, title='(STRAT) ATR Volatility Multiplier % {2.00}', minval=0.01)
 
 i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
 
-i_enableLongEdgeProtection = input.bool(true, '(STRAT) Enable Long Edge Protection? {True}')
+i_enableLongEdgeProtection = input.bool(false, '(STRAT) Enable Long Edge Protection? {False}')
 i_longEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Long Edge Length [100]')
 i_longEdgeSource = input.source(high, title = '(STRAT) Long Edge Source [high]')
 i_longEdgeMinimumDistance = input.float(3.50, title='(STRAT) Long Edge Minimum Distance % {3.50}', minval=0.01)
 
-i_enableShortEdgeProtection = input.bool(true, '(STRAT) Enable Short Edge Protection? {True}')
+i_enableShortEdgeProtection = input.bool(false, '(STRAT) Enable Short Edge Protection? {False}')
 i_shortEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Short Edge Length [100]')
 i_shortEdgeSource = input.source(low, title = '(STRAT) Short Edge Source [low]')
 i_shortEdgeMinimumDistance = input.float(3.50, title='(STRAT) Short Edge Minimum Distance % {3.50}', minval=0.01)
@@ -428,11 +428,24 @@ taTrVol() =>
     if na(close[1])
         floatNa
     else
-        math.max((high*volume) - (low*volume), math.abs((high*volume) - (close[1]*volume[1])), math.abs((low*volume) - (close[1]*volume[1])))
+        // Old code non based on volume:
+        // math.max((high - low), math.abs(high - close[1]), math.abs(low - close[1]))
+        //
+        // New code based on volume:
+        // (high - low) * (math.abs((high - low))/(high - low)) * volume = (high - low) * volume
+        // math.abs(high - close[1]) * (math.abs(high - close[1])/(high - low)) * volume
+        // math.abs(low - close[1]) * (math.abs(low - close[1])/(high - low)) * volume
+
+        highMinusLowVol = (high - low) * volume
+        highMinusClose1Vol = math.abs(high - close[1]) * (math.abs(high - close[1])/(high - low)) * volume
+        lowMinusClose1Vol = math.abs(low - close[1]) * (math.abs(low - close[1])/(high - low)) * volume
+
+        math.max(highMinusLowVol, highMinusClose1Vol, lowMinusClose1Vol)
+
 
 dirMovVol(_len) =>
-    up = ta.change(high*volume)
-    down = -ta.change(low*volume)
+    up = ta.change(high) * (math.abs(ta.change(high))/(high - low)) * volume
+    down = -ta.change(low) * (math.abs(ta.change(low))/(high - low)) * volume
     truerange = ta.rma(taTrVol(), _len)
     plus = fixnan(100 * ta.rma(up > down and up > 0 ? up : 0, _len) / truerange)
     minus = fixnan(100 * ta.rma(down > up and down > 0 ? down : 0, _len) / truerange)
@@ -505,8 +518,8 @@ trendRibbonShortCondition = false
 // trendRibbonLongCondition := (adx_up >= i_diPlusKeyLevel)
 // trendRibbonShortCondition := (adx_down >= i_diMinusKeyLevel)
 
-trendRibbonLongCondition := (adx_up_vol >= i_diPlusKeyLevel)
-trendRibbonShortCondition := (adx_down_vol >= i_diMinusKeyLevel)
+trendRibbonLongCondition := ta.crossunder (adx_down_vol, i_diMinusKeyLevel)
+trendRibbonShortCondition := ta.crossunder (adx_up_vol, i_diPlusKeyLevel)
 
 // mainMa substrategy
 mainMa = f_Ma (i_mainMaType, i_mainMaSource, i_mainMaLength)
@@ -731,7 +744,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or (ta.crossunder(adx_up, i_diPlusKeyLevel))
+LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -740,7 +753,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or (ta.crossunder(adx_down, i_diMinusKeyLevel))
+SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
