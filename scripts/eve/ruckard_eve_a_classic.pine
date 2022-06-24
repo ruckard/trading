@@ -3,7 +3,7 @@
 
 //@version=5
 
-// Current version: v20220624 ( A004 )
+// Current version: v20220624 ( A005 )
 // Tradingview Public description - BEGIN
 // 
 // When some of the substrategies (based on fast paced MAs) show that long/short condition is ready
@@ -173,7 +173,7 @@
 
 // Tradingview Public description - END
 
-strategy('Ruckard Eve A004', shorttitle='A004REve', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Ruckard Eve A005', shorttitle='A005REve', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/ZignalyBeta/14 as zig
