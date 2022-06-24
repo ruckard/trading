@@ -240,7 +240,7 @@ i_atrStopLossMultiplier = input.float(1.70, title='(STOPTAKE) ATR Stop Loss Mult
 
 i_sideMaTimeframe = input.timeframe("120",title='(STRAT) Side MA Timeframe [2 hours]')
 i_sideMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Side MA Type [EMA]')
-i_sideMaLength = input.int(55, minval = 1,  title = '(STRAT) Side MA Length [55]')
+i_sideMaLength = input.int(75, minval = 1,  title = '(STRAT) Side MA Length [75]')
 i_sideMaSource = input.source(close, title = '(STRAT) Side MA Source [close]')
 
 i_mainMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Main MA Type [EMA]')
