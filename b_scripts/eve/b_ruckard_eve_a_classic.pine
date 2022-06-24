@@ -217,7 +217,7 @@ i_diPlusSmooth = input.int(3, title='(ADX) DI+ Smooth {3}')
 i_diMinusSmooth = input.int(4, title='(ADX) DI- Smooth {4}')
 i_adxKeyLevel = input.float(29.0, title='(ADX) key level {29.0}')
 i_diPlusKeyLevel = input.float(17.0, title='(ADX) DI+ key level {17.0}')
-i_diMinusKeyLevel = input.float(22.0, title='(ADX) DI- key level {22.0}')
+i_diMinusKeyLevel = input.float(13.0, title='(ADX) DI- key level {13.0}')
 i_adxRangeKeyLevel = input.float(17.0, title='(ADX) Range key level {17}')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
@@ -253,7 +253,7 @@ i_t3Ema1Type = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RM
 i_t3Ema1Length = input.int(3, minval = 1,  title = '(STRAT) T3 MA1 Length [3]')
 i_t3Ema1Source = input.source(hlcc4, title = '(STRAT) T3 MA1 Source [hlcc4]')
 
-i_subStrategiesLookback = input.int(4, title='(STRAT) Substrategies Lookback [4]')
+i_subStrategiesLookback = input.int(9, title='(STRAT) Substrategies Lookback [9]')
 i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
 
 i_enableVolatilityProtection = input.bool(true, '(STRAT) Enable Volatility Protection? {True}')
@@ -727,7 +727,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
+LONG_CLOSE := offStopTimeInterval or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -736,7 +736,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
+SHORT_CLOSE := offStopTimeInterval or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
