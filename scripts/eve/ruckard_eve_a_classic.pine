@@ -211,8 +211,8 @@ i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
 
 i_adxLen = input.int(14, title='(ADX) Smoothing {14}')
 i_diLen = input.int(12, title='(ADX) DI Length {12}')
-i_diPlusLen = input.int(7, title='(ADX) DI+ Length {7}')
-i_diMinusLen = input.int(7, title='(ADX) DI- Length {7}')
+i_diPlusLen = input.int(14, title='(ADX) DI+ Length {14}')
+i_diMinusLen = input.int(14, title='(ADX) DI- Length {14}')
 i_diPlusSmooth = input.int(3, title='(ADX) DI+ Smooth {3}')
 i_diMinusSmooth = input.int(4, title='(ADX) DI- Smooth {4}')
 i_adxKeyLevel = input.float(29.0, title='(ADX) key level {29.0}')
@@ -680,6 +680,9 @@ else
 // Let's go down only when the main tendency is downwards (ohlc4 >= EMA200)
 longCondition := longCondition and sideMaLong
 shortCondition := shortCondition and sideMaShort
+
+longCondition := longCondition and (adx_up > i_adxRangeKeyLevel)
+shortCondition := shortCondition and (adx_down > i_adxRangeKeyLevel)
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
