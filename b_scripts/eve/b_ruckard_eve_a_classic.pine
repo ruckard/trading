@@ -199,12 +199,12 @@ i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {Fa
 i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High Closing MA Type [SMA]')
 i_highClosingMaLength = input.int(5, minval = 1,  title = '(STRAT) High Closing MA Length [5]')
 i_highClosingMaSource = input.source(ohlc4, title = '(STRAT) High Closing MA Source [ohlc4]')
-i_highestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Highest Closing MA Length [20]')
+i_highestClosingMaLength = input.int(18, minval = 1,  title = '(STRAT) Highest Closing MA Length [18]')
 
 i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
 i_lowClosingMaLength = input.int(5, minval = 1,  title = '(STRAT) Low Closing MA Length [5]')
 i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
-i_lowestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Lowest Closing MA Length [20]')
+i_lowestClosingMaLength = input.int(15, minval = 1,  title = '(STRAT) Lowest Closing MA Length [15]')
 
 i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
 i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
