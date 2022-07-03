@@ -217,6 +217,11 @@ i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multi
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
+i_atrLength = input.int(14, minval = 1,  title = '(STRAT) ATR Length [14]')
+i_atrSource = input.source(close, title = '(STRAT) ATR Source [close]')
+i_atrMultiplier = input.float(1.5, title='(STRAT) ATR Multiplier % {1.5}', minval=0.01)
+i_priceSource = input.source(close, title = '(STRAT) Price Source [close]')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -368,6 +373,21 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
+
+// ATR Logic
+var bool atrLong = false
+var bool atrShort = false
+
+float atrLongPrice = i_atrSource - (ta.atr(i_atrLength) * i_atrMultiplier)
+float atrShortPrice = i_atrSource + (ta.atr(i_atrLength) * i_atrMultiplier)
+
+if (ta.crossunder(i_priceSource, atrLongPrice[1]))
+    atrLong := true
+    atrShort := false
+
+if (ta.crossover(i_priceSource, atrShortPrice[1]))
+    atrShort := true
+    atrLong := false
 
 // Final logic
 bool longCondition1 = false
