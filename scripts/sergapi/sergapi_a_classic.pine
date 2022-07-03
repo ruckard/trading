@@ -9,7 +9,7 @@
 // This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
 // This specific strategy also includes Risk Management.
 // 
-// It was originally tested at BTCUSDT pair and 1D timeframe.
+// It was originally tested at BTCUSDT pair and 1H timeframe.
 // The strategy is a slightly modified copy of default TradingView strategy that appears when you create a blank new strategy.
 // It decides to go long when 14-period SMA crosses over 28-period SMA and goes short when 14-period SMA crosses under 28-period SMA.
 //
