@@ -4,9 +4,9 @@
 library("ZignalyBeta", true)
 
 getZignalySeparators (string alertType='webhook') =>
-    var string zigsep = ','
-    var string zigquote = '"'
-    var string zigequals = '='
+    string zigsep = ','
+    string zigquote = '"'
+    string zigequals = '='
     if alertType == 'email'
         zigsep := '||'
         zigquote := ''
@@ -129,9 +129,9 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
 
     priceDecimalDigitsString = priceDecimalDigitsZeroString(priceDecimalDigits)
 
-    var string _zignaleStopLossCombo = ''
-    var string _zignaleTakeProfitCombo = ''
-    var string _zignaleTrailingTakeProfitCombo = ''
+    string _zignaleStopLossCombo = ''
+    string _zignaleTakeProfitCombo = ''
+    string _zignaleTrailingTakeProfitCombo = ''
     _zignalyLongCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'entry' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
@@ -154,7 +154,7 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
 
 
 
-    var string _message = ''
+    string _message = ''
     if (providerType == 'copytrader')
         _message :=
              zignalyCommonAlertMessage +
@@ -254,9 +254,9 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
 
     priceDecimalDigitsString = priceDecimalDigitsZeroString(priceDecimalDigits)
 
-    var string _zignaleStopLossCombo = ''
-    var string _zignaleTakeProfitCombo = ''
-    var string _zignaleTrailingTakeProfitCombo = ''
+    string _zignaleStopLossCombo = ''
+    string _zignaleTakeProfitCombo = ''
+    string _zignaleTrailingTakeProfitCombo = ''
     _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'entry' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
@@ -279,7 +279,7 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
 
 
 
-    var string _message = ''
+    string _message = ''
     if (providerType == 'copytrader')
         _message :=
              zignalyCommonAlertMessage +
@@ -379,9 +379,9 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
 
     priceDecimalDigitsString = priceDecimalDigitsZeroString(priceDecimalDigits)
 
-    var string _zignaleStopLossCombo = ''
-    var string _zignaleTakeProfitCombo = ''
-    var string _zignaleTrailingTakeProfitCombo = ''
+    string _zignaleStopLossCombo = ''
+    string _zignaleTakeProfitCombo = ''
+    string _zignaleTrailingTakeProfitCombo = ''
     _zignalyReverseExitCommonAlertMessage = zigquote + 'exitSide' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'exitOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote
     _zignalyLongCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'reverse' + zigquote + zigsep + zigquote + 'entrySide' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'entryOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
@@ -405,7 +405,7 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
 
 
 
-    var string _message = ''
+    string _message = ''
     if (providerType == 'copytrader')
         _message :=
              zignalyCommonAlertMessage +
@@ -509,9 +509,9 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
 
     priceDecimalDigitsString = priceDecimalDigitsZeroString(priceDecimalDigits)
 
-    var string _zignaleStopLossCombo = ''
-    var string _zignaleTakeProfitCombo = ''
-    var string _zignaleTrailingTakeProfitCombo = ''
+    string _zignaleStopLossCombo = ''
+    string _zignaleTakeProfitCombo = ''
+    string _zignaleTrailingTakeProfitCombo = ''
     _zignalyReverseExitCommonAlertMessage = zigquote + 'exitSide' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'exitOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote
     _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'reverse' + zigquote + zigsep + zigquote + 'entrySide' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'entryOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
@@ -535,7 +535,7 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
 
 
 
-    var string _message = ''
+    string _message = ''
     if (providerType == 'copytrader')
         _message :=
              zignalyCommonAlertMessage +
@@ -585,7 +585,7 @@ export longExit (string key = na, string exchange, string exchangeAccountType, s
 
     _zignalyLongExitCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'exit' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
 
-    var string _message = ''
+    string _message = ''
     _message := zignalyCommonAlertMessage + zigsep + _zignalyLongExitCommonAlertMessage
 
     getMessageWithKey (_message, key, partial, alertType)
@@ -612,7 +612,7 @@ export shortExit (string key = na, string exchange, string exchangeAccountType, 
 
     _zignalyShortExitCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'exit' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
 
-    var string _message = ''
+    string _message = ''
     _message := zignalyCommonAlertMessage + zigsep + _zignalyShortExitCommonAlertMessage
 
     getMessageWithKey (_message, key, partial, alertType)
@@ -695,9 +695,9 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
 
     priceDecimalDigitsString = priceDecimalDigitsZeroString(priceDecimalDigits)
 
-    var string _zignaleStopLossCombo = ''
-    var string _zignaleTakeProfitCombo = ''
-    var string _zignaleTrailingTakeProfitCombo = ''
+    string _zignaleStopLossCombo = ''
+    string _zignaleTakeProfitCombo = ''
+    string _zignaleTrailingTakeProfitCombo = ''
     _zignalyLongCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'update' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
@@ -723,7 +723,7 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
 
 
 
-    var string _message = ''
+    string _message = ''
     if ((providerType == 'copytrader') and (not(na(p_positionSizeQuote))))
         _message :=
              zignalyCommonAlertMessage +
@@ -823,9 +823,9 @@ export updateShortEntry (string key = na, string providerType = 'copytrader', st
 
     priceDecimalDigitsString = priceDecimalDigitsZeroString(priceDecimalDigits)
 
-    var string _zignaleStopLossCombo = ''
-    var string _zignaleTakeProfitCombo = ''
-    var string _zignaleTrailingTakeProfitCombo = ''
+    string _zignaleStopLossCombo = ''
+    string _zignaleTakeProfitCombo = ''
+    string _zignaleTrailingTakeProfitCombo = ''
     _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'update' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
@@ -851,7 +851,7 @@ export updateShortEntry (string key = na, string providerType = 'copytrader', st
 
 
 
-    var string _message = ''
+    string _message = ''
     if ((providerType == 'copytrader') and (not(na(p_positionSizeQuote))))
         _message :=
              zignalyCommonAlertMessage +
@@ -900,7 +900,7 @@ export updateReverseLongEntry (string key = na, string providerType = 'copytrade
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    var string _message = updateLongEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage, partial)
+    string _message = updateLongEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage, partial)
 
     _message
 
@@ -931,7 +931,7 @@ export updateReverseShortEntry (string key = na, string providerType = 'copytrad
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    var string _message = updateShortEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage, partial)
+    string _message = updateShortEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage, partial)
 
     _message
 
@@ -950,7 +950,7 @@ export reverseLongExit (string key = na, string exchange, string exchangeAccount
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    var string _message = longExit (key, exchange, exchangeAccountType, pair, leverage, alertType, p_signalId, partial)
+    string _message = longExit (key, exchange, exchangeAccountType, pair, leverage, alertType, p_signalId, partial)
 
     _message
 
@@ -969,6 +969,6 @@ export reverseShortExit (string key = na, string exchange, string exchangeAccoun
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    var string _message = shortExit (key, exchange, exchangeAccountType, pair, leverage, alertType, p_signalId, partial)
+    string _message = shortExit (key, exchange, exchangeAccountType, pair, leverage, alertType, p_signalId, partial)
 
     _message
