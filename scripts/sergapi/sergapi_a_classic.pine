@@ -390,7 +390,7 @@ if (ta.crossover(i_priceSource, atrShortPrice[1]))
     atrLong := false
 
 // Final logic
-bool longCondition1 = false
+bool longCondition1 = atrLong
 bool longCondition2 = false
 bool longCondition3 = false
 bool longCondition4 = false
@@ -402,7 +402,7 @@ bool longCondition3Found = false
 bool longCondition4Found = false
 bool longCondition5Found = false
 
-bool shortCondition1 = false
+bool shortCondition1 = atrShort
 bool shortCondition2 = false
 bool shortCondition3 = false
 bool shortCondition4 = false
