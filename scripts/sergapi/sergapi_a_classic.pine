@@ -215,7 +215,7 @@ i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Sour
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
-i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
 
 i_atrLength = input.int(14, minval = 1,  title = '(STRAT) ATR Length [14]')
 i_atrSource = input.source(close, title = '(STRAT) ATR Source [close]')
@@ -455,7 +455,7 @@ if (ta.crossover(i_priceSource, atrShortPrice[1]))
 
 // Final logic
 bool longCondition1 = atrLong
-bool longCondition2 = false
+bool longCondition2 = higherTimeframeEMAsLong
 bool longCondition3 = false
 bool longCondition4 = false
 bool longCondition5 = false
@@ -467,7 +467,7 @@ bool longCondition4Found = false
 bool longCondition5Found = false
 
 bool shortCondition1 = atrShort
-bool shortCondition2 = false
+bool shortCondition2 = higherTimeframeEMAsShort
 bool shortCondition3 = false
 bool shortCondition4 = false
 bool shortCondition5 = false
