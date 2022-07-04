@@ -222,13 +222,13 @@ i_atrSource = input.source(close, title = '(STRAT) ATR Source [close]')
 i_atrMultiplier = input.float(1.5, title='(STRAT) ATR Multiplier % {1.5}', minval=0.01)
 i_priceSource = input.source(close, title = '(STRAT) Price Source [close]')
 
-i_fastTFFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Fast Timeframe MA Type [EMA]')
-i_fastTFFastMaLength = input.int(10, minval = 1,  title = '(STRAT) Fast Timeframe MA Length [10]')
-i_fastTFFastMaSource = input.source(close, title = '(STRAT) Fast Timeframe MA Source [close]')
+i_higherTFFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Fast Timeframe MA Type [EMA]')
+i_higherTFFastMaLength = input.int(10, minval = 1,  title = '(STRAT) Fast Timeframe MA Length [10]')
+i_higherTFFastMaSource = input.source(close, title = '(STRAT) Fast Timeframe MA Source [close]')
 
-i_slowTFFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Slow Timeframe MA Type [EMA]')
-i_slowTFFastMaLength = input.int(55, minval = 1,  title = '(STRAT) Slow Timeframe MA Length [55]')
-i_slowTFFastMaSource = input.source(close, title = '(STRAT) Slow Timeframe MA Source [close]')
+i_higherTFSlowMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Slow Timeframe MA Type [EMA]')
+i_higherTFSlowMaLength = input.int(55, minval = 1,  title = '(STRAT) Slow Timeframe MA Length [55]')
+i_higherTFSlowMaSource = input.source(close, title = '(STRAT) Slow Timeframe MA Source [close]')
 
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
@@ -424,17 +424,17 @@ fun_get_higher_timeframe() =>
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 
 // Higher Timeframe EMAs Logic
-float fastTFFastMa = request.security(syminfo.tickerid, fun_get_higher_timeframe(), f_Ma (i_fastTFFastMaType, i_fastTFFastMaSource, i_fastTFFastMaLength))
-float slowTFFastMa = request.security(syminfo.tickerid, fun_get_higher_timeframe(), f_Ma (i_slowTFFastMaType, i_slowTFFastMaSource, i_slowTFFastMaLength))
+float higherTFFastMa = request.security(syminfo.tickerid, fun_get_higher_timeframe(), f_Ma (i_higherTFFastMaType, i_higherTFFastMaSource, i_higherTFFastMaLength))
+float higherTFSlowMa = request.security(syminfo.tickerid, fun_get_higher_timeframe(), f_Ma (i_higherTFSlowMaType, i_higherTFSlowMaSource, i_higherTFSlowMaLength))
 
 var bool higherTimeframeEMAsLong = false
 var bool higherTimeframeEMAsShort = false
 
-if (ta.crossover(fastTFFastMa, slowTFFastMa))
+if (ta.crossover(higherTFFastMa, higherTFSlowMa))
     higherTimeframeEMAsLong := true
     higherTimeframeEMAsShort := false
 
-if (ta.crossunder(fastTFFastMa, slowTFFastMa))
+if (ta.crossunder(higherTFFastMa, higherTFSlowMa))
     higherTimeframeEMAsShort := true
     higherTimeframeEMAsLong := false
 
@@ -537,8 +537,8 @@ float atrShortPricePlot = atrShort ? atrShortPrice : na
 plot(atrLongPricePlot, title='ATR Long StopLoss', color=color.lime, linewidth=2, style=plot.style_linebr)
 plot(atrShortPricePlot, title='ATR Short StopLoss', color=color.red, linewidth=2, style=plot.style_linebr)
 
-plot(fastTFFastMa, title='Higher TF Fast MA', color=color.navy, linewidth=2, style=plot.style_line)
-plot(slowTFFastMa, title='Higher TF Slow MA', color=color.maroon, linewidth=2, style=plot.style_line)
+plot(higherTFFastMa, title='Higher TF Fast MA', color=color.navy, linewidth=2, style=plot.style_line)
+plot(higherTFSlowMa, title='Higher TF Slow MA', color=color.maroon, linewidth=2, style=plot.style_line)
 
 // Position price calculation - BEGIN
 float positionPrice = na
