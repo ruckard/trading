@@ -439,19 +439,29 @@ if (ta.crossunder(higherTFFastMa, higherTFSlowMa))
     higherTimeframeEMAsLong := false
 
 // ATR Logic
-var bool atrLong = false
-var bool atrShort = false
+var bool atrIsUpwards = false
+var bool atrIsDownwards = false
+bool atrLong = false
+bool atrShort = false
 
 float atrLongPrice = i_atrSource - (ta.atr(i_atrLength) * i_atrMultiplier)
 float atrShortPrice = i_atrSource + (ta.atr(i_atrLength) * i_atrMultiplier)
 
-if (ta.crossunder(i_priceSource, atrLongPrice[1]))
+if (ta.crossunder(i_priceSource, atrLongPrice[1])) and (not atrIsUpwards[1])
     atrLong := true
     atrShort := false
 
-if (ta.crossover(i_priceSource, atrShortPrice[1]))
+if (ta.crossover(i_priceSource, atrShortPrice[1])) and (not atrIsDownwards[1])
     atrShort := true
     atrLong := false
+
+if (ta.crossunder(i_priceSource, atrLongPrice[1]))
+    atrIsUpwards := true
+    atrIsDownwards := false
+
+if (ta.crossover(i_priceSource, atrShortPrice[1]))
+    atrIsDownwards := true
+    atrIsUpwards := false
 
 // Final logic
 bool longCondition1 = atrLong
@@ -532,8 +542,8 @@ shortCondition := (shortConditions >= i_subStrategiesMinimum)
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
-float atrLongPricePlot = atrLong ? atrLongPrice : na
-float atrShortPricePlot = atrShort ? atrShortPrice : na
+float atrLongPricePlot = atrIsUpwards ? atrLongPrice : na
+float atrShortPricePlot = atrIsDownwards ? atrShortPrice : na
 plot(atrLongPricePlot, title='ATR Long StopLoss', color=color.lime, linewidth=2, style=plot.style_linebr)
 plot(atrShortPricePlot, title='ATR Short StopLoss', color=color.red, linewidth=2, style=plot.style_linebr)
 
