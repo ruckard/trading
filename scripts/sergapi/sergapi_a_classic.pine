@@ -537,6 +537,9 @@ float atrShortPricePlot = atrShort ? atrShortPrice : na
 plot(atrLongPricePlot, title='ATR Long StopLoss', color=color.lime, linewidth=2, style=plot.style_linebr)
 plot(atrShortPricePlot, title='ATR Short StopLoss', color=color.red, linewidth=2, style=plot.style_linebr)
 
+plot(fastTFFastMa, title='Higher TF Fast MA', color=color.navy, linewidth=2, style=plot.style_line)
+plot(slowTFFastMa, title='Higher TF Slow MA', color=color.maroon, linewidth=2, style=plot.style_line)
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
