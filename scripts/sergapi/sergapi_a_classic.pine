@@ -447,19 +447,19 @@ bool atrShort = false
 float atrLongPrice = i_atrSource - (ta.atr(i_atrLength) * i_atrMultiplier)
 float atrShortPrice = i_atrSource + (ta.atr(i_atrLength) * i_atrMultiplier)
 
-if (ta.crossunder(i_priceSource, atrLongPrice[1])) and (not atrIsUpwards[1])
+if (ta.crossover(i_priceSource, atrShortPrice[1])) and (not atrIsUpwards[1])
     atrLong := true
     atrShort := false
 
-if (ta.crossover(i_priceSource, atrShortPrice[1])) and (not atrIsDownwards[1])
-    atrShort := true
+if (ta.crossunder(i_priceSource, atrLongPrice[1])) and (not atrIsDownwards[1])
     atrLong := false
+    atrShort := true
 
-if (ta.crossunder(i_priceSource, atrLongPrice[1]))
+if (ta.crossover(i_priceSource, atrShortPrice[1]))
     atrIsUpwards := true
     atrIsDownwards := false
 
-if (ta.crossover(i_priceSource, atrShortPrice[1]))
+if (ta.crossunder(i_priceSource, atrLongPrice[1]))
     atrIsDownwards := true
     atrIsUpwards := false
 
