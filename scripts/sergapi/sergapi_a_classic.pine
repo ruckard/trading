@@ -424,17 +424,18 @@ fun_get_higher_timeframe() =>
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 
 // Higher Timeframe EMAs Logic
-float higherTFFastMa = request.security(syminfo.tickerid, fun_get_higher_timeframe(), f_Ma (i_higherTFFastMaType, i_higherTFFastMaSource, i_higherTFFastMaLength))
+// float higherTFFastMa = request.security(syminfo.tickerid, fun_get_higher_timeframe(), f_Ma (i_higherTFFastMaType, i_higherTFFastMaSource, i_higherTFFastMaLength))
 float higherTFSlowMa = request.security(syminfo.tickerid, fun_get_higher_timeframe(), f_Ma (i_higherTFSlowMaType, i_higherTFSlowMaSource, i_higherTFSlowMaLength))
+float slowMa = f_Ma (i_higherTFSlowMaType, i_higherTFSlowMaSource, i_higherTFSlowMaLength)
 
-var bool higherTimeframeEMAsLong = false
-var bool higherTimeframeEMAsShort = false
+var bool higherTimeframeEMAsLong = (slowMa >= higherTFSlowMa)
+var bool higherTimeframeEMAsShort = (slowMa < higherTFSlowMa)
 
-if (ta.crossover(higherTFFastMa, higherTFSlowMa))
+if (ta.crossover(slowMa, higherTFSlowMa))
     higherTimeframeEMAsLong := true
     higherTimeframeEMAsShort := false
 
-if (ta.crossunder(higherTFFastMa, higherTFSlowMa))
+if (ta.crossunder(slowMa, higherTFSlowMa))
     higherTimeframeEMAsShort := true
     higherTimeframeEMAsLong := false
 
@@ -546,9 +547,6 @@ float atrLongPricePlot = atrIsUpwards ? atrLongPrice : na
 float atrShortPricePlot = atrIsDownwards ? atrShortPrice : na
 plot(atrLongPricePlot, title='ATR Long StopLoss', color=color.lime, linewidth=2, style=plot.style_linebr)
 plot(atrShortPricePlot, title='ATR Short StopLoss', color=color.red, linewidth=2, style=plot.style_linebr)
-
-plot(higherTFFastMa, title='Higher TF Fast MA', color=color.navy, linewidth=2, style=plot.style_line)
-plot(higherTFSlowMa, title='Higher TF Slow MA', color=color.maroon, linewidth=2, style=plot.style_line)
 
 // Position price calculation - BEGIN
 float positionPrice = na
