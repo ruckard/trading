@@ -184,7 +184,7 @@ import ruckard/ZignalyBeta/17 as zig
 i_enableZignalyAlert = input(true, '(ZIG) Enable Alert message {True}')
 i_zignalyServiceSecretKey = input.string('MYSECRETKEY', '(ZIG) Service Secret Key {MYSECRETKEY}')
 _ZIGHYBRIDINTEGRATION_ = 'Hybrid', _ZIGTVONLYINTEGRATION_ = 'TradingView only'
-i_zignalyIntegrationTypePre = input.string(_ZIGTVONLYINTEGRATION_, '(ZIG) Integration type', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
+i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, '(ZIG) Integration type', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
 i_zignalyIntegrationType = (i_zignalyIntegrationTypePre == _ZIGHYBRIDINTEGRATION_) ? 'hybrid' : 'nonhybrid'
 _ZIGSIGNALPROVIDER_ = 'Signal Provider', _ZIGCOPYTRADERPROVIDER_ = 'Profit Sharing/Copy Trader Provider'
 i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider type', options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
@@ -197,22 +197,39 @@ i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {T
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
-i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
+i_enableTakeProfit = input.bool(true, '(STOPTAKE) Take Profit? {True}')
 i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
-i_enableTrailingTakeProfit = input.bool(true, title='(TRAILING) Enable Trailing Take Profit (%) {True}')
+i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
-i_enableRiskRewardRatio = input.bool(false, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {False}')
+i_enableRiskRewardRatio = input.bool(true, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {True}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
-i_positionRatio = input.float(1.5, title='(STRAT) Risk/Reward Ratio % {1.5}', minval=0.01)
+i_positionRatio = input.float(1.30, title='(STRAT) Risk/Reward Ratio % {1.30}', minval=0.01)
 i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
-i_stopLossTypePre = input.string(_SLConstant_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
+i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
-i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+i_atrStopLossMultiplier = input.float(1.00, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.00}', minval=0.01)
+
+i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
+i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
+
+i_atrLength = input.int(14, minval = 1,  title = '(STRAT) ATR Length [14]')
+i_atrSource = input.source(close, title = '(STRAT) ATR Source [close]')
+i_atrMultiplier = input.float(1.5, title='(STRAT) ATR Multiplier % {1.5}', minval=0.01)
+i_priceSource = input.source(close, title = '(STRAT) Price Source [close]')
+
+i_higherTFFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Fast Timeframe MA Type [EMA]')
+i_higherTFFastMaLength = input.int(10, minval = 1,  title = '(STRAT) Fast Timeframe MA Length [10]')
+i_higherTFFastMaSource = input.source(close, title = '(STRAT) Fast Timeframe MA Source [close]')
+
+i_higherTFSlowMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Slow Timeframe MA Type [EMA]')
+i_higherTFSlowMaLength = input.int(55, minval = 1,  title = '(STRAT) Slow Timeframe MA Length [55]')
+i_higherTFSlowMaSource = input.source(close, title = '(STRAT) Slow Timeframe MA Source [close]')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -357,6 +374,47 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
+// MA - Functions - BEGIN
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : _maType == "WMA" ? ta.wma(_maSource, _maLength) : _maType == "HMA" ? ta.hma(_maSource, _maLength) : _maSource
+// MA - Functions - END
+
+// Improved from:
+// Get higher timeframe.period automatically
+// Name: Support Resistance MTF
+// User: LonesomeTheBlue
+// https://www.tradingview.com/script/E9l1xAQd-Support-Resistance-MTF/
+// Timeframe period functions
+fun_get_higher_timeframe() =>
+    Timeframe = timeframe.period
+    if (timeframe.period == '1')
+        Timeframe := '15'
+    else if (timeframe.period == '3')
+        Timeframe := '15'
+    else if (timeframe.period == '5')
+        Timeframe := '60'
+    else if (timeframe.period == '15')
+        Timeframe := '60'
+    else if (timeframe.period == '30')
+        Timeframe := '120'
+    else if (timeframe.period == '45')
+        Timeframe := '120'
+    else if (timeframe.period == '60')
+        Timeframe := '240'
+    else if (timeframe.period == '120')
+        Timeframe := '1D'
+    else if (timeframe.period == '180')
+        Timeframe := '1D'
+    else if (timeframe.period == '240')
+        Timeframe := '1D'
+    else if (timeframe.period == 'D')
+        Timeframe := '1W'
+    else if (timeframe.period == 'W')
+        Timeframe := '1M'
+    else if (timeframe.period == 'M')
+        Timeframe := '12M'
+    Timeframe
+
 // FUNCTIONS - END
 
 
@@ -364,10 +422,125 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
-longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+
+// Higher Timeframe EMAs Logic
+// float higherTFFastMa = request.security(syminfo.tickerid, fun_get_higher_timeframe(), f_Ma (i_higherTFFastMaType, i_higherTFFastMaSource, i_higherTFFastMaLength))
+float higherTFSlowMa = request.security(syminfo.tickerid, fun_get_higher_timeframe(), f_Ma (i_higherTFSlowMaType, i_higherTFSlowMaSource, i_higherTFSlowMaLength))
+float slowMa = f_Ma (i_higherTFSlowMaType, i_higherTFSlowMaSource, i_higherTFSlowMaLength)
+
+var bool higherTimeframeEMAsLong = (slowMa >= higherTFSlowMa)
+var bool higherTimeframeEMAsShort = (slowMa < higherTFSlowMa)
+
+if (ta.crossover(slowMa, higherTFSlowMa))
+    higherTimeframeEMAsLong := true
+    higherTimeframeEMAsShort := false
+
+if (ta.crossunder(slowMa, higherTFSlowMa))
+    higherTimeframeEMAsShort := true
+    higherTimeframeEMAsLong := false
+
+// ATR Logic
+var bool atrIsUpwards = false
+var bool atrIsDownwards = false
+bool atrLong = false
+bool atrShort = false
+
+float atrLongPrice = i_atrSource - (ta.atr(i_atrLength) * i_atrMultiplier)
+float atrShortPrice = i_atrSource + (ta.atr(i_atrLength) * i_atrMultiplier)
+
+if (ta.crossover(i_priceSource, atrShortPrice[1])) and (not atrIsUpwards[1])
+    atrLong := true
+    atrShort := false
+
+if (ta.crossunder(i_priceSource, atrLongPrice[1])) and (not atrIsDownwards[1])
+    atrLong := false
+    atrShort := true
+
+if (ta.crossover(i_priceSource, atrShortPrice[1]))
+    atrIsUpwards := true
+    atrIsDownwards := false
+
+if (ta.crossunder(i_priceSource, atrLongPrice[1]))
+    atrIsDownwards := true
+    atrIsUpwards := false
+
+// Final logic
+bool longCondition1 = atrLong
+bool longCondition2 = higherTimeframeEMAsLong
+bool longCondition3 = false
+bool longCondition4 = false
+bool longCondition5 = false
+
+bool longCondition1Found = false
+bool longCondition2Found = false
+bool longCondition3Found = false
+bool longCondition4Found = false
+bool longCondition5Found = false
+
+bool shortCondition1 = atrShort
+bool shortCondition2 = higherTimeframeEMAsShort
+bool shortCondition3 = false
+bool shortCondition4 = false
+bool shortCondition5 = false
+
+bool shortCondition1Found = false
+bool shortCondition2Found = false
+bool shortCondition3Found = false
+bool shortCondition4Found = false
+bool shortCondition5Found = false
+
+
+longConditions = 0
+shortConditions = 0
+for i = (i_subStrategiesLookback - 1) to 0
+    if longCondition1[i]
+        longCondition1Found := true
+    if longCondition2[i]
+        longCondition2Found := true
+    if longCondition3[i]
+        longCondition3Found := true
+    if longCondition4[i]
+        longCondition4Found := true
+    if longCondition5[i]
+        longCondition5Found := true
+    if shortCondition1[i]
+        shortCondition1Found := true
+    if shortCondition2[i]
+        shortCondition2Found := true
+    if shortCondition3[i]
+        shortCondition3Found := true
+    if shortCondition4[i]
+        shortCondition4Found := true
+    if shortCondition5[i]
+        shortCondition5Found := true
+
+if longCondition1Found
+    longConditions := longConditions + 1
+if longCondition2Found
+    longConditions := longConditions + 1
+if longCondition3Found
+    longConditions := longConditions + 1
+if longCondition4Found
+    longConditions := longConditions + 1
+if longCondition5Found
+    longConditions := longConditions + 1
+if shortCondition1Found
+    shortConditions := shortConditions + 1
+if shortCondition2Found
+    shortConditions := shortConditions + 1
+if shortCondition3Found
+    shortConditions := shortConditions + 1
+if shortCondition4Found
+    shortConditions := shortConditions + 1
+if shortCondition5Found
+    shortConditions := shortConditions + 1
+
+bool longCondition = na
+bool shortCondition = na
+
+longCondition := (longConditions >= i_subStrategiesMinimum)
+shortCondition := (shortConditions >= i_subStrategiesMinimum)
+
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
