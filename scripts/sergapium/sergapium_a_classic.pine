@@ -10,7 +10,7 @@
 // This strategy enter short positions when both ATR and EMA MTR says to sell.
 // This specific strategy also includes Risk Management.
 // 
-// It was originally tested at BTCUSDT pair and 1H timeframe.
+// It was originally tested at ETHUSDT pair and 1H timeframe.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
