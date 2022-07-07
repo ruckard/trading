@@ -543,6 +543,10 @@ shortCondition := (shortConditions >= i_subStrategiesMinimum)
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
+float atrLongPricePlot = atrIsUpwards ? atrLongPrice : na
+float atrShortPricePlot = atrIsDownwards ? atrShortPrice : na
+plot(atrLongPricePlot, title='ATR Long StopLoss', color=color.lime, linewidth=2, style=plot.style_linebr)
+plot(atrShortPricePlot, title='ATR Short StopLoss', color=color.red, linewidth=2, style=plot.style_linebr)
 
 // Position price calculation - BEGIN
 float positionPrice = na
