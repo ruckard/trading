@@ -1,0 +1,25 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © ruckard
+
+//@version=5
+strategy("Crossing EMAs B", overlay=true, margin_long=100, margin_short=100)
+
+import ruckard/ZignalyBeta/21 as zig
+
+i_showDebugLabels = input.bool(true, '(DEBUG) Show Debug Labels? {True}')
+
+string tmpOrderAlertMessage = ''
+
+longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
+if (longCondition)
+    tmpOrderAlertMessage := zig.reverseLongEntry()
+    if i_showDebugLabels
+        label.new(x=bar_index, y=high, text=tmpOrderAlertMessage, textalign=text.align_left)
+    strategy.entry("My Long Entry Id", strategy.long, alert_message=tmpOrderAlertMessage)
+
+shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+if (shortCondition)
+    tmpOrderAlertMessage := zig.reverseShortEntry()
+    if i_showDebugLabels
+        label.new(x=bar_index, y=high, text=tmpOrderAlertMessage, textalign=text.align_left)
+    strategy.entry("My Short Entry Id", strategy.short, alert_message=tmpOrderAlertMessage)

@@ -1,0 +1,64 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © ruckard
+
+//@version=5
+strategy("Crossing EMAs D", overlay=true, margin_long=100, margin_short=100)
+
+import ruckard/ZignalyBeta/21 as zig
+
+i_showDebugLabels = input.bool(true, '(DEBUG) Show Debug Labels? {True}')
+
+i_zignalyServiceSecretKey = input.string('MYSECRETKEY', '(ZIG) Service Secret Key {MYSECRETKEY}')
+
+_ZIGEXTYPESPOT_ = 'spot', _ZIGEXFUTURES_ = 'futures'
+i_zignalyExchangeType = input.string(_ZIGEXFUTURES_, '(ZIG) Exchange Type {Futures}', options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_])
+
+i_CapitalPercentage = input.float(25.0, title='(CAPITAL) Capital percentage invested per order (%) {25.0}', minval=0, step=0.01) * 0.01
+
+i_zignalyLeverage = input.int(1, '(ZIG) Leverage {1}', minval=1, step=1, maxval=125)
+
+i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
+i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
+i_takeProfitPerOne = i_takeProfit / 100
+
+i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
+i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
+i_stopLossPercentage = i_stopLoss * 100.0
+
+i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
+i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
+i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
+i_trailingTakeProfitPercentageOffset = input.float(25.0, '(TRAILING) Trailing Take Profit as a percentage of Trailing Take Profit Trigger (%) {25.0}', minval=0, step=0.01)
+i_trailingTakeProfitPercentageOffsetPerOne = i_trailingTakeProfitPercentageOffset * 0.01
+
+_ZIGNALYE_ = 'Email', _ZIGNALYW_ = 'WebHook'
+i_zignalyAlertTypePre = input.string(_ZIGNALYW_, '(ZIG) Zignaly Alert Type {WebHook}', options=[_ZIGNALYW_, _ZIGNALYE_])
+i_zignalyAlertType = (i_zignalyAlertTypePre == _ZIGNALYW_) ? 'webhook' : 'email'
+
+_ZIGHYBRIDINTEGRATION_ = 'Hybrid', _ZIGTVONLYINTEGRATION_ = 'TradingView only'
+i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, '(ZIG) Integration type', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
+i_zignalyIntegrationType = (i_zignalyIntegrationTypePre == _ZIGHYBRIDINTEGRATION_) ? 'hybrid' : 'nonhybrid'
+
+i_priceDecimalDigits = input.int(2, 'Number of decimal digits for Prices {2}', minval=0, maxval=10, step=1)
+
+
+string tmpOrderAlertMessage = ''
+
+float entryQuantity = na
+float currentCapital = strategy.initial_capital + strategy.netprofit
+entryQuantity := i_CapitalPercentage * currentCapital
+
+
+longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
+if (longCondition)
+    tmpOrderAlertMessage := zig.reverseLongEntry(key = i_zignalyServiceSecretKey, exchangeAccountType = i_zignalyExchangeType, positionSizeQuote = entryQuantity, leverage = i_zignalyLeverage, takeProfit = i_enableTakeProfit, takeProfitPercentage1 = i_takeProfit, stopLoss = i_enableStopLoss, stopLossPercentage = i_stopLossPercentage, trailingStopLoss = i_enableTrailingTakeProfit, trailingStopTriggerPercentage = i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage = i_trailingTakeProfitPercentageOffset, alertType = i_zignalyAlertType, integration = i_zignalyIntegrationType, priceDecimalDigits = i_priceDecimalDigits)
+    if i_showDebugLabels
+        label.new(x=bar_index, y=high, text=tmpOrderAlertMessage, textalign=text.align_left)
+    strategy.entry("My Long Entry Id", strategy.long, alert_message=tmpOrderAlertMessage)
+
+shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+if (shortCondition)
+    tmpOrderAlertMessage := zig.reverseShortEntry(key = i_zignalyServiceSecretKey, exchangeAccountType = i_zignalyExchangeType, positionSizeQuote = entryQuantity, leverage = i_zignalyLeverage, takeProfit = i_enableTakeProfit, takeProfitPercentage1 = i_takeProfit, stopLoss = i_enableStopLoss, stopLossPercentage = i_stopLossPercentage, trailingStopLoss = i_enableTrailingTakeProfit, trailingStopTriggerPercentage = i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage = i_trailingTakeProfitPercentageOffset, alertType = i_zignalyAlertType, integration = i_zignalyIntegrationType, priceDecimalDigits = i_priceDecimalDigits)
+    if i_showDebugLabels
+        label.new(x=bar_index, y=high, text=tmpOrderAlertMessage, textalign=text.align_left)
+    strategy.entry("My Short Entry Id", strategy.short, alert_message=tmpOrderAlertMessage)
