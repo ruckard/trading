@@ -575,6 +575,9 @@ highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor,
 lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
 // TrendRibbon - Plot - END
 
+plotshape(higherTimeframeEMAsLong, title="Higher Timeframe Up", style=shape.arrowup, color=color.new(#00c3ff, transp=0), location=location.bottom)
+plotshape(higherTimeframeEMAsShort, title="Higher Timeframe Down", style=shape.arrowdown, color=color.new(#ff0062, transp=0), location=location.bottom)
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
