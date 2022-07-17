@@ -551,6 +551,12 @@ if (i_sideMaEnforce)
     longCondition := longCondition and sideMaLong
     shortCondition := shortCondition and sideMaShort
 
+// TrendRibbon - Plot - BEGIN
+highestClosingLowestColor = i_showRibbon ? color.yellow : na
+highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = "Upper Closing line")
+lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
+// TrendRibbon - Plot - END
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
