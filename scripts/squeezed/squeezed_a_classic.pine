@@ -245,6 +245,14 @@ i_sideMaSource = input.source(close, title = '(STRAT) Side MA Source [close]')
 
 i_sideMaEnforce = input.bool(true, title='(STRAT) Enforce Side {True}')
 
+// Too old order - Inputs
+i_tooOldLongBarsNumber = input.int(6, '(OLD) Number of bars to consider a Long order to be old {6}', minval=1, maxval=100, step=1)
+i_tooOldShortBarsNumber = input.int(6, '(OLD) Number of bars to consider a Short order to be old {6}', minval=1, maxval=100, step=1)
+i_tooOldLongStopLoss = input.float(1.00, '(OLD) Too Old Long order Stop Loss (%) {1.00}', minval=0, step=0.01)
+i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
+i_tooOldShortStopLoss = input.float(1.00, '(OLD) Too Old Short order Stop Loss (%) {1.00}', minval=0, step=0.01)
+i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
+
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
@@ -433,6 +441,34 @@ f_Ma (_maType, _maSource, _maLength) =>
     _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : _maType == "WMA" ? ta.wma(_maSource, _maLength) : _maType == "HMA" ? ta.hma(_maSource, _maLength) : _maSource
 // MA - Functions - END
 
+// Too old orders functions
+
+getTooOldOrderLongCloseAdvice () =>
+    // Condition 1: The order is open
+    // Condition 2: The order is long
+    // Condition 3: Order age is bigger than the maximum setting
+    // Returns boolean
+    bool isValidOpenLongOrder = (strategy.position_size > 0)
+    bool isTooOld =  (bar_index >= (buyOrderOpenBarIndex + i_tooOldLongBarsNumber))
+    tooOldStopLoss = strategy.position_avg_price * (1 - i_tooOldLongStopLossPerOne)
+
+    bool isALosingOrder = close < tooOldStopLoss
+    tooOldOrderLongCloseAdvice = isValidOpenLongOrder and isTooOld and isALosingOrder
+    tooOldOrderLongCloseAdvice
+
+getTooOldOrderShortCloseAdvice () =>
+    // Condition 1: The order is open
+    // Condition 2: The order is short
+    // Condition 3: Order age is bigger than the maximum setting
+    // Returns boolean
+    bool is_valid_open_sell_order = (strategy.position_size < 0)
+    bool isTooOld =  (bar_index >= (sellOrderOpenBarIndex + i_tooOldShortBarsNumber))
+    tooOldStopLoss = strategy.position_avg_price * (1 + i_tooOldShortStopLossPerOne)
+
+    bool isALosingOrder = close > tooOldStopLoss
+    tooOldOrderShortCloseAdvice = is_valid_open_sell_order and isTooOld and isALosingOrder
+    tooOldOrderShortCloseAdvice
+
 // FUNCTIONS - END
 
 
@@ -485,6 +521,11 @@ lowClosingMa = f_Ma (i_lowClosingMaType, i_lowClosingMaSource, i_lowClosingMaLen
 
 highestClosingMA = ta.highest(highClosingMa, i_highestClosingMaLength)
 lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
+
+// Too old logic
+
+tooOldOrderLongCloseAdvice = getTooOldOrderLongCloseAdvice ()
+tooOldOrderShortCloseAdvice = getTooOldOrderShortCloseAdvice ()
 
 // Final logic
 bool longCondition1 = sqzmomHeightLong
@@ -614,7 +655,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
+LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or tooOldOrderLongCloseAdvice
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -623,7 +664,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
+SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or tooOldOrderShortCloseAdvice
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
