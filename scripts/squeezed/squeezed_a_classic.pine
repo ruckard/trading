@@ -413,23 +413,23 @@ sqzmom(length, mult, lengthKC, multKC, useTrueRange) =>
 // Strategy Body - BEGIN
 
 // SQMMOMHeight SubStrategy
-var sqzmom_top_val = na
-var sqzmom_bottom_val = na
+var float sqzmom_top_val = na
+var float sqzmom_bottom_val = na
 
 [sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
 
 if ( ( sqzmom_bcolor[1] == color.lime )  and ( sqzmom_bcolor[0] == color.green  ) )
-    sqzmom_top_val := val[1]
+    sqzmom_top_val := sqzmom_val[1]
 
 if ( ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon  ) )
-    sqzmom_bottom_val := val[1]
+    sqzmom_bottom_val := sqzmom_val[1]
 
 bool sqzmomHeightLong = false
-if ( (sqzmom_top_val[0] != sqzmom_top_val[1]) and (abs(sqzmom_top_val) >= abs(sqzmom_bottom_val)) )
+if ( (sqzmom_top_val[0] != sqzmom_top_val[1]) and (math.abs(sqzmom_top_val) >= math.abs(sqzmom_bottom_val)) )
     sqzmomHeightLong := true
 
 bool sqzmomHeightShort = false
-if ( (sqzmom_bottom_val[0] != sqzmom_bottom_val[1]) and (abs(sqzmom_bottom_val) >= abs(sqzmom_top_val)) )
+if ( (sqzmom_bottom_val[0] != sqzmom_bottom_val[1]) and (math.abs(sqzmom_bottom_val) >= math.abs(sqzmom_top_val)) )
     sqzmomHeightShort := true
 
 // Final logic
