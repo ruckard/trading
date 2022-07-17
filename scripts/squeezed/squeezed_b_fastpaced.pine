@@ -256,6 +256,26 @@ i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
+i_enableVolatilityProtection = input.bool(true, '(STRAT) Enable Volatility Protection? {True}')
+
+i_atrVolatilityLength = input.int(14, minval = 1,  title = '(STRAT) ATR Volatility Length [14]')
+i_atrVolatilitySource = input.source(close, title = '(STRAT) ATR Volatility Source [close]')
+i_atrVolatilityMultiplier = input.float(0.60, title='(STRAT) ATR Volatility Multiplier % {0.60}', minval=0.01)
+
+i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
+
+i_enableLongEdgeProtection = input.bool(true, '(STRAT) Enable Long Edge Protection? {True}')
+i_longEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Long Edge Length [100]')
+i_longEdgeSource = input.source(high, title = '(STRAT) Long Edge Source [high]')
+i_longEdgeMinimumDistance = input.float(3.50, title='(STRAT) Long Edge Minimum Distance % {3.50}', minval=0.01)
+
+i_enableShortEdgeProtection = input.bool(true, '(STRAT) Enable Short Edge Protection? {True}')
+i_shortEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Short Edge Length [100]')
+i_shortEdgeSource = input.source(low, title = '(STRAT) Short Edge Source [low]')
+i_shortEdgeMinimumDistance = input.float(3.50, title='(STRAT) Short Edge Minimum Distance % {3.50}', minval=0.01)
+
+i_showEdges = input.bool(false, title='(STRAT) Show Edge Minimum and Maximum {False}')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -527,6 +547,40 @@ lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
 tooOldOrderLongCloseAdvice = getTooOldOrderLongCloseAdvice ()
 tooOldOrderShortCloseAdvice = getTooOldOrderShortCloseAdvice ()
 
+// Volatility substrategy
+
+volatilityLongCondition = true
+volatilityShortCondition = true
+
+atrLongVolatilityPrice = i_atrVolatilitySource + (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
+barIsVolatileLong = (close[0] >= open[0]) and (close[0] >= atrLongVolatilityPrice[1])
+
+if barIsVolatileLong or barIsVolatileLong[1]
+    volatilityLongCondition := false
+
+atrShortVolatilityPrice = i_atrVolatilitySource - (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
+barIsVolatileShort = (close[0] <= open[0]) and (close[0] <= atrShortVolatilityPrice[1])
+
+if barIsVolatileShort or barIsVolatileShort[1]
+    volatilityShortCondition := false
+
+// Edge substrategy
+
+edgeLongCondition = true
+edgeShortCondition = true
+
+edgeShortPrice = ta.lowest(i_shortEdgeSource, i_shortEdgeLength)
+edgeShortMinimumPrice = edgeShortPrice + (edgeShortPrice * i_shortEdgeMinimumDistance * 0.01)
+
+edgeLongPrice = ta.highest(i_longEdgeSource, i_longEdgeLength)
+edgeLongMaximumPrice = edgeLongPrice - (edgeLongPrice * i_longEdgeMinimumDistance * 0.01)
+
+if not (close <= edgeLongMaximumPrice)
+    edgeLongCondition := false
+
+if not (close >= edgeShortMinimumPrice)
+    edgeShortCondition := false
+
 // Final logic
 bool longCondition1 = sqzmomHeightLong
 bool longCondition2 = false
@@ -603,6 +657,16 @@ bool shortCondition = na
 
 longCondition := (longConditions >= i_subStrategiesMinimum)
 shortCondition := (shortConditions >= i_subStrategiesMinimum)
+
+if i_enableVolatilityProtection
+    longCondition := longCondition and volatilityLongCondition
+    shortCondition := shortCondition and volatilityShortCondition
+
+if i_enableLongEdgeProtection
+    longCondition := longCondition and edgeLongCondition
+
+if i_enableShortEdgeProtection
+    shortCondition := shortCondition and edgeShortCondition
 
 if (i_sideMaEnforce)
     longCondition := longCondition and sideMaLong
