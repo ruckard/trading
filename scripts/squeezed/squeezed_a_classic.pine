@@ -243,7 +243,7 @@ i_sideMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RM
 i_sideMaLength = input.int(100, minval = 1,  title = '(STRAT) Side MA Length [100]')
 i_sideMaSource = input.source(close, title = '(STRAT) Side MA Source [close]')
 
-i_sideMaEnforce = input.bool(false, title='(STRAT) Enforce Side {False}')
+i_sideMaEnforce = input.bool(true, title='(STRAT) Enforce Side {True}')
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
