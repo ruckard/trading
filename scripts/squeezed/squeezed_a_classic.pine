@@ -451,11 +451,11 @@ if ( ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon  
     sqzmom_bottom_val := sqzmom_val[1]
 
 bool sqzmomHeightLong = false
-if ( (sqzmom_top_val[0] != sqzmom_top_val[1]) and (math.abs(sqzmom_top_val) >= math.abs(sqzmom_bottom_val)) )
+if ( sqzmom_val >= math.abs(sqzmom_bottom_val) ) and ( sqzmom_bcolor == color.lime )
     sqzmomHeightLong := true
 
 bool sqzmomHeightShort = false
-if ( (sqzmom_bottom_val[0] != sqzmom_bottom_val[1]) and (math.abs(sqzmom_bottom_val) >= math.abs(sqzmom_top_val)) )
+if ( sqzmom_val < ( -1.0 * math.abs(sqzmom_top_val)) ) and ( sqzmom_bcolor == color.red )
     sqzmomHeightShort := true
 
 // Side substrategy
