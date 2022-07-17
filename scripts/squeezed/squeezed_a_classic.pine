@@ -450,13 +450,13 @@ if ( ( sqzmom_bcolor[1] == color.lime )  and ( sqzmom_bcolor[0] == color.green  
 if ( ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon  ) )
     sqzmom_bottom_val := sqzmom_val[1]
 
-bool sqzmomHeightLong = false
-if ( sqzmom_val >= math.abs(sqzmom_bottom_val) ) and ( sqzmom_bcolor == color.lime )
-    sqzmomHeightLong := true
-
 bool sqzmomHeightShort = false
-if ( sqzmom_val < ( -1.0 * math.abs(sqzmom_top_val)) ) and ( sqzmom_bcolor == color.red )
+if ( sqzmom_val >= math.abs(sqzmom_bottom_val) ) and ( sqzmom_bcolor == color.lime )
     sqzmomHeightShort := true
+
+bool sqzmomHeightLong = false
+if ( sqzmom_val < ( -1.0 * math.abs(sqzmom_top_val)) ) and ( sqzmom_bcolor == color.red )
+    sqzmomHeightLong := true
 
 // Side substrategy
 sideMa = request.security(syminfo.tickerid, i_sideMaTimeframe, f_Ma (i_sideMaType, i_sideMaSource, i_sideMaLength))
