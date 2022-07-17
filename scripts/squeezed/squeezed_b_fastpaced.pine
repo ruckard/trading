@@ -188,7 +188,7 @@ import ruckard/ZignalyBeta/21 as zig
 i_enableZignalyAlert = input(true, '(ZIG) Enable Alert message {True}')
 i_zignalyServiceSecretKey = input.string('MYSECRETKEY', '(ZIG) Service Secret Key {MYSECRETKEY}')
 _ZIGHYBRIDINTEGRATION_ = 'Hybrid', _ZIGTVONLYINTEGRATION_ = 'TradingView only'
-i_zignalyIntegrationTypePre = input.string(_ZIGTVONLYINTEGRATION_, '(ZIG) Integration type', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
+i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, '(ZIG) Integration type', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
 i_zignalyIntegrationType = (i_zignalyIntegrationTypePre == _ZIGHYBRIDINTEGRATION_) ? 'hybrid' : 'nonhybrid'
 _ZIGSIGNALPROVIDER_ = 'Signal Provider', _ZIGCOPYTRADERPROVIDER_ = 'Profit Sharing/Copy Trader Provider'
 i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider type', options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
@@ -199,11 +199,25 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+
+i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High Closing MA Type [SMA]')
+i_highClosingMaLength = input.int(13, minval = 1,  title = '(STRAT) High Closing MA Length [13]')
+i_highClosingMaSource = input.source(ohlc4, title = '(STRAT) High Closing MA Source [ohlc4]')
+i_highestClosingMaLength = input.int(22, minval = 1,  title = '(STRAT) Highest Closing MA Length [22]')
+
+i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
+i_lowClosingMaLength = input.int(6, minval = 1,  title = '(STRAT) Low Closing MA Length [6]')
+i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
+i_lowestClosingMaLength = input.int(18, minval = 1,  title = '(STRAT) Lowest Closing MA Length [18]')
+
+i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
+i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
+
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
 i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
-i_enableTrailingTakeProfit = input.bool(true, title='(TRAILING) Enable Trailing Take Profit (%) {True}')
+i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
 i_enableRiskRewardRatio = input.bool(false, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {False}')
@@ -212,11 +226,36 @@ i_takeProfitPerOne = i_takeProfit / 100
 i_positionRatio = input.float(1.5, title='(STRAT) Risk/Reward Ratio % {1.5}', minval=0.01)
 i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
-i_stopLossTypePre = input.string(_SLConstant_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
+i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
 i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+
+i_sqzmomLength = input.int(20, title='(SQZMOM) BB Length {20}')
+i_sqzmomMult = input.float(2.0,title='(SQZMOM) BB MultFactor {2.0}')
+i_sqzmomLengthKC=input.int(20, title='(SQZMOM) KC Length {20}')
+i_sqzmomMultKC = input.float(1.5, title='(SQZMOM) KC MultFactor {1.5}')
+i_sqzmomUseTrueRange = input.bool(true, title='(SQZMOM) Use TrueRange (KC) {True}')
+
+i_sideMaTimeframe = input.timeframe("60",title='(STRAT) Side MA Timeframe [1 hours]')
+i_sideMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Side MA Type [EMA]')
+i_sideMaLength = input.int(100, minval = 1,  title = '(STRAT) Side MA Length [100]')
+i_sideMaSource = input.source(close, title = '(STRAT) Side MA Source [close]')
+
+i_sideMaEnforce = input.bool(true, title='(STRAT) Enforce Side {True}')
+
+// Too old order - Inputs
+i_tooOldLongBarsNumber = input.int(6, '(OLD) Number of bars to consider a Long order to be old {6}', minval=1, maxval=100, step=1)
+i_tooOldShortBarsNumber = input.int(6, '(OLD) Number of bars to consider a Short order to be old {6}', minval=1, maxval=100, step=1)
+i_tooOldLongStopLoss = input.float(1.10, '(OLD) Too Old Long order Stop Loss (%) {1.10}', minval=0, step=0.01)
+i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
+i_tooOldShortStopLoss = input.float(1.10, '(OLD) Too Old Short order Stop Loss (%) {1.10}', minval=0, step=0.01)
+i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
+
+i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
+i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -245,7 +284,7 @@ i_CapitalQuote = input.float(100.0, title='(CAPITAL) Capital quote invested per 
 i_CapitalPercentage = input.float(25.0, title='(CAPITAL) Capital percentage invested per order (%) {25.0}', minval=0, step=0.01) * 0.01
 // Risk Management - Inputs
 _SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None', _CUSTOM_ = 'Custom', _FORCED_ = 'Forced'
-i_riskManagementTypePre = input.string(_SCOMPOUND_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
+i_riskManagementTypePre = input.string(_NONE_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
 i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
 i_riskManagementMaximumLossPerTrade = input.float(1.0, title='(RISKM) Maximum loss per trade % {1.0}') / 100
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='(RISKM) Maximum loss per day % {6.0}') / 100
@@ -361,18 +400,213 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
+// SMILB functions - BEGIN
+sqzmom(length, mult, lengthKC, multKC, useTrueRange) =>
+    // Calculate BB
+    source = close
+    basis = ta.sma(source, length)
+    dev = mult * ta.stdev(source, length)
+    upperBB = basis + dev
+    lowerBB = basis - dev
+
+    // Calculate KC
+    ma = ta.sma(source, lengthKC)
+    _range = useTrueRange ? ta.tr : (high - low)
+    rangema = ta.sma(_range, lengthKC)
+    upperKC = ma + rangema * multKC
+    lowerKC = ma - rangema * multKC
+
+    sqzOn  = (lowerBB > lowerKC) and (upperBB < upperKC)
+    sqzOff = (lowerBB < lowerKC) and (upperBB > upperKC)
+    noSqz  = (sqzOn == false) and (sqzOff == false)
+
+    val = ta.linreg(source - math.avg(math.avg(ta.highest(high, lengthKC), ta.lowest(low, lengthKC)),ta.sma(close,lengthKC)), lengthKC,0)
+
+    bcolor = val > 0 ? ( val > nz(val[1]) ? color.lime : color.green ) : ( val < nz(val[1]) ? color.red : color.maroon )
+    // TODO: Use string variables for colours so that final user can change the actual colour if he wants to.
+    scolor = noSqz ? color.blue : sqzOn ? color.black : color.gray
+
+    sqzon_percentage = (((upperKC-upperBB)/upperKC)*100)*(0.5) + (((lowerBB-lowerKC)/lowerBB)*100)*(0.5)
+    sqzoff_percentage = (((upperBB-upperKC)/upperBB)*100)*(0.5) + (((lowerKC-lowerBB)/lowerKC)*100)*(0.5)
+    float sqz_percentage = na
+    if sqzOn
+        sqz_percentage := sqzon_percentage
+    else if sqzOff
+        sqz_percentage := - sqzoff_percentage
+
+    [val, bcolor, scolor, sqz_percentage]
+
+// MA - Functions - BEGIN
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : _maType == "WMA" ? ta.wma(_maSource, _maLength) : _maType == "HMA" ? ta.hma(_maSource, _maLength) : _maSource
+// MA - Functions - END
+
+// Too old orders functions
+
+getTooOldOrderLongCloseAdvice () =>
+    // Condition 1: The order is open
+    // Condition 2: The order is long
+    // Condition 3: Order age is bigger than the maximum setting
+    // Returns boolean
+    bool isValidOpenLongOrder = (strategy.position_size > 0)
+    bool isTooOld =  (bar_index >= (buyOrderOpenBarIndex + i_tooOldLongBarsNumber))
+    tooOldStopLoss = strategy.position_avg_price * (1 - i_tooOldLongStopLossPerOne)
+
+    bool isALosingOrder = close < tooOldStopLoss
+    tooOldOrderLongCloseAdvice = isValidOpenLongOrder and isTooOld and isALosingOrder
+    tooOldOrderLongCloseAdvice
+
+getTooOldOrderShortCloseAdvice () =>
+    // Condition 1: The order is open
+    // Condition 2: The order is short
+    // Condition 3: Order age is bigger than the maximum setting
+    // Returns boolean
+    bool is_valid_open_sell_order = (strategy.position_size < 0)
+    bool isTooOld =  (bar_index >= (sellOrderOpenBarIndex + i_tooOldShortBarsNumber))
+    tooOldStopLoss = strategy.position_avg_price * (1 + i_tooOldShortStopLossPerOne)
+
+    bool isALosingOrder = close > tooOldStopLoss
+    tooOldOrderShortCloseAdvice = is_valid_open_sell_order and isTooOld and isALosingOrder
+    tooOldOrderShortCloseAdvice
+
 // FUNCTIONS - END
 
 
 // Strategy Body - BEGIN
 
+// SQMMOMHeight SubStrategy
+var float sqzmom_top_val = na
+var float sqzmom_bottom_val = na
 
-// Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
-longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
-// Simple Logic to go LONG/LONG or go SHORT/SHORT - END
+[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
+
+if ( ( sqzmom_bcolor[1] == color.lime )  and ( sqzmom_bcolor[0] == color.green  ) )
+    sqzmom_top_val := sqzmom_val[1]
+
+if ( ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon  ) )
+    sqzmom_bottom_val := sqzmom_val[1]
+
+var bool sqzmomHeightToBeShort = false
+
+if ((sqzmom_bcolor[1] != color.lime) and (sqzmom_bcolor == color.lime))
+    sqzmomHeightToBeShort := false
+
+if ( sqzmom_val >= math.abs(sqzmom_bottom_val) ) and ( sqzmom_bcolor == color.lime )
+    sqzmomHeightToBeShort := true
+
+var bool sqzmomHeightToBeLong = false
+
+if ((sqzmom_bcolor[1] != color.red) and (sqzmom_bcolor == color.red))
+    sqzmomHeightToBeLong := false
+
+if ( sqzmom_val < ( -1.0 * math.abs(sqzmom_top_val)) ) and ( sqzmom_bcolor == color.red )
+    sqzmomHeightToBeLong := true
+
+bool sqzmomHeightShort = false
+if sqzmomHeightToBeShort and ( ( sqzmom_bcolor[1] == color.lime )  and ( sqzmom_bcolor[0] == color.green  ) )
+    sqzmomHeightShort := true
+
+bool sqzmomHeightLong = false
+if sqzmomHeightToBeLong and ( ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon  ) )
+    sqzmomHeightLong := true
+
+// Side substrategy
+sideMa = request.security(syminfo.tickerid, i_sideMaTimeframe, f_Ma (i_sideMaType, i_sideMaSource, i_sideMaLength))
+sideMaLong = i_sideMaSource > sideMa
+sideMaShort = i_sideMaSource <= sideMa
+
+// Noro TrendRibbon substrategy
+highClosingMa = f_Ma (i_highClosingMaType, i_highClosingMaSource, i_highClosingMaLength)
+lowClosingMa = f_Ma (i_lowClosingMaType, i_lowClosingMaSource, i_lowClosingMaLength)
+
+highestClosingMA = ta.highest(highClosingMa, i_highestClosingMaLength)
+lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
+
+// Too old logic
+
+tooOldOrderLongCloseAdvice = getTooOldOrderLongCloseAdvice ()
+tooOldOrderShortCloseAdvice = getTooOldOrderShortCloseAdvice ()
+
+// Final logic
+bool longCondition1 = sqzmomHeightLong
+bool longCondition2 = false
+bool longCondition3 = false
+bool longCondition4 = false
+bool longCondition5 = false
+
+bool longCondition1Found = false
+bool longCondition2Found = false
+bool longCondition3Found = false
+bool longCondition4Found = false
+bool longCondition5Found = false
+
+bool shortCondition1 = sqzmomHeightShort
+bool shortCondition2 = false
+bool shortCondition3 = false
+bool shortCondition4 = false
+bool shortCondition5 = false
+
+bool shortCondition1Found = false
+bool shortCondition2Found = false
+bool shortCondition3Found = false
+bool shortCondition4Found = false
+bool shortCondition5Found = false
+
+
+longConditions = 0
+shortConditions = 0
+for i = (i_subStrategiesLookback - 1) to 0
+    if longCondition1[i]
+        longCondition1Found := true
+    if longCondition2[i]
+        longCondition2Found := true
+    if longCondition3[i]
+        longCondition3Found := true
+    if longCondition4[i]
+        longCondition4Found := true
+    if longCondition5[i]
+        longCondition5Found := true
+    if shortCondition1[i]
+        shortCondition1Found := true
+    if shortCondition2[i]
+        shortCondition2Found := true
+    if shortCondition3[i]
+        shortCondition3Found := true
+    if shortCondition4[i]
+        shortCondition4Found := true
+    if shortCondition5[i]
+        shortCondition5Found := true
+
+if longCondition1Found
+    longConditions := longConditions + 1
+if longCondition2Found
+    longConditions := longConditions + 1
+if longCondition3Found
+    longConditions := longConditions + 1
+if longCondition4Found
+    longConditions := longConditions + 1
+if longCondition5Found
+    longConditions := longConditions + 1
+if shortCondition1Found
+    shortConditions := shortConditions + 1
+if shortCondition2Found
+    shortConditions := shortConditions + 1
+if shortCondition3Found
+    shortConditions := shortConditions + 1
+if shortCondition4Found
+    shortConditions := shortConditions + 1
+if shortCondition5Found
+    shortConditions := shortConditions + 1
+
+bool longCondition = na
+bool shortCondition = na
+
+longCondition := (longConditions >= i_subStrategiesMinimum)
+shortCondition := (shortConditions >= i_subStrategiesMinimum)
+
+if (i_sideMaEnforce)
+    longCondition := longCondition and sideMaLong
+    shortCondition := shortCondition and sideMaShort
 
 
 // Position price calculation - BEGIN
@@ -416,7 +650,7 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
 LONG_CLOSE = true
-LONG_CLOSE := offStopTimeInterval or shortCondition
+LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or tooOldOrderLongCloseAdvice
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -425,7 +659,7 @@ if LONG_CLOSE
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
-SHORT_CLOSE := offStopTimeInterval or longCondition
+SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or tooOldOrderShortCloseAdvice
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
