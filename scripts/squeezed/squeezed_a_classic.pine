@@ -248,9 +248,9 @@ i_sideMaEnforce = input.bool(true, title='(STRAT) Enforce Side {True}')
 // Too old order - Inputs
 i_tooOldLongBarsNumber = input.int(6, '(OLD) Number of bars to consider a Long order to be old {6}', minval=1, maxval=100, step=1)
 i_tooOldShortBarsNumber = input.int(6, '(OLD) Number of bars to consider a Short order to be old {6}', minval=1, maxval=100, step=1)
-i_tooOldLongStopLoss = input.float(1.00, '(OLD) Too Old Long order Stop Loss (%) {1.00}', minval=0, step=0.01)
+i_tooOldLongStopLoss = input.float(1.10, '(OLD) Too Old Long order Stop Loss (%) {1.10}', minval=0, step=0.01)
 i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
-i_tooOldShortStopLoss = input.float(1.00, '(OLD) Too Old Short order Stop Loss (%) {1.00}', minval=0, step=0.01)
+i_tooOldShortStopLoss = input.float(1.10, '(OLD) Too Old Short order Stop Loss (%) {1.10}', minval=0, step=0.01)
 i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
