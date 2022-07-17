@@ -450,12 +450,28 @@ if ( ( sqzmom_bcolor[1] == color.lime )  and ( sqzmom_bcolor[0] == color.green  
 if ( ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon  ) )
     sqzmom_bottom_val := sqzmom_val[1]
 
-bool sqzmomHeightShort = false
+var bool sqzmomHeightToBeShort = false
+
+if ((sqzmom_bcolor[1] != color.lime) and (sqzmom_bcolor == color.lime))
+    sqzmomHeightToBeShort := false
+
 if ( sqzmom_val >= math.abs(sqzmom_bottom_val) ) and ( sqzmom_bcolor == color.lime )
+    sqzmomHeightToBeShort := true
+
+var bool sqzmomHeightToBeLong = false
+
+if ((sqzmom_bcolor[1] != color.red) and (sqzmom_bcolor == color.red))
+    sqzmomHeightToBeLong := false
+
+if ( sqzmom_val < ( -1.0 * math.abs(sqzmom_top_val)) ) and ( sqzmom_bcolor == color.red )
+    sqzmomHeightToBeLong := true
+
+bool sqzmomHeightShort = false
+if sqzmomHeightToBeShort and ( ( sqzmom_bcolor[1] == color.lime )  and ( sqzmom_bcolor[0] == color.green  ) )
     sqzmomHeightShort := true
 
 bool sqzmomHeightLong = false
-if ( sqzmom_val < ( -1.0 * math.abs(sqzmom_top_val)) ) and ( sqzmom_bcolor == color.red )
+if sqzmomHeightToBeLong and ( ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon  ) )
     sqzmomHeightLong := true
 
 // Side substrategy
