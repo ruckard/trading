@@ -6,7 +6,12 @@
 // Current version: v20220718 ( B001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
+// This strategy checks changes between the different sections of the Squeeze Momentum Indicator.
+// If the next change of section changes colour then it confirms that side.
+// E.g. Light-Green to Dark-Green change -> Save its maximum height.
+//      If Light-Red is higher than former maximum then short entry.
+//      Viceversa for long entries.
+//
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 30m timeframe.
