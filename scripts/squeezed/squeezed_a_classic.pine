@@ -224,6 +224,11 @@ i_sqzmomLengthKC=input.int(20, title='(SQZMOM) KC Length {20}')
 i_sqzmomMultKC = input.float(1.5, title='(SQZMOM) KC MultFactor {1.5}')
 i_sqzmomUseTrueRange = input.bool(true, title='(SQZMOM) Use TrueRange (KC) {True}')
 
+i_sideMaTimeframe = input.timeframe("60",title='(STRAT) Side MA Timeframe [1 hours]')
+i_sideMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Side MA Type [EMA]')
+i_sideMaLength = input.int(100, minval = 1,  title = '(STRAT) Side MA Length [100]')
+i_sideMaSource = input.source(close, title = '(STRAT) Side MA Source [close]')
+
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
@@ -407,6 +412,11 @@ sqzmom(length, mult, lengthKC, multKC, useTrueRange) =>
 
     [val, bcolor, scolor, sqz_percentage]
 
+// MA - Functions - BEGIN
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : _maType == "WMA" ? ta.wma(_maSource, _maLength) : _maType == "HMA" ? ta.hma(_maSource, _maLength) : _maSource
+// MA - Functions - END
+
 // FUNCTIONS - END
 
 
@@ -431,6 +441,11 @@ if ( (sqzmom_top_val[0] != sqzmom_top_val[1]) and (math.abs(sqzmom_top_val) >= m
 bool sqzmomHeightShort = false
 if ( (sqzmom_bottom_val[0] != sqzmom_bottom_val[1]) and (math.abs(sqzmom_bottom_val) >= math.abs(sqzmom_top_val)) )
     sqzmomHeightShort := true
+
+// Side substrategy
+sideMa = request.security(syminfo.tickerid, i_sideMaTimeframe, f_Ma (i_sideMaType, i_sideMaSource, i_sideMaLength))
+sideMaLong = i_sideMaSource > sideMa
+sideMaShort = i_sideMaSource <= sideMa
 
 // Final logic
 bool longCondition1 = sqzmomHeightLong
