@@ -618,7 +618,7 @@ if not (close >= edgeShortMinimumPrice)
     edgeShortCondition := false
 
 // Final logic
-bool longCondition1 = false
+bool longCondition1 = sqzmomDivergenceLong
 bool longCondition2 = false
 bool longCondition3 = false
 bool longCondition4 = false
@@ -630,7 +630,7 @@ bool longCondition3Found = false
 bool longCondition4Found = false
 bool longCondition5Found = false
 
-bool shortCondition1 = false
+bool shortCondition1 = sqzmomDivergenceShort
 bool shortCondition2 = false
 bool shortCondition3 = false
 bool shortCondition4 = false
