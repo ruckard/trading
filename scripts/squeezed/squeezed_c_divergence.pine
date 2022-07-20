@@ -567,9 +567,17 @@ if (sqzmom_bottom_change and sqzmom_bottom_is_b and (sqzmom_bottom_val_b > sqzmo
     sqzmomDivergenceLong := true
 
 // Side substrategy
-sideMa = request.security(syminfo.tickerid, i_sideMaTimeframe, f_Ma (i_sideMaType, i_sideMaSource, i_sideMaLength))
-sideMaLong = i_sideMaSource > sideMa
-sideMaShort = i_sideMaSource <= sideMa
+sideMaCurrent = f_Ma (i_sideMaType, i_sideMaSource, i_sideMaLength)
+sideMa = request.security(syminfo.tickerid, i_sideMaTimeframe, sideMaCurrent[1])
+int sideMaBarIndex = request.security (syminfo.tickerid, i_sideMaTimeframe, bar_index)
+bool newSideMaBarIndex = sideMaBarIndex[1] != sideMaBarIndex[0]
+
+var sideMaLong = i_sideMaSource > sideMa
+var sideMaShort = i_sideMaSource <= sideMa
+
+if newSideMaBarIndex
+    sideMaLong := i_sideMaSource > sideMa
+    sideMaShort := i_sideMaSource <= sideMa
 
 // Noro TrendRibbon substrategy
 highClosingMa = f_Ma (i_highClosingMaType, i_highClosingMaSource, i_highClosingMaLength)
