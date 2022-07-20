@@ -688,6 +688,9 @@ edgeColor = i_showEdges ? color.purple : na
 edgeLongPricePlot = plot(edgeLongMaximumPrice, color = edgeColor, style=plot.style_stepline, title = "Long Edge Price")
 edgeShortPricePlot = plot(edgeShortMinimumPrice, color = edgeColor, style=plot.style_stepline, title = "Short Edge Price")
 
+plotshape(sideMaLong, title="SideMA Up", style=shape.arrowup, color=color.new(#00c3ff, transp=0), location=location.top)
+plotshape(sideMaShort, title="SideMA Down", style=shape.arrowdown, color=color.new(#ff0062, transp=0), location=location.top)
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
