@@ -568,7 +568,7 @@ if (sqzmom_bottom_change and sqzmom_bottom_is_b and (sqzmom_bottom_val_b > sqzmo
 
 // Side substrategy
 sideMaCurrent = f_Ma (i_sideMaType, i_sideMaSource, i_sideMaLength)
-sideMa = request.security(syminfo.tickerid, i_sideMaTimeframe, sideMaCurrent[1])
+sideMa = request.security(syminfo.tickerid, i_sideMaTimeframe, sideMaCurrent)
 int sideMaBarIndex = request.security (syminfo.tickerid, i_sideMaTimeframe, bar_index)
 bool newSideMaBarIndex = sideMaBarIndex[1] != sideMaBarIndex[0]
 
