@@ -274,7 +274,7 @@ i_enableShortEdgeProtection = input.bool(false, '(STRAT) Enable Short Edge Prote
 i_shortEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Short Edge Length [100]')
 i_shortEdgeSource = input.source(low, title = '(STRAT) Short Edge Source [low]')
 i_shortEdgeMinimumDistance = input.float(1.00, title='(STRAT) Short Edge Minimum Distance % {1.00}', minval=0.01)
-i_enableShortEdgeTakeProfitProtection = input.bool(true, '(STRAT) Enable Short Edge TakeProfit Protection? {True}')
+i_enableShortEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Short Edge TakeProfit Protection? {False}')
 
 i_showEdges = input.bool(false, title='(STRAT) Show Edge Minimum and Maximum {False}')
 
