@@ -554,16 +554,16 @@ bool sqzmomDivergenceLong = false
 bool sqzmomDivergenceShort = false
 
 // Short divergence - Section A
-if (sqzmom_top_is_a and (sqzmom_top_val_a < sqzmom_top_val_b) and (sqzmom_top_price_a > sqzmom_top_price_b))
+if (sqzmom_top_change and sqzmom_top_is_a and (sqzmom_top_val_a < sqzmom_top_val_b) and (sqzmom_top_price_a > sqzmom_top_price_b))
     sqzmomDivergenceShort := true
 // Short divergence - Section B
-if (sqzmom_top_is_b and (sqzmom_top_val_b < sqzmom_top_val_a) and (sqzmom_top_price_b > sqzmom_top_price_a))
+if (sqzmom_top_change and sqzmom_top_is_b and (sqzmom_top_val_b < sqzmom_top_val_a) and (sqzmom_top_price_b > sqzmom_top_price_a))
     sqzmomDivergenceShort := true
 // Long divergence - Section A
-if (sqzmom_bottom_is_a and (sqzmom_bottom_val_a > sqzmom_bottom_val_b) and (sqzmom_bottom_price_a < sqzmom_bottom_price_b))
+if (sqzmom_bottom_change and sqzmom_bottom_is_a and (sqzmom_bottom_val_a > sqzmom_bottom_val_b) and (sqzmom_bottom_price_a < sqzmom_bottom_price_b))
     sqzmomDivergenceLong := true
 // Long divergence - Section B
-if (sqzmom_bottom_is_b and (sqzmom_bottom_val_b > sqzmom_bottom_val_a) and (sqzmom_bottom_price_b < sqzmom_bottom_price_a))
+if (sqzmom_bottom_change and sqzmom_bottom_is_b and (sqzmom_bottom_val_b > sqzmom_bottom_val_a) and (sqzmom_bottom_price_b < sqzmom_bottom_price_a))
     sqzmomDivergenceLong := true
 
 // Side substrategy
