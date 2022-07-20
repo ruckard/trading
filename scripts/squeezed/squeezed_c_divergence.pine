@@ -496,6 +496,76 @@ getTooOldOrderShortCloseAdvice () =>
 
 // Strategy Body - BEGIN
 
+// SQMMOMDivergence SubStrategy
+// Short divergence means that next top height is smaller than previous top height and at the same time price is bigger than in the previous top height.
+// Long divergence means that next bottom height is higher than previous bottom height and at the same time price is smaller than in the previous bottom height.
+
+// Needed variables
+var int sqzmom_top_changes = 0
+var float sqzmom_top_val_a = na
+var float sqzmom_top_price_a = na
+var float sqzmom_top_val_b = na
+var float sqzmom_top_price_b = na
+
+var int sqzmom_bottom_changes = 0
+var float sqzmom_bottom_val_a = na
+var float sqzmom_bottom_price_a = na
+var float sqzmom_bottom_val_b = na
+var float sqzmom_bottom_price_b = na
+
+[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
+
+// Gather data
+
+bool sqzmom_top_change = ( sqzmom_bcolor[1] == color.lime )  and ( sqzmom_bcolor[0] == color.green )
+bool sqzmom_bottom_change = ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon )
+
+if (sqzmom_top_change)
+    sqzmom_top_changes := sqzmom_top_changes + 1
+
+if (sqzmom_bottom_change)
+    sqzmom_bottom_changes := sqzmom_bottom_changes + 1
+
+bool sqzmom_top_is_a = (sqzmom_top_changes % 2) == 0
+bool sqzmom_top_is_b = (sqzmom_top_changes % 2) == 1
+
+bool sqzmom_bottom_is_a = (sqzmom_bottom_changes % 2) == 0
+bool sqzmom_bottom_is_b = (sqzmom_bottom_changes % 2) == 1
+
+if (sqzmom_top_change and sqzmom_top_is_a)
+    sqzmom_top_val_a := sqzmom_val[1]
+    sqzmom_top_price_a := close[1]
+
+if (sqzmom_top_change and sqzmom_top_is_b)
+    sqzmom_top_val_b := sqzmom_val[1]
+    sqzmom_top_price_b := close[1]
+
+if (sqzmom_bottom_change and sqzmom_bottom_is_a)
+    sqzmom_bottom_val_a := sqzmom_val[1]
+    sqzmom_bottom_price_a := close[1]
+
+if (sqzmom_bottom_change and sqzmom_bottom_is_b)
+    sqzmom_bottom_val_b := sqzmom_val[1]
+    sqzmom_bottom_price_b := close[1]
+
+// Implement logic
+
+bool sqzmomDivergenceLong = false
+bool sqzmomDivergenceShort = false
+
+// Short divergence - Section A
+if (sqzmom_top_is_a and (sqzmom_top_val_a < sqzmom_top_val_b) and (sqzmom_top_price_a > sqzmom_top_price_b))
+    sqzmomDivergenceShort := true
+// Short divergence - Section B
+if (sqzmom_top_is_b and (sqzmom_top_val_b < sqzmom_top_val_a) and (sqzmom_top_price_b > sqzmom_top_price_a))
+    sqzmomDivergenceShort := true
+// Long divergence - Section A
+if (sqzmom_bottom_is_a and (sqzmom_bottom_val_a > sqzmom_bottom_val_b) and (sqzmom_bottom_price_a < sqzmom_bottom_price_b))
+    sqzmomDivergenceLong := true
+// Long divergence - Section B
+if (sqzmom_bottom_is_b and (sqzmom_bottom_val_b > sqzmom_bottom_val_a) and (sqzmom_bottom_price_b < sqzmom_bottom_price_a))
+    sqzmomDivergenceLong := true
+
 // Side substrategy
 sideMa = request.security(syminfo.tickerid, i_sideMaTimeframe, f_Ma (i_sideMaType, i_sideMaSource, i_sideMaLength))
 sideMaLong = i_sideMaSource > sideMa
