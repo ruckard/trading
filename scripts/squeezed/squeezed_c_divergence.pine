@@ -496,42 +496,6 @@ getTooOldOrderShortCloseAdvice () =>
 
 // Strategy Body - BEGIN
 
-// SQMMOMHeight SubStrategy
-var float sqzmom_top_val = na
-var float sqzmom_bottom_val = na
-
-[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
-
-if ( ( sqzmom_bcolor[1] == color.lime )  and ( sqzmom_bcolor[0] == color.green  ) )
-    sqzmom_top_val := sqzmom_val[1]
-
-if ( ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon  ) )
-    sqzmom_bottom_val := sqzmom_val[1]
-
-var bool sqzmomHeightToBeShort = false
-
-if ((sqzmom_bcolor[1] != color.lime) and (sqzmom_bcolor == color.lime))
-    sqzmomHeightToBeShort := false
-
-if ( sqzmom_val >= math.abs(sqzmom_bottom_val) ) and ( sqzmom_bcolor == color.lime )
-    sqzmomHeightToBeShort := true
-
-var bool sqzmomHeightToBeLong = false
-
-if ((sqzmom_bcolor[1] != color.red) and (sqzmom_bcolor == color.red))
-    sqzmomHeightToBeLong := false
-
-if ( sqzmom_val < ( -1.0 * math.abs(sqzmom_top_val)) ) and ( sqzmom_bcolor == color.red )
-    sqzmomHeightToBeLong := true
-
-bool sqzmomHeightShort = false
-if sqzmomHeightToBeShort and ( ( sqzmom_bcolor[1] == color.lime )  and ( sqzmom_bcolor[0] == color.green  ) )
-    sqzmomHeightShort := true
-
-bool sqzmomHeightLong = false
-if sqzmomHeightToBeLong and ( ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon  ) )
-    sqzmomHeightLong := true
-
 // Side substrategy
 sideMa = request.security(syminfo.tickerid, i_sideMaTimeframe, f_Ma (i_sideMaType, i_sideMaSource, i_sideMaLength))
 sideMaLong = i_sideMaSource > sideMa
@@ -584,7 +548,7 @@ if not (close >= edgeShortMinimumPrice)
     edgeShortCondition := false
 
 // Final logic
-bool longCondition1 = sqzmomHeightLong
+bool longCondition1 = false
 bool longCondition2 = false
 bool longCondition3 = false
 bool longCondition4 = false
@@ -596,7 +560,7 @@ bool longCondition3Found = false
 bool longCondition4Found = false
 bool longCondition5Found = false
 
-bool shortCondition1 = sqzmomHeightShort
+bool shortCondition1 = false
 bool shortCondition2 = false
 bool shortCondition3 = false
 bool shortCondition4 = false
