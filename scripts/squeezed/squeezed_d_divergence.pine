@@ -243,7 +243,7 @@ i_higherTimeframeTrendMaType = input.string(defval = 'EMA', options = ['SMA', 'E
 i_higherTimeframeTrendMaLength = input.int(13, minval = 1,  title = '(STRAT) Higher Timeframe Trend MA Length [13]')
 i_higherTimeframeTrendMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend MA Source [close]')
 
-i_higherTimeframeTrendMaEnforce = input.bool(true, title='(STRAT) Enforce Side {True}')
+i_higherTimeframeTrendMaEnforce = input.bool(true, title='(STRAT) Enforce Higher Timeframe Trend {True}')
 
 // Too old order - Inputs
 i_tooOldLongBarsNumber = input.int(6, '(OLD) Number of bars to consider a Long order to be old {6}', minval=1, maxval=100, step=1)
