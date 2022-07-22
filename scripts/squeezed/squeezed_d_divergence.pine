@@ -240,14 +240,14 @@ i_sqzmomUseTrueRange = input.bool(true, title='(SQZMOM) Use TrueRange (KC) {True
 
 i_higherTimeframeTrendMaTimeframe = input.timeframe("60",title='(STRAT) Higher Timeframe Trend MA Timeframe {1 hour}')
 
-i_higherTimeframeTrendMaOffset = input.int(0,title='(STRAT) Higher Timeframe Trend MA Bars Offset {0 bars}')
+i_higherTimeframeTrendMaOffset = input.int(12,title='(STRAT) Higher Timeframe Trend MA Bars Offset {12 bars}')
 
 i_higherTimeframeTrendFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend Fast MA Type {EMA}')
-i_higherTimeframeTrendFastMaLength = input.int(10, minval = 1,  title = '(STRAT) Higher Timeframe Trend Fast MA Length {10}')
+i_higherTimeframeTrendFastMaLength = input.int(1, minval = 1,  title = '(STRAT) Higher Timeframe Trend Fast MA Length {1}')
 i_higherTimeframeTrendFastMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Fast MA Source {close}')
 
 i_higherTimeframeTrendSlowMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend Slow MA Type {EMA}')
-i_higherTimeframeTrendSlowMaLength = input.int(55, minval = 1,  title = '(STRAT) Higher Timeframe Trend Slow MA Length {55}')
+i_higherTimeframeTrendSlowMaLength = input.int(12, minval = 1,  title = '(STRAT) Higher Timeframe Trend Slow MA Length {12}')
 i_higherTimeframeTrendSlowMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Slow MA Source {close}')
 
 i_higherTimeframeTrendMaEnforce = input.bool(true, title='(STRAT) Enforce Higher Timeframe Trend {True}')
