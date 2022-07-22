@@ -240,6 +240,8 @@ i_sqzmomUseTrueRange = input.bool(true, title='(SQZMOM) Use TrueRange (KC) {True
 
 i_higherTimeframeTrendMaTimeframe = input.timeframe("60",title='(STRAT) Higher Timeframe Trend MA Timeframe {1 hour}')
 
+i_higherTimeframeTrendMaOffset = input.int(0,title='(STRAT) Higher Timeframe Trend MA Bars Offset {0 bars}')
+
 i_higherTimeframeTrendFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend Fast MA Type {EMA}')
 i_higherTimeframeTrendFastMaLength = input.int(10, minval = 1,  title = '(STRAT) Higher Timeframe Trend Fast MA Length {10}')
 i_higherTimeframeTrendFastMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Fast MA Source {close}')
@@ -496,11 +498,13 @@ getTooOldOrderShortCloseAdvice () =>
     tooOldOrderShortCloseAdvice = is_valid_open_sell_order and isTooOld and isALosingOrder
     tooOldOrderShortCloseAdvice
 
-getTrend (_fastMaType, _fastMaLength, _fastMaSource, _slowMaType, _slowMaLength, _slowMaSource) =>
+getTrend (_fastMaType, _fastMaLength, _fastMaSource, _slowMaType, _slowMaLength, _slowMaSource, _offset) =>
     _fastMa = f_Ma (_fastMaType, _fastMaSource, _fastMaLength)
     _slowMa = f_Ma (_slowMaType, _slowMaSource, _slowMaLength)
     _trend = _fastMa >= _slowMa
-    _trend
+
+    _trendOffset = _trend[_offset]
+    _trendOffset
 
 // FUNCTIONS - END
 
@@ -580,7 +584,7 @@ if (sqzmom_bottom_change and sqzmom_bottom_is_b and (sqzmom_bottom_val_b > sqzmo
 // Higher Timeframe Trend substrategy
 
 
-higherTimeframeTrend = request.security(syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, getTrend (i_higherTimeframeTrendFastMaType, i_higherTimeframeTrendFastMaLength, i_higherTimeframeTrendFastMaSource, i_higherTimeframeTrendSlowMaType, i_higherTimeframeTrendSlowMaLength, i_higherTimeframeTrendSlowMaSource))
+higherTimeframeTrend = request.security(syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, getTrend (i_higherTimeframeTrendFastMaType, i_higherTimeframeTrendFastMaLength, i_higherTimeframeTrendFastMaSource, i_higherTimeframeTrendSlowMaType, i_higherTimeframeTrendSlowMaLength, i_higherTimeframeTrendSlowMaSource, i_higherTimeframeTrendMaOffset))
 
 int higherTimeframeTrendMaBarIndex = request.security (syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, bar_index)
 bool newHigherTimeframeTrendMaBar = higherTimeframeTrendMaBarIndex[1] != higherTimeframeTrendMaBarIndex[0]
