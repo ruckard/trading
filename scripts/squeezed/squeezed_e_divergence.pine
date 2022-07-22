@@ -733,6 +733,26 @@ if (i_higherTimeframeTrendMaEnforce)
     longCondition := longCondition and higherTimeframeTrendMaLong
     shortCondition := shortCondition and higherTimeframeTrendMaShort
 
+// TrendRibbon - Plot - BEGIN
+highestClosingLowestColor = i_showRibbon ? color.yellow : na
+highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = "Upper Closing line")
+lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
+// TrendRibbon - Plot - END
+
+atrVolatilityColor = i_showAtrVolatilityMultiplier ? color.maroon : na
+atrLongVolatilityPricePlot = plot(atrLongVolatilityPrice, color = atrVolatilityColor, title = "Long Volatility Price")
+atrShortVolatilityPricePlot = plot(atrShortVolatilityPrice, color = atrVolatilityColor, title = "Short Volatility Price")
+
+edgeColor = i_showEdges ? color.purple : na
+edgeLongPricePlot = plot(edgeLongMaximumPrice, color = edgeColor, style=plot.style_stepline, title = "Long Edge Price")
+edgeShortPricePlot = plot(edgeShortMinimumPrice, color = edgeColor, style=plot.style_stepline, title = "Short Edge Price")
+
+plotshape(higherTimeframeTrendMaLong, title="SideMA Up", style=shape.arrowup, color=color.new(#00c3ff, transp=0), location=location.top)
+plotshape(higherTimeframeTrendMaShort, title="SideMA Down", style=shape.arrowdown, color=color.new(#ff0062, transp=0), location=location.top)
+
+plotshape(sqzmomDivergenceLong, text="D", title="Divergence Up", style=shape.labelup, color=color.new(#00c3ff, transp=0), location=location.bottom)
+plotshape(sqzmomDivergenceShort, text="D", title="Divergence Down", style=shape.labeldown, color=color.new(#ff0062, transp=0), location=location.bottom)
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
