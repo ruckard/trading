@@ -238,12 +238,12 @@ i_sqzmomLengthKC=input.int(20, title='(SQZMOM) KC Length {20}')
 i_sqzmomMultKC = input.float(1.5, title='(SQZMOM) KC MultFactor {1.5}')
 i_sqzmomUseTrueRange = input.bool(true, title='(SQZMOM) Use TrueRange (KC) {True}')
 
-i_sideMaTimeframe = input.timeframe("60",title='(STRAT) Side MA Timeframe [1 hour]')
-i_sideMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Side MA Type [EMA]')
-i_sideMaLength = input.int(13, minval = 1,  title = '(STRAT) Side MA Length [13]')
-i_sideMaSource = input.source(close, title = '(STRAT) Side MA Source [close]')
+i_higherTimeframeTrendMaTimeframe = input.timeframe("60",title='(STRAT) Higher Timeframe Trend MA Timeframe [1 hour]')
+i_higherTimeframeTrendMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend MA Type [EMA]')
+i_higherTimeframeTrendMaLength = input.int(13, minval = 1,  title = '(STRAT) Higher Timeframe Trend MA Length [13]')
+i_higherTimeframeTrendMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend MA Source [close]')
 
-i_sideMaEnforce = input.bool(true, title='(STRAT) Enforce Side {True}')
+i_higherTimeframeTrendMaEnforce = input.bool(true, title='(STRAT) Enforce Side {True}')
 
 // Too old order - Inputs
 i_tooOldLongBarsNumber = input.int(6, '(OLD) Number of bars to consider a Long order to be old {6}', minval=1, maxval=100, step=1)
@@ -566,18 +566,18 @@ if (sqzmom_bottom_change and sqzmom_bottom_is_a and (sqzmom_bottom_val_a > sqzmo
 if (sqzmom_bottom_change and sqzmom_bottom_is_b and (sqzmom_bottom_val_b > sqzmom_bottom_val_a) and (sqzmom_bottom_price_b < sqzmom_bottom_price_a))
     sqzmomDivergenceLong := true
 
-// Side substrategy
-sideMaCurrent = f_Ma (i_sideMaType, i_sideMaSource, i_sideMaLength)
-sideMa = request.security(syminfo.tickerid, i_sideMaTimeframe, sideMaCurrent)
-int sideMaBarIndex = request.security (syminfo.tickerid, i_sideMaTimeframe, bar_index)
-bool newSideMaBarIndex = sideMaBarIndex[1] != sideMaBarIndex[0]
+// Higher Timeframe Trend substrategy
+trendMa = f_Ma (i_higherTimeframeTrendMaType, i_higherTimeframeTrendMaSource, i_higherTimeframeTrendMaLength)
+higherTimeframeTrendMa = request.security(syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, trendMa)
+int higherTimeframeTrendMaBarIndex = request.security (syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, bar_index)
+bool newSideMaBarIndex = higherTimeframeTrendMaBarIndex[1] != higherTimeframeTrendMaBarIndex[0]
 
-var sideMaLong = i_sideMaSource > sideMa
-var sideMaShort = i_sideMaSource <= sideMa
+var higherTimeframeTrendMaLong = i_higherTimeframeTrendMaSource > higherTimeframeTrendMa
+var higherTimeframeTrendMaShort = i_higherTimeframeTrendMaSource <= higherTimeframeTrendMa
 
 if newSideMaBarIndex
-    sideMaLong := i_sideMaSource > sideMa
-    sideMaShort := i_sideMaSource <= sideMa
+    higherTimeframeTrendMaLong := i_higherTimeframeTrendMaSource > higherTimeframeTrendMa
+    higherTimeframeTrendMaShort := i_higherTimeframeTrendMaSource <= higherTimeframeTrendMa
 
 // Noro TrendRibbon substrategy
 highClosingMa = f_Ma (i_highClosingMaType, i_highClosingMaSource, i_highClosingMaLength)
@@ -712,9 +712,9 @@ if i_enableLongEdgeProtection
 if i_enableShortEdgeProtection
     shortCondition := shortCondition and edgeShortCondition
 
-if (i_sideMaEnforce)
-    longCondition := longCondition and sideMaLong
-    shortCondition := shortCondition and sideMaShort
+if (i_higherTimeframeTrendMaEnforce)
+    longCondition := longCondition and higherTimeframeTrendMaLong
+    shortCondition := shortCondition and higherTimeframeTrendMaShort
 
 // TrendRibbon - Plot - BEGIN
 highestClosingLowestColor = i_showRibbon ? color.yellow : na
@@ -730,8 +730,8 @@ edgeColor = i_showEdges ? color.purple : na
 edgeLongPricePlot = plot(edgeLongMaximumPrice, color = edgeColor, style=plot.style_stepline, title = "Long Edge Price")
 edgeShortPricePlot = plot(edgeShortMinimumPrice, color = edgeColor, style=plot.style_stepline, title = "Short Edge Price")
 
-plotshape(sideMaLong, title="SideMA Up", style=shape.arrowup, color=color.new(#00c3ff, transp=0), location=location.top)
-plotshape(sideMaShort, title="SideMA Down", style=shape.arrowdown, color=color.new(#ff0062, transp=0), location=location.top)
+plotshape(higherTimeframeTrendMaLong, title="SideMA Up", style=shape.arrowup, color=color.new(#00c3ff, transp=0), location=location.top)
+plotshape(higherTimeframeTrendMaShort, title="SideMA Down", style=shape.arrowdown, color=color.new(#ff0062, transp=0), location=location.top)
 
 plotshape(sqzmomDivergenceLong, text="D", title="Divergence Up", style=shape.labelup, color=color.new(#00c3ff, transp=0), location=location.bottom)
 plotshape(sqzmomDivergenceShort, text="D", title="Divergence Down", style=shape.labeldown, color=color.new(#ff0062, transp=0), location=location.bottom)
