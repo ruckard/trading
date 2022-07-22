@@ -3,7 +3,7 @@
 
 //@version=5
 
-// Current version: v20220720 ( C004 )
+// Current version: v20220722 ( C005 )
 // Tradingview Public description - BEGIN
 // 
 // This strategy checks changes between the different sections of the Squeeze Momentum Indicator.
@@ -177,7 +177,7 @@
 
 // Tradingview Public description - END
 
-strategy('Ruckard Squeezed C004', shorttitle='C004RSqueezed', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Ruckard Squeezed C005', shorttitle='C005RSqueezed', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/ZignalyBeta/21 as zig
