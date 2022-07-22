@@ -238,10 +238,15 @@ i_sqzmomLengthKC=input.int(20, title='(SQZMOM) KC Length {20}')
 i_sqzmomMultKC = input.float(1.5, title='(SQZMOM) KC MultFactor {1.5}')
 i_sqzmomUseTrueRange = input.bool(true, title='(SQZMOM) Use TrueRange (KC) {True}')
 
-i_higherTimeframeTrendMaTimeframe = input.timeframe("60",title='(STRAT) Higher Timeframe Trend MA Timeframe [1 hour]')
-i_higherTimeframeTrendMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend MA Type [EMA]')
-i_higherTimeframeTrendMaLength = input.int(13, minval = 1,  title = '(STRAT) Higher Timeframe Trend MA Length [13]')
-i_higherTimeframeTrendMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend MA Source [close]')
+i_higherTimeframeTrendMaTimeframe = input.timeframe("60",title='(STRAT) Higher Timeframe Trend MA Timeframe {1 hour}')
+
+i_higherTimeframeTrendFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend Fast MA Type {EMA}')
+i_higherTimeframeTrendFastMaLength = input.int(10, minval = 1,  title = '(STRAT) Higher Timeframe Trend Fast MA Length {10}')
+i_higherTimeframeTrendFastMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Fast MA Source {close}')
+
+i_higherTimeframeTrendSlowMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend Slow MA Type {EMA}')
+i_higherTimeframeTrendSlowMaLength = input.int(55, minval = 1,  title = '(STRAT) Higher Timeframe Trend Slow MA Length {55}')
+i_higherTimeframeTrendSlowMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Slow MA Source {close}')
 
 i_higherTimeframeTrendMaEnforce = input.bool(true, title='(STRAT) Enforce Higher Timeframe Trend {True}')
 
@@ -491,6 +496,12 @@ getTooOldOrderShortCloseAdvice () =>
     tooOldOrderShortCloseAdvice = is_valid_open_sell_order and isTooOld and isALosingOrder
     tooOldOrderShortCloseAdvice
 
+getTrend (_fastMaType, _fastMaLength, _fastMaSource, _slowMaType, _slowMaLength, _slowMaSource) =>
+    _fastMa = f_Ma (_fastMaType, _fastMaSource, _fastMaLength)
+    _slowMa = f_Ma (_slowMaType, _slowMaSource, _slowMaLength)
+    _trend = _fastMa >= _slowMa
+    _trend
+
 // FUNCTIONS - END
 
 
@@ -567,17 +578,19 @@ if (sqzmom_bottom_change and sqzmom_bottom_is_b and (sqzmom_bottom_val_b > sqzmo
     sqzmomDivergenceLong := true
 
 // Higher Timeframe Trend substrategy
-trendMa = f_Ma (i_higherTimeframeTrendMaType, i_higherTimeframeTrendMaSource, i_higherTimeframeTrendMaLength)
-higherTimeframeTrendMa = request.security(syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, trendMa)
+
+
+higherTimeframeTrend = request.security(syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, getTrend (i_higherTimeframeTrendFastMaType, i_higherTimeframeTrendFastMaLength, i_higherTimeframeTrendFastMaSource, i_higherTimeframeTrendSlowMaType, i_higherTimeframeTrendSlowMaLength, i_higherTimeframeTrendSlowMaSource))
+
 int higherTimeframeTrendMaBarIndex = request.security (syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, bar_index)
-bool newSideMaBarIndex = higherTimeframeTrendMaBarIndex[1] != higherTimeframeTrendMaBarIndex[0]
+bool newHigherTimeframeTrendMaBar = higherTimeframeTrendMaBarIndex[1] != higherTimeframeTrendMaBarIndex[0]
 
-var higherTimeframeTrendMaLong = i_higherTimeframeTrendMaSource > higherTimeframeTrendMa
-var higherTimeframeTrendMaShort = i_higherTimeframeTrendMaSource <= higherTimeframeTrendMa
+var higherTimeframeTrendMaLong = higherTimeframeTrend
+var higherTimeframeTrendMaShort = (not higherTimeframeTrend)
 
-if newSideMaBarIndex
-    higherTimeframeTrendMaLong := i_higherTimeframeTrendMaSource > higherTimeframeTrendMa
-    higherTimeframeTrendMaShort := i_higherTimeframeTrendMaSource <= higherTimeframeTrendMa
+if newHigherTimeframeTrendMaBar
+    higherTimeframeTrendMaLong := higherTimeframeTrend
+    higherTimeframeTrendMaShort := (not higherTimeframeTrend)
 
 // Noro TrendRibbon substrategy
 highClosingMa = f_Ma (i_highClosingMaType, i_highClosingMaSource, i_highClosingMaLength)
