@@ -250,6 +250,10 @@ i_riskManagementMaximumLossPerMonth = input.float(10.0, title='(RISKM) Maximum l
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+
+i_diLen = input.int(14, title='(ADX) DI+/DI- Length {14}')
+i_diHigherTimeframe = input.timeframe('240',title='(STRAT) DI+/DI- Higher Timeframe {4 hours}')
+
 // INPUTS - END
 
 
@@ -359,11 +363,55 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
+// ADX - Functions - BEGIN
+
+dirmov(_len) =>
+    up = ta.change(high)
+    down = -ta.change(low)
+    truerange = ta.rma(ta.tr, _len)
+    plus = fixnan(100 * ta.rma(up > down and up > 0 ? up : 0, _len) / truerange)
+    minus = fixnan(100 * ta.rma(down > up and down > 0 ? down : 0, _len) / truerange)
+    [plus, minus]
+
+diPlusCrossOver(_len) =>
+    [diPlus, diMinus] = dirmov(_len)
+    _diPlusCrossOver = ta.crossover(diPlus, diMinus)
+    _diPlusCrossOver
+
+diPlusCrossUnder(_len) =>
+    [diPlus, diMinus] = dirmov(_len)
+    _diPlusCrossUnder = ta.crossunder(diPlus, diMinus)
+    _diPlusCrossUnder
+
+// ADX - Functions - END
+
 // FUNCTIONS - END
 
 
 // Strategy Body - BEGIN
 
+// Sergdi substrategy
+bool sergdiLong = false
+bool sergdiShort = false
+
+higherTimeframeDiPlusCrossOverTmp = request.security(syminfo.tickerid, i_diHigherTimeframe, diPlusCrossOver(i_diLen) )
+higherTimeframeDiPlusCrossUnderTmp = request.security(syminfo.tickerid, i_diHigherTimeframe, diPlusCrossUnder(i_diLen) )
+
+int HTBarIndex = request.security (syminfo.tickerid, i_diHigherTimeframe, bar_index)
+bool newHTBarIndex = HTBarIndex[1] != HTBarIndex[0]
+
+var bool higherTimeframeDiPlusCrossOver = higherTimeframeDiPlusCrossOverTmp
+var bool higherTimeframeDiPlusCrossUnder = higherTimeframeDiPlusCrossUnderTmp
+
+if newHTBarIndex
+    higherTimeframeDiPlusCrossOver := higherTimeframeDiPlusCrossOverTmp
+    higherTimeframeDiPlusCrossUnder := higherTimeframeDiPlusCrossUnderTmp
+
+if (newHTBarIndex and (higherTimeframeDiPlusCrossOver))
+    sergdiLong := true
+
+if (newHTBarIndex and (higherTimeframeDiPlusCrossUnder))
+    sergdiShort := true
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
