@@ -6,7 +6,8 @@
 // Current version: v20220723 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
+// This strategy enter long positions when 4h DI+ crosses over 4h DI-.
+// This strategy enter short positions when 4h DI+ crosses under 4h DI-.
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 15m timeframe.
