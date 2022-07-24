@@ -287,8 +287,9 @@ i_sqzmomMult = input.float(2.0,title='(SQZMOM) BB MultFactor {2.0}')
 i_sqzmomLengthKC=input.int(20, title='(SQZMOM) KC Length {20}')
 i_sqzmomMultKC = input.float(1.5, title='(SQZMOM) KC MultFactor {1.5}')
 i_sqzmomUseTrueRange = input.bool(true, title='(SQZMOM) Use TrueRange (KC) {True}')
-i_VPVRVpocNBars = input.int(400, '(VP) Number of bars for VPVR VPOC {400}', minval=1, maxval=500)
+i_VPVRVpocNBars = input.int(100, '(VP) Number of bars for VPVR VPOC {100}', minval=1, maxval=500)
 i_VPPriceLevels = input.int(24, '(VP) Price levels {24}', minval=10, maxval=500)
+i_higherTimeframeVPVRVpocTimeframe = input.timeframe('240',title='(STRAT) Higher Timeframe VPVR VPoC Timeframe {4 hours}')
 i_subStrategiesLookback = input.int(2, title='(STRAT) Substrategies Lookback [2]')
 i_subStrategiesMinimum = input.int(8, title='(STRAT) Substrategies minimum [8]')
 
@@ -533,15 +534,59 @@ get_resolution_bar_minutes(resolution) =>
 f_Ma (_maType, _maSource, _maLength) =>
     _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : ta.rma(_maSource, _maLength)
 
+getTrend (_fastMaType, _fastMaLength, _fastMaSource, _slowMaType, _slowMaLength, _slowMaSource, _offset) =>
+    _fastMa = f_Ma (_fastMaType, _fastMaSource, _fastMaLength)
+    _slowMa = f_Ma (_slowMaType, _slowMaSource, _slowMaLength)
+    _trend = _fastMa >= _slowMa
+
+    _trendOffset = _trend[_offset]
+    _trendOffset
+
+// 4H Trend substrategy
+
+bool trend4H = request.security(syminfo.tickerid, '240', getTrend (i_fastMaType, i_fastMaLength, i_fastMaSource, i_slowMaType, i_slowMaLength, i_slowMaSource, 0))
+
+int trendMaBarIndex4H = request.security (syminfo.tickerid, '240', bar_index)
+bool newTrendMaBarIndex4H = trendMaBarIndex4H[1] != trendMaBarIndex4H[0]
+
+var bool trend4HLong = trend4H
+var bool trend4HShort = (not trend4H)
+
+if newTrendMaBarIndex4H
+    trend4HLong := trend4H
+    trend4HShort := (not trend4H)
+
+// 1D Trend substrategy
+
+bool trend1D = request.security(syminfo.tickerid, '1D', getTrend (i_fastMaType, i_fastMaLength, i_fastMaSource, i_slowMaType, i_slowMaLength, i_slowMaSource, 0))
+
+int trendMaBarIndex1D = request.security (syminfo.tickerid, '1D', bar_index)
+bool newTrendMaBarIndex1D = trendMaBarIndex1D[1] != trendMaBarIndex1D[0]
+
+var bool trend1DLong = trend1D
+var bool trend1DShort = (not trend1D)
+
+if newTrendMaBarIndex1D
+    trend1DLong := trend1D
+    trend1DShort := (not trend1D)
+
+
 fastMa = f_Ma (i_fastMaType, i_fastMaSource, i_fastMaLength)
 slowMa = f_Ma (i_slowMaType, i_slowMaSource, i_slowMaLength)
 
 
 fastMa4H = request.security(syminfo.tickerid, '240', f_Ma (i_fastMaType, i_fastMaSource, i_fastMaLength))
 slowMa4H = request.security(syminfo.tickerid, '240', f_Ma (i_slowMaType, i_slowMaSource, i_slowMaLength))
-fastMa1D = request.security(syminfo.tickerid, '1D', f_Ma (i_fastMaType, i_fastMaSource, i_fastMaLength))
-slowMa1D = request.security(syminfo.tickerid, '1D', f_Ma (i_slowMaType, i_slowMaSource, i_slowMaLength))
 
+float fastMa1DTmp = request.security(syminfo.tickerid, '1D', f_Ma (i_fastMaType, i_fastMaSource, i_fastMaLength))
+float slowMa1DTmp = request.security(syminfo.tickerid, '1D', f_Ma (i_slowMaType, i_slowMaSource, i_slowMaLength))
+
+var float fastMa1D = fastMa1DTmp
+var float slowMa1D = slowMa1DTmp
+
+if newTrendMaBarIndex1D
+    fastMa1D := fastMa1DTmp
+    slowMa1D := slowMa1DTmp
 
 [adx_sig, adx_up, adx_down] = adx(i_diLen, i_adxLen)
 [sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
@@ -552,7 +597,10 @@ downTrendSqzmom = (sqzmom_bcolor == color.green) or (sqzmom_bcolor == color.red)
 newUpTrendSqzmom = ((sqzmom_bcolor == color.maroon) and (sqzmom_bcolor[1] == color.red)) or ((sqzmom_bcolor == color.lime) and (sqzmom_bcolor[1] == color.green))
 newDownTrendSqzmom = (sqzmom_bcolor == color.green) and (sqzmom_bcolor[1] == color.lime) or ((sqzmom_bcolor == color.red) and (sqzmom_bcolor[1] == color.maroon))
 
-VPVRPocPrice = vol.vpoc(i_VPPriceLevels, i_VPVRVpocNBars)
+VPVRPocPriceTmp = request.security(syminfo.tickerid, i_higherTimeframeVPVRVpocTimeframe, vol.vpoc(i_VPPriceLevels, i_VPVRVpocNBars))
+var float VPVRPocPrice = VPVRPocPriceTmp
+if newTrendMaBarIndex1D
+    VPVRPocPrice := VPVRPocPriceTmp
 
 [adx_sig1D, adx_up1D, adx_down1D] = request.security(syminfo.tickerid, '1D', adx(i_diLen, i_adxLen))
 
@@ -562,14 +610,20 @@ downTrendSqzmom1D = (sqzmom_bcolor1D == color.green) or (sqzmom_bcolor1D == colo
 
 volatility1D = (sqzmom_scolor1D == color.gray)
 
-upTrend1D = (adx_sig1D >= adx_sig1D[1]) and upTrendSqzmom1D and (fastMa1D >= slowMa1D) and (close >= fastMa1D) and volatility1D
-downTrend1D = (adx_sig1D >= adx_sig1D[1]) and downTrendSqzmom1D and (fastMa1D <= slowMa1D) and (close <= fastMa1D) and volatility1D
+upTrend1D = (adx_sig1D >= adx_sig1D[1]) and upTrendSqzmom1D and trend1DLong and (close >= fastMa1D) and volatility1D
+downTrend1D = (adx_sig1D >= adx_sig1D[1]) and downTrendSqzmom1D and trend1DShort and (close <= fastMa1D) and volatility1D
 
 int barsNumber1D = int(math.floor(get_resolution_bar_minutes('1D') / currentResInMinutes))
-VPocPrice1D = vol.vpoc(i_VPPriceLevels, barsNumber1D)
+
+VPocPrice1DTmp = vol.vpoc(i_VPPriceLevels, barsNumber1D)
+
+var float VPocPrice1D = VPocPrice1DTmp
+
+if newTrendMaBarIndex1D
+    VPocPrice1D := VPocPrice1DTmp
 
 // Final logic
-bool longCondition1 = (fastMa4H >= slowMa4H)
+bool longCondition1 = trend4HLong
 bool longCondition2 = (fastMa >= slowMa)
 bool longCondition3 = (adx_sig < 23.0)
 bool longCondition4 = newUpTrendSqzmom
@@ -587,7 +641,7 @@ bool longCondition6Found = false
 bool longCondition7Found = false
 bool longCondition8Found = false
 
-bool shortCondition1 = (fastMa4H <= slowMa4H)
+bool shortCondition1 = trend4HShort
 bool shortCondition2 = (fastMa <= slowMa)
 bool shortCondition3 = (adx_sig < 23.0)
 bool shortCondition4 = newDownTrendSqzmom
