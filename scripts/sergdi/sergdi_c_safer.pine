@@ -267,7 +267,7 @@ i_lowestClosingMaLength = input.int(18, minval = 1,  title = '(STRAT) Lowest Clo
 i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
 i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
 
-i_enableVolatilityProtection = input.bool(false, '(STRAT) Enable Volatility Protection? {False}')
+i_enableVolatilityProtection = input.bool(true, '(STRAT) Enable Volatility Protection? {True}')
 
 i_atrVolatilityLength = input.int(14, minval = 1,  title = '(STRAT) ATR Volatility Length [14]')
 i_atrVolatilitySource = input.source(close, title = '(STRAT) ATR Volatility Source [close]')
@@ -275,17 +275,17 @@ i_atrVolatilityMultiplier = input.float(2.00, title='(STRAT) ATR Volatility Mult
 
 i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
 
-i_enableLongEdgeProtection = input.bool(false, '(STRAT) Enable Long Edge Protection? {False}')
+i_enableLongEdgeProtection = input.bool(true, '(STRAT) Enable Long Edge Protection? {True}')
 i_longEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Long Edge Length [100]')
 i_longEdgeSource = input.source(high, title = '(STRAT) Long Edge Source [high]')
-i_longEdgeMinimumDistance = input.float(3.50, title='(STRAT) Long Edge Minimum Distance % {3.50}', minval=0.01)
-i_enableLongEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Long Edge TakeProfit Protection? {False}')
+i_longEdgeMinimumDistance = input.float(1.10, title='(STRAT) Long Edge Minimum Distance % {1.10}', minval=0.01)
+i_enableLongEdgeTakeProfitProtection = input.bool(true, '(STRAT) Enable Long Edge TakeProfit Protection? {True}')
 
-i_enableShortEdgeProtection = input.bool(false, '(STRAT) Enable Short Edge Protection? {False}')
+i_enableShortEdgeProtection = input.bool(true, '(STRAT) Enable Short Edge Protection? {True}')
 i_shortEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Short Edge Length [100]')
 i_shortEdgeSource = input.source(low, title = '(STRAT) Short Edge Source [low]')
-i_shortEdgeMinimumDistance = input.float(3.50, title='(STRAT) Short Edge Minimum Distance % {3.50}', minval=0.01)
-i_enableShortEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Short Edge TakeProfit Protection? {False}')
+i_shortEdgeMinimumDistance = input.float(1.10, title='(STRAT) Short Edge Minimum Distance % {1.10}', minval=0.01)
+i_enableShortEdgeTakeProfitProtection = input.bool(true, '(STRAT) Enable Short Edge TakeProfit Protection? {True}')
 
 i_showEdges = input.bool(false, title='(STRAT) Show Edge Minimum and Maximum {False}')
 
