@@ -303,6 +303,8 @@ i_higherTimeframeTrendSlowMaSource = input.source(close, title = '(STRAT) Higher
 
 i_higherTimeframeTrendMaEnforce = input.bool(true, title='(STRAT) Enforce Higher Timeframe Trend {True}')
 
+i_doNotOpenTradesInWeekends = input.bool(false, title='(STRAT) Do Not Open Trades in Weekends {False}')
+
 // INPUTS - END
 
 
@@ -451,6 +453,13 @@ getTrend (_fastMaType, _fastMaLength, _fastMaSource, _slowMaType, _slowMaLength,
 
 
 // Strategy Body - BEGIN
+
+// Do Not Open Trades in Weekends substrategy
+
+bool doNotOpenTradesInWeekendsAdvice = true
+
+if ((dayofweek == dayofweek.saturday) or (dayofweek == dayofweek.sunday))
+    doNotOpenTradesInWeekendsAdvice := false
 
 // Higher Timeframe Trend substrategy
 
@@ -625,6 +634,10 @@ if i_enableShortEdgeProtection
 if (i_higherTimeframeTrendMaEnforce)
     longCondition := longCondition and higherTimeframeTrendMaLong
     shortCondition := shortCondition and higherTimeframeTrendMaShort
+
+if (i_doNotOpenTradesInWeekends)
+    longCondition := longCondition and doNotOpenTradesInWeekendsAdvice
+    shortCondition := shortCondition and doNotOpenTradesInWeekendsAdvice
 
 // Closing Curie MAs - Plot - BEGIN
 highestClosingLowestColor = i_showRibbon ? color.yellow : na
