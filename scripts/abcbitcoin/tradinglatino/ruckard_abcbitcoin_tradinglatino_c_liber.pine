@@ -290,9 +290,11 @@ i_sqzmomUseTrueRange = input.bool(true, title='(SQZMOM) Use TrueRange (KC) {True
 i_VPVRVpocNBars = input.int(100, '(VP) Number of bars for VPVR VPOC {100}', minval=1, maxval=500)
 i_VPPriceLevels = input.int(24, '(VP) Price levels {24}', minval=10, maxval=500)
 i_higherTimeframeVPVRVpocTimeframe = input.timeframe('240',title='(STRAT) Higher Timeframe VPVR VPoC Timeframe {4 hours}')
-i_subStrategiesLookback = input.int(2, title='(STRAT) Substrategies Lookback [2]')
-i_subStrategiesMinimum = input.int(8, title='(STRAT) Substrategies minimum [8]')
 
+i_subStrategiesLookbackLong = input.int(2, title='(STRAT) LONG Substrategies Lookback [2]')
+i_subStrategiesMinimumLong = input.int(8, title='(STRAT) LONG Substrategies minimum [8]')
+i_subStrategiesLookbackShort = input.int(2, title='(STRAT) SHORT Substrategies Lookback [2]')
+i_subStrategiesMinimumShort = input.int(8, title='(STRAT) SHORT Substrategies minimum [8]')
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -661,7 +663,7 @@ bool shortCondition8Found = false
 
 longConditions = 0
 shortConditions = 0
-for i = (i_subStrategiesLookback - 1) to 0
+for i = (i_subStrategiesLookbackLong - 1) to 0
     if longCondition1[i]
         longCondition1Found := true
     if longCondition2[i]
@@ -678,6 +680,8 @@ for i = (i_subStrategiesLookback - 1) to 0
         longCondition7Found := true
     if longCondition8[i]
         longCondition8Found := true
+
+for i = (i_subStrategiesLookbackShort - 1) to 0
     if shortCondition1[i]
         shortCondition1Found := true
     if shortCondition2[i]
@@ -728,8 +732,8 @@ if shortCondition7Found
 if shortCondition8Found
     shortConditions := shortConditions + 1
 
-longCondition = longConditions >= i_subStrategiesMinimum
-shortCondition = shortConditions >= i_subStrategiesMinimum
+longCondition = longConditions >= i_subStrategiesMinimumLong
+shortCondition = shortConditions >= i_subStrategiesMinimumShort
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 marronColor=#800000
