@@ -330,6 +330,24 @@ i_riskManagementMaximumLossPerDay = input.float(6.0, title='(RISKM) Maximum loss
 i_riskManagementMaximumLossPerWeek = input.float(8.0, title='(RISKM) Maximum loss per week % {8.0}') / 100
 i_riskManagementMaximumLossPerMonth = input.float(10.0, title='(RISKM) Maximum loss per month % {10.0}') / 100
 
+i_enableTrend4HLong = input.bool(true, title='(STRAT) LONG - Enable Trend 4H {True}')
+i_enableTrendLong = input.bool(true, title='(STRAT) LONG - Enable Trend {True}')
+i_enableADXUnder23Long = input.bool(true, title='(STRAT) LONG - Enable ADX Under 23 {True}')
+i_enableNewSqzmomUptrendLong = input.bool(true, title='(STRAT) LONG - Enable New SQMOM Uptrend {True}')
+i_enablePriceAboveVPVRVPoCPriceLong = input.bool(true, title='(STRAT) LONG - Enable Price above VPVR VPoc Price {True}')
+i_enableUptrend1DLong = input.bool(true, title='(STRAT) LONG - Enable Uptrend 1D {True}')
+i_enablePriceAboveVpocPrice1DLong = input.bool(true, title='(STRAT) LONG - Enable Price Above VPoC Price 1D {True}')
+i_enablePriceAboveFastMALong = input.bool(true, title='(STRAT) LONG - Enable Price Above Fast MA {True}')
+
+i_enableTrend4HShort = input.bool(true, title='(STRAT) SHORT - Enable Trend 4H {True}')
+i_enableTrendShort = input.bool(true, title='(STRAT) SHORT - Enable Trend {True}')
+i_enableADXUnder23Short = input.bool(true, title='(STRAT) SHORT - Enable ADX Under 23 {True}')
+i_enableNewSqzmomDowntrendShort = input.bool(true, title='(STRAT) SHORT - Enable New SQMOM Downtrend {True}')
+i_enablePriceBelowVPVRVPoCPriceShort = input.bool(true, title='(STRAT) SHORT - Enable Price below VPVR VPoc Price {True}')
+i_enableDowntrend1DShort = input.bool(true, title='(STRAT) SHORT - Enable Downtrend 1D {True}')
+i_enablePriceBelowVpocPrice1DShort = input.bool(true, title='(STRAT) SHORT - Enable Price Below VPoC Price 1D {True}')
+i_enablePriceBelowFastMAShort = input.bool(true, title='(STRAT) SHORT - Enable Price Below Fast MA {True}')
+
 // INPUTS - END
 
 
@@ -625,14 +643,14 @@ if newTrendMaBarIndex1D
     VPocPrice1D := VPocPrice1DTmp
 
 // Final logic
-bool longCondition1 = trend4HLong
-bool longCondition2 = (fastMa >= slowMa)
-bool longCondition3 = (adx_sig < 23.0)
-bool longCondition4 = newUpTrendSqzmom
-bool longCondition5 = (close >= VPVRPocPrice)
-bool longCondition6 = upTrend1D
-bool longCondition7 = (close >= VPocPrice1D)
-bool longCondition8 = (close >= fastMa)
+bool longCondition1 = i_enableTrend4HLong ? trend4HLong : false
+bool longCondition2 = i_enableTrendLong ? (fastMa >= slowMa) : false
+bool longCondition3 = i_enableADXUnder23Long ? (adx_sig < 23.0) : false
+bool longCondition4 = i_enableNewSqzmomUptrendLong ? newUpTrendSqzmom : false
+bool longCondition5 = i_enablePriceAboveVPVRVPoCPriceLong ? (close >= VPVRPocPrice) : false
+bool longCondition6 = i_enableUptrend1DLong ? upTrend1D : false
+bool longCondition7 = i_enablePriceAboveVpocPrice1DLong ? (close >= VPocPrice1D) : false
+bool longCondition8 = i_enablePriceAboveFastMALong ? (close >= fastMa) : false
 
 bool longCondition1Found = false
 bool longCondition2Found = false
@@ -643,14 +661,14 @@ bool longCondition6Found = false
 bool longCondition7Found = false
 bool longCondition8Found = false
 
-bool shortCondition1 = trend4HShort
-bool shortCondition2 = (fastMa <= slowMa)
-bool shortCondition3 = (adx_sig < 23.0)
-bool shortCondition4 = newDownTrendSqzmom
-bool shortCondition5 = (close <= VPVRPocPrice)
-bool shortCondition6 = downTrend1D
-bool shortCondition7 = (close <= VPocPrice1D)
-bool shortCondition8 = (close <= fastMa)
+bool shortCondition1 = i_enableTrend4HShort ? trend4HShort : false
+bool shortCondition2 = i_enableTrendShort ? (fastMa <= slowMa) : false
+bool shortCondition3 = i_enableADXUnder23Short ? (adx_sig < 23.0) : false
+bool shortCondition4 = i_enableNewSqzmomDowntrendShort ? newDownTrendSqzmom : false
+bool shortCondition5 = i_enablePriceBelowVPVRVPoCPriceShort ? (close <= VPVRPocPrice) : false
+bool shortCondition6 = i_enableDowntrend1DShort ? downTrend1D : false
+bool shortCondition7 = i_enablePriceBelowVpocPrice1DShort ? (close <= VPocPrice1D) : false
+bool shortCondition8 = i_enablePriceBelowFastMAShort ? (close <= fastMa) : false
 
 bool shortCondition1Found = false
 bool shortCondition2Found = false
