@@ -289,6 +289,20 @@ i_enableShortEdgeTakeProfitProtection = input.bool(true, '(STRAT) Enable Short E
 
 i_showEdges = input.bool(false, title='(STRAT) Show Edge Minimum and Maximum {False}')
 
+i_higherTimeframeTrendMaTimeframe = input.timeframe("60",title='(STRAT) Higher Timeframe Trend MA Timeframe {1 hour}')
+
+i_higherTimeframeTrendMaOffset = input.int(12,title='(STRAT) Higher Timeframe Trend MA Bars Offset {12 bars}')
+
+i_higherTimeframeTrendFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend Fast MA Type {EMA}')
+i_higherTimeframeTrendFastMaLength = input.int(1, minval = 1,  title = '(STRAT) Higher Timeframe Trend Fast MA Length {1}')
+i_higherTimeframeTrendFastMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Fast MA Source {close}')
+
+i_higherTimeframeTrendSlowMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend Slow MA Type {EMA}')
+i_higherTimeframeTrendSlowMaLength = input.int(12, minval = 1,  title = '(STRAT) Higher Timeframe Trend Slow MA Length {12}')
+i_higherTimeframeTrendSlowMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Slow MA Source {close}')
+
+i_higherTimeframeTrendMaEnforce = input.bool(false, title='(STRAT) Enforce Higher Timeframe Trend {False}')
+
 // INPUTS - END
 
 
@@ -425,10 +439,32 @@ f_Ma (_maType, _maSource, _maLength) =>
     _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : ta.wma(_maSource, _maLength)
 // MA - Functions - END
 
+getTrend (_fastMaType, _fastMaLength, _fastMaSource, _slowMaType, _slowMaLength, _slowMaSource, _offset) =>
+    _fastMa = f_Ma (_fastMaType, _fastMaSource, _fastMaLength)
+    _slowMa = f_Ma (_slowMaType, _slowMaSource, _slowMaLength)
+    _trend = _fastMa >= _slowMa
+
+    _trendOffset = _trend[_offset]
+    _trendOffset
+
 // FUNCTIONS - END
 
 
 // Strategy Body - BEGIN
+
+// Higher Timeframe Trend substrategy
+
+higherTimeframeTrend = request.security(syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, getTrend (i_higherTimeframeTrendFastMaType, i_higherTimeframeTrendFastMaLength, i_higherTimeframeTrendFastMaSource, i_higherTimeframeTrendSlowMaType, i_higherTimeframeTrendSlowMaLength, i_higherTimeframeTrendSlowMaSource, i_higherTimeframeTrendMaOffset))
+
+int higherTimeframeTrendMaBarIndex = request.security (syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, bar_index)
+bool newHigherTimeframeTrendMaBar = higherTimeframeTrendMaBarIndex[1] != higherTimeframeTrendMaBarIndex[0]
+
+var higherTimeframeTrendMaLong = higherTimeframeTrend
+var higherTimeframeTrendMaShort = (not higherTimeframeTrend)
+
+if newHigherTimeframeTrendMaBar
+    higherTimeframeTrendMaLong := higherTimeframeTrend
+    higherTimeframeTrendMaShort := (not higherTimeframeTrend)
 
 // Volatility substrategy
 
@@ -585,6 +621,10 @@ if i_enableLongEdgeProtection
 
 if i_enableShortEdgeProtection
     shortCondition := shortCondition and edgeShortCondition
+
+if (i_higherTimeframeTrendMaEnforce)
+    longCondition := longCondition and higherTimeframeTrendMaLong
+    shortCondition := shortCondition and higherTimeframeTrendMaShort
 
 // Closing Curie MAs - Plot - BEGIN
 highestClosingLowestColor = i_showRibbon ? color.yellow : na
