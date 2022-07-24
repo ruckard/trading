@@ -520,6 +520,11 @@ longCondition := (longConditions >= i_subStrategiesMinimum)
 shortCondition := (shortConditions >= i_subStrategiesMinimum)
 // Common Logic to go LONG/LONG or go SHORT/SHORT - END
 
+// Closing Curie MAs - Plot - BEGIN
+highestClosingLowestColor = i_showRibbon ? color.yellow : na
+highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = "Upper Closing line")
+lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
+// Closing Curie MAs - Plot - END
 
 // Position price calculation - BEGIN
 float positionPrice = na
