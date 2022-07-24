@@ -289,9 +289,9 @@ i_enableShortEdgeTakeProfitProtection = input.bool(true, '(STRAT) Enable Short E
 
 i_showEdges = input.bool(false, title='(STRAT) Show Edge Minimum and Maximum {False}')
 
-i_higherTimeframeTrendMaTimeframe = input.timeframe("60",title='(STRAT) Higher Timeframe Trend MA Timeframe {1 hour}')
+i_higherTimeframeTrendMaTimeframe = input.timeframe("30",title='(STRAT) Higher Timeframe Trend MA Timeframe {30 minutes}')
 
-i_higherTimeframeTrendMaOffset = input.int(12,title='(STRAT) Higher Timeframe Trend MA Bars Offset {12 bars}')
+i_higherTimeframeTrendMaOffset = input.int(4,title='(STRAT) Higher Timeframe Trend MA Bars Offset {4 bars}')
 
 i_higherTimeframeTrendFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend Fast MA Type {EMA}')
 i_higherTimeframeTrendFastMaLength = input.int(1, minval = 1,  title = '(STRAT) Higher Timeframe Trend Fast MA Length {1}')
@@ -301,7 +301,7 @@ i_higherTimeframeTrendSlowMaType = input.string(defval = 'EMA', options = ['SMA'
 i_higherTimeframeTrendSlowMaLength = input.int(12, minval = 1,  title = '(STRAT) Higher Timeframe Trend Slow MA Length {12}')
 i_higherTimeframeTrendSlowMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Slow MA Source {close}')
 
-i_higherTimeframeTrendMaEnforce = input.bool(false, title='(STRAT) Enforce Higher Timeframe Trend {False}')
+i_higherTimeframeTrendMaEnforce = input.bool(true, title='(STRAT) Enforce Higher Timeframe Trend {True}')
 
 // INPUTS - END
 
