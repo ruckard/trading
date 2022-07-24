@@ -281,11 +281,11 @@ i_longEdgeSource = input.source(high, title = '(STRAT) Long Edge Source [high]')
 i_longEdgeMinimumDistance = input.float(1.10, title='(STRAT) Long Edge Minimum Distance % {1.10}', minval=0.01)
 i_enableLongEdgeTakeProfitProtection = input.bool(true, '(STRAT) Enable Long Edge TakeProfit Protection? {True}')
 
-i_enableShortEdgeProtection = input.bool(true, '(STRAT) Enable Short Edge Protection? {True}')
+i_enableShortEdgeProtection = input.bool(false, '(STRAT) Enable Short Edge Protection? {False}')
 i_shortEdgeLength = input.int(95, minval = 1,  title = '(STRAT) Short Edge Length [95]')
 i_shortEdgeSource = input.source(low, title = '(STRAT) Short Edge Source [low]')
 i_shortEdgeMinimumDistance = input.float(1.10, title='(STRAT) Short Edge Minimum Distance % {1.10}', minval=0.01)
-i_enableShortEdgeTakeProfitProtection = input.bool(true, '(STRAT) Enable Short Edge TakeProfit Protection? {True}')
+i_enableShortEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Short Edge TakeProfit Protection? {False}')
 
 i_showEdges = input.bool(false, title='(STRAT) Show Edge Minimum and Maximum {False}')
 
@@ -301,9 +301,9 @@ i_higherTimeframeTrendSlowMaType = input.string(defval = 'EMA', options = ['SMA'
 i_higherTimeframeTrendSlowMaLength = input.int(12, minval = 1,  title = '(STRAT) Higher Timeframe Trend Slow MA Length {12}')
 i_higherTimeframeTrendSlowMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Slow MA Source {close}')
 
-i_higherTimeframeTrendMaEnforce = input.bool(true, title='(STRAT) Enforce Higher Timeframe Trend {True}')
+i_higherTimeframeTrendMaEnforce = input.bool(false, title='(STRAT) Enforce Higher Timeframe Trend {False}')
 
-i_doNotOpenTradesInWeekends = input.bool(false, title='(STRAT) Do Not Open Trades in Weekends {False}')
+i_doNotOpenTradesInWeekends = input.bool(true, title='(STRAT) Do Not Open Trades in Weekends {True}')
 
 // INPUTS - END
 
