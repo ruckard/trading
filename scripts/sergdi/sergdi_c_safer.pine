@@ -3,7 +3,7 @@
 
 //@version=5
 
-// Current version: v20220724 ( C001 )
+// Current version: v20220724 ( C002 )
 // Tradingview Public description - BEGIN
 // 
 // This strategy enter long positions when 4h DI+ crosses over 4h DI-.
@@ -173,7 +173,7 @@
 
 // Tradingview Public description - END
 
-strategy('Sergdi C001', shorttitle='C001Sergdi', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Sergdi C002', shorttitle='C002Sergdi', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/ZignalyBeta/21 as zig
