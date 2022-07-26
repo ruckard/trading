@@ -556,7 +556,7 @@ if LONG
 //     else if ( i_stopLossType == 'atr' )
 //         orderStopLossPerOne := (close - atrLongStopLossPrice) / close
 
-    float engulfingLongStopLossPrice = open - 2.0 * (close - open)
+    float engulfingLongStopLossPrice = open - (2.0 * (close - open))
     orderStopLossPerOne := (close - engulfingLongStopLossPrice) / close
     orderStopLoss := orderStopLossPerOne * 100
 else
@@ -565,7 +565,7 @@ else
 //     else if ( i_stopLossType == 'atr' )
 //         orderStopLossPerOne := (atrShortStopLossPrice - close) / atrShortStopLossPrice
 
-    float engulfingShortStopLossPrice = open + 2.0 * (close - open)
+    float engulfingShortStopLossPrice = open + (2.0 * (open - close))
     orderStopLossPerOne := (engulfingShortStopLossPrice - close) / engulfingShortStopLossPrice
     orderStopLoss := orderStopLossPerOne * 100
 
