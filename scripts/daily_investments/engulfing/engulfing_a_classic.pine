@@ -6,7 +6,20 @@
 // Current version: v20220726 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a beginner's guide to connect TradingView signals to Zignaly Crypto Trading Platform.
+// How this strategy works:
+// Price above EMA200 -> Only long entries
+// Price below EMA200 -> Only short entries
+//
+// Long entry: First find three consecutive red candles, then one green candle
+// which it's engulfing the previous one (Engulfing its previous body with the current body).
+//
+// Settings of the long entry:
+//
+// StopLoss: Twice the body length.
+// TakeProfit: 2 x StopLoss
+//
+// Same logic for short trades.
+//
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 5m timeframe.
