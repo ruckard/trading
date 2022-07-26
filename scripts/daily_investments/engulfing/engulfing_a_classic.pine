@@ -658,11 +658,11 @@ if (not insideABuyOrder)
 if (not insideASellOrder)
     ShortTakeProfit := close * (1 - takeProfitPerOne)
 
-// Final TakeProfit value based on actual position price
-if ((not insideABuyOrder[1]) and (insideABuyOrder))
-    LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
-if ((not insideASellOrder[1]) and (insideASellOrder))
-    ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
+// // Final TakeProfit value based on actual position price
+// if ((not insideABuyOrder[1]) and (insideABuyOrder))
+//     LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
+// if ((not insideASellOrder[1]) and (insideASellOrder))
+//     ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
