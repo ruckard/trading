@@ -612,11 +612,11 @@ if (i_enableStopLoss and (not insideABuyOrder))
 if (i_enableStopLoss and (not insideASellOrder))
     ShortStopLoss := close * (1 + orderStopLossPerOne)
 
-// Final StopLoss value based on actual position price
-if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
-    LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
-if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
-    ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+// // Final StopLoss value based on actual position price
+// if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
+//     LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+// if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
+//     ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 
 // Make sure LongStopLoss and ShortStopLoss are undefined
 // by default when i_enableStopLoss is set to false
