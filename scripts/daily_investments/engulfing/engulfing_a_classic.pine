@@ -376,6 +376,19 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
 
 // Strategy Body - BEGIN
 
+// Engulfing Substrategy
+
+// Engulfing - Long condition
+bool threePreviousRedCandles = (close[3] < open[3]) and (close[2] < open[2]) and (close[1] < open[1])
+bool engulfingLongCandle = (close[0] > close[1]) and (open[0] < open[1])
+
+bool engulfingLong = threePreviousRedCandles and engulfingLongCandle
+
+// Engulfing - Short condition
+bool threePreviousGreenCandles = (close[3] > open[3]) and (close[2] > open[2]) and (close[1] > open[1])
+bool engulfingShortCandle = (close[0] < close[1]) and (open[0] > open[1])
+
+bool engulfingShort = threePreviousGreenCandles and engulfingShortCandle
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
