@@ -218,7 +218,7 @@ i_enableRiskRewardRatio = input.bool(false, title='(STOPTAKE) Calculate Take Pro
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
 i_positionRatio = input.float(1.5, title='(STRAT) Risk/Reward Ratio % {1.5}', minval=0.01)
-i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
+// i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLConstant_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
@@ -536,18 +536,22 @@ if SHORT_CLOSE
 atrLongStopLossPrice = i_atrStopLossSource - (ta.atr(i_atrStopLossLength) * i_atrStopLossMultiplier)
 atrShortStopLossPrice = i_atrStopLossSource + (ta.atr(i_atrStopLossLength) * i_atrStopLossMultiplier)
 if LONG
-    if ( i_stopLossType == 'constant' )
-        orderStopLossPerOne := i_stopLoss
-    else if ( i_stopLossType == 'atr' )
-        orderStopLossPerOne := (close - atrLongStopLossPrice) / close
+//     if ( i_stopLossType == 'constant' )
+//         orderStopLossPerOne := i_stopLoss
+//     else if ( i_stopLossType == 'atr' )
+//         orderStopLossPerOne := (close - atrLongStopLossPrice) / close
 
+    float engulfingLongStopLossPrice = open - 2.0 * (close - open)
+    orderStopLossPerOne := (close - engulfingLongStopLossPrice) / close
     orderStopLoss := orderStopLossPerOne * 100
 else
-    if ( i_stopLossType == 'constant' )
-        orderStopLossPerOne := i_stopLoss
-    else if ( i_stopLossType == 'atr' )
-        orderStopLossPerOne := (atrShortStopLossPrice - close) / atrShortStopLossPrice
+//     if ( i_stopLossType == 'constant' )
+//         orderStopLossPerOne := i_stopLoss
+//     else if ( i_stopLossType == 'atr' )
+//         orderStopLossPerOne := (atrShortStopLossPrice - close) / atrShortStopLossPrice
 
+    float engulfingShortStopLossPrice = open + 2.0 * (close - open)
+    orderStopLossPerOne := (engulfingShortStopLossPrice - close) / engulfingShortStopLossPrice
     orderStopLoss := orderStopLossPerOne * 100
 
 var float LongBreakEvenTrigger = na
