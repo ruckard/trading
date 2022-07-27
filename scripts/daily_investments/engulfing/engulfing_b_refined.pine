@@ -266,6 +266,9 @@ i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 i_trendMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Trend MA Type {EMA}')
 i_trendMaLength = input.int(200, minval = 1,  title = '(STRAT) Trend MA Length {200}')
 i_trendMaSource = input.source(close, title = '(STRAT) Trend MA Source {close}')
+
+i_minimumEngolfingBodyLength = input.float(0.20, title='(STRAT) Minimum Body Length % {0.20}')
+i_minimumEngolfingBodyLengthPerOne = i_minimumEngolfingBodyLength / 100
 // INPUTS - END
 
 
@@ -390,18 +393,22 @@ f_Ma (_maType, _maSource, _maLength) =>
 trendMa = f_Ma (i_trendMaType, i_trendMaSource, i_trendMaLength)
 
 // Engulfing - Long condition
+bool minimumEngulfingBodyLong = ((close - open)/open) >= i_minimumEngolfingBodyLengthPerOne
+
 bool threePreviousRedCandles = (close[3] < open[3]) and (close[2] < open[2]) and (close[1] < open[1])
 bool engulfingLongCandle = (close[0] > open[1]) and (open[0] < close[1])
 
-bool engulfingLong = threePreviousRedCandles and engulfingLongCandle
+bool engulfingLong = threePreviousRedCandles and engulfingLongCandle and minimumEngulfingBodyLong
 if (true)
     engulfingLong := engulfingLong and (close >= trendMa)
 
 // Engulfing - Short condition
+bool minimumEngulfingBodyShort = ((open - close)/close) >= i_minimumEngolfingBodyLengthPerOne
+
 bool threePreviousGreenCandles = (close[3] > open[3]) and (close[2] > open[2]) and (close[1] > open[1])
 bool engulfingShortCandle = (open[0] > close[1]) and (close[0] < open[1])
 
-bool engulfingShort = threePreviousGreenCandles and engulfingShortCandle
+bool engulfingShort = threePreviousGreenCandles and engulfingShortCandle and minimumEngulfingBodyShort
 if (true)
     engulfingShort := engulfingShort and (close < trendMa)
 
