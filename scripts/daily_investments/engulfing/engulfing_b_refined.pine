@@ -269,6 +269,8 @@ i_trendMaSource = input.source(close, title = '(STRAT) Trend MA Source {close}')
 
 i_minimumEngolfingBodyLength = input.float(0.20, title='(STRAT) Minimum Body Length % {0.20}')
 i_minimumEngolfingBodyLengthPerOne = i_minimumEngolfingBodyLength / 100
+
+i_enforcePerfectShadows = input.bool(false, '(STRAT) Enforce Perfect Shadows? {False}')
 // INPUTS - END
 
 
@@ -394,21 +396,29 @@ trendMa = f_Ma (i_trendMaType, i_trendMaSource, i_trendMaLength)
 
 // Engulfing - Long condition
 bool minimumEngulfingBodyLong = ((close - open)/open) >= i_minimumEngolfingBodyLengthPerOne
+bool threeDescendingRedCandles = (close[3] > close[2]) and (close[2] > close[1]) and (open[3] > open[2]) and (open[2] > open[1])
+bool threeDescendingShadowRedCandles = (high[3] > high[2]) and (high[2] > high[1]) and (low[3] > low[2]) and (low[2] > low[1])
 
 bool threePreviousRedCandles = (close[3] < open[3]) and (close[2] < open[2]) and (close[1] < open[1])
 bool engulfingLongCandle = (close[0] > open[1]) and (open[0] < close[1])
 
-bool engulfingLong = threePreviousRedCandles and engulfingLongCandle and minimumEngulfingBodyLong
+bool engulfingLong = threePreviousRedCandles and engulfingLongCandle and minimumEngulfingBodyLong and threeDescendingRedCandles
+if (i_enforcePerfectShadows)
+    engulfingLong := engulfingLong and threeDescendingShadowRedCandles
 if (true)
     engulfingLong := engulfingLong and (close >= trendMa)
 
 // Engulfing - Short condition
 bool minimumEngulfingBodyShort = ((open - close)/close) >= i_minimumEngolfingBodyLengthPerOne
+bool threeAscendingGreenCandles = (close[3] < close[2]) and (close[2] < close[1]) and (open[3] < open[2]) and (open[2] < open[1])
+bool threeAscendingShadowGreenCandles = (high[3] < high[2]) and (high[2] < high[1]) and (low[3] < low[2]) and (low[2] < low[1])
 
 bool threePreviousGreenCandles = (close[3] > open[3]) and (close[2] > open[2]) and (close[1] > open[1])
 bool engulfingShortCandle = (open[0] > close[1]) and (close[0] < open[1])
 
-bool engulfingShort = threePreviousGreenCandles and engulfingShortCandle and minimumEngulfingBodyShort
+bool engulfingShort = threePreviousGreenCandles and engulfingShortCandle and minimumEngulfingBodyShort and threeAscendingGreenCandles
+if (i_enforcePerfectShadows)
+    engulfingShort := engulfingShort and threeAscendingShadowGreenCandles
 if (true)
     engulfingShort := engulfingShort and (close < trendMa)
 
