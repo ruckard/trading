@@ -271,6 +271,8 @@ i_minimumEngolfingBodyLength = input.float(0.20, title='(STRAT) Minimum Body Len
 i_minimumEngolfingBodyLengthPerOne = i_minimumEngolfingBodyLength / 100
 
 i_enforcePerfectShadows = input.bool(false, '(STRAT) Enforce Perfect Shadows? {False}')
+
+i_bodyStopLossMultiplier = input.float(2.00, title='(STRAT) Body Stop Loss Multiplier {2.00}', minval=0.01)
 // INPUTS - END
 
 
@@ -573,7 +575,7 @@ if LONG
 //     else if ( i_stopLossType == 'atr' )
 //         orderStopLossPerOne := (close - atrLongStopLossPrice) / close
 
-    float engulfingLongStopLossPrice = close - (2.0 * (close - open))
+    float engulfingLongStopLossPrice = close - (i_bodyStopLossMultiplier * (close - open))
     orderStopLossPerOne := (close - engulfingLongStopLossPrice) / close
     orderStopLoss := orderStopLossPerOne * 100
 else
@@ -582,7 +584,7 @@ else
 //     else if ( i_stopLossType == 'atr' )
 //         orderStopLossPerOne := (atrShortStopLossPrice - close) / atrShortStopLossPrice
 
-    float engulfingShortStopLossPrice = close + (2.0 * (open - close))
+    float engulfingShortStopLossPrice = close + (i_bodyStopLossMultiplier * (open - close))
     orderStopLossPerOne := (engulfingShortStopLossPrice - close) / engulfingShortStopLossPrice
     orderStopLoss := orderStopLossPerOne * 100
 
