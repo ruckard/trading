@@ -273,6 +273,8 @@ i_minimumEngolfingBodyLengthPerOne = i_minimumEngolfingBodyLength / 100
 i_enforcePerfectShadows = input.bool(false, '(STRAT) Enforce Perfect Shadows? {False}')
 
 i_bodyStopLossMultiplier = input.float(2.00, title='(STRAT) Body Stop Loss Multiplier {2.00}', minval=0.01)
+i_trendMaDecidesSide = input.bool(true, '(STRAT) Trend MA decides Side? {True}')
+i_trendMaDecidesSideInverse = input.bool(false, '(STRAT) Trend MA decides Side but inverse? {False}')
 // INPUTS - END
 
 
@@ -407,8 +409,11 @@ bool engulfingLongCandle = (close[0] > open[1]) and (open[0] < close[1])
 bool engulfingLong = threePreviousRedCandles and engulfingLongCandle and minimumEngulfingBodyLong and threeDescendingRedCandles
 if (i_enforcePerfectShadows)
     engulfingLong := engulfingLong and threeDescendingShadowRedCandles
-if (true)
-    engulfingLong := engulfingLong and (close >= trendMa)
+if (i_trendMaDecidesSide)
+    if (not i_trendMaDecidesSideInverse)
+        engulfingLong := engulfingLong and (close >= trendMa)
+    else
+        engulfingLong := engulfingLong and (close < trendMa)
 
 // Engulfing - Short condition
 bool minimumEngulfingBodyShort = ((open - close)/close) >= i_minimumEngolfingBodyLengthPerOne
@@ -421,8 +426,11 @@ bool engulfingShortCandle = (open[0] > close[1]) and (close[0] < open[1])
 bool engulfingShort = threePreviousGreenCandles and engulfingShortCandle and minimumEngulfingBodyShort and threeAscendingGreenCandles
 if (i_enforcePerfectShadows)
     engulfingShort := engulfingShort and threeAscendingShadowGreenCandles
-if (true)
-    engulfingShort := engulfingShort and (close < trendMa)
+if (i_trendMaDecidesSide)
+    if (not i_trendMaDecidesSideInverse)
+        engulfingShort := engulfingShort and (close < trendMa)
+    else
+        engulfingShort := engulfingShort and (close >= trendMa)
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
