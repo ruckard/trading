@@ -286,6 +286,15 @@ i_tooOldLongStopLoss = input.float(1.00, '(OLD) Too Old Long order Stop Loss (%)
 i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
 i_tooOldShortStopLoss = input.float(1.00, '(OLD) Too Old Short order Stop Loss (%) {1.00}', minval=0, step=0.01)
 i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
+
+i_enableVolatilityProtection = input.bool(false, '(STRAT) Enable Volatility Protection? {False}')
+
+i_atrVolatilityLength = input.int(14, minval = 1,  title = '(STRAT) ATR Volatility Length [14]')
+i_atrVolatilitySource = input.source(close, title = '(STRAT) ATR Volatility Source [close]')
+i_atrVolatilityMultiplier = input.float(1.10, title='(STRAT) ATR Volatility Multiplier % {1.10}', minval=0.01)
+
+i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
+
 // INPUTS - END
 
 
@@ -433,6 +442,23 @@ getTooOldOrderShortCloseAdvice () =>
 
 // Strategy Body - BEGIN
 
+// Volatility substrategy
+
+volatilityLongCondition = true
+volatilityShortCondition = true
+
+atrLongVolatilityPrice = i_atrVolatilitySource + (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
+barIsVolatileLong = (close[0] >= open[0]) and (close[0] >= atrLongVolatilityPrice[1])
+
+if barIsVolatileLong or barIsVolatileLong[1]
+    volatilityLongCondition := false
+
+atrShortVolatilityPrice = i_atrVolatilitySource - (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
+barIsVolatileShort = (close[0] <= open[0]) and (close[0] <= atrShortVolatilityPrice[1])
+
+if barIsVolatileShort or barIsVolatileShort[1]
+    volatilityShortCondition := false
+
 // Too old logic
 
 tooOldOrderLongCloseAdvice = getTooOldOrderLongCloseAdvice ()
@@ -556,9 +582,17 @@ bool shortCondition = na
 
 longCondition := (longConditions >= i_subStrategiesMinimum)
 shortCondition := (shortConditions >= i_subStrategiesMinimum)
+
+if i_enableVolatilityProtection
+    longCondition := longCondition and volatilityLongCondition
+    shortCondition := shortCondition and volatilityShortCondition
+
 // Common Logic to go LONG/LONG or go SHORT/SHORT - END
 
 trendMaPlot = plot(i_showTrendMa ? trendMa : na, color = color.maroon, title = 'Trend MA')
+
+atrLongVolatilityPricePlot = plot(i_showAtrVolatilityMultiplier ? atrLongVolatilityPrice : na, color = color.maroon, title = 'Long Volatility Price')
+atrShortVolatilityPricePlot = plot(i_showAtrVolatilityMultiplier ? atrShortVolatilityPrice : na, color = color.maroon, title = 'Short Volatility Price')
 
 // Position price calculation - BEGIN
 float positionPrice = na
