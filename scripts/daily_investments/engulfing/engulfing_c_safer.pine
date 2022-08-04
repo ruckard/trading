@@ -275,6 +275,8 @@ i_enforcePerfectShadows = input.bool(false, '(STRAT) Enforce Perfect Shadows? {F
 i_bodyStopLossMultiplier = input.float(2.00, title='(STRAT) Body Stop Loss Multiplier {2.00}', minval=0.01)
 i_trendMaDecidesSide = input.bool(true, '(STRAT) Trend MA decides Side? {True}')
 i_trendMaDecidesSideInverse = input.bool(false, '(STRAT) Trend MA decides Side but inverse? {False}')
+
+i_showTrendMa = input.bool(true, title = 'Show Trend MA {True}')
 // INPUTS - END
 
 
@@ -514,6 +516,7 @@ longCondition := (longConditions >= i_subStrategiesMinimum)
 shortCondition := (shortConditions >= i_subStrategiesMinimum)
 // Common Logic to go LONG/LONG or go SHORT/SHORT - END
 
+trendMaPlot = plot(i_showTrendMa ? trendMa : na, color = color.maroon, title = 'Trend MA')
 
 // Position price calculation - BEGIN
 float positionPrice = na
