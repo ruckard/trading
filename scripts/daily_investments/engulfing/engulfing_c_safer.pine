@@ -295,6 +295,20 @@ i_atrVolatilityMultiplier = input.float(1.10, title='(STRAT) ATR Volatility Mult
 
 i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
 
+i_enableLongEdgeProtection = input.bool(false, '(STRAT) Enable Long Edge Protection? {False}')
+i_longEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Long Edge Length [100]')
+i_longEdgeSource = input.source(high, title = '(STRAT) Long Edge Source [high]')
+i_longEdgeMinimumDistance = input.float(3.50, title='(STRAT) Long Edge Minimum Distance % {3.50}', minval=0.01)
+i_enableLongEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Long Edge TakeProfit Protection? {False}')
+
+i_enableShortEdgeProtection = input.bool(false, '(STRAT) Enable Short Edge Protection? {False}')
+i_shortEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Short Edge Length [100]')
+i_shortEdgeSource = input.source(low, title = '(STRAT) Short Edge Source [low]')
+i_shortEdgeMinimumDistance = input.float(1.00, title='(STRAT) Short Edge Minimum Distance % {1.00}', minval=0.01)
+i_enableShortEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Short Edge TakeProfit Protection? {False}')
+
+i_showEdges = input.bool(false, title='(STRAT) Show Edge Minimum and Maximum {False}')
+
 // INPUTS - END
 
 
@@ -442,6 +456,23 @@ getTooOldOrderShortCloseAdvice () =>
 
 // Strategy Body - BEGIN
 
+// Edge substrategy
+
+edgeLongCondition = true
+edgeShortCondition = true
+
+edgeShortPrice = ta.lowest(i_shortEdgeSource, i_shortEdgeLength)
+edgeShortMinimumPrice = edgeShortPrice + (edgeShortPrice * i_shortEdgeMinimumDistance * 0.01)
+
+edgeLongPrice = ta.highest(i_longEdgeSource, i_longEdgeLength)
+edgeLongMaximumPrice = edgeLongPrice - (edgeLongPrice * i_longEdgeMinimumDistance * 0.01)
+
+if not (close <= edgeLongMaximumPrice)
+    edgeLongCondition := false
+
+if not (close >= edgeShortMinimumPrice)
+    edgeShortCondition := false
+
 // Volatility substrategy
 
 volatilityLongCondition = true
@@ -587,6 +618,12 @@ if i_enableVolatilityProtection
     longCondition := longCondition and volatilityLongCondition
     shortCondition := shortCondition and volatilityShortCondition
 
+if i_enableLongEdgeProtection
+    longCondition := longCondition and edgeLongCondition
+
+if i_enableShortEdgeProtection
+    shortCondition := shortCondition and edgeShortCondition
+
 // Common Logic to go LONG/LONG or go SHORT/SHORT - END
 
 trendMaPlot = plot(i_showTrendMa ? trendMa : na, color = color.maroon, title = 'Trend MA')
@@ -640,6 +677,9 @@ LONG_CLOSE := offStopTimeInterval or shortCondition
 if i_tooOldLongBarsEnabled
     LONG_CLOSE := LONG_CLOSE or tooOldOrderLongCloseAdvice
 
+if i_enableLongEdgeTakeProfitProtection
+    LONG_CLOSE := LONG_CLOSE or (not edgeLongCondition)
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
     LONG := false
@@ -651,6 +691,9 @@ SHORT_CLOSE := offStopTimeInterval or longCondition
 
 if i_tooOldLongBarsEnabled
     SHORT_CLOSE := SHORT_CLOSE or tooOldOrderLongCloseAdvice
+
+if i_enableShortEdgeTakeProfitProtection
+    SHORT_CLOSE := SHORT_CLOSE or (not edgeShortCondition)
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
