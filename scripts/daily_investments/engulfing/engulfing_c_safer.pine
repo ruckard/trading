@@ -217,7 +217,7 @@ i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Bre
 i_enableRiskRewardRatio = input.bool(true, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {True}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
-i_positionRatio = input.float(2.00, title='(STRAT) Risk/Reward Ratio % {2.00}', minval=0.01)
+i_positionRatio = input.float(1.75, title='(STRAT) Risk/Reward Ratio % {1.75}', minval=0.01)
 // i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLConstant_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
@@ -264,7 +264,7 @@ i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
 i_trendMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Trend MA Type {EMA}')
-i_trendMaLength = input.int(200, minval = 1,  title = '(STRAT) Trend MA Length {200}')
+i_trendMaLength = input.int(13, minval = 1,  title = '(STRAT) Trend MA Length {13}')
 i_trendMaSource = input.source(close, title = '(STRAT) Trend MA Source {close}')
 
 i_minimumEngolfingBodyLength = input.float(0.20, title='(STRAT) Minimum Body Length % {0.20}')
@@ -272,8 +272,8 @@ i_minimumEngolfingBodyLengthPerOne = i_minimumEngolfingBodyLength / 100
 
 i_enforcePerfectShadows = input.bool(false, '(STRAT) Enforce Perfect Shadows? {False}')
 
-i_bodyStopLossMultiplier = input.float(2.00, title='(STRAT) Body Stop Loss Multiplier {2.00}', minval=0.01)
-i_trendMaDecidesSide = input.bool(true, '(STRAT) Trend MA decides Side? {True}')
+i_bodyStopLossMultiplier = input.float(3.00, title='(STRAT) Body Stop Loss Multiplier {3.00}', minval=0.01)
+i_trendMaDecidesSide = input.bool(false, '(STRAT) Trend MA decides Side? {False}')
 i_trendMaDecidesSideInverse = input.bool(false, '(STRAT) Trend MA decides Side but inverse? {False}')
 
 i_showTrendMa = input.bool(true, title = 'Show Trend MA {True}')
