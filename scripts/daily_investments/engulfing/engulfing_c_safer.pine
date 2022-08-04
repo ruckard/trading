@@ -277,6 +277,15 @@ i_trendMaDecidesSide = input.bool(true, '(STRAT) Trend MA decides Side? {True}')
 i_trendMaDecidesSideInverse = input.bool(false, '(STRAT) Trend MA decides Side but inverse? {False}')
 
 i_showTrendMa = input.bool(true, title = 'Show Trend MA {True}')
+
+// Too old order - Inputs
+i_tooOldLongBarsEnabled = input.bool(true, title = 'Enable closing when order is too old. {True}')
+i_tooOldLongBarsNumber = input.int(12, '(OLD) Number of bars to consider a Long order to be old {12}', minval=1, maxval=100, step=1)
+i_tooOldShortBarsNumber = input.int(12, '(OLD) Number of bars to consider a Short order to be old {12}', minval=1, maxval=100, step=1)
+i_tooOldLongStopLoss = input.float(1.00, '(OLD) Too Old Long order Stop Loss (%) {1.00}', minval=0, step=0.01)
+i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
+i_tooOldShortStopLoss = input.float(1.00, '(OLD) Too Old Short order Stop Loss (%) {1.00}', minval=0, step=0.01)
+i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
 // INPUTS - END
 
 
@@ -391,10 +400,43 @@ f_Ma (_maType, _maSource, _maLength) =>
     _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : ta.wma(_maSource, _maLength)
 // MA - Functions - END
 
+// Too old orders functions
+
+getTooOldOrderLongCloseAdvice () =>
+    // Condition 1: The order is open
+    // Condition 2: The order is long
+    // Condition 3: Order age is bigger than the maximum setting
+    // Returns boolean
+    bool isValidOpenLongOrder = (strategy.position_size > 0)
+    bool isTooOld =  (bar_index >= (buyOrderOpenBarIndex + i_tooOldLongBarsNumber))
+    tooOldStopLoss = strategy.position_avg_price * (1 - i_tooOldLongStopLossPerOne)
+
+    bool isALosingOrder = close < tooOldStopLoss
+    tooOldOrderLongCloseAdvice = isValidOpenLongOrder and isTooOld and isALosingOrder
+    tooOldOrderLongCloseAdvice
+
+getTooOldOrderShortCloseAdvice () =>
+    // Condition 1: The order is open
+    // Condition 2: The order is short
+    // Condition 3: Order age is bigger than the maximum setting
+    // Returns boolean
+    bool is_valid_open_sell_order = (strategy.position_size < 0)
+    bool isTooOld =  (bar_index >= (sellOrderOpenBarIndex + i_tooOldShortBarsNumber))
+    tooOldStopLoss = strategy.position_avg_price * (1 + i_tooOldShortStopLossPerOne)
+
+    bool isALosingOrder = close > tooOldStopLoss
+    tooOldOrderShortCloseAdvice = is_valid_open_sell_order and isTooOld and isALosingOrder
+    tooOldOrderShortCloseAdvice
+
 // FUNCTIONS - END
 
 
 // Strategy Body - BEGIN
+
+// Too old logic
+
+tooOldOrderLongCloseAdvice = getTooOldOrderLongCloseAdvice ()
+tooOldOrderShortCloseAdvice = getTooOldOrderShortCloseAdvice ()
 
 // Engulfing Substrategy
 
@@ -561,6 +603,9 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 LONG_CLOSE = true
 LONG_CLOSE := offStopTimeInterval or shortCondition
 
+if i_tooOldLongBarsEnabled
+    LONG_CLOSE := LONG_CLOSE or tooOldOrderLongCloseAdvice
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
     LONG := false
@@ -569,6 +614,9 @@ if LONG_CLOSE
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
 SHORT_CLOSE := offStopTimeInterval or longCondition
+
+if i_tooOldLongBarsEnabled
+    SHORT_CLOSE := SHORT_CLOSE or tooOldOrderLongCloseAdvice
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
