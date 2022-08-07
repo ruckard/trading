@@ -268,12 +268,12 @@ i_trendMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'R
 i_trendMaLength = input.int(13, minval = 1,  title = '(STRAT) Trend MA Length {13}')
 i_trendMaSource = input.source(close, title = '(STRAT) Trend MA Source {close}')
 
-i_minimumEnlargedBodiesBodyLength = input.float(0.20, title='(STRAT) Minimum Body Length % {0.20}')
+i_minimumEnlargedBodiesBodyLength = input.float(0.45, title='(STRAT) Minimum Body Length % {0.45}')
 i_minimumEnlargedBodiesBodyLengthPerOne = i_minimumEnlargedBodiesBodyLength / 100
 
 i_enforcePerfectShadows = input.bool(false, '(STRAT) Enforce Perfect Shadows? {False}')
 
-i_bodyStopLossMultiplier = input.float(1.25, title='(STRAT) Body Stop Loss Multiplier {1.25}', minval=0.01)
+i_bodyStopLossMultiplier = input.float(2.00, title='(STRAT) Body Stop Loss Multiplier {2.00}', minval=0.01)
 i_trendMaDecidesSide = input.bool(false, '(STRAT) Trend MA decides Side? {False}')
 i_trendMaDecidesSideInverse = input.bool(false, '(STRAT) Trend MA decides Side but inverse? {False}')
 
@@ -281,8 +281,8 @@ i_showTrendMa = input.bool(true, title = 'Show Trend MA {True}')
 
 // Too old order - Inputs
 i_tooOldLongBarsEnabled = input.bool(true, title = 'Enable closing when order is too old. {True}')
-i_tooOldLongBarsNumber = input.int(12, '(OLD) Number of bars to consider a Long order to be old {12}', minval=1, maxval=100, step=1)
-i_tooOldShortBarsNumber = input.int(12, '(OLD) Number of bars to consider a Short order to be old {12}', minval=1, maxval=100, step=1)
+i_tooOldLongBarsNumber = input.int(24, '(OLD) Number of bars to consider a Long order to be old {24}', minval=1, maxval=100, step=1)
+i_tooOldShortBarsNumber = input.int(24, '(OLD) Number of bars to consider a Short order to be old {24}', minval=1, maxval=100, step=1)
 i_tooOldLongStopLoss = input.float(1.00, '(OLD) Too Old Long order Stop Loss (%) {1.00}', minval=0, step=0.01)
 i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
 i_tooOldShortStopLoss = input.float(1.00, '(OLD) Too Old Short order Stop Loss (%) {1.00}', minval=0, step=0.01)
