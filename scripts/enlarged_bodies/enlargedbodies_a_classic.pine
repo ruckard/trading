@@ -273,7 +273,7 @@ i_minimumEnlargedBodiesBodyLengthPerOne = i_minimumEnlargedBodiesBodyLength / 10
 
 i_enforcePerfectShadows = input.bool(false, '(STRAT) Enforce Perfect Shadows? {False}')
 
-i_bodyStopLossMultiplier = input.float(3.00, title='(STRAT) Body Stop Loss Multiplier {3.00}', minval=0.01)
+i_bodyStopLossMultiplier = input.float(1.25, title='(STRAT) Body Stop Loss Multiplier {1.25}', minval=0.01)
 i_trendMaDecidesSide = input.bool(false, '(STRAT) Trend MA decides Side? {False}')
 i_trendMaDecidesSideInverse = input.bool(false, '(STRAT) Trend MA decides Side but inverse? {False}')
 
