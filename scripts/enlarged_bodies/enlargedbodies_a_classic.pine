@@ -268,8 +268,8 @@ i_trendMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'R
 i_trendMaLength = input.int(13, minval = 1,  title = '(STRAT) Trend MA Length {13}')
 i_trendMaSource = input.source(close, title = '(STRAT) Trend MA Source {close}')
 
-i_minimumEngolfingBodyLength = input.float(0.20, title='(STRAT) Minimum Body Length % {0.20}')
-i_minimumEngolfingBodyLengthPerOne = i_minimumEngolfingBodyLength / 100
+i_minimumEnlargedBodiesBodyLength = input.float(0.20, title='(STRAT) Minimum Body Length % {0.20}')
+i_minimumEnlargedBodiesBodyLengthPerOne = i_minimumEnlargedBodiesBodyLength / 100
 
 i_enforcePerfectShadows = input.bool(false, '(STRAT) Enforce Perfect Shadows? {False}')
 
@@ -496,47 +496,47 @@ if barIsVolatileShort or barIsVolatileShort[1]
 tooOldOrderLongCloseAdvice = getTooOldOrderLongCloseAdvice ()
 tooOldOrderShortCloseAdvice = getTooOldOrderShortCloseAdvice ()
 
-// Engulfing Substrategy
+// EnlargedBodies Substrategy
 
 trendMa = f_Ma (i_trendMaType, i_trendMaSource, i_trendMaLength)
 
-// Engulfing - Long condition
-bool minimumEngulfingBodyLong = ((close - open)/open) >= i_minimumEngolfingBodyLengthPerOne
-bool threeDescendingRedCandles = (close[3] > close[2]) and (close[2] > close[1]) and (open[3] > open[2]) and (open[2] > open[1])
-bool threeDescendingShadowRedCandles = (high[3] > high[2]) and (high[2] > high[1]) and (low[3] > low[2]) and (low[2] > low[1])
+// EnlargedBodies - Long condition
+bool threeAscendingGreenCandles = (close[2] < close[1]) and (close[1] < close[0]) and (open[2] < open[1]) and (open[1] < open[0])
+bool minimumEnlargedBodiesBodyLong = ((close[0] - open[2])/open[2]) >= i_minimumEnlargedBodiesBodyLengthPerOne
+bool threeAscendingShadowGreenCandles = (high[2] < high[1]) and (high[1] < high[0]) and (low[2] < low[1]) and (low[1] < low[0])
+bool threeEnlargedBodiesCandlesLong = ((close[0] - open[0]) > (close[1] - open[1])) and ((close[1] - open[1]) > (close[2] - open[2]))
 
-bool threePreviousRedCandles = (close[3] < open[3]) and (close[2] < open[2]) and (close[1] < open[1])
-bool engulfingLongCandle = (close[0] > open[1]) and (open[0] < close[1])
+bool threeGreenCandles = (close[2] > open[2]) and (close[1] > open[1]) and (close[0] > open[0])
 
-bool engulfingLong = threePreviousRedCandles and engulfingLongCandle and minimumEngulfingBodyLong and threeDescendingRedCandles
+bool enlargedBodiesLong = threeGreenCandles and minimumEnlargedBodiesBodyLong and threeAscendingGreenCandles and threeEnlargedBodiesCandlesLong
 if (i_enforcePerfectShadows)
-    engulfingLong := engulfingLong and threeDescendingShadowRedCandles
+    enlargedBodiesLong := enlargedBodiesLong and threeAscendingShadowGreenCandles
 if (i_trendMaDecidesSide)
     if (not i_trendMaDecidesSideInverse)
-        engulfingLong := engulfingLong and (close >= trendMa)
+        enlargedBodiesLong := enlargedBodiesLong and (close >= trendMa)
     else
-        engulfingLong := engulfingLong and (close < trendMa)
+        enlargedBodiesLong := enlargedBodiesLong and (close < trendMa)
 
-// Engulfing - Short condition
-bool minimumEngulfingBodyShort = ((open - close)/close) >= i_minimumEngolfingBodyLengthPerOne
-bool threeAscendingGreenCandles = (close[3] < close[2]) and (close[2] < close[1]) and (open[3] < open[2]) and (open[2] < open[1])
-bool threeAscendingShadowGreenCandles = (high[3] < high[2]) and (high[2] < high[1]) and (low[3] < low[2]) and (low[2] < low[1])
+// EnlargedBodies - Short condition
+bool threeDescendingRedCandles = (close[2] > close[1]) and (close[1] > close[0]) and (open[2] > open[1]) and (open[1] > open[0])
+bool minimumEnlargedBodiesBodyShort = ((open[2] - close[0])/close[0]) >= i_minimumEnlargedBodiesBodyLengthPerOne
+bool threeDescendingShadowRedCandles = (high[2] > high[1]) and (high[1] > high[0]) and (low[2] > low[1]) and (low[1] > low[0])
+bool threeEnlargedBodiesCandlesShort = ((open[0] - close[0]) > (open[1] - close[1])) and ((open[1] - close[1]) > (open[2] - close[2]))
 
-bool threePreviousGreenCandles = (close[3] > open[3]) and (close[2] > open[2]) and (close[1] > open[1])
-bool engulfingShortCandle = (open[0] > close[1]) and (close[0] < open[1])
+bool threeRedCandles = (close[3] < open[3]) and (close[2] < open[2]) and (close[1] < open[1])
 
-bool engulfingShort = threePreviousGreenCandles and engulfingShortCandle and minimumEngulfingBodyShort and threeAscendingGreenCandles
+bool enlargedBodiesShort = threeRedCandles and minimumEnlargedBodiesBodyShort and threeDescendingRedCandles and threeEnlargedBodiesCandlesShort
 if (i_enforcePerfectShadows)
-    engulfingShort := engulfingShort and threeAscendingShadowGreenCandles
+    enlargedBodiesShort := enlargedBodiesShort and threeDescendingShadowRedCandles
 if (i_trendMaDecidesSide)
     if (not i_trendMaDecidesSideInverse)
-        engulfingShort := engulfingShort and (close < trendMa)
+        enlargedBodiesShort := enlargedBodiesShort and (close < trendMa)
     else
-        engulfingShort := engulfingShort and (close >= trendMa)
+        enlargedBodiesShort := enlargedBodiesShort and (close >= trendMa)
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
-bool longCondition1 = engulfingLong
+bool longCondition1 = enlargedBodiesLong
 bool longCondition2 = false
 bool longCondition3 = false
 bool longCondition4 = false
@@ -544,7 +544,7 @@ bool longCondition5 = false
 // Define here your, at most, 5 long conditions. Use false if not used. - END
 
 // Define here your, at most, 5 short conditions. Use false if not used. - BEGIN
-bool shortCondition1 = engulfingShort
+bool shortCondition1 = enlargedBodiesShort
 bool shortCondition2 = false
 bool shortCondition3 = false
 bool shortCondition4 = false
@@ -712,8 +712,8 @@ if LONG
 //     else if ( i_stopLossType == 'atr' )
 //         orderStopLossPerOne := (close - atrLongStopLossPrice) / close
 
-    float engulfingLongStopLossPrice = close - (i_bodyStopLossMultiplier * (close - open))
-    orderStopLossPerOne := (close - engulfingLongStopLossPrice) / close
+    float enlargedBodiesLongStopLossPrice = close - (i_bodyStopLossMultiplier * (close[0] - open[2]))
+    orderStopLossPerOne := (close - enlargedBodiesLongStopLossPrice) / close
     orderStopLoss := orderStopLossPerOne * 100
 else
 //     if ( i_stopLossType == 'constant' )
@@ -721,8 +721,8 @@ else
 //     else if ( i_stopLossType == 'atr' )
 //         orderStopLossPerOne := (atrShortStopLossPrice - close) / atrShortStopLossPrice
 
-    float engulfingShortStopLossPrice = close + (i_bodyStopLossMultiplier * (open - close))
-    orderStopLossPerOne := (engulfingShortStopLossPrice - close) / engulfingShortStopLossPrice
+    float enlargedBodiesShortStopLossPrice = close + (i_bodyStopLossMultiplier * (open[2] - close[0]))
+    orderStopLossPerOne := (enlargedBodiesShortStopLossPrice - close) / enlargedBodiesShortStopLossPrice
     orderStopLoss := orderStopLossPerOne * 100
 
 var float LongBreakEvenTrigger = na
