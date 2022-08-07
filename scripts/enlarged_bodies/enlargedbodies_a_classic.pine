@@ -310,6 +310,21 @@ i_enableShortEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Short 
 
 i_showEdges = input.bool(false, title='(STRAT) Show Edge Minimum and Maximum {False}')
 
+i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High Closing MA Type [SMA]')
+i_highClosingMaLength = input.int(5, minval = 1,  title = '(STRAT) High Closing MA Length [5]')
+i_highClosingMaSource = input.source(ohlc4, title = '(STRAT) High Closing MA Source [ohlc4]')
+i_highestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Highest Closing MA Length [20]')
+
+i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
+i_lowClosingMaLength = input.int(5, minval = 1,  title = '(STRAT) Low Closing MA Length [5]')
+i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
+i_lowestClosingMaLength = input.int(20, minval = 1,  title = '(STRAT) Lowest Closing MA Length [20]')
+
+i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
+i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
+
+i_curieClosingMAsEnabled = input.bool(true, '(STRAT) Enable Curie Closing MAs? {True}')
+
 // INPUTS - END
 
 
@@ -456,6 +471,13 @@ getTooOldOrderShortCloseAdvice () =>
 
 
 // Strategy Body - BEGIN
+
+// Noro TrendRibbon substrategy
+highClosingMa = f_Ma (i_highClosingMaType, i_highClosingMaSource, i_highClosingMaLength)
+lowClosingMa = f_Ma (i_lowClosingMaType, i_lowClosingMaSource, i_lowClosingMaLength)
+
+highestClosingMA = ta.highest(highClosingMa, i_highestClosingMaLength)
+lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
 
 // Edge substrategy
 
@@ -632,6 +654,12 @@ trendMaPlot = plot(i_showTrendMa ? trendMa : na, color = color.maroon, title = '
 atrLongVolatilityPricePlot = plot(i_showAtrVolatilityMultiplier ? atrLongVolatilityPrice : na, color = color.maroon, title = 'Long Volatility Price')
 atrShortVolatilityPricePlot = plot(i_showAtrVolatilityMultiplier ? atrShortVolatilityPrice : na, color = color.maroon, title = 'Short Volatility Price')
 
+// TrendRibbon - Plot - BEGIN
+highestClosingLowestColor = i_showRibbon ? color.yellow : na
+highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = 'Upper Closing line')
+lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = 'Lower Closing Line')
+// TrendRibbon - Plot - END
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
@@ -681,6 +709,9 @@ if i_tooOldLongBarsEnabled
 if i_enableLongEdgeTakeProfitProtection
     LONG_CLOSE := LONG_CLOSE or (not edgeLongCondition)
 
+if i_curieClosingMAsEnabled
+    LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
     LONG := false
@@ -695,6 +726,9 @@ if i_tooOldLongBarsEnabled
 
 if i_enableShortEdgeTakeProfitProtection
     SHORT_CLOSE := SHORT_CLOSE or (not edgeShortCondition)
+
+if i_curieClosingMAsEnabled
+    SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
