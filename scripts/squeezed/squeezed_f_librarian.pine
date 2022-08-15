@@ -200,7 +200,15 @@ i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
 
+i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High Closing MA Type [SMA]')
+i_highClosingMaLength = input.int(13, minval = 1,  title = '(STRAT) High Closing MA Length [13]')
+i_highClosingMaSource = input.source(ohlc4, title = '(STRAT) High Closing MA Source [ohlc4]')
+i_highestClosingMaLength = input.int(22, minval = 1,  title = '(STRAT) Highest Closing MA Length [22]')
 
+i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
+i_lowClosingMaLength = input.int(6, minval = 1,  title = '(STRAT) Low Closing MA Length [6]')
+i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
+i_lowestClosingMaLength = input.int(18, minval = 1,  title = '(STRAT) Lowest Closing MA Length [18]')
 
 i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
 i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
@@ -252,7 +260,28 @@ i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
 i_tooOldShortStopLoss = input.float(0.60, '(OLD) Too Old Short order Stop Loss (%) {0.60}', minval=0, step=0.01)
 i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
 
+i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
+i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+
+i_enableVolatilityProtection = input.bool(true, '(STRAT) Enable Volatility Protection? {True}')
+
+i_atrVolatilityLength = input.int(14, minval = 1,  title = '(STRAT) ATR Volatility Length [14]')
+i_atrVolatilitySource = input.source(close, title = '(STRAT) ATR Volatility Source [close]')
+i_atrVolatilityMultiplier = input.float(1.10, title='(STRAT) ATR Volatility Multiplier % {1.10}', minval=0.01)
+
 i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
+
+i_enableLongEdgeProtection = input.bool(false, '(STRAT) Enable Long Edge Protection? {False}')
+i_longEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Long Edge Length [100]')
+i_longEdgeSource = input.source(high, title = '(STRAT) Long Edge Source [high]')
+i_longEdgeMinimumDistance = input.float(3.50, title='(STRAT) Long Edge Minimum Distance % {3.50}', minval=0.01)
+i_enableLongEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Long Edge TakeProfit Protection? {False}')
+
+i_enableShortEdgeProtection = input.bool(false, '(STRAT) Enable Short Edge Protection? {False}')
+i_shortEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Short Edge Length [100]')
+i_shortEdgeSource = input.source(low, title = '(STRAT) Short Edge Source [low]')
+i_shortEdgeMinimumDistance = input.float(1.00, title='(STRAT) Short Edge Minimum Distance % {1.00}', minval=0.01)
+i_enableShortEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Short Edge TakeProfit Protection? {False}')
 
 i_showEdges = input.bool(false, title='(STRAT) Show Edge Minimum and Maximum {False}')
 
@@ -482,355 +511,227 @@ getTrend (_fastMaType, _fastMaLength, _fastMaSource, _slowMaType, _slowMaLength,
 
 // Strategy Body - BEGIN
 
-squeezedStrategyHigherTimeframeTrend() =>
-    higherTimeframeTrend = getTrend (i_higherTimeframeTrendFastMaType, i_higherTimeframeTrendFastMaLength, i_higherTimeframeTrendFastMaSource, i_higherTimeframeTrendSlowMaType, i_higherTimeframeTrendSlowMaLength, i_higherTimeframeTrendSlowMaSource, i_higherTimeframeTrendMaOffset)
-
-    bool higherTimeframeTrendMaLong = higherTimeframeTrend
-    bool higherTimeframeTrendMaShort = (not higherTimeframeTrend)
-
-    [higherTimeframeTrendMaLong, higherTimeframeTrendMaShort]
-
-[squeezeStrategyHigherTimeframeTrendMaLong, squeezeStrategyHigherTimeframeTrendMaShort] = request.security('BTCUSDTPERP', i_higherTimeframeTrendMaTimeframe, squeezedStrategyHigherTimeframeTrend())
-
-// @function Returns strategy array status
-// @param key Service secret key (It is found in the Edit tab of your service.)
-// @param exchangeAccountType Either 'futures' or 'spot'. Defaults to 'futures'.
-// @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
-// @param integration Integration mode. 'hybrid': Both TradingView and Zignaly handle StopLoss and alike. 'nonhybrid': TradingView only handles entries and exits. Defaults to 'hybrid'.
-// @param priceDecimalDigits Number of digits for price decimals. Defaults to 2.
-// @param signalId Defaults to SHORT-pair.
-// @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
-// @param higherTimeframeTrendMaLong
-// @param higherTimeframeTrendMaShort
-// @returns alert_message for opening short entries in Zignaly
-squeezedStrategyMain() =>
-
-//     i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High Closing MA Type [SMA]')
-//     i_highClosingMaLength = input.int(13, minval = 1,  title = '(STRAT) High Closing MA Length [13]')
-//     i_highClosingMaSource = input.source(ohlc4, title = '(STRAT) High Closing MA Source [ohlc4]')
-//     i_highestClosingMaLength = input.int(22, minval = 1,  title = '(STRAT) Highest Closing MA Length [22]')
-// 
-//     i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
-//     i_lowClosingMaLength = input.int(6, minval = 1,  title = '(STRAT) Low Closing MA Length [6]')
-//     i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
-//     i_lowestClosingMaLength = input.int(18, minval = 1,  title = '(STRAT) Lowest Closing MA Length [18]')
-// 
-//     i_enableVolatilityProtection = input.bool(true, '(STRAT) Enable Volatility Protection? {True}')
-// 
-//     i_atrVolatilityLength = input.int(14, minval = 1,  title = '(STRAT) ATR Volatility Length [14]')
-//     i_atrVolatilitySource = input.source(close, title = '(STRAT) ATR Volatility Source [close]')
-//     i_atrVolatilityMultiplier = input.float(1.10, title='(STRAT) ATR Volatility Multiplier % {1.10}', minval=0.01)
-// 
-//     i_enableLongEdgeProtection = input.bool(false, '(STRAT) Enable Long Edge Protection? {False}')
-//     i_longEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Long Edge Length [100]')
-//     i_longEdgeSource = input.source(high, title = '(STRAT) Long Edge Source [high]')
-//     i_longEdgeMinimumDistance = input.float(3.50, title='(STRAT) Long Edge Minimum Distance % {3.50}', minval=0.01)
-//     i_enableLongEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Long Edge TakeProfit Protection? {False}')
-// 
-//     i_enableShortEdgeProtection = input.bool(false, '(STRAT) Enable Short Edge Protection? {False}')
-//     i_shortEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Short Edge Length [100]')
-//     i_shortEdgeSource = input.source(low, title = '(STRAT) Short Edge Source [low]')
-//     i_shortEdgeMinimumDistance = input.float(1.00, title='(STRAT) Short Edge Minimum Distance % {1.00}', minval=0.01)
-//     i_enableShortEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Short Edge TakeProfit Protection? {False}')
-// 
-//     i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
-//     i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
-
-    string i_highClosingMaType = 'SMA'
-    int i_highClosingMaLength = 13
-    float i_highClosingMaSource = ohlc4
-    int i_highestClosingMaLength = 22
-
-    string i_lowClosingMaType = 'SMA'
-    int i_lowClosingMaLength = 6
-    float i_lowClosingMaSource = ohlc4
-    int i_lowestClosingMaLength = 18
-
-    bool i_enableVolatilityProtection = true
-
-    int i_atrVolatilityLength = 14
-    float i_atrVolatilitySource = close
-    float i_atrVolatilityMultiplier = 1.10
-
-    bool i_enableLongEdgeProtection = false
-    int i_longEdgeLength = 100
-    float i_longEdgeSource = high
-    float i_longEdgeMinimumDistance = 3.50
-    bool i_enableLongEdgeTakeProfitProtection = false
-
-    bool i_enableShortEdgeProtection = false
-    int i_shortEdgeLength = 100
-    float i_shortEdgeSource = low
-    float i_shortEdgeMinimumDistance = 1.00
-    bool i_enableShortEdgeTakeProfitProtection = false
-
-    int i_subStrategiesLookback = 1
-    int i_subStrategiesMinimum = 1
-
-    // SQMMOMDivergence SubStrategy
-    // Short divergence means that next top height is smaller than previous top height and at the same time price is bigger than in the previous top height.
-    // Long divergence means that next bottom height is higher than previous bottom height and at the same time price is smaller than in the previous bottom height.
-
-    // Needed variables
-    var int sqzmom_top_changes = 0
-    var float sqzmom_top_val_a = na
-    var float sqzmom_top_price_a = na
-    var float sqzmom_top_val_b = na
-    var float sqzmom_top_price_b = na
-
-    var int sqzmom_bottom_changes = 0
-    var float sqzmom_bottom_val_a = na
-    var float sqzmom_bottom_price_a = na
-    var float sqzmom_bottom_val_b = na
-    var float sqzmom_bottom_price_b = na
+// SQMMOMDivergence SubStrategy
+// Short divergence means that next top height is smaller than previous top height and at the same time price is bigger than in the previous top height.
+// Long divergence means that next bottom height is higher than previous bottom height and at the same time price is smaller than in the previous bottom height.
 
-    [sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
+// Needed variables
+var int sqzmom_top_changes = 0
+var float sqzmom_top_val_a = na
+var float sqzmom_top_price_a = na
+var float sqzmom_top_val_b = na
+var float sqzmom_top_price_b = na
 
-    // Gather data
+var int sqzmom_bottom_changes = 0
+var float sqzmom_bottom_val_a = na
+var float sqzmom_bottom_price_a = na
+var float sqzmom_bottom_val_b = na
+var float sqzmom_bottom_price_b = na
 
-    bool sqzmom_top_change = ( sqzmom_bcolor[1] == color.lime )  and ( sqzmom_bcolor[0] == color.green )
-    bool sqzmom_bottom_change = ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon )
+[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
 
-    if (sqzmom_top_change)
-        sqzmom_top_changes := sqzmom_top_changes + 1
+// Gather data
 
-    if (sqzmom_bottom_change)
-        sqzmom_bottom_changes := sqzmom_bottom_changes + 1
+bool sqzmom_top_change = ( sqzmom_bcolor[1] == color.lime )  and ( sqzmom_bcolor[0] == color.green )
+bool sqzmom_bottom_change = ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon )
 
-    bool sqzmom_top_is_a = (sqzmom_top_changes % 2) == 0
-    bool sqzmom_top_is_b = (sqzmom_top_changes % 2) == 1
+if (sqzmom_top_change)
+    sqzmom_top_changes := sqzmom_top_changes + 1
 
-    bool sqzmom_bottom_is_a = (sqzmom_bottom_changes % 2) == 0
-    bool sqzmom_bottom_is_b = (sqzmom_bottom_changes % 2) == 1
+if (sqzmom_bottom_change)
+    sqzmom_bottom_changes := sqzmom_bottom_changes + 1
 
-    if (sqzmom_top_change and sqzmom_top_is_a)
-        sqzmom_top_val_a := sqzmom_val[1]
-        sqzmom_top_price_a := close[1]
+bool sqzmom_top_is_a = (sqzmom_top_changes % 2) == 0
+bool sqzmom_top_is_b = (sqzmom_top_changes % 2) == 1
 
-    if (sqzmom_top_change and sqzmom_top_is_b)
-        sqzmom_top_val_b := sqzmom_val[1]
-        sqzmom_top_price_b := close[1]
+bool sqzmom_bottom_is_a = (sqzmom_bottom_changes % 2) == 0
+bool sqzmom_bottom_is_b = (sqzmom_bottom_changes % 2) == 1
 
-    if (sqzmom_bottom_change and sqzmom_bottom_is_a)
-        sqzmom_bottom_val_a := sqzmom_val[1]
-        sqzmom_bottom_price_a := close[1]
+if (sqzmom_top_change and sqzmom_top_is_a)
+    sqzmom_top_val_a := sqzmom_val[1]
+    sqzmom_top_price_a := close[1]
 
-    if (sqzmom_bottom_change and sqzmom_bottom_is_b)
-        sqzmom_bottom_val_b := sqzmom_val[1]
-        sqzmom_bottom_price_b := close[1]
+if (sqzmom_top_change and sqzmom_top_is_b)
+    sqzmom_top_val_b := sqzmom_val[1]
+    sqzmom_top_price_b := close[1]
 
-    // Implement logic
+if (sqzmom_bottom_change and sqzmom_bottom_is_a)
+    sqzmom_bottom_val_a := sqzmom_val[1]
+    sqzmom_bottom_price_a := close[1]
 
-    bool sqzmomDivergenceLong = false
-    bool sqzmomDivergenceShort = false
+if (sqzmom_bottom_change and sqzmom_bottom_is_b)
+    sqzmom_bottom_val_b := sqzmom_val[1]
+    sqzmom_bottom_price_b := close[1]
 
-    // Short divergence - Section A
-    if (sqzmom_top_change and sqzmom_top_is_a and (sqzmom_top_val_a < sqzmom_top_val_b) and (sqzmom_top_price_a > sqzmom_top_price_b))
-        sqzmomDivergenceShort := true
-    // Short divergence - Section B
-    if (sqzmom_top_change and sqzmom_top_is_b and (sqzmom_top_val_b < sqzmom_top_val_a) and (sqzmom_top_price_b > sqzmom_top_price_a))
-        sqzmomDivergenceShort := true
-    // Long divergence - Section A
-    if (sqzmom_bottom_change and sqzmom_bottom_is_a and (sqzmom_bottom_val_a > sqzmom_bottom_val_b) and (sqzmom_bottom_price_a < sqzmom_bottom_price_b))
-        sqzmomDivergenceLong := true
-    // Long divergence - Section B
-    if (sqzmom_bottom_change and sqzmom_bottom_is_b and (sqzmom_bottom_val_b > sqzmom_bottom_val_a) and (sqzmom_bottom_price_b < sqzmom_bottom_price_a))
-        sqzmomDivergenceLong := true
-
-    // Noro TrendRibbon substrategy
-    highClosingMa = f_Ma (i_highClosingMaType, i_highClosingMaSource, i_highClosingMaLength)
-    lowClosingMa = f_Ma (i_lowClosingMaType, i_lowClosingMaSource, i_lowClosingMaLength)
-
-    highestClosingMA = ta.highest(highClosingMa, i_highestClosingMaLength)
-    lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
-
-    // Too old logic
-
-    tooOldOrderLongCloseAdvice = getTooOldOrderLongCloseAdvice ()
-    tooOldOrderShortCloseAdvice = getTooOldOrderShortCloseAdvice ()
-
-    // Volatility substrategy
-
-    volatilityLongCondition = true
-    volatilityShortCondition = true
-
-    atrLongVolatilityPrice = i_atrVolatilitySource + (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
-    barIsVolatileLong = (close[0] >= open[0]) and (close[0] >= atrLongVolatilityPrice[1])
-
-    if barIsVolatileLong or barIsVolatileLong[1]
-        volatilityLongCondition := false
-
-    atrShortVolatilityPrice = i_atrVolatilitySource - (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
-    barIsVolatileShort = (close[0] <= open[0]) and (close[0] <= atrShortVolatilityPrice[1])
-
-    if barIsVolatileShort or barIsVolatileShort[1]
-        volatilityShortCondition := false
-
-    // Edge substrategy
-
-    edgeLongCondition = true
-    edgeShortCondition = true
-
-    edgeShortPrice = ta.lowest(i_shortEdgeSource, i_shortEdgeLength)
-    edgeShortMinimumPrice = edgeShortPrice + (edgeShortPrice * i_shortEdgeMinimumDistance * 0.01)
-
-    edgeLongPrice = ta.highest(i_longEdgeSource, i_longEdgeLength)
-    edgeLongMaximumPrice = edgeLongPrice - (edgeLongPrice * i_longEdgeMinimumDistance * 0.01)
-
-    if not (close <= edgeLongMaximumPrice)
-        edgeLongCondition := false
-
-    if not (close >= edgeShortMinimumPrice)
-        edgeShortCondition := false
-
-    // Final logic
-    bool longCondition1 = sqzmomDivergenceLong
-    bool longCondition2 = false
-    bool longCondition3 = false
-    bool longCondition4 = false
-    bool longCondition5 = false
-
-    bool longCondition1Found = false
-    bool longCondition2Found = false
-    bool longCondition3Found = false
-    bool longCondition4Found = false
-    bool longCondition5Found = false
-
-    bool shortCondition1 = sqzmomDivergenceShort
-    bool shortCondition2 = false
-    bool shortCondition3 = false
-    bool shortCondition4 = false
-    bool shortCondition5 = false
-
-    bool shortCondition1Found = false
-    bool shortCondition2Found = false
-    bool shortCondition3Found = false
-    bool shortCondition4Found = false
-    bool shortCondition5Found = false
-
-
-    longConditions = 0
-    shortConditions = 0
-    for i = (i_subStrategiesLookback - 1) to 0
-        if longCondition1[i]
-            longCondition1Found := true
-        if longCondition2[i]
-            longCondition2Found := true
-        if longCondition3[i]
-            longCondition3Found := true
-        if longCondition4[i]
-            longCondition4Found := true
-        if longCondition5[i]
-            longCondition5Found := true
-        if shortCondition1[i]
-            shortCondition1Found := true
-        if shortCondition2[i]
-            shortCondition2Found := true
-        if shortCondition3[i]
-            shortCondition3Found := true
-        if shortCondition4[i]
-            shortCondition4Found := true
-        if shortCondition5[i]
-            shortCondition5Found := true
-
-    if longCondition1Found
-        longConditions := longConditions + 1
-    if longCondition2Found
-        longConditions := longConditions + 1
-    if longCondition3Found
-        longConditions := longConditions + 1
-    if longCondition4Found
-        longConditions := longConditions + 1
-    if longCondition5Found
-        longConditions := longConditions + 1
-    if shortCondition1Found
-        shortConditions := shortConditions + 1
-    if shortCondition2Found
-        shortConditions := shortConditions + 1
-    if shortCondition3Found
-        shortConditions := shortConditions + 1
-    if shortCondition4Found
-        shortConditions := shortConditions + 1
-    if shortCondition5Found
-        shortConditions := shortConditions + 1
-
-    bool longCondition = na
-    bool shortCondition = na
-
-    longCondition := (longConditions >= i_subStrategiesMinimum)
-    shortCondition := (shortConditions >= i_subStrategiesMinimum)
-
-    if i_enableVolatilityProtection
-        longCondition := longCondition and volatilityLongCondition
-        shortCondition := shortCondition and volatilityShortCondition
-
-    if i_enableLongEdgeProtection
-        longCondition := longCondition and edgeLongCondition
-
-    if i_enableShortEdgeProtection
-        shortCondition := shortCondition and edgeShortCondition
-
-    if (i_higherTimeframeTrendMaEnforce)
-        longCondition := longCondition and higherTimeframeTrendMaLong
-        shortCondition := shortCondition and higherTimeframeTrendMaShort
-
-    // Decide if we are going to LONG/Go LONG - BEGIN
-    PRE_LONG = false
-    if (i_tooRecentMinutesNumber == 0)
-        PRE_LONG := onStartTimeInterval and longCondition
-    else
-        PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice)
-
-    // LONG = PRE_LONG[1] and PRE_LONG // Wait for confirmation
-    LONG = PRE_LONG // Do not wait for confirmation
-
-    // Decide if we are going to LONG/Go LONG - END
-
-    // Decide if we are going to SHORT/Go SHORT - BEGIN
-    PRE_SHORT = false
-    if (i_tooRecentMinutesNumber == 0)
-        PRE_SHORT := onStartTimeInterval and shortCondition
-    else
-        PRE_SHORT := onStartTimeInterval and shortCondition and (not tooRecentOrderNotOpenAdvice)
-
-    // SHORT = PRE_SHORT[1] and PRE_SHORT // Wait for confirmation
-    SHORT = PRE_SHORT // Do not wait for confirmation
-
-    // Decide if we are going to SHORT/Go SHORT - END
-
-    // Decide if a LONG/LONG entry should be closed - BEGIN
-    LONG_CLOSE = true
-    LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or tooOldOrderLongCloseAdvice
-
-    if i_enableLongEdgeTakeProfitProtection
-        LONG_CLOSE := LONG_CLOSE or (not edgeLongCondition)
-
-    LONG_CLOSE = true
-    LONG_CLOSE := squeezeStrategyLongExit
-
-    // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
-    if LONG_CLOSE
-        LONG := false
-    // Decide if a LONG/LONG entry should be closed - END
-
-    // Decide if a SHORT/SHORT entry should be closed - BEGIN
-    SHORT_CLOSE = true
-    SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or tooOldOrderShortCloseAdvice
-
-    if i_enableShortEdgeTakeProfitProtection
-        SHORT_CLOSE := SHORT_CLOSE or (not edgeShortCondition)
-
-    SHORT_CLOSE = true
-    SHORT_CLOSE := squeezedStrategyShortExit
-
-    // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
-    if SHORT_CLOSE
-        SHORT := false
-    // Decide if a SHORT/SHORT entry should be closed - END
-
-    [LONG, SHORT, LONG_CLOSE, SHORT_CLOSE, squeezeStrategyLongTakeProfit, squeezeStrategyLongStopLoss, squeezeStrategyShortTakeProfit, squeezeStrategyShortStopLoss, squeezeStrategyEnableTakeProfit, squeezeStrategyEnableStopLoss] // TODO: 4/n
-
-[squeezeStrategyLong, squeezedStrategyShort, squeezeStrategyLongClose, squeezedStrategyShortClose, squeezeStrategyLongTakeProfit, squeezeStrategyLongStopLoss, squeezeStrategyShortTakeProfit, squeezeStrategyShortStopLoss, squeezeStrategyEnableTakeProfit, squeezeStrategyEnableStopLoss] = request.security('BTCUSDTPERP', '1h', squeezedStrategyMain())
+// Implement logic
+
+bool sqzmomDivergenceLong = false
+bool sqzmomDivergenceShort = false
+
+// Short divergence - Section A
+if (sqzmom_top_change and sqzmom_top_is_a and (sqzmom_top_val_a < sqzmom_top_val_b) and (sqzmom_top_price_a > sqzmom_top_price_b))
+    sqzmomDivergenceShort := true
+// Short divergence - Section B
+if (sqzmom_top_change and sqzmom_top_is_b and (sqzmom_top_val_b < sqzmom_top_val_a) and (sqzmom_top_price_b > sqzmom_top_price_a))
+    sqzmomDivergenceShort := true
+// Long divergence - Section A
+if (sqzmom_bottom_change and sqzmom_bottom_is_a and (sqzmom_bottom_val_a > sqzmom_bottom_val_b) and (sqzmom_bottom_price_a < sqzmom_bottom_price_b))
+    sqzmomDivergenceLong := true
+// Long divergence - Section B
+if (sqzmom_bottom_change and sqzmom_bottom_is_b and (sqzmom_bottom_val_b > sqzmom_bottom_val_a) and (sqzmom_bottom_price_b < sqzmom_bottom_price_a))
+    sqzmomDivergenceLong := true
+
+// Higher Timeframe Trend substrategy
+
+
+higherTimeframeTrend = request.security(syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, getTrend (i_higherTimeframeTrendFastMaType, i_higherTimeframeTrendFastMaLength, i_higherTimeframeTrendFastMaSource, i_higherTimeframeTrendSlowMaType, i_higherTimeframeTrendSlowMaLength, i_higherTimeframeTrendSlowMaSource, i_higherTimeframeTrendMaOffset))
+
+int higherTimeframeTrendMaBarIndex = request.security (syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, bar_index)
+bool newHigherTimeframeTrendMaBar = higherTimeframeTrendMaBarIndex[1] != higherTimeframeTrendMaBarIndex[0]
+
+var higherTimeframeTrendMaLong = higherTimeframeTrend
+var higherTimeframeTrendMaShort = (not higherTimeframeTrend)
+
+if newHigherTimeframeTrendMaBar
+    higherTimeframeTrendMaLong := higherTimeframeTrend
+    higherTimeframeTrendMaShort := (not higherTimeframeTrend)
+
+// Noro TrendRibbon substrategy
+highClosingMa = f_Ma (i_highClosingMaType, i_highClosingMaSource, i_highClosingMaLength)
+lowClosingMa = f_Ma (i_lowClosingMaType, i_lowClosingMaSource, i_lowClosingMaLength)
+
+highestClosingMA = ta.highest(highClosingMa, i_highestClosingMaLength)
+lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
+
+// Too old logic
+
+tooOldOrderLongCloseAdvice = getTooOldOrderLongCloseAdvice ()
+tooOldOrderShortCloseAdvice = getTooOldOrderShortCloseAdvice ()
+
+// Volatility substrategy
+
+volatilityLongCondition = true
+volatilityShortCondition = true
+
+atrLongVolatilityPrice = i_atrVolatilitySource + (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
+barIsVolatileLong = (close[0] >= open[0]) and (close[0] >= atrLongVolatilityPrice[1])
+
+if barIsVolatileLong or barIsVolatileLong[1]
+    volatilityLongCondition := false
+
+atrShortVolatilityPrice = i_atrVolatilitySource - (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
+barIsVolatileShort = (close[0] <= open[0]) and (close[0] <= atrShortVolatilityPrice[1])
+
+if barIsVolatileShort or barIsVolatileShort[1]
+    volatilityShortCondition := false
+
+// Edge substrategy
+
+edgeLongCondition = true
+edgeShortCondition = true
+
+edgeShortPrice = ta.lowest(i_shortEdgeSource, i_shortEdgeLength)
+edgeShortMinimumPrice = edgeShortPrice + (edgeShortPrice * i_shortEdgeMinimumDistance * 0.01)
+
+edgeLongPrice = ta.highest(i_longEdgeSource, i_longEdgeLength)
+edgeLongMaximumPrice = edgeLongPrice - (edgeLongPrice * i_longEdgeMinimumDistance * 0.01)
+
+if not (close <= edgeLongMaximumPrice)
+    edgeLongCondition := false
+
+if not (close >= edgeShortMinimumPrice)
+    edgeShortCondition := false
+
+// Final logic
+bool longCondition1 = sqzmomDivergenceLong
+bool longCondition2 = false
+bool longCondition3 = false
+bool longCondition4 = false
+bool longCondition5 = false
+
+bool longCondition1Found = false
+bool longCondition2Found = false
+bool longCondition3Found = false
+bool longCondition4Found = false
+bool longCondition5Found = false
+
+bool shortCondition1 = sqzmomDivergenceShort
+bool shortCondition2 = false
+bool shortCondition3 = false
+bool shortCondition4 = false
+bool shortCondition5 = false
+
+bool shortCondition1Found = false
+bool shortCondition2Found = false
+bool shortCondition3Found = false
+bool shortCondition4Found = false
+bool shortCondition5Found = false
+
+
+longConditions = 0
+shortConditions = 0
+for i = (i_subStrategiesLookback - 1) to 0
+    if longCondition1[i]
+        longCondition1Found := true
+    if longCondition2[i]
+        longCondition2Found := true
+    if longCondition3[i]
+        longCondition3Found := true
+    if longCondition4[i]
+        longCondition4Found := true
+    if longCondition5[i]
+        longCondition5Found := true
+    if shortCondition1[i]
+        shortCondition1Found := true
+    if shortCondition2[i]
+        shortCondition2Found := true
+    if shortCondition3[i]
+        shortCondition3Found := true
+    if shortCondition4[i]
+        shortCondition4Found := true
+    if shortCondition5[i]
+        shortCondition5Found := true
+
+if longCondition1Found
+    longConditions := longConditions + 1
+if longCondition2Found
+    longConditions := longConditions + 1
+if longCondition3Found
+    longConditions := longConditions + 1
+if longCondition4Found
+    longConditions := longConditions + 1
+if longCondition5Found
+    longConditions := longConditions + 1
+if shortCondition1Found
+    shortConditions := shortConditions + 1
+if shortCondition2Found
+    shortConditions := shortConditions + 1
+if shortCondition3Found
+    shortConditions := shortConditions + 1
+if shortCondition4Found
+    shortConditions := shortConditions + 1
+if shortCondition5Found
+    shortConditions := shortConditions + 1
+
+bool longCondition = na
+bool shortCondition = na
+
+longCondition := (longConditions >= i_subStrategiesMinimum)
+shortCondition := (shortConditions >= i_subStrategiesMinimum)
+
+if i_enableVolatilityProtection
+    longCondition := longCondition and volatilityLongCondition
+    shortCondition := shortCondition and volatilityShortCondition
+
+if i_enableLongEdgeProtection
+    longCondition := longCondition and edgeLongCondition
+
+if i_enableShortEdgeProtection
+    shortCondition := shortCondition and edgeShortCondition
+
+if (i_higherTimeframeTrendMaEnforce)
+    longCondition := longCondition and higherTimeframeTrendMaLong
+    shortCondition := shortCondition and higherTimeframeTrendMaShort
 
 // TrendRibbon - Plot - BEGIN
 highestClosingLowestColor = i_showRibbon ? color.yellow : na
@@ -868,15 +769,52 @@ else
 tooRecentOrderNotOpenAdvice = f_getTooRecentOrderNotOpenAdvice (lastOrderOpenBarTime)
 
 // Decide if we are going to LONG/Go LONG - BEGIN
-LONG = false
-LONG := squeezeStrategyLong
-SHORT = false
-SHORT := squeezedStrategyShort
-LONG_CLOSE = false
-LONG_CLOSE := squeezeStrategyLongClose
-SHORT_CLOSE = false
-SHORT_CLOSE := squeezedStrategyShortClose
+PRE_LONG = false
+if (i_tooRecentMinutesNumber == 0)
+    PRE_LONG := onStartTimeInterval and longCondition
+else
+    PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice)
+
+// LONG = PRE_LONG[1] and PRE_LONG // Wait for confirmation
+LONG = PRE_LONG // Do not wait for confirmation
+
 // Decide if we are going to LONG/Go LONG - END
+
+// Decide if we are going to SHORT/Go SHORT - BEGIN
+PRE_SHORT = false
+if (i_tooRecentMinutesNumber == 0)
+    PRE_SHORT := onStartTimeInterval and shortCondition
+else
+    PRE_SHORT := onStartTimeInterval and shortCondition and (not tooRecentOrderNotOpenAdvice)
+
+// SHORT = PRE_SHORT[1] and PRE_SHORT // Wait for confirmation
+SHORT = PRE_SHORT // Do not wait for confirmation
+
+// Decide if we are going to SHORT/Go SHORT - END
+
+// Decide if a LONG/LONG entry should be closed - BEGIN
+LONG_CLOSE = true
+LONG_CLOSE := offStopTimeInterval or shortCondition or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) ) or tooOldOrderLongCloseAdvice
+
+if i_enableLongEdgeTakeProfitProtection
+    LONG_CLOSE := LONG_CLOSE or (not edgeLongCondition)
+
+// Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
+if LONG_CLOSE
+    LONG := false
+// Decide if a LONG/LONG entry should be closed - END
+
+// Decide if a SHORT/SHORT entry should be closed - BEGIN
+SHORT_CLOSE = true
+SHORT_CLOSE := offStopTimeInterval or longCondition or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) ) or tooOldOrderShortCloseAdvice
+
+if i_enableShortEdgeTakeProfitProtection
+    SHORT_CLOSE := SHORT_CLOSE or (not edgeShortCondition)
+
+// Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
+if SHORT_CLOSE
+    SHORT := false
+// Decide if a SHORT/SHORT entry should be closed - END
 
 // orderStopLoss is just here just in case
 // we implement i_longStopLoss and i_shortStopLoss
