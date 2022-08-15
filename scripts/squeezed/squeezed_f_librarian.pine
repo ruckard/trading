@@ -1268,4 +1268,6 @@ squeezedStrategyMain() =>
 
     [LONG, SHORT, LONG_CLOSE, SHORT_CLOSE, alertMessage]
 
+[squeezeStrategyHigherTimeframeTrendMaLong, squeezeStrategyHigherTimeframeTrendMaShort] = request.security('BTCUSDTPERP', i_higherTimeframeTrendMaTimeframe, squeezedStrategyHigherTimeframeTrend())
 
+[squeezeStrategyLong, squeezedStrategyShort, squeezeStrategyLongClose, squeezedStrategyShortClose, squeezedStrategyAlertMessage] = request.security('BTCUSDTPERP', '1h', squeezedStrategyMain())
