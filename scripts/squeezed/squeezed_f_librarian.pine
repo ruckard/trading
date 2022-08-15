@@ -182,6 +182,14 @@ strategy('Ruckard Squeezed F001', shorttitle='F001RSqueezed', overlay=true, max_
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/ZignalyBeta/21 as zig
 
+squeezedStrategyHigherTimeframeTrend() =>
+    higherTimeframeTrend = getTrend (i_higherTimeframeTrendFastMaType, i_higherTimeframeTrendFastMaLength, i_higherTimeframeTrendFastMaSource, i_higherTimeframeTrendSlowMaType, i_higherTimeframeTrendSlowMaLength, i_higherTimeframeTrendSlowMaSource, i_higherTimeframeTrendMaOffset)
+
+    bool higherTimeframeTrendMaLong = higherTimeframeTrend
+    bool higherTimeframeTrendMaShort = (not higherTimeframeTrend)
+
+    [higherTimeframeTrendMaLong, higherTimeframeTrendMaShort]
+
 squeezedStrategyMain() =>
 
     // INPUTS - BEGIN
