@@ -1273,3 +1273,13 @@ squeezedStrategyMain() =>
 [squeezeStrategyLong, squeezedStrategyShort, squeezeStrategyLongClose, squeezedStrategyShortClose, squeezedStrategyAlertMessage] = request.security('BTCUSDTPERP', '1h', squeezedStrategyMain())
 
 alert(message= i_enableZignalyAlert  ? squeezedStrategyAlertMessage : na)
+
+string mainStrategyAlertMessage = squeezedStrategyAlertMessage
+bool mainStrategyLong = squeezeStrategyLong
+bool mainStrategyShort = squeezedStrategyShort
+float mainStrategyEntryQuantityContracts = squeezedStrategyEntryQuantityContracts
+// If main pair
+if mainStrategyLong
+    strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? mainStrategyAlertMessage : na, comment=mainStrategyAlertMessage)
+if mainStrategyShort
+    strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? mainStrategyAlertMessage : na, comment=mainStrategyAlertMessage)
