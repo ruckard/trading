@@ -1265,19 +1265,33 @@ squeezedStrategyMain() =>
     // Handle STOP LOSS (and similar) order exits - END
 
     // Strategy Body - END
+    // TODO: Return 'i_enableAnyStopLoss ? ShortStopLoss : n' as ShortStopLoss.
 
     [LONG, SHORT, LONG_CLOSE, SHORT_CLOSE, alertMessage]
 
 [squeezeStrategyHigherTimeframeTrendMaLong, squeezeStrategyHigherTimeframeTrendMaShort] = request.security('BTCUSDTPERP', i_higherTimeframeTrendMaTimeframe, squeezedStrategyHigherTimeframeTrend())
 
-[squeezedStrategyLong, squeezedStrategyShort, squeezedStrategyLongClose, squeezedStrategyShortClose, squeezedStrategyAlertMessage, squeezedStrategyEntryQuantityContracts] = request.security('BTCUSDTPERP', '1h', squeezedStrategyMain())
+[squeezedStrategyLong, squeezedStrategyShort, squeezedStrategyLongClose, squeezedStrategyShortClose, squeezedStrategyAlertMessage, squeezedStrategyEntryQuantityContracts, squeezedStrategyLongExit, squeezedStrategyShortExit, squeezedStrategyLongStopLoss, squeezedStrategyLongTakeProfit, squeezedStrategyLongTrailingTakeProfitPrice, squeezedStrategyLongTrailingTakeProfitOffset, squeezedStrategyShortStopLoss, squeezedStrategyShortTakeProfit, squeezedStrategyShortTrailingTakeProfitPrice, squeezedStrategyShortTrailingTakeProfitOffset, squeezedStrategyLongStopLossAlertMessage, squeezedStrategyShortStopLossAlertMessage] = request.security('BTCUSDTPERP', '1h', squeezedStrategyMain())
 
 string mainStrategyAlertMessage = squeezedStrategyAlertMessage
+string mainStrategyLongStopLossAlertMessage = squeezedStrategyLongStopLossAlertMessage
+string mainStrategyShortStopLossAlertMessage = squeezedStrategyShortStopLossAlertMessage
 bool mainStrategyLong = squeezedStrategyLong
 bool mainStrategyShort = squeezedStrategyShort
 float mainStrategyEntryQuantityContracts = squeezedStrategyEntryQuantityContracts
 bool mainStrategyLongClose = squeezedStrategyLongClose
 bool mainStrategyShortClose = squeezedStrategyShortClose
+bool mainStrategyLongExit = squeezedStrategyLongExit
+bool mainStrategyShortExit = squeezedStrategyShortExit
+
+bool mainStrategyLongStopLoss = squeezedStrategyLongStopLoss
+bool mainStrategyLongTakeProfit = squeezedStrategyLongTakeProfit
+bool mainStrategyLongTrailingTakeProfitPrice = squeezedStrategyLongTrailingTakeProfitPrice
+bool mainStrategyLongTrailingTakeProfitOffset = squeezedStrategyLongTrailingTakeProfitOffset
+bool mainStrategyShortStopLoss = squeezedStrategyShortStopLoss
+bool mainStrategyShortTakeProfit = squeezedStrategyShortTakeProfit
+bool mainStrategyShortTrailingTakeProfitPrice = squeezedStrategyShortTrailingTakeProfitPrice
+bool mainStrategyShortTrailingTakeProfitOffset = squeezedStrategyShortTrailingTakeProfitOffset
 
 // TODO: Do not send alert here for the main strategy
 // when either of mainStrategyLong, mainStrategyShort, mainStrategyLongClose or mainStrategyShortClose
@@ -1293,3 +1307,7 @@ if mainStrategyLongClose
     strategy.close("[L]", alert_message=i_enableZignalyAlert ? mainStrategyAlertMessage : na, comment=mainStrategyAlertMessage)
 if mainStrategyShortClose
     strategy.close("[S]", alert_message=i_enableZignalyAlert ? mainStrategyAlertMessage : na, comment=mainStrategyAlertMessage)
+if mainStrategyLongExit
+    strategy.exit("[L]-[SL/TP]", "[L]", stop= mainStrategyLongStopLoss, limit= mainStrategyLongTakeProfit, trail_price= mainStrategyLongTrailingTakeProfitPrice, trail_offset = mainStrategyLongTrailingTakeProfitOffset, alert_message= i_enableZignalyAlert ? mainStrategyLongStopLossAlertMessage : na, comment=mainStrategyLongStopLossAlertMessage)
+if mainStrategyShortExit
+    strategy.exit("[S]-[SL/TP]", "[S]", stop= mainStrategyShortStopLoss, limit= mainStrategyShortTakeProfit, trail_price= mainStrategyShortTrailingTakeProfitPrice, trail_offset = mainStrategyLongTrailingTakeProfitOffset, alert_message= i_enableZignalyAlert ? mainStrategyShortStopLossAlertMessage : na, comment=mainStrategyShortStopLossAlertMessage)
