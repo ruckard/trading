@@ -1270,16 +1270,26 @@ squeezedStrategyMain() =>
 
 [squeezeStrategyHigherTimeframeTrendMaLong, squeezeStrategyHigherTimeframeTrendMaShort] = request.security('BTCUSDTPERP', i_higherTimeframeTrendMaTimeframe, squeezedStrategyHigherTimeframeTrend())
 
-[squeezeStrategyLong, squeezedStrategyShort, squeezeStrategyLongClose, squeezedStrategyShortClose, squeezedStrategyAlertMessage] = request.security('BTCUSDTPERP', '1h', squeezedStrategyMain())
-
-alert(message= i_enableZignalyAlert  ? squeezedStrategyAlertMessage : na)
+[squeezedStrategyLong, squeezedStrategyShort, squeezedStrategyLongClose, squeezedStrategyShortClose, squeezedStrategyAlertMessage, squeezedStrategyEntryQuantityContracts] = request.security('BTCUSDTPERP', '1h', squeezedStrategyMain())
 
 string mainStrategyAlertMessage = squeezedStrategyAlertMessage
-bool mainStrategyLong = squeezeStrategyLong
+bool mainStrategyLong = squeezedStrategyLong
 bool mainStrategyShort = squeezedStrategyShort
 float mainStrategyEntryQuantityContracts = squeezedStrategyEntryQuantityContracts
+bool mainStrategyLongClose = squeezedStrategyLongClose
+bool mainStrategyShortClose = squeezedStrategyShortClose
+
+// TODO: Do not send alert here for the main strategy
+// when either of mainStrategyLong, mainStrategyShort, mainStrategyLongClose or mainStrategyShortClose
+// is true
+alert(message= i_enableZignalyAlert  ? squeezedStrategyAlertMessage : na)
+
 // If main pair
 if mainStrategyLong
-    strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? mainStrategyAlertMessage : na, comment=mainStrategyAlertMessage)
+    strategy.entry("[L]", strategy.long, qty=mainStrategyEntryQuantityContracts, alert_message=i_enableZignalyAlert ? mainStrategyAlertMessage : na, comment=mainStrategyAlertMessage)
 if mainStrategyShort
-    strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? mainStrategyAlertMessage : na, comment=mainStrategyAlertMessage)
+    strategy.entry("[S]", strategy.short, qty=mainStrategyEntryQuantityContracts, alert_message=i_enableZignalyAlert ? mainStrategyAlertMessage : na, comment=mainStrategyAlertMessage)
+if mainStrategyLongClose
+    strategy.close("[L]", alert_message=i_enableZignalyAlert ? mainStrategyAlertMessage : na, comment=mainStrategyAlertMessage)
+if mainStrategyShortClose
+    strategy.close("[S]", alert_message=i_enableZignalyAlert ? mainStrategyAlertMessage : na, comment=mainStrategyAlertMessage)
