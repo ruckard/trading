@@ -1271,3 +1271,5 @@ squeezedStrategyMain() =>
 [squeezeStrategyHigherTimeframeTrendMaLong, squeezeStrategyHigherTimeframeTrendMaShort] = request.security('BTCUSDTPERP', i_higherTimeframeTrendMaTimeframe, squeezedStrategyHigherTimeframeTrend())
 
 [squeezeStrategyLong, squeezedStrategyShort, squeezeStrategyLongClose, squeezedStrategyShortClose, squeezedStrategyAlertMessage] = request.security('BTCUSDTPERP', '1h', squeezedStrategyMain())
+
+alert(message= i_enableZignalyAlert  ? squeezedStrategyAlertMessage : na)
