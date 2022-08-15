@@ -200,15 +200,7 @@ i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
 
-i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High Closing MA Type [SMA]')
-i_highClosingMaLength = input.int(13, minval = 1,  title = '(STRAT) High Closing MA Length [13]')
-i_highClosingMaSource = input.source(ohlc4, title = '(STRAT) High Closing MA Source [ohlc4]')
-i_highestClosingMaLength = input.int(22, minval = 1,  title = '(STRAT) Highest Closing MA Length [22]')
 
-i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
-i_lowClosingMaLength = input.int(6, minval = 1,  title = '(STRAT) Low Closing MA Length [6]')
-i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
-i_lowestClosingMaLength = input.int(18, minval = 1,  title = '(STRAT) Lowest Closing MA Length [18]')
 
 i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
 i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
@@ -260,28 +252,7 @@ i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
 i_tooOldShortStopLoss = input.float(0.60, '(OLD) Too Old Short order Stop Loss (%) {0.60}', minval=0, step=0.01)
 i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
 
-i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
-i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
-
-i_enableVolatilityProtection = input.bool(true, '(STRAT) Enable Volatility Protection? {True}')
-
-i_atrVolatilityLength = input.int(14, minval = 1,  title = '(STRAT) ATR Volatility Length [14]')
-i_atrVolatilitySource = input.source(close, title = '(STRAT) ATR Volatility Source [close]')
-i_atrVolatilityMultiplier = input.float(1.10, title='(STRAT) ATR Volatility Multiplier % {1.10}', minval=0.01)
-
 i_showAtrVolatilityMultiplier = input.bool(false, title='(STRAT) Show ATR Volatility Multiplier Level {False}')
-
-i_enableLongEdgeProtection = input.bool(false, '(STRAT) Enable Long Edge Protection? {False}')
-i_longEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Long Edge Length [100]')
-i_longEdgeSource = input.source(high, title = '(STRAT) Long Edge Source [high]')
-i_longEdgeMinimumDistance = input.float(3.50, title='(STRAT) Long Edge Minimum Distance % {3.50}', minval=0.01)
-i_enableLongEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Long Edge TakeProfit Protection? {False}')
-
-i_enableShortEdgeProtection = input.bool(false, '(STRAT) Enable Short Edge Protection? {False}')
-i_shortEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Short Edge Length [100]')
-i_shortEdgeSource = input.source(low, title = '(STRAT) Short Edge Source [low]')
-i_shortEdgeMinimumDistance = input.float(1.00, title='(STRAT) Short Edge Minimum Distance % {1.00}', minval=0.01)
-i_enableShortEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Short Edge TakeProfit Protection? {False}')
 
 i_showEdges = input.bool(false, title='(STRAT) Show Edge Minimum and Maximum {False}')
 
@@ -533,6 +504,37 @@ squeezedStrategyHigherTimeframeTrend() =>
 // @param higherTimeframeTrendMaShort
 // @returns alert_message for opening short entries in Zignaly
 squeezedStrategyMain() =>
+
+    i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High Closing MA Type [SMA]')
+    i_highClosingMaLength = input.int(13, minval = 1,  title = '(STRAT) High Closing MA Length [13]')
+    i_highClosingMaSource = input.source(ohlc4, title = '(STRAT) High Closing MA Source [ohlc4]')
+    i_highestClosingMaLength = input.int(22, minval = 1,  title = '(STRAT) Highest Closing MA Length [22]')
+
+    i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
+    i_lowClosingMaLength = input.int(6, minval = 1,  title = '(STRAT) Low Closing MA Length [6]')
+    i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
+    i_lowestClosingMaLength = input.int(18, minval = 1,  title = '(STRAT) Lowest Closing MA Length [18]')
+
+    i_enableVolatilityProtection = input.bool(true, '(STRAT) Enable Volatility Protection? {True}')
+
+    i_atrVolatilityLength = input.int(14, minval = 1,  title = '(STRAT) ATR Volatility Length [14]')
+    i_atrVolatilitySource = input.source(close, title = '(STRAT) ATR Volatility Source [close]')
+    i_atrVolatilityMultiplier = input.float(1.10, title='(STRAT) ATR Volatility Multiplier % {1.10}', minval=0.01)
+
+    i_enableLongEdgeProtection = input.bool(false, '(STRAT) Enable Long Edge Protection? {False}')
+    i_longEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Long Edge Length [100]')
+    i_longEdgeSource = input.source(high, title = '(STRAT) Long Edge Source [high]')
+    i_longEdgeMinimumDistance = input.float(3.50, title='(STRAT) Long Edge Minimum Distance % {3.50}', minval=0.01)
+    i_enableLongEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Long Edge TakeProfit Protection? {False}')
+
+    i_enableShortEdgeProtection = input.bool(false, '(STRAT) Enable Short Edge Protection? {False}')
+    i_shortEdgeLength = input.int(100, minval = 1,  title = '(STRAT) Short Edge Length [100]')
+    i_shortEdgeSource = input.source(low, title = '(STRAT) Short Edge Source [low]')
+    i_shortEdgeMinimumDistance = input.float(1.00, title='(STRAT) Short Edge Minimum Distance % {1.00}', minval=0.01)
+    i_enableShortEdgeTakeProfitProtection = input.bool(false, '(STRAT) Enable Short Edge TakeProfit Protection? {False}')
+
+    i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
+    i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
     // SQMMOMDivergence SubStrategy
     // Short divergence means that next top height is smaller than previous top height and at the same time price is bigger than in the previous top height.
