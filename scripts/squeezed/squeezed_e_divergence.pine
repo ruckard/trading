@@ -581,15 +581,32 @@ bool sqzmomDivergenceShort = false
 // Short divergence - Section A
 if (sqzmom_top_change and sqzmom_top_is_a and (sqzmom_top_val_a < sqzmom_top_val_b) and (sqzmom_top_price_a > sqzmom_top_price_b))
     sqzmomDivergenceShort := true
+    if (i_enableShortSqzmomPriceMinimumDifference)
+        shortSectionASqzmomMinimumPrice = sqzmom_top_price_b + (shortSqzmomPriceMinimumDifference * 0.01 * sqzmom_top_price_b)
+        shortSectionASqzmomPriceIsOverMinimum = sqzmom_top_price_a >= shortSectionASqzmomMinimumPrice
+        sqzmomDivergenceShort := sqzmomDivergenceShort and shortSectionASqzmomPriceIsOverMinimum
 // Short divergence - Section B
 if (sqzmom_top_change and sqzmom_top_is_b and (sqzmom_top_val_b < sqzmom_top_val_a) and (sqzmom_top_price_b > sqzmom_top_price_a))
     sqzmomDivergenceShort := true
+    if (i_enableShortSqzmomPriceMinimumDifference)
+        shortSectionBSqzmomMinimumPrice = sqzmom_top_price_a + (shortSqzmomPriceMinimumDifference * 0.01 * sqzmom_top_price_a)
+        shortSectionBSqzmomPriceIsOverMinimum = sqzmom_top_price_b >= shortSectionBSqzmomMinimumPrice
+        sqzmomDivergenceShort := sqzmomDivergenceShort and shortSectionBSqzmomPriceIsOverMinimum
 // Long divergence - Section A
 if (sqzmom_bottom_change and sqzmom_bottom_is_a and (sqzmom_bottom_val_a > sqzmom_bottom_val_b) and (sqzmom_bottom_price_a < sqzmom_bottom_price_b))
     sqzmomDivergenceLong := true
+    if (i_enableLongSqzmomPriceMinimumDifference)
+        longSectionASqzmomMinimumPrice = sqzmom_bottom_price_a + (longSqzmomPriceMinimumDifference * 0.01 * sqzmom_bottom_price_a)
+        longSectionASqzmomPriceIsOverMinimum = sqzmom_bottom_price_b >= longSectionASqzmomMinimumPrice
+        sqzmomDivergenceLong := sqzmomDivergenceLong and longSectionASqzmomPriceIsOverMinimum
+
 // Long divergence - Section B
 if (sqzmom_bottom_change and sqzmom_bottom_is_b and (sqzmom_bottom_val_b > sqzmom_bottom_val_a) and (sqzmom_bottom_price_b < sqzmom_bottom_price_a))
     sqzmomDivergenceLong := true
+    if (i_enableLongSqzmomPriceMinimumDifference)
+        longSqzmomSectionBMinimumPrice = sqzmom_bottom_price_b + (longSqzmomPriceMinimumDifference * 0.01 * sqzmom_bottom_price_b)
+        longSectionBSqzmomPriceIsOverMinimum = sqzmom_bottom_price_a >= longSqzmomSectionBMinimumPrice
+        sqzmomDivergenceLong := sqzmomDivergenceLong and longSectionBSqzmomPriceIsOverMinimum
 
 // Higher Timeframe Trend substrategy
 
