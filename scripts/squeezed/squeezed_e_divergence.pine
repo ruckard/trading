@@ -320,6 +320,16 @@ i_riskManagementMaximumLossPerDay = input.float(6.0, title='(RISKM) Maximum loss
 i_riskManagementMaximumLossPerWeek = input.float(8.0, title='(RISKM) Maximum loss per week % {8.0}') / 100
 i_riskManagementMaximumLossPerMonth = input.float(10.0, title='(RISKM) Maximum loss per month % {10.0}') / 100
 
+i_enableLongSqzmomPriceMinimumDifference = input.bool(true, '(STRAT) Enable Long Sqzmom Price Minimum Difference? {True}')
+i_enableShortSqzmomPriceMinimumDifference = input.bool(true, '(STRAT) Enable Short Sqzmom Price Minimum Difference? {True}')
+i_enableLongSqzmomValMinimumDifference = input.bool(true, '(STRAT) Enable Long Sqzmom Val Minimum Difference? {True}')
+i_enableShortSqzmomValMinimumDifference = input.bool(true, '(STRAT) Enable Short Sqzmom Val Minimum Difference? {True}')
+
+longSqzmomPriceMinimumDifference = input.float(0.50, title='(STRAT) Long Sqzmom Price Minimum Difference % {0.50}', minval=0.01)
+shortSqzmomPriceMinimumDifference = input.float(0.50, title='(STRAT) Short Sqzmom Price Minimum Difference % {0.50}', minval=0.01)
+longSqzmomValMinimumDifference = input.float(0.50, title='(STRAT) Long Sqzmom Val Minimum Difference % {0.50}', minval=0.01)
+shortSqzmomValMinimumDifference = input.float(0.50, title='(STRAT) Short Sqzmom Val Minimum Difference % {0.50}', minval=0.01)
+
 // INPUTS - END
 
 
