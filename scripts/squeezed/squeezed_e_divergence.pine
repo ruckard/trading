@@ -216,9 +216,9 @@ i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {False}')
-i_enableStopLoss = input.bool(false, '(STOPTAKE) Stop Loss? {False}')
+i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
 i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
-i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
+i_enableBreakEven = input.bool(true, title='(BREAKEVEN) Enable Break Even (%) {True}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
 i_enableRiskRewardRatio = input.bool(false, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {False}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
@@ -291,9 +291,9 @@ i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrig
 i_trailingTakeProfitPercentageOffset = input.float(25.0, '(TRAILING) Trailing Take Profit as a percentage of Trailing Take Profit Trigger (%) {25.0}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageOffsetPerOne = i_trailingTakeProfitPercentageOffset * 0.01
 // Break Even - Inputs
-i_breakEvenTrigger = input.float(1.0, '(BREAKEVEN) Break Even Trigger (%) {1.0}', minval=0, step=0.01)
+i_breakEvenTrigger = input.float(2.15, '(BREAKEVEN) Break Even Trigger (%) {2.15}', minval=0, step=0.01)
 i_breakEvenTriggerPerOne = i_breakEvenTrigger * 0.01
-i_breakEven = input.float(0.20, '(BREAKEVEN) Break Even Stop Loss (%) {0.20}', minval=0, step=0.01)
+i_breakEven = input.float(0.25, '(BREAKEVEN) Break Even Stop Loss (%) {0.25}', minval=0, step=0.01)
 i_breakEvenPerOne = i_breakEven * 0.01
 // Zignaly - Email (zignalye)
 _ZIGNALYE_ = 'Email', _ZIGNALYW_ = 'WebHook'
@@ -325,10 +325,10 @@ i_enableShortSqzmomPriceMinimumDifference = input.bool(true, '(STRAT) Enable Sho
 i_enableLongSqzmomValMinimumDifference = input.bool(true, '(STRAT) Enable Long Sqzmom Val Minimum Difference? {True}')
 i_enableShortSqzmomValMinimumDifference = input.bool(true, '(STRAT) Enable Short Sqzmom Val Minimum Difference? {True}')
 
-longSqzmomPriceMinimumDifference = input.float(0.50, title='(STRAT) Long Sqzmom Price Minimum Difference % {0.50}', minval=0.01)
-shortSqzmomPriceMinimumDifference = input.float(0.50, title='(STRAT) Short Sqzmom Price Minimum Difference % {0.50}', minval=0.01)
-longSqzmomValMinimumDifference = input.float(0.50, title='(STRAT) Long Sqzmom Val Minimum Difference % {0.50}', minval=0.01)
-shortSqzmomValMinimumDifference = input.float(0.50, title='(STRAT) Short Sqzmom Val Minimum Difference % {0.50}', minval=0.01)
+longSqzmomPriceMinimumDifference = input.float(0.15, title='(STRAT) Long Sqzmom Price Minimum Difference % {0.15}', minval=0.01)
+shortSqzmomPriceMinimumDifference = input.float(0.35, title='(STRAT) Short Sqzmom Price Minimum Difference % {0.35}', minval=0.01)
+longSqzmomValMinimumDifference = input.float(15.00, title='(STRAT) Long Sqzmom Val Minimum Difference % {15.00}', minval=0.01)
+shortSqzmomValMinimumDifference = input.float(150.00, title='(STRAT) Short Sqzmom Val Minimum Difference % {150.00}', minval=0.01)
 
 // INPUTS - END
 
