@@ -364,10 +364,8 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
 
 
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
-// longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-// shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
-longCondition = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
-shortCondition = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+longCondition = ta.crossover(ta.ema(close, 10), ta.ema(close, 120))
+shortCondition = ta.crossunder(ta.ema(close, 10), ta.ema(close, 120))
 // Simple Logic to go LONG/LONG or go SHORT/SHORT - END
 
 
