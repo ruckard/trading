@@ -10,6 +10,7 @@
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 1H timeframe.
+// It decides to go long when 10-period EMA crosses over 120-period EMA and goes short when 10-period EMA crosses under 120-period EMA.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
