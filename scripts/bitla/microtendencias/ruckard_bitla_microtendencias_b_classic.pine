@@ -250,6 +250,15 @@ i_riskManagementMaximumLossPerMonth = input.float(10.0, title='(RISKM) Maximum l
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+
+i_bitlaFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend Fast MA Type {EMA}')
+i_bitlaFastMaLength = input.int(10, minval = 1,  title = '(STRAT) Higher Timeframe Trend Fast MA Length {10}')
+i_bitlaFastMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Fast MA Source {close}')
+
+i_bitlaSlowMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend Slow MA Type {EMA}')
+i_bitlaSlowMaLength = input.int(120, minval = 1,  title = '(STRAT) Higher Timeframe Trend Slow MA Length {120}')
+i_bitlaSlowMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Slow MA Source {close}')
+
 // INPUTS - END
 
 
@@ -359,10 +368,28 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
         _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
     _tooRecentOrderBuyNotOpenAdvice
 
+// MA - Functions - BEGIN
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : _maType == "WMA" ? ta.wma(_maSource, _maLength) : _maType == "HMA" ? ta.hma(_maSource, _maLength) : _maSource
+// MA - Functions - END
+
 // FUNCTIONS - END
 
 
 // Strategy Body - BEGIN
+
+// bitla MicroTendency substrategy - BEGIN
+var bool bitlaMicrotendencyLong = false
+var bool bitlaMicrotendencyShort = false
+bitlaFastMa = f_Ma (i_bitlaFastMaType, i_bitlaFastMaSource, i_bitlaFastMaLength)
+bitlaSlowMa = f_Ma (i_bitlaSlowMaType, i_bitlaSlowMaSource, i_bitlaSlowMaLength)
+if (ta.crossover(bitlaFastMa, bitlaSlowMa))
+    bitlaMicrotendencyLong := true
+    bitlaMicrotendencyShort := false
+if (ta.crossunder(bitlaFastMa, bitlaSlowMa))
+    bitlaMicrotendencyLong := false
+    bitlaMicrotendencyShort := true
+// bitla MicroTendency substrategy - END
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
