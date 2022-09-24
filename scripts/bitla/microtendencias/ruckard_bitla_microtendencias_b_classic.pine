@@ -251,13 +251,13 @@ i_riskManagementMaximumLossPerMonth = input.float(10.0, title='(RISKM) Maximum l
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
-i_bitlaFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend Fast MA Type {EMA}')
-i_bitlaFastMaLength = input.int(10, minval = 1,  title = '(STRAT) Higher Timeframe Trend Fast MA Length {10}')
-i_bitlaFastMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Fast MA Source {close}')
+i_bitlaFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) bitla Microtendency Fast MA Type {EMA}')
+i_bitlaFastMaLength = input.int(10, minval = 1,  title = '(STRAT) bitla Microtendency Fast MA Length {10}')
+i_bitlaFastMaSource = input.source(close, title = '(STRAT) bitla Microtendency Fast MA Source {close}')
 
-i_bitlaSlowMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) Higher Timeframe Trend Slow MA Type {EMA}')
-i_bitlaSlowMaLength = input.int(120, minval = 1,  title = '(STRAT) Higher Timeframe Trend Slow MA Length {120}')
-i_bitlaSlowMaSource = input.source(close, title = '(STRAT) Higher Timeframe Trend Slow MA Source {close}')
+i_bitlaSlowMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = '(STRAT) bitla Microtendency Slow MA Type {EMA}')
+i_bitlaSlowMaLength = input.int(120, minval = 1,  title = '(STRAT) bitla Microtendency Slow MA Length {120}')
+i_bitlaSlowMaSource = input.source(close, title = '(STRAT) bitla Microtendency Slow MA Source {close}')
 
 // INPUTS - END
 
