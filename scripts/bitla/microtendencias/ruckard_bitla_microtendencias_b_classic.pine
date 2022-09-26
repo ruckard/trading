@@ -196,19 +196,19 @@ i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
 
-i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) High Closing MA Type [SMA]')
-i_highClosingMaLength = input.int(13, minval = 1,  title = '(STRAT) High Closing MA Length [13]')
-i_highClosingMaSource = input.source(ohlc4, title = '(STRAT) High Closing MA Source [ohlc4]')
-i_highestClosingMaLength = input.int(22, minval = 1,  title = '(STRAT) Highest Closing MA Length [22]')
+i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(CURIE) High Closing MA Type [SMA]')
+i_highClosingMaLength = input.int(13, minval = 1,  title = '(CURIE) High Closing MA Length [13]')
+i_highClosingMaSource = input.source(ohlc4, title = '(CURIE) High Closing MA Source [ohlc4]')
+i_highestClosingMaLength = input.int(22, minval = 1,  title = '(CURIE) Highest Closing MA Length [22]')
 
-i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(STRAT) Low Closing MA Type [SMA]')
-i_lowClosingMaLength = input.int(6, minval = 1,  title = '(STRAT) Low Closing MA Length [6]')
-i_lowClosingMaSource = input.source(ohlc4, title = '(STRAT) Low Closing MA Source [ohlc4]')
-i_lowestClosingMaLength = input.int(18, minval = 1,  title = '(STRAT) Lowest Closing MA Length [18]')
+i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(CURIE) Low Closing MA Type [SMA]')
+i_lowClosingMaLength = input.int(6, minval = 1,  title = '(CURIE) Low Closing MA Length [6]')
+i_lowClosingMaSource = input.source(ohlc4, title = '(CURIE) Low Closing MA Source [ohlc4]')
+i_lowestClosingMaLength = input.int(18, minval = 1,  title = '(CURIE) Lowest Closing MA Length [18]')
 
-i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
-i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
-i_enableClosingCurieLines = input.bool(true, title = 'Use Curie Closing lines [true]')
+i_signalSource = input.source(ohlc4, title = '(CURIE) Signal Source [ohlc4]')
+i_showRibbon = input.bool(true, title = '(CURIE) Show ribbon [true]')
+i_enableClosingCurieLines = input.bool(true, title = '(CURIE) Use Curie Closing lines [true]')
 
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
