@@ -208,6 +208,7 @@ i_lowestClosingMaLength = input.int(18, minval = 1,  title = '(STRAT) Lowest Clo
 
 i_signalSource = input.source(ohlc4, title = '(STRAT) Signal Source [ohlc4]')
 i_showRibbon = input.bool(true, title = 'Show ribbon [true]')
+i_enableClosingCurieLines = input.bool(true, title = 'Use Curie Closing lines [true]')
 
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
