@@ -194,6 +194,23 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Sta
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+
+// Curie Closing Lines - Inputs
+i_enableCurieClosingLines = input.bool(false, title = 'Use {False}', group='Curie Closing Lines', inline='CurieEnableShow')
+i_showCurieClosingLines = input.bool(false, title = 'Show {False}', group='Curie Closing Lines', inline='CurieEnableShow')
+
+i_curieHighClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'High MA {SMA/13/ohlc4}', group='Curie Closing Lines', inline='High Closing Ma')
+i_curieHighClosingMaLength = input.int(13, minval = 1,  title = '', group='Curie Closing Lines', inline='High Closing Ma')
+i_curieHighClosingMaSource = input.source(ohlc4, title = '', group='Curie Closing Lines', inline='High Closing Ma')
+i_curieHighestClosingMaLength = input.int(22, minval = 1,  title = 'Highest MA Length {22}', group='Curie Closing Lines')
+
+i_curieLowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'Low MA {SMA/6/ohlc4}', group='Curie Closing Lines', inline='Low Closing Ma')
+i_curieLowClosingMaLength = input.int(6, minval = 1,  title = '', group='Curie Closing Lines', inline='Low Closing Ma')
+i_curieLowClosingMaSource = input.source(ohlc4, title = '', group='Curie Closing Lines', inline='Low Closing Ma')
+i_curieLowestClosingMaLength = input.int(18, minval = 1,  title = 'Lowest MA Length {18}', group='Curie Closing Lines')
+
+i_curieSource = input.source(ohlc4, title = 'Source {ohlc4}', group='Curie Closing Lines')
+
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
@@ -368,6 +385,13 @@ f_Ma (_maType, _maSource, _maLength) =>
 
 // Strategy Body - BEGIN
 
+// Curie Closing Lines substrategy
+curieHighClosingMa = f_Ma (i_curieHighClosingMaType, i_curieHighClosingMaSource, i_curieHighClosingMaLength)
+curieLowClosingMa = f_Ma (i_curieLowClosingMaType, i_curieLowClosingMaSource, i_curieLowClosingMaLength)
+
+curieHighestClosingMA = ta.highest(curieHighClosingMa, i_curieHighestClosingMaLength)
+curieLowestClosingMA = ta.lowest(curieLowClosingMa, i_curieLowestClosingMaLength)
+
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
 bool longCondition1 = false
@@ -450,6 +474,11 @@ longCondition := (longConditions >= i_subStrategiesMinimum)
 shortCondition := (shortConditions >= i_subStrategiesMinimum)
 // Common Logic to go LONG/LONG or go SHORT/SHORT - END
 
+// Curie Closing Lines - Plot - BEGIN
+curieHighestClosingLowestColor = i_showCurieClosingLines ? color.yellow : na
+curieHighestClosingMAPlot = plot(curieHighestClosingMA, color = curieHighestClosingLowestColor, title = 'Upper Curie Closing line')
+curieLowestClosingMAPlot = plot(curieLowestClosingMA, color = curieHighestClosingLowestColor, title = 'Lower Curie Closing Line')
+// Curie Closing Lines - Plot - END
 
 // Position price calculation - BEGIN
 float positionPrice = na
@@ -494,6 +523,9 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 LONG_CLOSE = true
 LONG_CLOSE := offStopTimeInterval or shortCondition
 
+if i_enableCurieClosingLines
+    LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(i_curieSource, curieHighestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
     LONG := false
@@ -502,6 +534,9 @@ if LONG_CLOSE
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
 SHORT_CLOSE = true
 SHORT_CLOSE := offStopTimeInterval or longCondition
+
+if i_enableCurieClosingLines
+    SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(i_curieSource, curieLowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
