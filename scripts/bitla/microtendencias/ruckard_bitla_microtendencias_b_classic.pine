@@ -196,19 +196,21 @@ i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
 
-i_curieHighClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(CURIE) High Closing MA Type {SMA}')
-i_curieHighClosingMaLength = input.int(13, minval = 1,  title = '(CURIE) High Closing MA Length {13}')
-i_curieHighClosingMaSource = input.source(ohlc4, title = '(CURIE) High Closing MA Source {ohlc4}')
-i_curieHighestClosingMaLength = input.int(22, minval = 1,  title = '(CURIE) Highest Closing MA Length {22}')
+// Curie Closing Lines - Inputs
+i_enableCurieClosingLines = input.bool(true, title = 'Use {true}', group='Curie Closing Lines', inline='CurieEnableShow')
+i_showCurieClosingLines = input.bool(true, title = 'Show {true}', group='Curie Closing Lines', inline='CurieEnableShow')
 
-i_curieLowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(CURIE) Low Closing MA Type {SMA}')
-i_curieLowClosingMaLength = input.int(6, minval = 1,  title = '(CURIE) Low Closing MA Length {6}')
-i_curieLowClosingMaSource = input.source(ohlc4, title = '(CURIE) Low Closing MA Source {ohlc4}')
-i_curieLowestClosingMaLength = input.int(18, minval = 1,  title = '(CURIE) Lowest Closing MA Length {18}')
+i_curieHighClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'High MA {SMA/13/ohlc4}', group='Curie Closing Lines', inline='High Closing Ma')
+i_curieHighClosingMaLength = input.int(13, minval = 1,  title = '', group='Curie Closing Lines', inline='High Closing Ma')
+i_curieHighClosingMaSource = input.source(ohlc4, title = '', group='Curie Closing Lines', inline='High Closing Ma')
+i_curieHighestClosingMaLength = input.int(22, minval = 1,  title = 'Highest MA Length {22}', group='Curie Closing Lines')
 
-i_curieSource = input.source(ohlc4, title = '(CURIE) Source {ohlc4}')
-i_showCurieClosingLines = input.bool(true, title = '(CURIE) Show Curie closing lines {true}')
-i_enableCurieClosingLines = input.bool(true, title = '(CURIE) Use Curie Closing lines {true}')
+i_curieLowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'Low MA {SMA/6/ohlc4}', group='Curie Closing Lines', inline='Low Closing Ma')
+i_curieLowClosingMaLength = input.int(6, minval = 1,  title = '', group='Curie Closing Lines', inline='Low Closing Ma')
+i_curieLowClosingMaSource = input.source(ohlc4, title = '', group='Curie Closing Lines', inline='Low Closing Ma')
+i_curieLowestClosingMaLength = input.int(18, minval = 1,  title = 'Lowest MA Length {18}', group='Curie Closing Lines')
+
+i_curieSource = input.source(ohlc4, title = 'Source {ohlc4}', group='Curie Closing Lines')
 
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
