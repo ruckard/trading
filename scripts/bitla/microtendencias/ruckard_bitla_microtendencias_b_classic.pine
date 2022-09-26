@@ -196,19 +196,19 @@ i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
 
-i_highClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(CURIE) High Closing MA Type [SMA]')
-i_highClosingMaLength = input.int(13, minval = 1,  title = '(CURIE) High Closing MA Length [13]')
-i_highClosingMaSource = input.source(ohlc4, title = '(CURIE) High Closing MA Source [ohlc4]')
-i_highestClosingMaLength = input.int(22, minval = 1,  title = '(CURIE) Highest Closing MA Length [22]')
+i_curieHighClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(CURIE) High Closing MA Type [SMA]')
+i_curieHighClosingMaLength = input.int(13, minval = 1,  title = '(CURIE) High Closing MA Length [13]')
+i_curieHighClosingMaSource = input.source(ohlc4, title = '(CURIE) High Closing MA Source [ohlc4]')
+i_curieHighestClosingMaLength = input.int(22, minval = 1,  title = '(CURIE) Highest Closing MA Length [22]')
 
-i_lowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(CURIE) Low Closing MA Type [SMA]')
-i_lowClosingMaLength = input.int(6, minval = 1,  title = '(CURIE) Low Closing MA Length [6]')
-i_lowClosingMaSource = input.source(ohlc4, title = '(CURIE) Low Closing MA Source [ohlc4]')
-i_lowestClosingMaLength = input.int(18, minval = 1,  title = '(CURIE) Lowest Closing MA Length [18]')
+i_curieLowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = '(CURIE) Low Closing MA Type [SMA]')
+i_curieLowClosingMaLength = input.int(6, minval = 1,  title = '(CURIE) Low Closing MA Length [6]')
+i_curieLowClosingMaSource = input.source(ohlc4, title = '(CURIE) Low Closing MA Source [ohlc4]')
+i_curieLowestClosingMaLength = input.int(18, minval = 1,  title = '(CURIE) Lowest Closing MA Length [18]')
 
-i_signalSource = input.source(ohlc4, title = '(CURIE) Signal Source [ohlc4]')
-i_showRibbon = input.bool(true, title = '(CURIE) Show ribbon [true]')
-i_enableClosingCurieLines = input.bool(true, title = '(CURIE) Use Curie Closing lines [true]')
+i_curieSource = input.source(ohlc4, title = '(CURIE) Source [ohlc4]')
+i_showCurieClosingLines = input.bool(true, title = '(CURIE) Show Curie closing lines [true]')
+i_enableCurieClosingLines = input.bool(true, title = '(CURIE) Use Curie Closing lines [true]')
 
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
@@ -394,11 +394,11 @@ f_Ma (_maType, _maSource, _maLength) =>
 // Strategy Body - BEGIN
 
 // Noro TrendRibbon substrategy
-highClosingMa = f_Ma (i_highClosingMaType, i_highClosingMaSource, i_highClosingMaLength)
-lowClosingMa = f_Ma (i_lowClosingMaType, i_lowClosingMaSource, i_lowClosingMaLength)
+highClosingMa = f_Ma (i_curieHighClosingMaType, i_curieHighClosingMaSource, i_curieHighClosingMaLength)
+lowClosingMa = f_Ma (i_curieLowClosingMaType, i_curieLowClosingMaSource, i_curieLowClosingMaLength)
 
-highestClosingMA = ta.highest(highClosingMa, i_highestClosingMaLength)
-lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
+highestClosingMA = ta.highest(highClosingMa, i_curieHighestClosingMaLength)
+lowestClosingMA = ta.lowest(lowClosingMa, i_curieLowestClosingMaLength)
 
 // bitla MicroTendency substrategy - BEGIN
 var bool bitlaMicrotendencyLong = false
@@ -496,7 +496,7 @@ shortCondition := (shortConditions >= i_subStrategiesMinimum)
 // Common Logic to go LONG/LONG or go SHORT/SHORT - END
 
 // TrendRibbon - Plot - BEGIN
-highestClosingLowestColor = i_showRibbon ? color.yellow : na
+highestClosingLowestColor = i_showCurieClosingLines ? color.yellow : na
 highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = "Upper Closing line")
 lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
 // TrendRibbon - Plot - END
@@ -544,8 +544,8 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 LONG_CLOSE = true
 LONG_CLOSE := offStopTimeInterval or shortCondition
 
-if i_enableClosingCurieLines
-    LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(i_signalSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
+if i_enableCurieClosingLines
+    LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(i_curieSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -556,8 +556,8 @@ if LONG_CLOSE
 SHORT_CLOSE = true
 SHORT_CLOSE := offStopTimeInterval or longCondition
 
-if i_enableClosingCurieLines
-    SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(i_signalSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
+if i_enableCurieClosingLines
+    SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(i_curieSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
