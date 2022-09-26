@@ -392,6 +392,13 @@ f_Ma (_maType, _maSource, _maLength) =>
 
 // Strategy Body - BEGIN
 
+// Noro TrendRibbon substrategy
+highClosingMa = f_Ma (i_highClosingMaType, i_highClosingMaSource, i_highClosingMaLength)
+lowClosingMa = f_Ma (i_lowClosingMaType, i_lowClosingMaSource, i_lowClosingMaLength)
+
+highestClosingMA = ta.highest(highClosingMa, i_highestClosingMaLength)
+lowestClosingMA = ta.lowest(lowClosingMa, i_lowestClosingMaLength)
+
 // bitla MicroTendency substrategy - BEGIN
 var bool bitlaMicrotendencyLong = false
 var bool bitlaMicrotendencyShort = false
