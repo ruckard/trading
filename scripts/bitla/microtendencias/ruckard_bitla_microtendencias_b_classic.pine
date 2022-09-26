@@ -393,12 +393,12 @@ f_Ma (_maType, _maSource, _maLength) =>
 
 // Strategy Body - BEGIN
 
-// Noro TrendRibbon substrategy
-highClosingMa = f_Ma (i_curieHighClosingMaType, i_curieHighClosingMaSource, i_curieHighClosingMaLength)
-lowClosingMa = f_Ma (i_curieLowClosingMaType, i_curieLowClosingMaSource, i_curieLowClosingMaLength)
+// Curie Closing Lines substrategy
+curieHighClosingMa = f_Ma (i_curieHighClosingMaType, i_curieHighClosingMaSource, i_curieHighClosingMaLength)
+curieLowClosingMa = f_Ma (i_curieLowClosingMaType, i_curieLowClosingMaSource, i_curieLowClosingMaLength)
 
-highestClosingMA = ta.highest(highClosingMa, i_curieHighestClosingMaLength)
-lowestClosingMA = ta.lowest(lowClosingMa, i_curieLowestClosingMaLength)
+curieHighestClosingMA = ta.highest(curieHighClosingMa, i_curieHighestClosingMaLength)
+curieLowestClosingMA = ta.lowest(curieLowClosingMa, i_curieLowestClosingMaLength)
 
 // bitla MicroTendency substrategy - BEGIN
 var bool bitlaMicrotendencyLong = false
@@ -495,11 +495,11 @@ longCondition := (longConditions >= i_subStrategiesMinimum)
 shortCondition := (shortConditions >= i_subStrategiesMinimum)
 // Common Logic to go LONG/LONG or go SHORT/SHORT - END
 
-// TrendRibbon - Plot - BEGIN
-highestClosingLowestColor = i_showCurieClosingLines ? color.yellow : na
-highestClosingMAPlot = plot(highestClosingMA, color = highestClosingLowestColor, title = "Upper Closing line")
-lowestClosingMAPlot = plot(lowestClosingMA, color = highestClosingLowestColor, title = "Lower Closing Line")
-// TrendRibbon - Plot - END
+// Curie Closing Lines - Plot - BEGIN
+curieHighestClosingLowestColor = i_showCurieClosingLines ? color.yellow : na
+curieHighestClosingMAPlot = plot(curieHighestClosingMA, color = curieHighestClosingLowestColor, title = 'Upper Curie Closing line')
+curieLowestClosingMAPlot = plot(curieLowestClosingMA, color = curieHighestClosingLowestColor, title = 'Lower Curie Closing Line')
+// Curie Closing Lines - Plot - END
 
 // Position price calculation - BEGIN
 float positionPrice = na
@@ -545,7 +545,7 @@ LONG_CLOSE = true
 LONG_CLOSE := offStopTimeInterval or shortCondition
 
 if i_enableCurieClosingLines
-    LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(i_curieSource, highestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
+    LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(i_curieSource, curieHighestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -557,7 +557,7 @@ SHORT_CLOSE = true
 SHORT_CLOSE := offStopTimeInterval or longCondition
 
 if i_enableCurieClosingLines
-    SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(i_curieSource, lowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
+    SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(i_curieSource, curieLowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
