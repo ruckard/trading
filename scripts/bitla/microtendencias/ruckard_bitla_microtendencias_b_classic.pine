@@ -276,9 +276,9 @@ i_bitlaSlowMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA'
 i_bitlaSlowMaLength = input.int(120, minval = 1,  title = '(STRAT) bitla Microtendency Slow MA Length {120}')
 i_bitlaSlowMaSource = input.source(close, title = '(STRAT) bitla Microtendency Slow MA Source {close}')
 
-i_pivotPointBarsNumber = input.int(title='Pivot Point Bars Number', defval=2, minval=1, maxval=50, group = "Kill Zone")
-i_pivotPointAtrMultiplier = input.float (title='ATR Multiplier', defval=3, minval=1, step=0.1, group = "Kill Zone", inline = "ATR")
-i_pivotPointAtrLength = input.int(title='ATR Length', defval=10, minval=1, group = "Kill Zone", inline = "ATR")
+i_pivotPointBarsNumber = input.int(title='Pivot Point Bars Number {2}', defval=2, minval=1, maxval=50, group = "Kill Zone")
+i_pivotPointAtrMultiplier = input.float (title='ATR Multiplier {3}', defval=3, minval=1, step=0.1, group = "Kill Zone", inline = "ATR")
+i_pivotPointAtrLength = input.int(title='ATR Length {10}', defval=10, minval=1, group = "Kill Zone", inline = "ATR")
 // INPUTS - END
 
 
