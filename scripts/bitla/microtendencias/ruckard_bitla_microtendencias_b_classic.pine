@@ -426,8 +426,7 @@ float bitlaPivotLow = na
 bitlaPivotHigh := ta.pivothigh(i_pivotPointBarsNumber, i_pivotPointBarsNumber)
 bitlaPivotLow := ta.pivotlow(i_pivotPointBarsNumber, i_pivotPointBarsNumber)
 
-float bitlaPivotCenter = na
-bitlaPivotCenter := bitlaPivotCenter[1]
+var float bitlaPivotCenter = na
 float bitlaLastPivotPoint = bitlaPivotHigh ? bitlaPivotHigh : bitlaPivotLow ? bitlaPivotLow : na
 if bitlaLastPivotPoint
     if na(bitlaPivotCenter)
