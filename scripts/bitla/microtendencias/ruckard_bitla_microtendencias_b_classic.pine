@@ -426,8 +426,7 @@ float bitlaPivotLow = na
 bitlaPivotHigh := ta.pivothigh(i_pivotPointBarsNumber, i_pivotPointBarsNumber)
 bitlaPivotLow := ta.pivotlow(i_pivotPointBarsNumber, i_pivotPointBarsNumber)
 
-float bitlaPivotCenter = na
-bitlaPivotCenter := bitlaPivotCenter[1]
+var float bitlaPivotCenter = na
 float bitlaLastPivotPoint = bitlaPivotHigh ? bitlaPivotHigh : bitlaPivotLow ? bitlaPivotLow : na
 if bitlaLastPivotPoint
     if na(bitlaPivotCenter)
@@ -441,9 +440,9 @@ bitlaPivotPointDown = bitlaPivotCenter + (i_pivotPointAtrMultiplier * ta.atr(i_p
 float bitlaPivotPointTrendUp = na
 float bitlaPivotPointTrendDown = na
 bitlaPivotPointTrend = 0
-bitlaPivotPointTrendUp := close[1] > bitlaPivotPointTrendUp[1] ? math.max(bitlaPivotPointUp, bitlaPivotPointTrendUp[1]) : bitlaPivotPointUp
-bitlaPivotPointTrendDown := close[1] < bitlaPivotPointTrendDown[1] ? math.min(bitlaPivotPointDown, bitlaPivotPointTrendDown[1]) : bitlaPivotPointDown
-bitlaPivotPointTrend := close > bitlaPivotPointTrendDown[1] ? 1: close < bitlaPivotPointTrendUp[1]? -1: nz(bitlaPivotPointTrend[1], 1)
+bitlaPivotPointTrendUp := close > bitlaPivotPointTrendUp ? math.max(bitlaPivotPointUp, bitlaPivotPointTrendUp) : bitlaPivotPointUp
+bitlaPivotPointTrendDown := close < bitlaPivotPointTrendDown ? math.min(bitlaPivotPointDown, bitlaPivotPointTrendDown) : bitlaPivotPointDown
+bitlaPivotPointTrend := close > bitlaPivotPointTrendDown ? 1: close < bitlaPivotPointTrendUp? -1: nz(bitlaPivotPointTrend, 1)
 if (bitlaPivotPointTrend == 1 and bitlaPivotPointTrend[1] == -1)
     bitlaKillZoneLong := true
     bitlaKillZoneShort := false
