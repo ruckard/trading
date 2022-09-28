@@ -419,8 +419,8 @@ if (ta.crossunder(bitlaFastMa, bitlaSlowMa))
 // bitla MicroTendency substrategy - END
 
 // bitla Kill Zone substrategy - BEGIN
-var bool bitlaKillZoneLong = false
-var bool bitlaKillZoneShort = false
+bool bitlaKillZoneLong = false
+bool bitlaKillZoneShort = false
 float bitlaPivotHigh = na
 float bitlaPivotLow = na
 bitlaPivotHigh := ta.pivothigh(i_pivotPointBarsNumber, i_pivotPointBarsNumber)
