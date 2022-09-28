@@ -268,9 +268,10 @@ i_riskManagementMaximumLossPerMonth = input.float(10.0, title='(RISKM) Maximum l
 i_enableVolatilityProtection = input.bool(true, title='Enable {True}', group='ATR Volatility Protection')
 i_showAtrVolatilityMultiplier = input.bool(true, title='Show {True}', group='ATR Volatility Protection')
 
-i_atrVolatilityLength = input.int(14, minval = 1,  title='{14/close/1.10 %}', group='ATR Volatility Protection', inline='ATRVolatility')
-i_atrVolatilitySource = input.source(close, title='', group='ATR Volatility Protection', inline='ATRVolatility')
-i_atrVolatilityMultiplier = input.float(1.10, title='', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatility')
+i_atrVolatilityLength = input.int(14, minval = 1,  title='{14/close/1.10 %}', group='ATR Volatility Protection', inline='ATRVolatilitySettings')
+i_atrVolatilitySource = input.source(close, title='', group='ATR Volatility Protection', inline='ATRVolatilitySettings')
+i_atrVolatilityMinimumMultiplier = input.float(1.10, title='Min/Max {1.10/2.00}', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
+i_atrVolatilityMaximumMultiplier = input.float(2.00, title='', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
 
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
@@ -411,14 +412,16 @@ f_Ma (_maType, _maSource, _maLength) =>
 volatilityLongCondition = true
 volatilityShortCondition = true
 
-atrLongVolatilityPrice = i_atrVolatilitySource + (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
-barIsVolatileLong = (close[0] >= open[0]) and (close[0] >= atrLongVolatilityPrice[1])
+atrLongVolatilityMinimumPrice = i_atrVolatilitySource + (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMinimumMultiplier)
+atrLongVolatilityMaximumPrice = i_atrVolatilitySource + (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMaximumMultiplier)
+barIsVolatileLong = (close[0] >= open[0]) and (close[0] >= atrLongVolatilityMinimumPrice[1]) and (close[0] < atrLongVolatilityMaximumPrice[1])
 
 if barIsVolatileLong or barIsVolatileLong[1]
     volatilityLongCondition := false
 
-atrShortVolatilityPrice = i_atrVolatilitySource - (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMultiplier)
-barIsVolatileShort = (close[0] <= open[0]) and (close[0] <= atrShortVolatilityPrice[1])
+atrShortVolatilityMinimumPrice = i_atrVolatilitySource - (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMinimumMultiplier)
+atrShortVolatilityMaximumPrice = i_atrVolatilitySource - (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMaximumMultiplier)
+barIsVolatileShort = (close[0] <= open[0]) and (close[0] <= atrShortVolatilityMinimumPrice[1]) and (close[0] > atrShortVolatilityMaximumPrice[1])
 
 if barIsVolatileShort or barIsVolatileShort[1]
     volatilityShortCondition := false
@@ -564,8 +567,10 @@ if i_enableVolatilityProtection
 
 // Volatility - Plot - BEGIN
 atrVolatilityColor = i_showAtrVolatilityMultiplier ? color.maroon : na
-atrLongVolatilityPricePlot = plot(atrLongVolatilityPrice, color = atrVolatilityColor, title = "Long Volatility Price")
-atrShortVolatilityPricePlot = plot(atrShortVolatilityPrice, color = atrVolatilityColor, title = "Short Volatility Price")
+atrLongVolatilityMinimumPricePlot = plot(atrLongVolatilityMinimumPrice, color = atrVolatilityColor, title = "Long Volatility Minimum Price")
+atrShortVolatilityMinimumPricePlot = plot(atrShortVolatilityMinimumPrice, color = atrVolatilityColor, title = "Short Volatility Minimum Price")
+atrLongVolatilityMaximumPricePlot = plot(atrLongVolatilityMaximumPrice, color = atrVolatilityColor, title = "Long Volatility Maximum Price")
+atrShortVolatilityMaximumPricePlot = plot(atrShortVolatilityMaximumPrice, color = atrVolatilityColor, title = "Short Volatility Maximum Price")
 // Volatility - Plot - END
 
 // Curie Closing Lines - Plot - BEGIN
