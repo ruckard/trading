@@ -291,6 +291,10 @@ i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enfo
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+
+i_pivotPointBarsNumber = input.int(title='Pivot Point Bars Number {2}', defval=2, minval=1, maxval=50, group='Kill Zone')
+i_pivotPointAtrMultiplier = input.float (title='ATR Multiplier {3}', defval=3, minval=1, step=0.1, group='Kill Zone', inline='ATR')
+i_pivotPointAtrLength = input.int(title='ATR Length {14}', defval=14, minval=1, group='Kill Zone', inline='ATR')
 // INPUTS - END
 
 
@@ -457,6 +461,39 @@ curieLowClosingMa = f_Ma (i_curieLowClosingMaType, i_curieLowClosingMaSource, i_
 
 curieHighestClosingMA = ta.highest(curieHighClosingMa, i_curieHighestClosingMaLength)
 curieLowestClosingMA = ta.lowest(curieLowClosingMa, i_curieLowestClosingMaLength)
+
+// bitla Kill Zone substrategy - BEGIN
+bool bitlaKillZoneLong = false
+bool bitlaKillZoneShort = false
+float bitlaPivotHigh = na
+float bitlaPivotLow = na
+bitlaPivotHigh := ta.pivothigh(i_pivotPointBarsNumber, i_pivotPointBarsNumber)
+bitlaPivotLow := ta.pivotlow(i_pivotPointBarsNumber, i_pivotPointBarsNumber)
+
+var float bitlaPivotCenter = na
+float bitlaLastPivotPoint = bitlaPivotHigh ? bitlaPivotHigh : bitlaPivotLow ? bitlaPivotLow : na
+if bitlaLastPivotPoint
+    if na(bitlaPivotCenter)
+        bitlaPivotCenter := bitlaLastPivotPoint
+    else
+        bitlaPivotCenter := (bitlaPivotCenter * 2 + bitlaLastPivotPoint) / 3
+
+bitlaPivotPointUp = bitlaPivotCenter - (i_pivotPointAtrMultiplier * ta.atr(i_pivotPointAtrLength))
+bitlaPivotPointDown = bitlaPivotCenter + (i_pivotPointAtrMultiplier * ta.atr(i_pivotPointAtrLength))
+
+float bitlaPivotPointTrendUp = na
+float bitlaPivotPointTrendDown = na
+bitlaPivotPointTrend = 0
+bitlaPivotPointTrendUp := close[1] > bitlaPivotPointTrendUp[1] ? math.max(bitlaPivotPointUp, bitlaPivotPointTrendUp[1]) : bitlaPivotPointUp
+bitlaPivotPointTrendDown := close[1] < bitlaPivotPointTrendDown[1] ? math.min(bitlaPivotPointDown, bitlaPivotPointTrendDown[1]) : bitlaPivotPointDown
+bitlaPivotPointTrend := close > bitlaPivotPointTrendDown[1] ? 1: close < bitlaPivotPointTrendUp[1]? -1: nz(bitlaPivotPointTrend[1], 1)
+if (bitlaPivotPointTrend == 1 and bitlaPivotPointTrend[1] == -1)
+    bitlaKillZoneLong := true
+    bitlaKillZoneShort := false
+if (bitlaPivotPointTrend == -1 and bitlaPivotPointTrend[1] == 1)
+    bitlaKillZoneLong := false
+    bitlaKillZoneShort := true
+// bitla Kill Zone substrategy - END
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
