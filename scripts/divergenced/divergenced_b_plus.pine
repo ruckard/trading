@@ -3,7 +3,7 @@
 
 //@version=5
 
-// Current version: v20220929 ( B001 )
+// Current version: v20220929 ( B002 )
 // Tradingview Public description - BEGIN
 // 
 // This strategy serves as a template for Ruckard strategies that interact with Zignaly.
@@ -125,6 +125,8 @@
 // [*] 'TradingView only': TradingView sends entry and exit orders to Zignaly so that Zignaly only buys or sells. Zignaly won't handle stop loss or other settings on its own.
 // [/LIST]
 
+
+
 // [B]HOW TO USE THIS STRATEGY[/B]
 // [LIST]
 // [*] Beginner: Copy and paste the strategy and change it to your needs. Turn off '(DEBUG) Enable debug on order comments' setting.
@@ -181,7 +183,7 @@
 
 // Tradingview Public description - END
 
-strategy('Divergenced B001', shorttitle='B001Divergenced', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Divergenced B002', shorttitle='B002Divergenced', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/ZignalyBeta/21 as zig
