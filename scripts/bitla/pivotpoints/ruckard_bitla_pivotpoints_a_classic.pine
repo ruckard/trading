@@ -10,6 +10,7 @@
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 1H timeframe.
+// It uses pivot points as entries and then it closes the positions thanks to the Curie Closing lines.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
