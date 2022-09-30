@@ -336,9 +336,9 @@ i_longSqzmomValMinimumDifference = input.float(15.00, title='', minval=0.01, gro
 i_enableShortSqzmomValMinimumDifference = input.bool(true, 'Val Minimum Difference (Short) {True/150.00 %}', group='Sqzmom Divergences', inline='SqzmomShortValMinimumDifference')
 i_shortSqzmomValMinimumDifference = input.float(150.00, title='', minval=0.01, group='Sqzmom Divergences', inline='SqzmomShortValMinimumDifference')
 
-// i_enableSecondaryDivergence = input.bool(true, title='LB/Pair {1/LTC}', group='Secondary Divergence', inline='SDLookbackPair')
-// i_secondaryDivergenceLookback = input.int(1, title='', tooltip='LookBack Bars Number', group='Secondary Divergence', inline='SDLookbackPair')
-// i_secondaryDivergencePair = input.symbol('BINANCE:LTCUSDTPERP', title='', group='Secondary Divergence',inline='SDLookbackPair')
+i_enableSecondaryDivergence = input.bool(true, title='LB/Pair {1/LTC}', group='Secondary Divergence', inline='SDLookbackPair')
+i_secondaryDivergenceLookback = input.int(1, title='', tooltip='LookBack Bars Number', group='Secondary Divergence', inline='SDLookbackPair')
+i_secondaryDivergencePair = input.symbol('BINANCE:LTCUSDTPERP', title='', group='Secondary Divergence',inline='SDLookbackPair')
 
 // INPUTS - END
 
@@ -682,20 +682,20 @@ getSqzmomDivergences (p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMu
 
 [sqzmomDivergenceLong, sqzmomDivergenceShort] = getSqzmomDivergences (i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, i_shortSqzmomPriceMinimumDifference, i_enableShortSqzmomValMinimumDifference, i_shortSqzmomValMinimumDifference, i_enableShortSqzmomPriceMinimumDifference, i_longSqzmomPriceMinimumDifference, i_enableLongSqzmomValMinimumDifference, i_longSqzmomValMinimumDifference, i_enableLongSqzmomPriceMinimumDifference)
 
-// // Secondary Pair Divergence logic
-// [currentSecondaryDivergenceLong, currentSecondaryDivergenceShort] = request.security(i_secondaryDivergencePair, timeframe.period, getSqzmomDivergences())
-// 
-// bool currentSecondaryDivergenceLongFound = false
-// for i = (i_secondaryDivergenceLookback - 1) to 0
-//     if currentSecondaryDivergenceLong[i]
-//         currentSecondaryDivergenceLongFound := true
-// bool currentSecondaryDivergenceShortFound = false
-// for i = (i_secondaryDivergenceLookback - 1) to 0
-//     if currentSecondaryDivergenceShort[i]
-//         currentSecondaryDivergenceShortFound := true
-// 
-// bool secondaryDivergenceLong = currentSecondaryDivergenceLongFound
-// bool secondaryDivergenceShort = currentSecondaryDivergenceShortFound
+// Secondary Pair Divergence logic
+[currentSecondaryDivergenceLong, currentSecondaryDivergenceShort] = request.security(i_secondaryDivergencePair, timeframe.period, getSqzmomDivergences())
+
+bool currentSecondaryDivergenceLongFound = false
+for i = (i_secondaryDivergenceLookback - 1) to 0
+    if currentSecondaryDivergenceLong[i]
+        currentSecondaryDivergenceLongFound := true
+bool currentSecondaryDivergenceShortFound = false
+for i = (i_secondaryDivergenceLookback - 1) to 0
+    if currentSecondaryDivergenceShort[i]
+        currentSecondaryDivergenceShortFound := true
+
+bool secondaryDivergenceLong = currentSecondaryDivergenceLongFound
+bool secondaryDivergenceShort = currentSecondaryDivergenceShortFound
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
@@ -786,9 +786,9 @@ if (i_higherTimeframeTrendMaEnforce)
     longCondition := longCondition and higherTimeframeTrendMaLong
     shortCondition := shortCondition and higherTimeframeTrendMaShort
 
-// if (i_enableSecondaryDivergence)
-//     longCondition := longCondition and secondaryDivergenceLong
-//     shortCondition := shortCondition and secondaryDivergenceShort
+if (i_enableSecondaryDivergence)
+    longCondition := longCondition and secondaryDivergenceLong
+    shortCondition := shortCondition and secondaryDivergenceShort
 // Common Logic to go LONG/LONG or go SHORT/SHORT - END
 
 // Volatility - Plot - BEGIN
