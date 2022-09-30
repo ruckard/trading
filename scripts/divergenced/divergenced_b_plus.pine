@@ -298,6 +298,19 @@ i_higherTimeframeTrendSlowMaType = input.string(defval = 'VWMA', options = ['SMA
 i_higherTimeframeTrendSlowMaLength = input.int(55, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
 i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
 
+// Too old order - Inputs
+i_enableTooOldLongOrderClose = input.bool(true, title='Enable/Bars/SL (L) {True/6/1.20 %}', group='Too Old Orders', inline='Too Old Long Orders')
+
+i_tooOldLongBarsNumber = input.int(6, title='', minval=1, maxval=100, step=1, group='Too Old Orders', inline='Too Old Long Orders')
+
+i_tooOldLongStopLoss = input.float(1.20, title='', tooltip='(OLD) Too Old Long order Stop Loss (%) {1.20}', minval=0, step=0.01, group='Too Old Orders', inline='Too Old Long Orders')
+i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
+
+
+i_enableTooOldShortOrderClose = input.bool(true, title='Enable/Bars/SL (S) {True/6/0.60 %}', group='Too Old Orders', inline='Too Old Short Orders')
+i_tooOldShortBarsNumber = input.int(6, title='', minval=1, maxval=100, step=1, group='Too Old Orders', inline='Too Old Short Orders')
+i_tooOldShortStopLoss = input.float(0.60, title='', tooltip='(OLD) Too Old Short order Stop Loss (%) {0.60}', minval=0, step=0.01, group='Too Old Orders', inline='Too Old Short Orders')
+i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
@@ -444,6 +457,34 @@ getTrend (_fastMaType, _fastMaLength, _fastMaSource, _slowMaType, _slowMaLength,
     _trendOffset = _trend[_offset]
     _trendOffset
 
+// Too old orders functions
+
+getTooOldOrderLongCloseAdvice () =>
+    // Condition 1: The order is open
+    // Condition 2: The order is long
+    // Condition 3: Order age is bigger than the maximum setting
+    // Returns boolean
+    bool isValidOpenLongOrder = (strategy.position_size > 0)
+    bool isTooOld =  (bar_index >= (buyOrderOpenBarIndex + i_tooOldLongBarsNumber))
+    tooOldStopLoss = strategy.position_avg_price * (1 - i_tooOldLongStopLossPerOne)
+
+    bool isALosingOrder = close < tooOldStopLoss
+    tooOldOrderLongCloseAdvice = isValidOpenLongOrder and isTooOld and isALosingOrder
+    tooOldOrderLongCloseAdvice
+
+getTooOldOrderShortCloseAdvice () =>
+    // Condition 1: The order is open
+    // Condition 2: The order is short
+    // Condition 3: Order age is bigger than the maximum setting
+    // Returns boolean
+    bool is_valid_open_sell_order = (strategy.position_size < 0)
+    bool isTooOld =  (bar_index >= (sellOrderOpenBarIndex + i_tooOldShortBarsNumber))
+    tooOldStopLoss = strategy.position_avg_price * (1 + i_tooOldShortStopLossPerOne)
+
+    bool isALosingOrder = close > tooOldStopLoss
+    tooOldOrderShortCloseAdvice = is_valid_open_sell_order and isTooOld and isALosingOrder
+    tooOldOrderShortCloseAdvice
+
 // SMILB functions - BEGIN
 sqzmom(length, mult, lengthKC, multKC, useTrueRange) =>
     // Calculate BB
@@ -524,6 +565,10 @@ curieLowClosingMa = f_Ma (i_curieLowClosingMaType, i_curieLowClosingMaSource, i_
 
 curieHighestClosingMA = ta.highest(curieHighClosingMa, i_curieHighestClosingMaLength)
 curieLowestClosingMA = ta.lowest(curieLowClosingMa, i_curieLowestClosingMaLength)
+
+// Too old logic
+tooOldOrderLongCloseAdvice = getTooOldOrderLongCloseAdvice ()
+tooOldOrderShortCloseAdvice = getTooOldOrderShortCloseAdvice ()
 
 // SQMMOMDivergence SubStrategy
 // Short divergence means that next top height is smaller than previous top height and at the same time price is bigger than in the previous top height.
@@ -791,6 +836,9 @@ LONG_CLOSE := offStopTimeInterval or shortCondition
 if i_enableCurieClosingLines
     LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(i_curieSource, curieHighestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
 
+if i_enableTooOldLongOrderClose
+    LONG_CLOSE := LONG_CLOSE or tooOldOrderLongCloseAdvice
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
     LONG := false
@@ -802,6 +850,9 @@ SHORT_CLOSE := offStopTimeInterval or longCondition
 
 if i_enableCurieClosingLines
     SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(i_curieSource, curieLowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
+
+if i_enableTooOldShortOrderClose
+    SHORT_CLOSE := SHORT_CLOSE or tooOldOrderShortCloseAdvice
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
