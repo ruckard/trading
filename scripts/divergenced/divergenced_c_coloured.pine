@@ -316,6 +316,7 @@ i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
 i_showSqzmomDivergences = input.bool(true, title='Show {True}', group='Sqzmom Divergences')
+i_enableSqzmomColourConfirmation = input.bool(true, title='Colour confirmation {True}', group='Sqzmom Divergences')
 
 i_sqzmomLength = input.int(20, title='BB Length/MultFactor {20/2.0}', group='Sqzmom Divergences', inline='SqzmomBB')
 i_sqzmomMult = input.float(2.0,title='', group='Sqzmom Divergences', inline='SqzmomBB')
@@ -577,7 +578,7 @@ tooOldOrderShortCloseAdvice = getTooOldOrderShortCloseAdvice ()
 
 // SQMMOMDivergence SubStrategy
 
-getSqzmomDivergences (p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange, p_shortSqzmomPriceMinimumDifference, p_enableShortSqzmomValMinimumDifference, p_shortSqzmomValMinimumDifference, p_enableShortSqzmomPriceMinimumDifference, p_longSqzmomPriceMinimumDifference, p_enableLongSqzmomValMinimumDifference, p_longSqzmomValMinimumDifference, p_enableLongSqzmomPriceMinimumDifference) =>
+getSqzmomDivergences (p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange, p_shortSqzmomPriceMinimumDifference, p_enableShortSqzmomValMinimumDifference, p_shortSqzmomValMinimumDifference, p_enableShortSqzmomPriceMinimumDifference, p_longSqzmomPriceMinimumDifference, p_enableLongSqzmomValMinimumDifference, p_longSqzmomValMinimumDifference, p_enableLongSqzmomPriceMinimumDifference, p_colourConfirmation) =>
     // Short divergence means that next top height is smaller than previous top height and at the same time price is bigger than in the previous top height.
     // Long divergence means that next bottom height is higher than previous bottom height and at the same time price is smaller than in the previous bottom height.
 
@@ -678,12 +679,20 @@ getSqzmomDivergences (p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMu
             longSectionBSqzmomMinimumVal = sqzmom_bottom_val_a + (p_longSqzmomValMinimumDifference * 0.01 * math.abs(sqzmom_bottom_val_a))
             longSectionBSqzmomValIsOverMinimum = sqzmom_bottom_val_b >= longSectionBSqzmomMinimumVal
             _sqzmomDivergenceLong := _sqzmomDivergenceLong and longSectionBSqzmomValIsOverMinimum
-    [_sqzmomDivergenceLong, _sqzmomDivergenceShort]
+    bool r_sqzmomDivergenceLong = na
+    bool r_sqzmomDivergenceShort = na
+    if (p_colourConfirmation)
+        r_sqzmomDivergenceLong := _sqzmomDivergenceLong[1] and (sqzmom_bcolor[1] == sqzmom_bcolor[0])
+        r_sqzmomDivergenceShort := _sqzmomDivergenceShort[1] and (sqzmom_bcolor[1] == sqzmom_bcolor[0])
+    else
+        r_sqzmomDivergenceLong := _sqzmomDivergenceLong
+        r_sqzmomDivergenceShort := _sqzmomDivergenceShort
+    [r_sqzmomDivergenceLong, r_sqzmomDivergenceShort]
 
-[sqzmomDivergenceLong, sqzmomDivergenceShort] = getSqzmomDivergences (i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, i_shortSqzmomPriceMinimumDifference, i_enableShortSqzmomValMinimumDifference, i_shortSqzmomValMinimumDifference, i_enableShortSqzmomPriceMinimumDifference, i_longSqzmomPriceMinimumDifference, i_enableLongSqzmomValMinimumDifference, i_longSqzmomValMinimumDifference, i_enableLongSqzmomPriceMinimumDifference)
+[sqzmomDivergenceLong, sqzmomDivergenceShort] = getSqzmomDivergences (i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, i_shortSqzmomPriceMinimumDifference, i_enableShortSqzmomValMinimumDifference, i_shortSqzmomValMinimumDifference, i_enableShortSqzmomPriceMinimumDifference, i_longSqzmomPriceMinimumDifference, i_enableLongSqzmomValMinimumDifference, i_longSqzmomValMinimumDifference, i_enableLongSqzmomPriceMinimumDifference, i_enableSqzmomColourConfirmation)
 
 // Secondary Pair Divergence logic
-[currentSecondaryDivergenceLong, currentSecondaryDivergenceShort] = request.security(i_secondaryDivergencePair, timeframe.period, getSqzmomDivergences(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, i_shortSqzmomPriceMinimumDifference, i_enableShortSqzmomValMinimumDifference, i_shortSqzmomValMinimumDifference, i_enableShortSqzmomPriceMinimumDifference, i_longSqzmomPriceMinimumDifference, i_enableLongSqzmomValMinimumDifference, i_longSqzmomValMinimumDifference, i_enableLongSqzmomPriceMinimumDifference))
+[currentSecondaryDivergenceLong, currentSecondaryDivergenceShort] = request.security(i_secondaryDivergencePair, timeframe.period, getSqzmomDivergences(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, i_shortSqzmomPriceMinimumDifference, i_enableShortSqzmomValMinimumDifference, i_shortSqzmomValMinimumDifference, i_enableShortSqzmomPriceMinimumDifference, i_longSqzmomPriceMinimumDifference, i_enableLongSqzmomValMinimumDifference, i_longSqzmomValMinimumDifference, i_enableLongSqzmomPriceMinimumDifference, i_enableSqzmomColourConfirmation))
 
 bool currentSecondaryDivergenceLongFound = false
 for i = (i_secondaryDivergenceLookback - 1) to 0
