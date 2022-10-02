@@ -336,7 +336,7 @@ i_longSqzmomValMinimumDifference = input.float(15.00, title='', minval=0.01, gro
 i_enableShortSqzmomValMinimumDifference = input.bool(true, 'Val Minimum Difference (Short) {True/150.00 %}', group='Sqzmom Divergences', inline='SqzmomShortValMinimumDifference')
 i_shortSqzmomValMinimumDifference = input.float(150.00, title='', minval=0.01, group='Sqzmom Divergences', inline='SqzmomShortValMinimumDifference')
 
-i_enableSecondaryDivergence = input.bool(true, title='LB/Pair {1/LTC}', group='Secondary Divergence', inline='SDLookbackPair')
+i_enableSecondaryDivergence = input.bool(false, title='LB/Pair {1/LTC}', group='Secondary Divergence', inline='SDLookbackPair')
 i_secondaryDivergenceLookback = input.int(1, title='', tooltip='LookBack Bars Number', group='Secondary Divergence', inline='SDLookbackPair')
 i_secondaryDivergencePair = input.symbol('BINANCE:LTCUSDTPERP', title='', group='Secondary Divergence',inline='SDLookbackPair')
 
