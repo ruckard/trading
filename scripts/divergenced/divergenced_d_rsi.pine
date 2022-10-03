@@ -341,6 +341,13 @@ i_enableSecondaryDivergence = input.bool(false, title='LB/Pair {1/LTC}', group='
 i_secondaryDivergenceLookback = input.int(1, title='', tooltip='LookBack Bars Number', group='Secondary Divergence', inline='SDLookbackPair')
 i_secondaryDivergencePair = input.symbol('BINANCE:LTCUSDTPERP', title='', group='Secondary Divergence',inline='SDLookbackPair')
 
+i_enableLongRSIProtection = input.bool(true, title='Enable (L) RSI Protection {True, 45.0}', group='RSI Protection', inline='LongRSIProtection')
+i_longRSILevel = input.float(45.0, title='', group='RSI Protection', inline='LongRSIProtection', tooltip='Not greater than')
+i_enableShortRSIProtection = input.bool(true, title='Enable (S) RSI Protection {True, 55.0}', group='RSI Protection', inline='ShortRSIProtection')
+i_shortRSILevel = input.float(55.0, title='', group='RSI Protection', inline='ShortRSIProtection', tooltip='Not lower than')
+i_protectionRsiLength = input.int(14, minval=1, title='RSI Length', group='RSI Protection')
+i_protectionRsiSource = input.source(close, 'RSI Source', group='RSI Protection')
+
 // INPUTS - END
 
 
@@ -576,6 +583,17 @@ curieLowestClosingMA = ta.lowest(curieLowClosingMa, i_curieLowestClosingMaLength
 tooOldOrderLongCloseAdvice = getTooOldOrderLongCloseAdvice ()
 tooOldOrderShortCloseAdvice = getTooOldOrderShortCloseAdvice ()
 
+// RSI protection substrategy
+rsiProtectionLongCondition = true
+rsiProtectionShortCondition = true
+
+float protectionRsi = ta.rsi(i_protectionRsiSource, i_protectionRsiLength)
+
+if (protectionRsi > i_longRSILevel)
+    rsiProtectionLongCondition := false
+if (protectionRsi < i_shortRSILevel)
+    rsiProtectionShortCondition := false
+
 // SQMMOMDivergence SubStrategy
 
 getSqzmomDivergences (p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange, p_shortSqzmomPriceMinimumDifference, p_enableShortSqzmomValMinimumDifference, p_shortSqzmomValMinimumDifference, p_enableShortSqzmomPriceMinimumDifference, p_longSqzmomPriceMinimumDifference, p_enableLongSqzmomValMinimumDifference, p_longSqzmomValMinimumDifference, p_enableLongSqzmomPriceMinimumDifference, p_colourConfirmation) =>
@@ -794,6 +812,11 @@ if i_enableVolatilityProtection
 if (i_higherTimeframeTrendMaEnforce)
     longCondition := longCondition and higherTimeframeTrendMaLong
     shortCondition := shortCondition and higherTimeframeTrendMaShort
+
+if (i_enableLongRSIProtection)
+    longCondition := longCondition and rsiProtectionLongCondition
+if (i_enableShortRSIProtection)
+    shortCondition := shortCondition and rsiProtectionShortCondition
 
 if (i_enableSecondaryDivergence)
     longCondition := longCondition and secondaryDivergenceLong
