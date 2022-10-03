@@ -316,7 +316,7 @@ i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
 i_showSqzmomDivergences = input.bool(true, title='Show {True}', group='Sqzmom Divergences')
-i_enableSqzmomColourConfirmation = input.bool(true, title='Colour confirmation {True}', group='Sqzmom Divergences')
+i_enableSqzmomColourConfirmation = input.bool(false, title='Colour confirmation {False}', group='Sqzmom Divergences')
 
 i_sqzmomLength = input.int(20, title='BB Length/MultFactor {20/2.0}', group='Sqzmom Divergences', inline='SqzmomBB')
 i_sqzmomMult = input.float(2.0,title='', group='Sqzmom Divergences', inline='SqzmomBB')
