@@ -331,7 +331,7 @@ i_longSqzmomPriceMinimumDifference = input.float(0.15, title='', minval=0.01, gr
 i_enableShortSqzmomPriceMinimumDifference = input.bool(true, 'Price Minimum Difference (Short) {True/0.35 %}', group='Sqzmom Divergences', inline='SqzmomShortPriceMinimumDifference')
 i_shortSqzmomPriceMinimumDifference = input.float(0.35, title='', minval=0.01, group='Sqzmom Divergences', inline='SqzmomShortPriceMinimumDifference')
 
-i_enableLongSqzmomValMinimumDifference = input.bool(true, 'Val Minimum Difference (Long) {True/15.00 %}', group='Sqzmom Divergences', inline='SqzmomLongValMinimumDifference')
+i_enableLongSqzmomValMinimumDifference = input.bool(false, 'Val Minimum Difference (Long) {False/15.00 %}', group='Sqzmom Divergences', inline='SqzmomLongValMinimumDifference')
 i_longSqzmomValMinimumDifference = input.float(15.00, title='', minval=0.01, group='Sqzmom Divergences', inline='SqzmomLongValMinimumDifference')
 
 i_enableShortSqzmomValMinimumDifference = input.bool(true, 'Val Minimum Difference (Short) {True/150.00 %}', group='Sqzmom Divergences', inline='SqzmomShortValMinimumDifference')
