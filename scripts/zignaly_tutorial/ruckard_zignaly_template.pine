@@ -298,6 +298,15 @@ i_tooOldShortBarsNumber = input.int(6, title='', minval=1, maxval=100, step=1, g
 i_tooOldShortStopLoss = input.float(0.60, title='', tooltip='(OLD) Too Old Short order Stop Loss (%) {0.60}', minval=0, step=0.01, group='Too Old Orders', inline='Too Old Short Orders')
 i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
 
+i_enableLongRSIProtection = input.bool(false, title='Enable (L) RSI Protection {False, 45.0}', group='RSI Protection', inline='LongRSIProtection')
+i_longRSILevel = input.float(45.0, title='', group='RSI Protection', inline='LongRSIProtection', tooltip='Not greater than')
+i_enableShortRSIProtection = input.bool(false, title='Enable (S) RSI Protection {False, 58.0}', group='RSI Protection', inline='ShortRSIProtection')
+i_shortRSILevel = input.float(58.0, title='', group='RSI Protection', inline='ShortRSIProtection', tooltip='Not lower than')
+i_enableRSIProtectionCustomTimeframe = input.bool(false, title='Use Custom Timeframe {False, 3 hours}', group='RSI Protection', inline='RSIProtectionTimeframe')
+i_RSIProtectionCustomTimeframe = input.timeframe('180', title='', group='RSI Protection', inline='RSIProtectionTimeframe')
+i_protectionRsiLength = input.int(14, minval=1, title='RSI Length', group='RSI Protection')
+i_protectionRsiSource = input.source(close, 'RSI Source', group='RSI Protection')
+
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 // INPUTS - END
@@ -499,6 +508,24 @@ curieLowestClosingMA = ta.lowest(curieLowClosingMa, i_curieLowestClosingMaLength
 tooOldOrderLongCloseAdvice = getTooOldOrderLongCloseAdvice ()
 tooOldOrderShortCloseAdvice = getTooOldOrderShortCloseAdvice ()
 
+// RSI protection substrategy
+rsiProtectionLongCondition = true
+rsiProtectionShortCondition = true
+
+float currentTimeframeProtectionRsi = ta.rsi(i_protectionRsiSource, i_protectionRsiLength)
+float higherTimeframeProtectionRsi = request.security(syminfo.tickerid, i_RSIProtectionCustomTimeframe, ta.rsi(i_protectionRsiSource, i_protectionRsiLength))
+
+float protectionRsi = na
+if (i_enableRSIProtectionCustomTimeframe)
+    protectionRsi := higherTimeframeProtectionRsi
+else
+    protectionRsi := currentTimeframeProtectionRsi
+
+if (protectionRsi > i_longRSILevel)
+    rsiProtectionLongCondition := false
+if (protectionRsi < i_shortRSILevel)
+    rsiProtectionShortCondition := false
+
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
 bool longCondition1 = false
@@ -587,6 +614,11 @@ if i_enableVolatilityProtection
 if (i_higherTimeframeTrendMaEnforce)
     longCondition := longCondition and higherTimeframeTrendMaLong
     shortCondition := shortCondition and higherTimeframeTrendMaShort
+
+if (i_enableLongRSIProtection)
+    longCondition := longCondition and rsiProtectionLongCondition
+if (i_enableShortRSIProtection)
+    shortCondition := shortCondition and rsiProtectionShortCondition
 // Common Logic to go LONG/LONG or go SHORT/SHORT - END
 
 // Volatility - Plot - BEGIN
