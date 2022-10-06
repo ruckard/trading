@@ -207,8 +207,8 @@ i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {T
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
 
 // Curie Closing Lines - Inputs
-i_enableCurieClosingLines = input.bool(true, title = 'Use {True}', group='Curie Closing Lines', inline='CurieEnableShow')
-i_showCurieClosingLines = input.bool(true, title = 'Show {True}', group='Curie Closing Lines', inline='CurieEnableShow')
+i_enableCurieClosingLines = input.bool(false, title = 'Use {False}', group='Curie Closing Lines', inline='CurieEnableShow')
+i_showCurieClosingLines = input.bool(false, title = 'Show {False}', group='Curie Closing Lines', inline='CurieEnableShow')
 
 i_curieHighClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'High MA {SMA/20/ohlc4}', group='Curie Closing Lines', inline='High Closing Ma')
 i_curieHighClosingMaLength = input.int(20, minval = 1,  title = '', group='Curie Closing Lines', inline='High Closing Ma')
