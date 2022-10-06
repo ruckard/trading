@@ -350,6 +350,15 @@ i_RSIProtectionCustomTimeframe = input.timeframe('180', title='', group='RSI Pro
 i_RSIProtectionLength = input.int(14, minval=1, title='RSI Length', group='RSI Protection')
 i_RSIProtectionSource = input.source(close, 'RSI Source', group='RSI Protection')
 
+i_enableLongRSIClosing = input.bool(true, title='Enable (L) RSI Closing {True, 55.0}', group='RSI Closing', inline='LongRSIClosing')
+i_longRSIClosingLevel = input.float(55.0, title='', group='RSI Closing', inline='LongRSIClosing', tooltip='Close when crossing under')
+i_enableShortRSIClosing = input.bool(true, title='Enable (S) RSI Closing {True, 45.0}', group='RSI Closing', inline='ShortRSIClosing')
+i_shortRSIClosingLevel = input.float(45.0, title='', group='RSI Closing', inline='ShortRSIClosing', tooltip='Close when crossing over')
+i_enableRSIClosingCustomTimeframe = input.bool(false, title='Use Custom Timeframe {False, 3 hours}', group='RSI Closing', inline='RSIClosingTimeframe')
+i_RSIClosingCustomTimeframe = input.timeframe('180', title='', group='RSI Closing', inline='RSIClosingTimeframe')
+i_RSIClosingLength = input.int(14, minval=1, title='RSI Length', group='RSI Closing')
+i_RSIClosingSource = input.source(close, 'RSI Source', group='RSI Closing')
+
 // INPUTS - END
 
 
@@ -602,6 +611,16 @@ if (protectionRsi > i_longRSIProtectionLevel)
     rsiProtectionLongCondition := false
 if (protectionRsi < i_shortRSIProtectionLevel)
     rsiProtectionShortCondition := false
+
+// RSI Closing substrategy
+float currentTimeframeClosingRsi = ta.rsi(i_RSIClosingSource, i_RSIClosingLength)
+float higherTimeframeClosingRsi = request.security(syminfo.tickerid, i_RSIClosingCustomTimeframe, ta.rsi(i_RSIClosingSource, i_RSIClosingLength))
+
+float closingRsi = na
+if (i_enableRSIClosingCustomTimeframe)
+    closingRsi := higherTimeframeClosingRsi
+else
+    closingRsi := currentTimeframeClosingRsi
 
 // SQMMOMDivergence SubStrategy
 
@@ -909,6 +928,9 @@ if i_enableCurieClosingLines
 if i_enableTooOldLongOrderClose
     LONG_CLOSE := LONG_CLOSE or tooOldOrderLongCloseAdvice
 
+if i_enableLongRSIClosing
+    LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(closingRsi, i_longRSIClosingLevel) )
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
     LONG := false
@@ -923,6 +945,9 @@ if i_enableCurieClosingLines
 
 if i_enableTooOldShortOrderClose
     SHORT_CLOSE := SHORT_CLOSE or tooOldOrderShortCloseAdvice
+
+if i_enableShortRSIClosing
+    SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(closingRsi, i_shortRSIClosingLevel) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
