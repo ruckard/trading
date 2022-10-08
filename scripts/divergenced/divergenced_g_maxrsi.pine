@@ -358,6 +358,9 @@ i_enableRSIClosingCustomTimeframe = input.bool(false, title='Use Custom Timefram
 i_RSIClosingCustomTimeframe = input.timeframe('180', title='', group='RSI Closing', inline='RSIClosingTimeframe')
 i_RSIClosingLength = input.int(14, minval=1, title='RSI Length', group='RSI Closing')
 i_RSIClosingSource = input.source(close, 'RSI Source', group='RSI Closing')
+i_enableRSIClosingAutoLevel = input.bool(true, title='Auto Level {True, 55 bars, 42 bars}', group='RSI Closing', inline='RSIClosingAutoLevel')
+i_RSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='RSIClosingAutoLevel')
+i_RSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='RSIClosingAutoLevel')
 
 // INPUTS - END
 
@@ -621,6 +624,21 @@ if (i_enableRSIClosingCustomTimeframe)
     closingRsi := higherTimeframeClosingRsi
 else
     closingRsi := currentTimeframeClosingRsi
+
+float longRSIClosingLevel = na
+float shortRSIClosingLevel = na
+
+float longPreAutoRSIClosingLevel = math.max(closingRsi, i_RSIClosingAutoBarsNumber)
+float shortPreAutoRSIClosingLevel = math.min(closingRsi, i_RSIClosingAutoBarsNumber)
+float longAutoRSIClosingLevel = longPreAutoRSIClosingLevel[i_RSIClosingLookbackBarsNumber]
+float shortAutoRSIClosingLevel = shortPreAutoRSIClosingLevel[i_RSIClosingLookbackBarsNumber]
+
+if (i_enableRSIClosingAutoLevel)
+    longRSIClosingLevel := longAutoRSIClosingLevel
+    shortRSIClosingLevel := shortAutoRSIClosingLevel
+else
+    longRSIClosingLevel := i_longRSIClosingLevel
+    shortRSIClosingLevel := i_shortRSIClosingLevel
 
 // SQMMOMDivergence SubStrategy
 
@@ -929,7 +947,7 @@ if i_enableTooOldLongOrderClose
     LONG_CLOSE := LONG_CLOSE or tooOldOrderLongCloseAdvice
 
 if i_enableLongRSIClosing
-    LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(closingRsi, i_longRSIClosingLevel) )
+    LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(closingRsi, longRSIClosingLevel) )
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -947,7 +965,7 @@ if i_enableTooOldShortOrderClose
     SHORT_CLOSE := SHORT_CLOSE or tooOldOrderShortCloseAdvice
 
 if i_enableShortRSIClosing
-    SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(closingRsi, i_shortRSIClosingLevel) )
+    SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(closingRsi, shortRSIClosingLevel) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
