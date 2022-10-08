@@ -307,6 +307,21 @@ i_RSIProtectionCustomTimeframe = input.timeframe('180', title='', group='RSI Pro
 i_RSIProtectionLength = input.int(14, minval=1, title='RSI Length', group='RSI Protection')
 i_RSIProtectionSource = input.source(close, 'RSI Source', group='RSI Protection')
 
+i_enableLongRSIClosing = input.bool(false, title='Enable (L) RSI Closing {False, 55.0}', group='RSI Closing', inline='LongRSIClosing')
+i_longRSIClosingLevel = input.float(55.0, title='', group='RSI Closing', inline='LongRSIClosing', tooltip='Close when crossing under')
+i_enableShortRSIClosing = input.bool(false, title='Enable (S) RSI Closing {False, 45.0}', group='RSI Closing', inline='ShortRSIClosing')
+i_shortRSIClosingLevel = input.float(45.0, title='', group='RSI Closing', inline='ShortRSIClosing', tooltip='Close when crossing over')
+i_enableRSIClosingCustomTimeframe = input.bool(false, title='Use Custom Timeframe {False, 3 hours}', group='RSI Closing', inline='RSIClosingTimeframe')
+i_RSIClosingCustomTimeframe = input.timeframe('180', title='', group='RSI Closing', inline='RSIClosingTimeframe')
+i_RSIClosingLength = input.int(14, minval=1, title='RSI Length', group='RSI Closing')
+i_RSIClosingSource = input.source(close, 'RSI Source', group='RSI Closing')
+i_enableLongRSIClosingAutoLevel = input.bool(true, title='(L) Auto Level {True, 55 bars, 42 bars}', group='RSI Closing', inline='longRSIClosingAutoLevel')
+i_longRSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='longRSIClosingAutoLevel')
+i_longRSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='longRSIClosingAutoLevel')
+i_enableShortRSIClosingAutoLevel = input.bool(true, title='(S) Auto Level {True, 55 bars, 42 bars}', group='RSI Closing', inline='shortRSIClosingAutoLevel')
+i_shortRSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
+i_shortRSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
+
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 // INPUTS - END
@@ -526,6 +541,34 @@ if (protectionRsi > i_longRSIProtectionLevel)
 if (protectionRsi < i_shortRSIProtectionLevel)
     rsiProtectionShortCondition := false
 
+// RSI Closing substrategy
+float currentTimeframeClosingRsi = ta.rsi(i_RSIClosingSource, i_RSIClosingLength)
+float higherTimeframeClosingRsi = request.security(syminfo.tickerid, i_RSIClosingCustomTimeframe, ta.rsi(i_RSIClosingSource, i_RSIClosingLength))
+
+float closingRsi = na
+if (i_enableRSIClosingCustomTimeframe)
+    closingRsi := higherTimeframeClosingRsi
+else
+    closingRsi := currentTimeframeClosingRsi
+
+float longRSIClosingLevel = na
+float shortRSIClosingLevel = na
+
+float longPreAutoRSIClosingLevel = math.max(closingRsi, i_longRSIClosingAutoBarsNumber)
+float shortPreAutoRSIClosingLevel = math.min(closingRsi, i_shortRSIClosingAutoBarsNumber)
+float longAutoRSIClosingLevel = longPreAutoRSIClosingLevel[i_longRSIClosingLookbackBarsNumber]
+float shortAutoRSIClosingLevel = shortPreAutoRSIClosingLevel[i_shortRSIClosingLookbackBarsNumber]
+
+if (i_enableLongRSIClosingAutoLevel)
+    longRSIClosingLevel := longAutoRSIClosingLevel
+else
+    longRSIClosingLevel := i_longRSIClosingLevel
+
+if (i_enableShortRSIClosingAutoLevel)
+    shortRSIClosingLevel := shortAutoRSIClosingLevel
+else
+    shortRSIClosingLevel := i_shortRSIClosingLevel
+
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
 bool longCondition1 = false
@@ -691,6 +734,9 @@ if i_enableCurieClosingLines
 if i_enableTooOldLongOrderClose
     LONG_CLOSE := LONG_CLOSE or tooOldOrderLongCloseAdvice
 
+if i_enableLongRSIClosing
+    LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(closingRsi, longRSIClosingLevel) )
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
     LONG := false
@@ -705,6 +751,9 @@ if i_enableCurieClosingLines
 
 if i_enableTooOldShortOrderClose
     SHORT_CLOSE := SHORT_CLOSE or tooOldOrderShortCloseAdvice
+
+if i_enableShortRSIClosing
+    SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(closingRsi, shortRSIClosingLevel) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
