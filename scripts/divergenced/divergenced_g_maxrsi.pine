@@ -358,9 +358,12 @@ i_enableRSIClosingCustomTimeframe = input.bool(false, title='Use Custom Timefram
 i_RSIClosingCustomTimeframe = input.timeframe('180', title='', group='RSI Closing', inline='RSIClosingTimeframe')
 i_RSIClosingLength = input.int(14, minval=1, title='RSI Length', group='RSI Closing')
 i_RSIClosingSource = input.source(close, 'RSI Source', group='RSI Closing')
-i_enableRSIClosingAutoLevel = input.bool(true, title='Auto Level {True, 55 bars, 42 bars}', group='RSI Closing', inline='RSIClosingAutoLevel')
-i_RSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='RSIClosingAutoLevel')
-i_RSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='RSIClosingAutoLevel')
+i_enableLongRSIClosingAutoLevel = input.bool(true, title='(L) Auto Level {True, 55 bars, 42 bars}', group='RSI Closing', inline='longRSIClosingAutoLevel')
+i_longRSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='longRSIClosingAutoLevel')
+i_longRSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='longRSIClosingAutoLevel')
+i_enableShortRSIClosingAutoLevel = input.bool(true, title='(S) Auto Level {True, 55 bars, 42 bars}', group='RSI Closing', inline='shortRSIClosingAutoLevel')
+i_shortRSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
+i_shortRSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
 
 // INPUTS - END
 
@@ -628,16 +631,19 @@ else
 float longRSIClosingLevel = na
 float shortRSIClosingLevel = na
 
-float longPreAutoRSIClosingLevel = math.max(closingRsi, i_RSIClosingAutoBarsNumber)
-float shortPreAutoRSIClosingLevel = math.min(closingRsi, i_RSIClosingAutoBarsNumber)
-float longAutoRSIClosingLevel = longPreAutoRSIClosingLevel[i_RSIClosingLookbackBarsNumber]
-float shortAutoRSIClosingLevel = shortPreAutoRSIClosingLevel[i_RSIClosingLookbackBarsNumber]
+float longPreAutoRSIClosingLevel = math.max(closingRsi, i_longRSIClosingAutoBarsNumber)
+float shortPreAutoRSIClosingLevel = math.min(closingRsi, i_shortRSIClosingAutoBarsNumber)
+float longAutoRSIClosingLevel = longPreAutoRSIClosingLevel[i_longRSIClosingLookbackBarsNumber]
+float shortAutoRSIClosingLevel = shortPreAutoRSIClosingLevel[i_shortRSIClosingLookbackBarsNumber]
 
-if (i_enableRSIClosingAutoLevel)
+if (i_enableLongRSIClosingAutoLevel)
     longRSIClosingLevel := longAutoRSIClosingLevel
-    shortRSIClosingLevel := shortAutoRSIClosingLevel
 else
     longRSIClosingLevel := i_longRSIClosingLevel
+
+if (i_enableShortRSIClosingAutoLevel)
+    shortRSIClosingLevel := shortAutoRSIClosingLevel
+else
     shortRSIClosingLevel := i_shortRSIClosingLevel
 
 // SQMMOMDivergence SubStrategy
