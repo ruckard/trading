@@ -933,6 +933,13 @@ plotshape(higherTimeframeTrendMaLong, title='SideMA Up', style=shape.arrowup, co
 plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdown, color=higherTimeframeTrendMaShortColor, location=location.top)
 // Higher Timeframe Trend - Plot - END
 
+// Squeeze Momentum Divergence - Plot - BEGIN
+sqzmomDivergenceLongColor = i_showSqzmomDivergences ? color.new(#00c3ff, transp=0) : na
+sqzmomDivergenceShortColor = i_showSqzmomDivergences ? color.new(#ff0062, transp=0) : na
+plotshape(sqzmomDivergenceLong, text='D', title='Divergence Up', style=shape.labelup, color=sqzmomDivergenceLongColor, location=location.bottom)
+plotshape(sqzmomDivergenceShort, text='D', title='Divergence Down', style=shape.labeldown, color=sqzmomDivergenceShortColor, location=location.bottom)
+// Squeeze Momentum Divergence - Plot - END
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
