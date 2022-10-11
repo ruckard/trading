@@ -199,15 +199,15 @@ i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {Fa
 i_enableCurieClosingLines = input.bool(false, title = 'Use {False}', group='Curie Closing Lines', inline='CurieEnableShow')
 i_showCurieClosingLines = input.bool(false, title = 'Show {False}', group='Curie Closing Lines', inline='CurieEnableShow')
 
-i_curieHighClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'High MA {SMA/13/ohlc4}', group='Curie Closing Lines', inline='High Closing Ma')
-i_curieHighClosingMaLength = input.int(13, minval = 1,  title = '', group='Curie Closing Lines', inline='High Closing Ma')
+i_curieHighClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'High MA {SMA/20/ohlc4}', group='Curie Closing Lines', inline='High Closing Ma')
+i_curieHighClosingMaLength = input.int(20, minval = 1,  title = '', group='Curie Closing Lines', inline='High Closing Ma')
 i_curieHighClosingMaSource = input.source(ohlc4, title = '', group='Curie Closing Lines', inline='High Closing Ma')
-i_curieHighestClosingMaLength = input.int(22, minval = 1,  title = 'Highest MA Length {22}', group='Curie Closing Lines')
+i_curieHighestClosingMaLength = input.int(5, minval = 1,  title = 'Highest MA Length {5}', group='Curie Closing Lines')
 
-i_curieLowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'Low MA {SMA/6/ohlc4}', group='Curie Closing Lines', inline='Low Closing Ma')
-i_curieLowClosingMaLength = input.int(6, minval = 1,  title = '', group='Curie Closing Lines', inline='Low Closing Ma')
+i_curieLowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'Low MA {SMA/25/ohlc4}', group='Curie Closing Lines', inline='Low Closing Ma')
+i_curieLowClosingMaLength = input.int(25, minval = 1,  title = '', group='Curie Closing Lines', inline='Low Closing Ma')
 i_curieLowClosingMaSource = input.source(ohlc4, title = '', group='Curie Closing Lines', inline='Low Closing Ma')
-i_curieLowestClosingMaLength = input.int(18, minval = 1,  title = 'Lowest MA Length {18}', group='Curie Closing Lines')
+i_curieLowestClosingMaLength = input.int(10, minval = 1,  title = 'Lowest MA Length {10}', group='Curie Closing Lines')
 
 i_curieSource = input.source(ohlc4, title = 'Source {ohlc4}', group='Curie Closing Lines')
 
