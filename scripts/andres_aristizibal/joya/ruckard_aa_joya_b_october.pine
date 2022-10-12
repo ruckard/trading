@@ -9,7 +9,7 @@
 // This strategy serves as a template for Ruckard strategies that interact with Zignaly.
 // This specific strategy also includes Risk Management.
 // 
-// It was originally tested at BTCUSDT pair and 1H timeframe.
+// It was originally tested at XRPUSDT pair and 15m timeframe.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
