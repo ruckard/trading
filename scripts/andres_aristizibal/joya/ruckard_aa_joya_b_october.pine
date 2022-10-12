@@ -6,7 +6,7 @@
 // Current version: v20221012 ( B001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a template for Ruckard strategies that interact with Zignaly.
+// This strategy uses Trend Indicator A-V2, Supertrend and QQE Mod at the same time for choosing go long or short.
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at XRPUSDT pair and 15m timeframe.
