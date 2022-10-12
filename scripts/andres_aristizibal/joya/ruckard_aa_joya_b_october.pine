@@ -841,6 +841,21 @@ plotshape(higherTimeframeTrendMaLong, title='SideMA Up', style=shape.arrowup, co
 plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdown, color=higherTimeframeTrendMaShortColor, location=location.top)
 // Higher Timeframe Trend - Plot - END
 
+// Trend Indicator A-V2 ( Dziwne) - Plot - BEGIN
+trendIsTrending = trendHACloseMaSmooth >= trendHAOpenMaSmooth
+trendColor = trendIsTrending ? i_trendPositiveColor : i_trendNegativeColor
+trendShowPositiveLineColor = i_trendShowLines ? i_trendPositiveColor : na
+trendShowNegativeLineColor = i_trendShowLines ? i_trendNegativeColor : na
+trendShowHighLowCloudColor = i_trendShowHighLowCloud ? i_trendHighAndLowColor : na
+trendShowOpenCloseCloudColor = i_trendShowOpenCloseCloud ? trendColor : na
+trendOpenLine = plot(trendHAOpenMaSmooth, color=trendShowPositiveLineColor, title="(Trend) Open line")
+trendCloseLine = plot(trendHACloseMaSmooth, color=trendShowNegativeLineColor, title="(Trend) Close line")
+trendHighLine = plot(trendHAHighMaSmooth, color=trendShowPositiveLineColor, title="(Trend) High line")
+trendLowLine = plot(trendHALowMaSmooth, color=trendShowNegativeLineColor, title="(Trend) Low line")
+fill(trendOpenLine, trendCloseLine, color=trendShowOpenCloseCloudColor, title="(Trend) Open & Close Trendcloud")
+fill(trendHighLine, trendLowLine, color=trendShowHighLowCloudColor, title="(Trend) High & Low Trendcloud")
+// Trend Indicator A-V2 ( Dziwne) - Plot - END
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
