@@ -333,6 +333,20 @@ i_shortRSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='R
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+
+// Trend Indicator A-V2 ( Dziwne) - Inputs
+i_trendMaType = input.string(title="(Trend) MA Type", defval="VWMA", options=["EMA", "SMA", "SWMA", "VWMA", "WMA"])
+i_trendMaPeriod = input.int(title="(Trend) MA Period (Length)", defval=52, minval=1)
+i_trendMaPeriodSmoothing = input.int(title="(Trend) MA Period smoothing (Length)", defval=10, minval=1)
+
+i_trendPositiveColor = input.color(title="(Trend) Positive color (Bullish)", defval=color.new(#26A69A, 50) )
+i_trendNegativeColor = input.color(title="(Trend) Negative color (Bearish)", defval=color.new(#EF5350, 50) )
+i_trendHighAndLowColor = input.color(title="(Trend) High & Low cloud color", defval=color.new(#808080, 80) )
+
+i_trendShowLines = input.bool(title="(Trend) Show (lines)", defval=false)
+i_trendShowHighLowCloud = input.bool(title="(Trend) Show (High & Low cloud)", defval=true)
+i_trendShowOpenCloseCloud = input.bool(title="(Trend) Show (Open & Close cloud)", defval=true)
+
 // INPUTS - END
 
 
@@ -614,6 +628,26 @@ if (i_enableShortRSIClosingAutoLevel)
     shortRSIClosingLevel := shortAutoRSIClosingLevel
 else
     shortRSIClosingLevel := i_shortRSIClosingLevel
+
+// Trend Indicator A-V2 ( Dziwne) substrategy
+trendOpenMa = f_Ma(i_trendMaType, open, i_trendMaPeriod)
+trendCloseMa = f_Ma(i_trendMaType, close, i_trendMaPeriod)
+trendHighMa = f_Ma(i_trendMaType, high, i_trendMaPeriod)
+trendLowMa = f_Ma(i_trendMaType, low, i_trendMaPeriod)
+
+trendHeikinAshiTicker = ticker.heikinashi(syminfo.tickerid)
+trendHAOpenMa = request.security(trendHeikinAshiTicker, timeframe.period, trendOpenMa)
+trendHACloseMa = request.security(trendHeikinAshiTicker, timeframe.period, trendCloseMa)
+trendHAHighMa = request.security(trendHeikinAshiTicker, timeframe.period, trendHighMa)
+trendHALowMa = request.security(trendHeikinAshiTicker, timeframe.period, trendLowMa)
+
+trendHAOpenMaSmooth = f_Ma(i_trendMaType, trendHAOpenMa, i_trendMaPeriodSmoothing)
+trendHACloseMaSmooth = f_Ma(i_trendMaType, trendHACloseMa, i_trendMaPeriodSmoothing)
+trendHAHighMaSmooth = f_Ma(i_trendMaType, trendHAHighMa, i_trendMaPeriodSmoothing)
+trendHALowMaSmooth = f_Ma(i_trendMaType, trendHALowMa, i_trendMaPeriodSmoothing)
+
+trendLong = trendHACloseMaSmooth >= trendHAOpenMaSmooth
+trendShort = trendHACloseMaSmooth < trendHAOpenMaSmooth
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
