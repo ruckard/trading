@@ -355,6 +355,21 @@ i_supertrendChangeATR= input.bool(title="(Supertrend) Change ATR Calculation Met
 
 i_supertrendShowSignals = input.bool(title="(Supertrend) Show Buy/Sell Signals ?", defval=false)
 
+// QQE MOD - Inputs
+qqemodRSILength1 = input.int(6, title='(QQEMOD) RSI Length 1')
+qqemodRSISource1 = input(close, title='(QQEMOD) RSI Source 1')
+qqemodRSISmoothing1 = input.int(5, title='(QQEMOD) RSI Smoothing 1')
+
+qqemodRSILength2 = input(6, title='(QQEMOD) RSI Length 2')
+qqemodRSISource2 = input(close, title='(QQEMOD) RSI Source 2')
+qqemodRSISmoothing2 = input(5, title='(QQEMOD) RSI Smoothing 2')
+qqemodThreshHold2 = input(3, title='(QQEMOD) Thresh-hold 2')
+
+qqemodFastQQEFactor = input(3, title='(QQEMOD) Fast QQE Factor')
+
+qqemodBollingerLength = input.int(50, minval=1, title='(QQEMOD) Bollinger Length')
+qqemodBollingerMultiplier = input.float(0.35, minval=0.001, maxval=5, step=0.1, title='(QQEMOD) BB Multiplier')
+
 // INPUTS - END
 
 
@@ -676,6 +691,39 @@ supertrendSellSignal = supertrendTrend == -1 and supertrendTrend[1] == 1
 
 supertrendLong = supertrendBuySignal
 supertrendShort = supertrendSellSignal
+
+// QQE MOD substrategy
+qqemodRSI = ta.rsi(qqemodRSISource1, qqemodRSILength1)
+qqemodRSIMa = ta.ema(qqemodRSI, qqemodRSISmoothing1)
+
+qqemodRSI2 = ta.rsi(qqemodRSISource2, qqemodRSILength2)
+qqemodRSIMa2 = ta.ema(qqemodRSI2, qqemodRSISmoothing2)
+
+qqemodWildersLength = qqemodRSILength1 * 2 - 1
+qqemodATRRSI = math.abs(qqemodRSIMa[1] - qqemodRSIMa)
+qqemodATRRSIMa = ta.ema(qqemodATRRSI, qqemodWildersLength)
+qqemodDeltaFastAtrRsi = ta.ema(qqemodATRRSIMa, qqemodWildersLength) * qqemodFastQQEFactor
+
+qqemodLongband = 0.0
+qqemodShortband = 0.0
+qqemodTrend1 = 0
+
+qqemodRSIndex = qqemodRSIMa
+qqemodNewshortband = qqemodRSIndex + qqemodDeltaFastAtrRsi
+qqemodNewlongband = qqemodRSIndex - qqemodDeltaFastAtrRsi
+qqemodLongband := qqemodRSIndex[1] > qqemodLongband[1] and qqemodRSIndex > qqemodLongband[1] ? math.max(qqemodLongband[1], qqemodNewlongband) : qqemodNewlongband
+qqemodShortband := qqemodRSIndex[1] < qqemodShortband[1] and qqemodRSIndex < qqemodShortband[1] ? math.min(qqemodShortband[1], qqemodNewshortband) : qqemodNewshortband
+qqemodCross1 = ta.cross(qqemodLongband[1], qqemodRSIndex)
+qqemodTrend1 := ta.cross(qqemodRSIndex, qqemodShortband[1]) ? 1 : qqemodCross1 ? -1 : nz(qqemodTrend1[1], 1)
+qqemodFastAtrRsiTL = qqemodTrend1 == 1 ? qqemodLongband : qqemodShortband
+
+qqemodBasis = ta.sma(qqemodFastAtrRsiTL - 50, qqemodBollingerLength)
+qqemodDev = qqemodBollingerMultiplier * ta.stdev(qqemodFastAtrRsiTL - 50, qqemodBollingerLength)
+qqemodUpper = qqemodBasis + qqemodDev
+qqemodLower = qqemodBasis - qqemodDev
+
+qqemodLong = (qqemodRSIMa2 - 50 > qqemodThreshHold2) and (qqemodRSIMa - 50 > qqemodUpper)
+qqemodShort = (qqemodRSIMa2 - 50 < 0 - qqemodThreshHold2) and (qqemodRSIMa - 50 < qqemodLower)
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
