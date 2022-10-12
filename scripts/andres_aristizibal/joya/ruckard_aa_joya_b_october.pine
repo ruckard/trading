@@ -348,9 +348,9 @@ i_trendShowHighLowCloud = input.bool(title="(Trend) Show (High & Low cloud)", de
 i_trendShowOpenCloseCloud = input.bool(title="(Trend) Show (Open & Close cloud)", defval=true)
 
 // Supertrend Indicator ( KivancOzbilgic ) - Inputs
-i_supertrendATRLength = input.int(title="(Supertrend) ATR Period", defval=9, minval=1)
+i_supertrendATRLength = input.int(title="(Supertrend) ATR Period", defval=10, minval=1)
 i_supertrendSource = input(hl2, title="(Supertrend) Source")
-i_supertrendATRMultiplier = input.float(title="(Supertrend) ATR Multiplier", step=0.1, defval=3.9)
+i_supertrendATRMultiplier = input.float(title="(Supertrend) ATR Multiplier", step=0.1, defval=3)
 i_supertrendChangeATR= input.bool(title="(Supertrend) Change ATR Calculation Method ?", defval=true)
 
 i_supertrendShowSignals = input.bool(title="(Supertrend) Show Buy/Sell Signals ?", defval=false)
