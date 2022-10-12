@@ -686,8 +686,8 @@ supertrendTrend = 1
 supertrendTrend := nz(supertrendTrend[1], supertrendTrend)
 supertrendTrend := supertrendTrend == -1 and close > supertrendDown1 ? 1 : supertrendTrend == 1 and close < supertrendUp1 ? -1 : supertrendTrend
 
-supertrendBuySignal = supertrendTrend == 1 and supertrendTrend[1] == -1
-supertrendSellSignal = supertrendTrend == -1 and supertrendTrend[1] == 1
+supertrendBuySignal = supertrendTrend == 1
+supertrendSellSignal = supertrendTrend == -1
 
 supertrendLong = supertrendBuySignal
 supertrendShort = supertrendSellSignal
