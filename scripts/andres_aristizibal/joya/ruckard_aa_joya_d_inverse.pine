@@ -727,17 +727,17 @@ qqemodShort = (qqemodRSIMa2 - 50 < 0 - qqemodThreshHold2) and (qqemodRSIMa - 50 
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
-bool longCondition1 = trendLong
-bool longCondition2 = supertrendLong
-bool longCondition3 = qqemodLong
+bool longCondition1 = trendShort
+bool longCondition2 = supertrendShort
+bool longCondition3 = qqemodShort
 bool longCondition4 = false
 bool longCondition5 = false
 // Define here your, at most, 5 long conditions. Use false if not used. - END
 
 // Define here your, at most, 5 short conditions. Use false if not used. - BEGIN
-bool shortCondition1 = trendShort
-bool shortCondition2 = supertrendShort
-bool shortCondition3 = qqemodShort
+bool shortCondition1 = trendLong
+bool shortCondition2 = supertrendLong
+bool shortCondition3 = qqemodLong
 bool shortCondition4 = false
 bool shortCondition5 = false
 // Define here your, at most, 5 short conditions. Use false if not used. - END
