@@ -866,6 +866,11 @@ plotshape(supertrendSellSignal and i_supertrendShowSignals ? supertrendDown : na
 supertrendDownPlot = plot(supertrendTrend == 1 ? na : supertrendDown, title="Down Trend", style=plot.style_linebr, linewidth=2, color=color.red)
 // Supertrend Indicator ( KivancOzbilgic ) - Plot - END
 
+// QQE MOD - Plot - BEGIN
+plotshape(qqemodLong, title="QQE Up", style=shape.arrowup, color=color.new(#00c3ff, transp=0), location=location.bottom)
+plotshape(qqemodShort, title="QQE Down", style=shape.arrowdown, color=color.new(#ff0062, transp=0), location=location.bottom)
+// QQE MOD - Plot - END
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
