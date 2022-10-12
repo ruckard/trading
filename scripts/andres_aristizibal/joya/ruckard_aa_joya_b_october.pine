@@ -331,8 +331,8 @@ i_enableShortRSIClosingAutoLevel = input.bool(true, title='(S) Auto Level {True,
 i_shortRSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
 i_shortRSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
 
-i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
-i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+i_subStrategiesLookback = input.int(5, title='(STRAT) Substrategies Lookback [5]')
+i_subStrategiesMinimum = input.int(3, title='(STRAT) Substrategies minimum [3]')
 
 // Trend Indicator A-V2 ( Dziwne) - Inputs
 i_trendMaType = input.string(title="(Trend) MA Type", defval="VWMA", options=["EMA", "SMA", "SWMA", "VWMA", "WMA"])
