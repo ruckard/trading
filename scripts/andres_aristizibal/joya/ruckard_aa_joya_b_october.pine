@@ -347,6 +347,14 @@ i_trendShowLines = input.bool(title="(Trend) Show (lines)", defval=false)
 i_trendShowHighLowCloud = input.bool(title="(Trend) Show (High & Low cloud)", defval=true)
 i_trendShowOpenCloseCloud = input.bool(title="(Trend) Show (Open & Close cloud)", defval=true)
 
+// Supertrend Indicator ( KivancOzbilgic ) - Inputs
+i_supertrendATRLength = input.int(title="(Supertrend) ATR Period", defval=9, minval=1)
+i_supertrendSource = input(hl2, title="(Supertrend) Source")
+i_supertrendATRMultiplier = input.float(title="(Supertrend) ATR Multiplier", step=0.1, defval=3.9)
+i_supertrendChangeATR= input.bool(title="(Supertrend) Change ATR Calculation Method ?", defval=true)
+
+i_supertrendShowSignals = input.bool(title="(Supertrend) Show Buy/Sell Signals ?", defval=false)
+
 // INPUTS - END
 
 
@@ -648,6 +656,26 @@ trendHALowMaSmooth = f_Ma(i_trendMaType, trendHALowMa, i_trendMaPeriodSmoothing)
 
 trendLong = trendHACloseMaSmooth >= trendHAOpenMaSmooth
 trendShort = trendHACloseMaSmooth < trendHAOpenMaSmooth
+
+// Supertrend Indicator ( KivancOzbilgic ) substrategy
+supertrendAlternativeATR = ta.sma(ta.tr, i_supertrendATRLength)
+supertrendDefaultATR = ta.atr(i_supertrendATRLength)
+supertrendATR = i_supertrendChangeATR ? supertrendDefaultATR : supertrendAlternativeATR
+supertrendUp = i_supertrendSource-(i_supertrendATRMultiplier * supertrendATR)
+supertrendUp1 = nz(supertrendUp[1],supertrendUp)
+supertrendUp := close[1] > supertrendUp1 ? math.max(supertrendUp,supertrendUp1) : supertrendUp
+supertrendDown = i_supertrendSource + (i_supertrendATRMultiplier * supertrendATR)
+supertrendDown1 = nz(supertrendDown[1], supertrendDown)
+supertrendDown := close[1] < supertrendDown1 ? math.min(supertrendDown, supertrendDown1) : supertrendDown
+supertrendTrend = 1
+supertrendTrend := nz(supertrendTrend[1], supertrendTrend)
+supertrendTrend := supertrendTrend == -1 and close > supertrendDown1 ? 1 : supertrendTrend == 1 and close < supertrendUp1 ? -1 : supertrendTrend
+
+supertrendBuySignal = supertrendTrend == 1 and supertrendTrend[1] == -1
+supertrendSellSignal = supertrendTrend == -1 and supertrendTrend[1] == 1
+
+supertrendLong = supertrendBuySignal
+supertrendShort = supertrendSellSignal
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
