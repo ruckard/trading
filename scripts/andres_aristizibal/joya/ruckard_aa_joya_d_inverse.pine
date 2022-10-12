@@ -818,15 +818,6 @@ if (i_enableLongRSIProtection)
     longCondition := longCondition and rsiProtectionLongCondition
 if (i_enableShortRSIProtection)
     shortCondition := shortCondition and rsiProtectionShortCondition
-
-// Andres Logic Protection - BEGIN
-bool suggestedLongCondition = longCondition
-bool suggestedShortCondition = shortCondition
-
-longCondition := longCondition and (not suggestedLongCondition[1])
-shortCondition := shortCondition and (not suggestedShortCondition[1])
-// Andres Logic Protection - END
-
 // Common Logic to go LONG/LONG or go SHORT/SHORT - END
 
 // Volatility - Plot - BEGIN
