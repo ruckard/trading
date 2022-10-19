@@ -176,7 +176,7 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
              zigsep +
              _zignalyLongCommonAlertMessage +
              zigsep +
-             zigquote + 'positionSizePercentage' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
+             zigquote + 'positionSizePercentageFromQuoteTotal' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
@@ -301,7 +301,7 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
              zigsep +
              _zignalyShortCommonAlertMessage +
              zigsep +
-             zigquote + 'positionSizePercentage' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
+             zigquote + 'positionSizePercentageFromQuoteTotal' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
@@ -745,7 +745,7 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
              zigsep +
              _zignalyLongCommonAlertMessage +
              zigsep +
-             zigquote + 'positionSizePercentage' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
+             zigquote + 'positionSizePercentageFromQuoteTotal' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
@@ -873,7 +873,7 @@ export updateShortEntry (string key = na, string providerType = 'copytrader', st
              zigsep +
              _zignalyShortCommonAlertMessage +
              zigsep +
-             zigquote + 'positionSizePercentage' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
+             zigquote + 'positionSizePercentageFromQuoteTotal' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
