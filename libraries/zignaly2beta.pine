@@ -43,7 +43,7 @@ getZignalyCommonAlertMessage (string exchange='zignaly', string exchangeAccountT
 
     leverage_str = str.tostring(p_leverage)
 
-    zignalyCommonAlertMessage = zigquote + 'exchange' + zigquote + zigequals + zigquote + p_exchange + zigquote + zigsep + zigquote + 'exchangeAccountType' + zigquote + zigequals + zigquote + p_exchangeAccountType + zigquote + zigsep + zigquote + 'pair' + zigquote + zigequals + zigquote + '' + p_pair + zigquote + zigsep + zigquote + 'leverage' + zigquote + zigequals + zigquote + leverage_str + zigquote
+    zignalyCommonAlertMessage = zigquote + 'exchange' + zigquote + zigequals + zigquote + p_exchange + zigquote + zigsep + zigquote + 'pair' + zigquote + zigequals + zigquote + '' + p_pair + zigquote + zigsep + zigquote + 'leverage' + zigquote + zigequals + zigquote + leverage_str + zigquote
     zignalyCommonAlertMessage
 
 priceDecimalDigitsZeroString (int priceDecimalDigits=2) =>
