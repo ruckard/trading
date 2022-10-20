@@ -154,29 +154,15 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
     else
         _zignaleTrailingTakeProfitCombo := ''
 
-
-
-    string _message = ''
-    if (providerType == 'copytrader')
-        _message :=
-             zignalyCommonAlertMessage +
-             ',' +
-             _zignalyLongCommonAlertMessage +
-             ',' +
-             '"' + 'positionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
-    else // 'signalprovider'
-        _message :=
-             zignalyCommonAlertMessage +
-             ',' +
-             _zignalyLongCommonAlertMessage +
-             ',' +
-             '"' + 'positionSizeQuote' + '":"' + '' +  _entryQuantityContractsUSDTStr + '"' +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
+    string _message =
+         zignalyCommonAlertMessage +
+         ',' +
+         _zignalyLongCommonAlertMessage +
+         ',' +
+         '"' + 'positionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
+         _zignaleStopLossCombo +
+         _zignaleTakeProfitCombo +
+         _zignaleTrailingTakeProfitCombo
 
     getMessageWithKey (_message, key, partial)
 
@@ -277,29 +263,15 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
     else
         _zignaleTrailingTakeProfitCombo := ''
 
-
-
-    string _message = ''
-    if (providerType == 'copytrader')
-        _message :=
-             zignalyCommonAlertMessage +
-             ',' +
-             _zignalyShortCommonAlertMessage +
-             ',' +
-             '"' + 'positionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
-    else // 'signalprovider'
-        _message :=
-             zignalyCommonAlertMessage +
-             ',' +
-             _zignalyShortCommonAlertMessage +
-             ',' +
-             '"' + 'positionSizeQuote' + '":"' + '' +  _entryQuantityContractsUSDTStr + '"' +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
+    string _message =
+         zignalyCommonAlertMessage +
+         ',' +
+         _zignalyShortCommonAlertMessage +
+         ',' +
+         '"' + 'positionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
+         _zignaleStopLossCombo +
+         _zignaleTakeProfitCombo +
+         _zignaleTrailingTakeProfitCombo
 
     getMessageWithKey (_message, key, partial)
 
@@ -401,33 +373,17 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
     else
         _zignaleTrailingTakeProfitCombo := ''
 
-
-
-    string _message = ''
-    if (providerType == 'copytrader')
-        _message :=
-             zignalyCommonAlertMessage +
-             ',' +
-             _zignalyReverseExitCommonAlertMessage +
-             ',' +
-             _zignalyLongCommonAlertMessage +
-             ',' +
-             '"' + 'entryPositionSizePercentage' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
-    else // 'signalprovider'
-        _message :=
-             zignalyCommonAlertMessage +
-             ',' +
-             _zignalyReverseExitCommonAlertMessage +
-             ',' +
-             _zignalyLongCommonAlertMessage +
-             ',' +
-             '"' + 'entryPositionSizeQuote' + '":"' + '' +  _entryQuantityContractsUSDTStr + '"' +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
+    string _message =
+         zignalyCommonAlertMessage +
+         ',' +
+         _zignalyReverseExitCommonAlertMessage +
+         ',' +
+         _zignalyLongCommonAlertMessage +
+         ',' +
+         '"' + 'entryPositionSizePercentage' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
+         _zignaleStopLossCombo +
+         _zignaleTakeProfitCombo +
+         _zignaleTrailingTakeProfitCombo
 
     getMessageWithKey (_message, key, partial)
 
@@ -529,33 +485,17 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
     else
         _zignaleTrailingTakeProfitCombo := ''
 
-
-
-    string _message = ''
-    if (providerType == 'copytrader')
-        _message :=
-             zignalyCommonAlertMessage +
-             ',' +
-             _zignalyReverseExitCommonAlertMessage +
-             ',' +
-             _zignalyShortCommonAlertMessage +
-             ',' +
-             '"' + 'entryPositionSizePercentage' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
-    else // 'signalprovider'
-        _message :=
-             zignalyCommonAlertMessage +
-             ',' +
-             _zignalyReverseExitCommonAlertMessage +
-             ',' +
-             _zignalyShortCommonAlertMessage +
-             ',' +
-             '"' + 'entryPositionSizeQuote' + '":"' + '' +  _entryQuantityContractsUSDTStr + '"' +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
+    string _message =
+         zignalyCommonAlertMessage +
+         ',' +
+         _zignalyReverseExitCommonAlertMessage +
+         ',' +
+         _zignalyShortCommonAlertMessage +
+         ',' +
+         '"' + 'entryPositionSizePercentage' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
+         _zignaleStopLossCombo +
+         _zignaleTakeProfitCombo +
+         _zignaleTrailingTakeProfitCombo
 
     getMessageWithKey (_message, key, partial)
 
@@ -709,27 +649,15 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
     else
         _zignaleTrailingTakeProfitCombo := ''
 
-
-
-    string _message = ''
-    if ((providerType == 'copytrader') and (not(na(p_positionSizeQuote))))
-        _message :=
-             zignalyCommonAlertMessage +
-             ',' +
-             _zignalyLongCommonAlertMessage +
-             ',' +
-             '"' + 'positionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
-    else // 'signalprovider'
-        _message :=
-             zignalyCommonAlertMessage +
-             ',' +
-             _zignalyLongCommonAlertMessage +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
+    string _message =
+         zignalyCommonAlertMessage +
+         ',' +
+         _zignalyLongCommonAlertMessage +
+         ',' +
+         '"' + 'positionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
+         _zignaleStopLossCombo +
+         _zignaleTakeProfitCombo +
+         _zignaleTrailingTakeProfitCombo
 
     getMessageWithKey (_message, key, partial)
 
@@ -835,27 +763,15 @@ export updateShortEntry (string key = na, string providerType = 'copytrader', st
     else
         _zignaleTrailingTakeProfitCombo := ''
 
-
-
-    string _message = ''
-    if ((providerType == 'copytrader') and (not(na(p_positionSizeQuote))))
-        _message :=
-             zignalyCommonAlertMessage +
-             ',' +
-             _zignalyShortCommonAlertMessage +
-             ',' +
-             '"' + 'positionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
-    else // 'signalprovider'
-        _message :=
-             zignalyCommonAlertMessage +
-             ',' +
-             _zignalyShortCommonAlertMessage +
-             _zignaleStopLossCombo +
-             _zignaleTakeProfitCombo +
-             _zignaleTrailingTakeProfitCombo
+    string _message =
+         zignalyCommonAlertMessage +
+         ',' +
+         _zignalyShortCommonAlertMessage +
+         ',' +
+         '"' + 'positionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
+         _zignaleStopLossCombo +
+         _zignaleTakeProfitCombo +
+         _zignaleTrailingTakeProfitCombo
 
     getMessageWithKey (_message, key, partial)
 
