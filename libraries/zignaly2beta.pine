@@ -3,21 +3,6 @@
 // @description Provides Zignaly related functions.
 library("Zignaly2Beta", true)
 
-getZignalySeparators (string alertType='webhook') =>
-    string zigsep = ','
-    string zigquote = '"'
-    string zigequals = '='
-    if alertType == 'email'
-        zigsep := '||'
-        zigquote := ''
-        zigequals := '='
-    else
-        zigsep := ','
-        zigquote := '"'
-        zigequals := ':'
-
-    [zigsep, zigquote, zigequals]
-
 getZignalyPair(string pair = na) =>
     string p_pair = pair
     if (na(p_pair))
@@ -47,12 +32,11 @@ getZignalyCommonAlertMessage (string exchange='zignaly', string exchangeAccountT
     if (na(p_exchangeAccountType))
         p_exchangeAccountType := 'futures'
 
-    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
     string p_pair = getZignalyPair(pair)
 
     leverage_str = str.tostring(p_leverage)
 
-    zignalyCommonAlertMessage = zigquote + 'exchange' + zigquote + zigequals + zigquote + p_exchange + zigquote + zigsep + zigquote + 'pair' + zigquote + zigequals + zigquote + '' + p_pair + zigquote + zigsep + zigquote + 'leverage' + zigquote + zigequals + zigquote + leverage_str + zigquote + zigsep + zigquote + 'multiplyByLeverage' + zigquote + zigequals + zigquote + p_multiplyByLeverage + zigquote
+    zignalyCommonAlertMessage = '"' + 'exchange' + '"' + ':' + '"' + p_exchange + '"' + ',' + '"' + 'pair' + '"' + ':' + '"' + '' + p_pair + '"' + ',' + '"' + 'leverage' + '"' + ':' + '"' + leverage_str + '"' + ',' + '"' + 'multiplyByLeverage' + '"' + ':' + '"' + p_multiplyByLeverage + '"'
     zignalyCommonAlertMessage
 
 priceDecimalDigitsZeroString (int priceDecimalDigits=2) =>
@@ -62,20 +46,16 @@ priceDecimalDigitsZeroString (int priceDecimalDigits=2) =>
             _zeroString += '0'
     _zeroString
 
-getMessageWithKey (string message='', string key='NON_DEFINED_SECRET_KEY', bool partial = false, string alertType) =>
+getMessageWithKey (string message='', string key='NON_DEFINED_SECRET_KEY', bool partial = false) =>
     string p_key = key
     if (na(p_key))
         p_key := 'NON_DEFINED_SECRET_KEY'
 
-    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
-    partialMessage = message + zigsep + zigquote + 'key' + zigquote + zigequals + zigquote + p_key + zigquote
+    partialMessage = message + ',' + '"' + 'key' + '"' + ':' + '"' + p_key + '"'
     if (partial)
         partialMessage
     else // Complete message
-        if (alertType == 'email')
-            '||' + partialMessage + '||'
-        else
-            '{' + partialMessage + '}'
+        '{' + partialMessage + '}'
 
 // @function Returns partial alert_message for opening long entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -114,8 +94,6 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
     if (na(p_positionSizeQuote))
         p_positionSizeQuote := p_currentCapital
 
-    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
-
     bool p_stopLoss = stopLoss
     bool p_takeProfit = takeProfit
     bool p_trailingStopLoss = trailingStopLoss
@@ -156,7 +134,7 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
     string _zignaleStopLossCombo = ''
     string _zignaleTakeProfitCombo = ''
     string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyLongCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'entry' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
+    _zignalyLongCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'entry' + '"' + ',' + '"' + 'side' + '"' + ':' + '"' + 'long' + '"' + ',' + '"' + 'orderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -164,15 +142,15 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
     _entryQuantityContractsPercentStr = str.tostring(_entryQuantityContractsPercent, '0.' + priceDecimalDigitsString)
 
     if p_stopLoss and integration == 'hybrid'
-        _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '"' + ':' + '"' + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
-        _zignaleTakeProfitCombo := zigsep + zigquote + 'takeProfitPercentage1' + zigquote + zigequals + zigquote + '' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleTakeProfitCombo := ',' + '"' + 'takeProfitPercentage1' + '"' + ':' + '"' + '' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTakeProfitCombo := ''
     if p_trailingStopLoss and integration == 'hybrid'
-        _zignaleTrailingTakeProfitCombo := zigsep + zigquote + 'trailingStopDistancePercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + zigquote + zigsep + zigquote + 'trailingStopTriggerPercentage' + zigquote + zigequals + zigquote + '' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'trailingStopDistancePercentage' + '"' + ':' + '"' + '-' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '"' + ',' + '"' + 'trailingStopTriggerPercentage' + '"' + ':' + '"' + '' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTrailingTakeProfitCombo := ''
 
@@ -182,25 +160,25 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
     if (providerType == 'copytrader')
         _message :=
              zignalyCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyLongCommonAlertMessage +
-             zigsep +
-             zigquote + 'positionSizePercentageFromQuoteTotal' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
+             ',' +
+             '"' + 'positionSizePercentageFromQuoteTotal' + '"' + ':' + '"' + '' +  _entryQuantityContractsPercentStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
     else // 'signalprovider'
         _message :=
              zignalyCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyLongCommonAlertMessage +
-             zigsep +
-             zigquote + 'positionSizeQuote' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsUSDTStr + zigquote +
+             ',' +
+             '"' + 'positionSizeQuote' + '"' + ':' + '"' + '' +  _entryQuantityContractsUSDTStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
 
-    getMessageWithKey (_message, key, partial, alertType)
+    getMessageWithKey (_message, key, partial)
 
 // @function Returns partial alert_message for opening short entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -239,8 +217,6 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
     if (na(p_positionSizeQuote))
         p_positionSizeQuote := p_currentCapital
 
-    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
-
     bool p_stopLoss = stopLoss
     bool p_takeProfit = takeProfit
     bool p_trailingStopLoss = trailingStopLoss
@@ -281,7 +257,7 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
     string _zignaleStopLossCombo = ''
     string _zignaleTakeProfitCombo = ''
     string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'entry' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
+    _zignalyShortCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'entry' + '"' + ',' + '"' + 'side' + '"' + ':' + '"' + 'short' + '"' + ',' + '"' + 'orderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -289,15 +265,15 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
     _entryQuantityContractsPercentStr = str.tostring(_entryQuantityContractsPercent, '0.' + priceDecimalDigitsString)
 
     if p_stopLoss and integration == 'hybrid'
-        _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '"' + ':' + '"' + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
-        _zignaleTakeProfitCombo := zigsep + zigquote + 'takeProfitPercentage1' + zigquote + zigequals + zigquote + '-' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleTakeProfitCombo := ',' + '"' + 'takeProfitPercentage1' + '"' + ':' + '"' + '-' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTakeProfitCombo := ''
     if p_trailingStopLoss and integration == 'hybrid'
-        _zignaleTrailingTakeProfitCombo := zigsep + zigquote + 'trailingStopDistancePercentage' + zigquote + zigequals + zigquote + '' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + zigquote + zigsep + zigquote + 'trailingStopTriggerPercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'trailingStopDistancePercentage' + '"' + ':' + '"' + '' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '"' + ',' + '"' + 'trailingStopTriggerPercentage' + '"' + ':' + '"' + '-' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTrailingTakeProfitCombo := ''
 
@@ -307,25 +283,25 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
     if (providerType == 'copytrader')
         _message :=
              zignalyCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyShortCommonAlertMessage +
-             zigsep +
-             zigquote + 'positionSizePercentageFromQuoteTotal' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
+             ',' +
+             '"' + 'positionSizePercentageFromQuoteTotal' + '"' + ':' + '"' + '' +  _entryQuantityContractsPercentStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
     else // 'signalprovider'
         _message :=
              zignalyCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyShortCommonAlertMessage +
-             zigsep +
-             zigquote + 'positionSizeQuote' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsUSDTStr + zigquote +
+             ',' +
+             '"' + 'positionSizeQuote' + '"' + ':' + '"' + '' +  _entryQuantityContractsUSDTStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
 
-    getMessageWithKey (_message, key, partial, alertType)
+    getMessageWithKey (_message, key, partial)
 
 // @function Returns partial alert_message for opening reverse long entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -364,8 +340,6 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
     if (na(p_positionSizeQuote))
         p_positionSizeQuote := p_currentCapital
 
-    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
-
     bool p_stopLoss = stopLoss
     bool p_takeProfit = takeProfit
     bool p_trailingStopLoss = trailingStopLoss
@@ -406,8 +380,8 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
     string _zignaleStopLossCombo = ''
     string _zignaleTakeProfitCombo = ''
     string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyReverseExitCommonAlertMessage = zigquote + 'exitSide' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'exitOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote
-    _zignalyLongCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'reverse' + zigquote + zigsep + zigquote + 'entrySide' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'entryOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
+    _zignalyReverseExitCommonAlertMessage = '"' + 'exitSide' + '"' + ':' + '"' + 'short' + '"' + ',' + '"' + 'exitOrderType' + '"' + ':' + '"' + 'market' + '"'
+    _zignalyLongCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'reverse' + '"' + ',' + '"' + 'entrySide' + '"' + ':' + '"' + 'long' + '"' + ',' + '"' + 'entryOrderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -415,15 +389,15 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
     _entryQuantityContractsPercentStr = str.tostring(_entryQuantityContractsPercent, '0.' + priceDecimalDigitsString)
 
     if p_stopLoss and integration == 'hybrid'
-        _zignaleStopLossCombo := zigsep + zigquote + 'entryStopLossPercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleStopLossCombo := ',' + '"' + 'entryStopLossPercentage' + '"' + ':' + '"' + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
-        _zignaleTakeProfitCombo := zigsep + zigquote + 'entryTakeProfitPercentage1' + zigquote + zigequals + zigquote + '' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleTakeProfitCombo := ',' + '"' + 'entryTakeProfitPercentage1' + '"' + ':' + '"' + '' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTakeProfitCombo := ''
     if p_trailingStopLoss and integration == 'hybrid'
-        _zignaleTrailingTakeProfitCombo := zigsep + zigquote + 'entryTrailingStopDistancePercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + zigquote + zigsep + zigquote + 'entryTrailingStopTriggerPercentage' + zigquote + zigequals + zigquote + '' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'entryTrailingStopDistancePercentage' + '"' + ':' + '"' + '-' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '"' + ',' + '"' + 'entryTrailingStopTriggerPercentage' + '"' + ':' + '"' + '' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTrailingTakeProfitCombo := ''
 
@@ -433,29 +407,29 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
     if (providerType == 'copytrader')
         _message :=
              zignalyCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyReverseExitCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyLongCommonAlertMessage +
-             zigsep +
-             zigquote + 'entryPositionSizePercentage' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
+             ',' +
+             '"' + 'entryPositionSizePercentage' + '"' + ':' + '"' + '' +  _entryQuantityContractsPercentStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
     else // 'signalprovider'
         _message :=
              zignalyCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyReverseExitCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyLongCommonAlertMessage +
-             zigsep +
-             zigquote + 'entryPositionSizeQuote' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsUSDTStr + zigquote +
+             ',' +
+             '"' + 'entryPositionSizeQuote' + '"' + ':' + '"' + '' +  _entryQuantityContractsUSDTStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
 
-    getMessageWithKey (_message, key, partial, alertType)
+    getMessageWithKey (_message, key, partial)
 
 // @function Returns partial alert_message for opening reverse short entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -494,8 +468,6 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
     if (na(p_positionSizeQuote))
         p_positionSizeQuote := p_currentCapital
 
-    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
-
     bool p_stopLoss = stopLoss
     bool p_takeProfit = takeProfit
     bool p_trailingStopLoss = trailingStopLoss
@@ -536,8 +508,8 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
     string _zignaleStopLossCombo = ''
     string _zignaleTakeProfitCombo = ''
     string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyReverseExitCommonAlertMessage = zigquote + 'exitSide' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'exitOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote
-    _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'reverse' + zigquote + zigsep + zigquote + 'entrySide' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'entryOrderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
+    _zignalyReverseExitCommonAlertMessage = '"' + 'exitSide' + '"' + ':' + '"' + 'long' + '"' + ',' + '"' + 'exitOrderType' + '"' + ':' + '"' + 'market' + '"'
+    _zignalyShortCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'reverse' + '"' + ',' + '"' + 'entrySide' + '"' + ':' + '"' + 'short' + '"' + ',' + '"' + 'entryOrderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -545,15 +517,15 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
     _entryQuantityContractsPercentStr = str.tostring(_entryQuantityContractsPercent, '0.' + priceDecimalDigitsString)
 
     if p_stopLoss and integration == 'hybrid'
-        _zignaleStopLossCombo := zigsep + zigquote + 'entryStopLossPercentage' + zigquote + zigequals + zigquote + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleStopLossCombo := ',' + '"' + 'entryStopLossPercentage' + '"' + ':' + '"' + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
-        _zignaleTakeProfitCombo := zigsep + zigquote + 'entryTakeProfitPercentage1' + zigquote + zigequals + zigquote + '-' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleTakeProfitCombo := ',' + '"' + 'entryTakeProfitPercentage1' + '"' + ':' + '"' + '-' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTakeProfitCombo := ''
     if p_trailingStopLoss and integration == 'hybrid'
-        _zignaleTrailingTakeProfitCombo := zigsep + zigquote + 'entryTrailingStopDistancePercentage' + zigquote + zigequals + zigquote + '' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + zigquote + zigsep + zigquote + 'entryTrailingStopTriggerPercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'entryTrailingStopDistancePercentage' + '"' + ':' + '"' + '' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '"' + ',' + '"' + 'entryTrailingStopTriggerPercentage' + '"' + ':' + '"' + '-' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTrailingTakeProfitCombo := ''
 
@@ -563,29 +535,29 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
     if (providerType == 'copytrader')
         _message :=
              zignalyCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyReverseExitCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyShortCommonAlertMessage +
-             zigsep +
-             zigquote + 'entryPositionSizePercentage' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
+             ',' +
+             '"' + 'entryPositionSizePercentage' + '"' + ':' + '"' + '' +  _entryQuantityContractsPercentStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
     else // 'signalprovider'
         _message :=
              zignalyCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyReverseExitCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyShortCommonAlertMessage +
-             zigsep +
-             zigquote + 'entryPositionSizeQuote' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsUSDTStr + zigquote +
+             ',' +
+             '"' + 'entryPositionSizeQuote' + '"' + ':' + '"' + '' +  _entryQuantityContractsUSDTStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
 
-    getMessageWithKey (_message, key, partial, alertType)
+    getMessageWithKey (_message, key, partial)
 
 // @function Returns partial alert_message for closing long entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -604,15 +576,12 @@ export longExit (string key = na, string exchange = na, string exchangeAccountTy
     if (na(p_signalId))
         p_signalId := 'LONG-' + getZignalyPair(pair)
 
-
-    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
-
-    _zignalyLongExitCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'exit' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
+    _zignalyLongExitCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'exit' + '"' + ',' + '"' + 'side' + '"' + ':' + '"' + 'long' + '"' + ',' + '"' + 'orderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
 
     string _message = ''
-    _message := zignalyCommonAlertMessage + zigsep + _zignalyLongExitCommonAlertMessage
+    _message := zignalyCommonAlertMessage + ',' + _zignalyLongExitCommonAlertMessage
 
-    getMessageWithKey (_message, key, partial, alertType)
+    getMessageWithKey (_message, key, partial)
 
 // @function Returns partial alert_message for closing short entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -631,15 +600,12 @@ export shortExit (string key = na, string exchange = na, string exchangeAccountT
     if (na(p_signalId))
         p_signalId := 'SHORT-' + getZignalyPair(pair)
 
-
-    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
-
-    _zignalyShortExitCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'exit' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
+    _zignalyShortExitCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'exit' + '"' + ',' + '"' + 'side' + '"' + ':' + '"' + 'short' + '"' + ',' + '"' + 'orderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
 
     string _message = ''
-    _message := zignalyCommonAlertMessage + zigsep + _zignalyShortExitCommonAlertMessage
+    _message := zignalyCommonAlertMessage + ',' + _zignalyShortExitCommonAlertMessage
 
-    getMessageWithKey (_message, key, partial, alertType)
+    getMessageWithKey (_message, key, partial)
 
 // @function Returns partial alert_message for updating long entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -677,8 +643,6 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
 
     float p_positionSizeQuote = positionSizeQuote
 
-    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
-
     bool p_stopLoss = stopLoss
     bool p_takeProfit = takeProfit
     bool p_trailingStopLoss = trailingStopLoss
@@ -722,7 +686,7 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
     string _zignaleStopLossCombo = ''
     string _zignaleTakeProfitCombo = ''
     string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyLongCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'update' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'long' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
+    _zignalyLongCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'update' + '"' + ',' + '"' + 'side' + '"' + ':' + '"' + 'long' + '"' + ',' + '"' + 'orderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -731,17 +695,17 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
 
     if p_stopLoss and integration == 'hybrid'
         if (na(breakEvenPercentage))
-            _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
+            _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '"' + ':' + '"' + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
         else
-            _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '' + str.tostring(nz(breakEvenPercentage), '0.' + priceDecimalDigitsString) + zigquote
+            _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '"' + ':' + '"' + '' + str.tostring(nz(breakEvenPercentage), '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
-        _zignaleTakeProfitCombo := zigsep + zigquote + 'takeProfitPercentage1' + zigquote + zigequals + zigquote + '' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleTakeProfitCombo := ',' + '"' + 'takeProfitPercentage1' + '"' + ':' + '"' + '' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTakeProfitCombo := ''
     if p_trailingStopLoss and integration == 'hybrid'
-        _zignaleTrailingTakeProfitCombo := zigsep + zigquote + 'trailingStopDistancePercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + zigquote + zigsep + zigquote + 'trailingStopTriggerPercentage' + zigquote + zigequals + zigquote + '' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'trailingStopDistancePercentage' + '"' + ':' + '"' + '-' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '"' + ',' + '"' + 'trailingStopTriggerPercentage' + '"' + ':' + '"' + '' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTrailingTakeProfitCombo := ''
 
@@ -751,23 +715,23 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
     if ((providerType == 'copytrader') and (not(na(p_positionSizeQuote))))
         _message :=
              zignalyCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyLongCommonAlertMessage +
-             zigsep +
-             zigquote + 'positionSizePercentageFromQuoteTotal' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
+             ',' +
+             '"' + 'positionSizePercentageFromQuoteTotal' + '"' + ':' + '"' + '' +  _entryQuantityContractsPercentStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
     else // 'signalprovider'
         _message :=
              zignalyCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyLongCommonAlertMessage +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
 
-    getMessageWithKey (_message, key, partial, alertType)
+    getMessageWithKey (_message, key, partial)
 
 // @function Returns partial alert_message for updating short entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
@@ -805,8 +769,6 @@ export updateShortEntry (string key = na, string providerType = 'copytrader', st
 
     float p_positionSizeQuote = positionSizeQuote
 
-    [zigsep, zigquote, zigequals] = getZignalySeparators (alertType)
-
     bool p_stopLoss = stopLoss
     bool p_takeProfit = takeProfit
     bool p_trailingStopLoss = trailingStopLoss
@@ -850,7 +812,7 @@ export updateShortEntry (string key = na, string providerType = 'copytrader', st
     string _zignaleStopLossCombo = ''
     string _zignaleTakeProfitCombo = ''
     string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyShortCommonAlertMessage = zigquote + 'type' + zigquote + zigequals + zigquote + 'update' + zigquote + zigsep + zigquote + 'side' + zigquote + zigequals + zigquote + 'short' + zigquote + zigsep + zigquote + 'orderType' + zigquote + zigequals + zigquote + 'market' + zigquote + zigsep + zigquote + 'signalId' + zigquote + zigequals + zigquote + p_signalId + zigquote
+    _zignalyShortCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'update' + '"' + ',' + '"' + 'side' + '"' + ':' + '"' + 'short' + '"' + ',' + '"' + 'orderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -859,17 +821,17 @@ export updateShortEntry (string key = na, string providerType = 'copytrader', st
 
     if p_stopLoss and integration == 'hybrid'
         if (na(breakEvenPercentage))
-            _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
+            _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '"' + ':' + '"' + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
         else
-            _zignaleStopLossCombo := zigsep + zigquote + 'stopLossPercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + zigquote
+            _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '"' + ':' + '"' + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
-        _zignaleTakeProfitCombo := zigsep + zigquote + 'takeProfitPercentage1' + zigquote + zigequals + zigquote + '-' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleTakeProfitCombo := ',' + '"' + 'takeProfitPercentage1' + '"' + ':' + '"' + '-' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTakeProfitCombo := ''
     if p_trailingStopLoss and integration == 'hybrid'
-        _zignaleTrailingTakeProfitCombo := zigsep + zigquote + 'trailingStopDistancePercentage' + zigquote + zigequals + zigquote + '' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + zigquote + zigsep + zigquote + 'trailingStopTriggerPercentage' + zigquote + zigequals + zigquote + '-' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + zigquote
+        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'trailingStopDistancePercentage' + '"' + ':' + '"' + '' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '"' + ',' + '"' + 'trailingStopTriggerPercentage' + '"' + ':' + '"' + '-' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTrailingTakeProfitCombo := ''
 
@@ -879,23 +841,23 @@ export updateShortEntry (string key = na, string providerType = 'copytrader', st
     if ((providerType == 'copytrader') and (not(na(p_positionSizeQuote))))
         _message :=
              zignalyCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyShortCommonAlertMessage +
-             zigsep +
-             zigquote + 'positionSizePercentageFromQuoteTotal' + zigquote + zigequals + zigquote + '' +  _entryQuantityContractsPercentStr + zigquote +
+             ',' +
+             '"' + 'positionSizePercentageFromQuoteTotal' + '"' + ':' + '"' + '' +  _entryQuantityContractsPercentStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
     else // 'signalprovider'
         _message :=
              zignalyCommonAlertMessage +
-             zigsep +
+             ',' +
              _zignalyShortCommonAlertMessage +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
 
-    getMessageWithKey (_message, key, partial, alertType)
+    getMessageWithKey (_message, key, partial)
 
 // @function Returns partial alert_message for updating reverse long entries in Zignaly
 // @param key Service secret key (It is found in the Edit tab of your service.)
