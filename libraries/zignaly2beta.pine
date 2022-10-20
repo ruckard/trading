@@ -36,7 +36,7 @@ getZignalyCommonAlertMessage (string exchange='zignaly', string exchangeAccountT
 
     leverage_str = str.tostring(p_leverage)
 
-    zignalyCommonAlertMessage = '"' + 'exchange' + '"' + ':' + '"' + p_exchange + '"' + ',' + '"' + 'pair' + '"' + ':' + '"' + '' + p_pair + '"' + ',' + '"' + 'leverage' + '"' + ':' + '"' + leverage_str + '"' + ',' + '"' + 'multiplyByLeverage' + '"' + ':' + '"' + p_multiplyByLeverage + '"'
+    zignalyCommonAlertMessage = '"' + 'exchange' + '":"' + p_exchange + '","' + 'pair' + '":"' + '' + p_pair + '","' + 'leverage' + '":"' + leverage_str + '","' + 'multiplyByLeverage' + '":"' + p_multiplyByLeverage + '"'
     zignalyCommonAlertMessage
 
 priceDecimalDigitsZeroString (int priceDecimalDigits=2) =>
@@ -51,7 +51,7 @@ getMessageWithKey (string message='', string key='NON_DEFINED_SECRET_KEY', bool 
     if (na(p_key))
         p_key := 'NON_DEFINED_SECRET_KEY'
 
-    partialMessage = message + ',' + '"' + 'key' + '"' + ':' + '"' + p_key + '"'
+    partialMessage = message + ',' + '"' + 'key' + '":"' + p_key + '"'
     if (partial)
         partialMessage
     else // Complete message
@@ -134,7 +134,7 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
     string _zignaleStopLossCombo = ''
     string _zignaleTakeProfitCombo = ''
     string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyLongCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'entry' + '"' + ',' + '"' + 'side' + '"' + ':' + '"' + 'long' + '"' + ',' + '"' + 'orderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
+    _zignalyLongCommonAlertMessage = '"' + 'type' + '":"' + 'entry' + '","' + 'side' + '":"' + 'long' + '","' + 'orderType' + '":"' + 'market' + '","' + 'signalId' + '":"' + p_signalId + '"'
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -142,15 +142,15 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
     _entryQuantityContractsPercentStr = str.tostring(_entryQuantityContractsPercent, '0.' + priceDecimalDigitsString)
 
     if p_stopLoss and integration == 'hybrid'
-        _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '"' + ':' + '"' + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
+        _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '":"' + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
-        _zignaleTakeProfitCombo := ',' + '"' + 'takeProfitPercentage1' + '"' + ':' + '"' + '' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
+        _zignaleTakeProfitCombo := ',' + '"' + 'takeProfitPercentage1' + '":"' + '' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTakeProfitCombo := ''
     if p_trailingStopLoss and integration == 'hybrid'
-        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'trailingStopDistancePercentage' + '"' + ':' + '"' + '-' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '"' + ',' + '"' + 'trailingStopTriggerPercentage' + '"' + ':' + '"' + '' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
+        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'trailingStopDistancePercentage' + '":"' + '-' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '","' + 'trailingStopTriggerPercentage' + '":"' + '' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTrailingTakeProfitCombo := ''
 
@@ -163,7 +163,7 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
              ',' +
              _zignalyLongCommonAlertMessage +
              ',' +
-             '"' + 'positionSizePercentageFromQuoteTotal' + '"' + ':' + '"' + '' +  _entryQuantityContractsPercentStr + '"' +
+             '"' + 'positionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
@@ -173,7 +173,7 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
              ',' +
              _zignalyLongCommonAlertMessage +
              ',' +
-             '"' + 'positionSizeQuote' + '"' + ':' + '"' + '' +  _entryQuantityContractsUSDTStr + '"' +
+             '"' + 'positionSizeQuote' + '":"' + '' +  _entryQuantityContractsUSDTStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
@@ -257,7 +257,7 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
     string _zignaleStopLossCombo = ''
     string _zignaleTakeProfitCombo = ''
     string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyShortCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'entry' + '"' + ',' + '"' + 'side' + '"' + ':' + '"' + 'short' + '"' + ',' + '"' + 'orderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
+    _zignalyShortCommonAlertMessage = '"' + 'type' + '":"' + 'entry' + '","' + 'side' + '":"' + 'short' + '","' + 'orderType' + '":"' + 'market' + '","' + 'signalId' + '":"' + p_signalId + '"'
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -265,15 +265,15 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
     _entryQuantityContractsPercentStr = str.tostring(_entryQuantityContractsPercent, '0.' + priceDecimalDigitsString)
 
     if p_stopLoss and integration == 'hybrid'
-        _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '"' + ':' + '"' + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
+        _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '":"' + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
-        _zignaleTakeProfitCombo := ',' + '"' + 'takeProfitPercentage1' + '"' + ':' + '"' + '-' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
+        _zignaleTakeProfitCombo := ',' + '"' + 'takeProfitPercentage1' + '":"' + '-' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTakeProfitCombo := ''
     if p_trailingStopLoss and integration == 'hybrid'
-        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'trailingStopDistancePercentage' + '"' + ':' + '"' + '' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '"' + ',' + '"' + 'trailingStopTriggerPercentage' + '"' + ':' + '"' + '-' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
+        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'trailingStopDistancePercentage' + '":"' + '' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '","' + 'trailingStopTriggerPercentage' + '":"' + '-' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTrailingTakeProfitCombo := ''
 
@@ -286,7 +286,7 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
              ',' +
              _zignalyShortCommonAlertMessage +
              ',' +
-             '"' + 'positionSizePercentageFromQuoteTotal' + '"' + ':' + '"' + '' +  _entryQuantityContractsPercentStr + '"' +
+             '"' + 'positionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
@@ -296,7 +296,7 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
              ',' +
              _zignalyShortCommonAlertMessage +
              ',' +
-             '"' + 'positionSizeQuote' + '"' + ':' + '"' + '' +  _entryQuantityContractsUSDTStr + '"' +
+             '"' + 'positionSizeQuote' + '":"' + '' +  _entryQuantityContractsUSDTStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
@@ -380,8 +380,8 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
     string _zignaleStopLossCombo = ''
     string _zignaleTakeProfitCombo = ''
     string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyReverseExitCommonAlertMessage = '"' + 'exitSide' + '"' + ':' + '"' + 'short' + '"' + ',' + '"' + 'exitOrderType' + '"' + ':' + '"' + 'market' + '"'
-    _zignalyLongCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'reverse' + '"' + ',' + '"' + 'entrySide' + '"' + ':' + '"' + 'long' + '"' + ',' + '"' + 'entryOrderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
+    _zignalyReverseExitCommonAlertMessage = '"' + 'exitSide' + '":"' + 'short' + '","' + 'exitOrderType' + '":"' + 'market' + '"'
+    _zignalyLongCommonAlertMessage = '"' + 'type' + '":"' + 'reverse' + '","' + 'entrySide' + '":"' + 'long' + '","' + 'entryOrderType' + '":"' + 'market' + '","' + 'signalId' + '":"' + p_signalId + '"'
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -389,15 +389,15 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
     _entryQuantityContractsPercentStr = str.tostring(_entryQuantityContractsPercent, '0.' + priceDecimalDigitsString)
 
     if p_stopLoss and integration == 'hybrid'
-        _zignaleStopLossCombo := ',' + '"' + 'entryStopLossPercentage' + '"' + ':' + '"' + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
+        _zignaleStopLossCombo := ',' + '"' + 'entryStopLossPercentage' + '":"' + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
-        _zignaleTakeProfitCombo := ',' + '"' + 'entryTakeProfitPercentage1' + '"' + ':' + '"' + '' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
+        _zignaleTakeProfitCombo := ',' + '"' + 'entryTakeProfitPercentage1' + '":"' + '' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTakeProfitCombo := ''
     if p_trailingStopLoss and integration == 'hybrid'
-        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'entryTrailingStopDistancePercentage' + '"' + ':' + '"' + '-' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '"' + ',' + '"' + 'entryTrailingStopTriggerPercentage' + '"' + ':' + '"' + '' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
+        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'entryTrailingStopDistancePercentage' + '":"' + '-' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '","' + 'entryTrailingStopTriggerPercentage' + '":"' + '' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTrailingTakeProfitCombo := ''
 
@@ -412,7 +412,7 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
              ',' +
              _zignalyLongCommonAlertMessage +
              ',' +
-             '"' + 'entryPositionSizePercentage' + '"' + ':' + '"' + '' +  _entryQuantityContractsPercentStr + '"' +
+             '"' + 'entryPositionSizePercentage' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
@@ -424,7 +424,7 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
              ',' +
              _zignalyLongCommonAlertMessage +
              ',' +
-             '"' + 'entryPositionSizeQuote' + '"' + ':' + '"' + '' +  _entryQuantityContractsUSDTStr + '"' +
+             '"' + 'entryPositionSizeQuote' + '":"' + '' +  _entryQuantityContractsUSDTStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
@@ -508,8 +508,8 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
     string _zignaleStopLossCombo = ''
     string _zignaleTakeProfitCombo = ''
     string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyReverseExitCommonAlertMessage = '"' + 'exitSide' + '"' + ':' + '"' + 'long' + '"' + ',' + '"' + 'exitOrderType' + '"' + ':' + '"' + 'market' + '"'
-    _zignalyShortCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'reverse' + '"' + ',' + '"' + 'entrySide' + '"' + ':' + '"' + 'short' + '"' + ',' + '"' + 'entryOrderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
+    _zignalyReverseExitCommonAlertMessage = '"' + 'exitSide' + '":"' + 'long' + '","' + 'exitOrderType' + '":"' + 'market' + '"'
+    _zignalyShortCommonAlertMessage = '"' + 'type' + '":"' + 'reverse' + '","' + 'entrySide' + '":"' + 'short' + '","' + 'entryOrderType' + '":"' + 'market' + '","' + 'signalId' + '":"' + p_signalId + '"'
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -517,15 +517,15 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
     _entryQuantityContractsPercentStr = str.tostring(_entryQuantityContractsPercent, '0.' + priceDecimalDigitsString)
 
     if p_stopLoss and integration == 'hybrid'
-        _zignaleStopLossCombo := ',' + '"' + 'entryStopLossPercentage' + '"' + ':' + '"' + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
+        _zignaleStopLossCombo := ',' + '"' + 'entryStopLossPercentage' + '":"' + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
-        _zignaleTakeProfitCombo := ',' + '"' + 'entryTakeProfitPercentage1' + '"' + ':' + '"' + '-' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
+        _zignaleTakeProfitCombo := ',' + '"' + 'entryTakeProfitPercentage1' + '":"' + '-' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTakeProfitCombo := ''
     if p_trailingStopLoss and integration == 'hybrid'
-        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'entryTrailingStopDistancePercentage' + '"' + ':' + '"' + '' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '"' + ',' + '"' + 'entryTrailingStopTriggerPercentage' + '"' + ':' + '"' + '-' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
+        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'entryTrailingStopDistancePercentage' + '":"' + '' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '","' + 'entryTrailingStopTriggerPercentage' + '":"' + '-' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTrailingTakeProfitCombo := ''
 
@@ -540,7 +540,7 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
              ',' +
              _zignalyShortCommonAlertMessage +
              ',' +
-             '"' + 'entryPositionSizePercentage' + '"' + ':' + '"' + '' +  _entryQuantityContractsPercentStr + '"' +
+             '"' + 'entryPositionSizePercentage' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
@@ -552,7 +552,7 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
              ',' +
              _zignalyShortCommonAlertMessage +
              ',' +
-             '"' + 'entryPositionSizeQuote' + '"' + ':' + '"' + '' +  _entryQuantityContractsUSDTStr + '"' +
+             '"' + 'entryPositionSizeQuote' + '":"' + '' +  _entryQuantityContractsUSDTStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
@@ -576,7 +576,7 @@ export longExit (string key = na, string exchange = na, string exchangeAccountTy
     if (na(p_signalId))
         p_signalId := 'LONG-' + getZignalyPair(pair)
 
-    _zignalyLongExitCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'exit' + '"' + ',' + '"' + 'side' + '"' + ':' + '"' + 'long' + '"' + ',' + '"' + 'orderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
+    _zignalyLongExitCommonAlertMessage = '"' + 'type' + '":"' + 'exit' + '","' + 'side' + '":"' + 'long' + '","' + 'orderType' + '":"' + 'market' + '","' + 'signalId' + '":"' + p_signalId + '"'
 
     string _message = ''
     _message := zignalyCommonAlertMessage + ',' + _zignalyLongExitCommonAlertMessage
@@ -600,7 +600,7 @@ export shortExit (string key = na, string exchange = na, string exchangeAccountT
     if (na(p_signalId))
         p_signalId := 'SHORT-' + getZignalyPair(pair)
 
-    _zignalyShortExitCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'exit' + '"' + ',' + '"' + 'side' + '"' + ':' + '"' + 'short' + '"' + ',' + '"' + 'orderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
+    _zignalyShortExitCommonAlertMessage = '"' + 'type' + '":"' + 'exit' + '","' + 'side' + '":"' + 'short' + '","' + 'orderType' + '":"' + 'market' + '","' + 'signalId' + '":"' + p_signalId + '"'
 
     string _message = ''
     _message := zignalyCommonAlertMessage + ',' + _zignalyShortExitCommonAlertMessage
@@ -686,7 +686,7 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
     string _zignaleStopLossCombo = ''
     string _zignaleTakeProfitCombo = ''
     string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyLongCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'update' + '"' + ',' + '"' + 'side' + '"' + ':' + '"' + 'long' + '"' + ',' + '"' + 'orderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
+    _zignalyLongCommonAlertMessage = '"' + 'type' + '":"' + 'update' + '","' + 'side' + '":"' + 'long' + '","' + 'orderType' + '":"' + 'market' + '","' + 'signalId' + '":"' + p_signalId + '"'
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -695,17 +695,17 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
 
     if p_stopLoss and integration == 'hybrid'
         if (na(breakEvenPercentage))
-            _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '"' + ':' + '"' + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
+            _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '":"' + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
         else
-            _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '"' + ':' + '"' + '' + str.tostring(nz(breakEvenPercentage), '0.' + priceDecimalDigitsString) + '"'
+            _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '":"' + '' + str.tostring(nz(breakEvenPercentage), '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
-        _zignaleTakeProfitCombo := ',' + '"' + 'takeProfitPercentage1' + '"' + ':' + '"' + '' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
+        _zignaleTakeProfitCombo := ',' + '"' + 'takeProfitPercentage1' + '":"' + '' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTakeProfitCombo := ''
     if p_trailingStopLoss and integration == 'hybrid'
-        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'trailingStopDistancePercentage' + '"' + ':' + '"' + '-' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '"' + ',' + '"' + 'trailingStopTriggerPercentage' + '"' + ':' + '"' + '' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
+        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'trailingStopDistancePercentage' + '":"' + '-' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '","' + 'trailingStopTriggerPercentage' + '":"' + '' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTrailingTakeProfitCombo := ''
 
@@ -718,7 +718,7 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
              ',' +
              _zignalyLongCommonAlertMessage +
              ',' +
-             '"' + 'positionSizePercentageFromQuoteTotal' + '"' + ':' + '"' + '' +  _entryQuantityContractsPercentStr + '"' +
+             '"' + 'positionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
@@ -812,7 +812,7 @@ export updateShortEntry (string key = na, string providerType = 'copytrader', st
     string _zignaleStopLossCombo = ''
     string _zignaleTakeProfitCombo = ''
     string _zignaleTrailingTakeProfitCombo = ''
-    _zignalyShortCommonAlertMessage = '"' + 'type' + '"' + ':' + '"' + 'update' + '"' + ',' + '"' + 'side' + '"' + ':' + '"' + 'short' + '"' + ',' + '"' + 'orderType' + '"' + ':' + '"' + 'market' + '"' + ',' + '"' + 'signalId' + '"' + ':' + '"' + p_signalId + '"'
+    _zignalyShortCommonAlertMessage = '"' + 'type' + '":"' + 'update' + '","' + 'side' + '":"' + 'short' + '","' + 'orderType' + '":"' + 'market' + '","' + 'signalId' + '":"' + p_signalId + '"'
     float _floatEntryQuantityContractsUSDT = p_positionSizeQuote
     _entryQuantityContractsUSDTStr = str.tostring(p_positionSizeQuote, '0.' + priceDecimalDigitsString)
     float _floatCurrentCapital = p_currentCapital
@@ -821,17 +821,17 @@ export updateShortEntry (string key = na, string providerType = 'copytrader', st
 
     if p_stopLoss and integration == 'hybrid'
         if (na(breakEvenPercentage))
-            _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '"' + ':' + '"' + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
+            _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '":"' + '' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
         else
-            _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '"' + ':' + '"' + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
+            _zignaleStopLossCombo := ',' + '"' + 'stopLossPercentage' + '":"' + '-' + str.tostring(nz(stopLossPercentage), '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleStopLossCombo := ''
     if p_takeProfit and integration == 'hybrid'
-        _zignaleTakeProfitCombo := ',' + '"' + 'takeProfitPercentage1' + '"' + ':' + '"' + '-' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
+        _zignaleTakeProfitCombo := ',' + '"' + 'takeProfitPercentage1' + '":"' + '-' + str.tostring(takeProfitPercentage1, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTakeProfitCombo := ''
     if p_trailingStopLoss and integration == 'hybrid'
-        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'trailingStopDistancePercentage' + '"' + ':' + '"' + '' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '"' + ',' + '"' + 'trailingStopTriggerPercentage' + '"' + ':' + '"' + '-' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
+        _zignaleTrailingTakeProfitCombo := ',' + '"' + 'trailingStopDistancePercentage' + '":"' + '' + str.tostring(trailingStopDistancePercentage, '0.' + priceDecimalDigitsString) + '","' + 'trailingStopTriggerPercentage' + '":"' + '-' + str.tostring(trailingStopTriggerPercentage, '0.' + priceDecimalDigitsString) + '"'
     else
         _zignaleTrailingTakeProfitCombo := ''
 
@@ -844,7 +844,7 @@ export updateShortEntry (string key = na, string providerType = 'copytrader', st
              ',' +
              _zignalyShortCommonAlertMessage +
              ',' +
-             '"' + 'positionSizePercentageFromQuoteTotal' + '"' + ':' + '"' + '' +  _entryQuantityContractsPercentStr + '"' +
+             '"' + 'positionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
              _zignaleStopLossCombo +
              _zignaleTakeProfitCombo +
              _zignaleTrailingTakeProfitCombo
