@@ -58,9 +58,10 @@ getZignalyCommonAlertMessage (string exchange='zignaly', string exchangeAccountT
 
     leverage_str = str.tostring(p_leverage)
 
+    string quote_str = '"'
     zignalyCommonAlertMessage =
          '"' + 'exchange' + '":"' + p_exchange + '"'
-         + ',"' + 'pair' + '":"' + '' + p_pair + + '"'
+         + ',"' + 'pair' + '":"' + '' + p_pair + '"'
          + ',"' + 'leverage' + '":"' + leverage_str + '"'
          + ',"' + 'multiplyByLeverage' + '":"' + p_multiplyByLeverage + '"'
          + ',"' + 'hedgeMode' + '":"' + p_hedgeMode + '"'
