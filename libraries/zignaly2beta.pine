@@ -94,6 +94,10 @@ getMessageWithKey (string message='', string key='NON_DEFINED_SECRET_KEY', bool 
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
 // @param positionSizeQuote Entry Quantity that has already been calculated in USDT or base pair. Defaults to full currentCapital.
 // @param leverage Futures leverage. Defaults to 1.
+// @param multiplyByLeverage. Multiply invested amount by leverage. Defaults to true. (As the old behaviour in Profit Sharing 1.0.)
+// @param hedgeMode Hedge mode. For an specific pair it will allow us to open a position in the opposite direction even if there is already one open. Defaults to false.
+// @param ignoreOpenContractCheck Ignore Open Contract Check. Allows us to open all the positions that we want for the same pair and in the directions that we want. Defaults to false.
+// @param marginMode Margin mode. Either cross (Full account might be liquidated) or isolated (Current position would be liquidated but not full account). Defaults to cross.
 // @param takeProfit Take Profit switch. Defaults to false if no takeProfitPercentage1 has been given.
 // @param takeProfitPercentage1 Take Profit Percentage from average entry price. If used while takeProfit is undefined then takeProfit is turned on.
 // @param stopLoss Stop Loss switch. Defaults to false if no stopLossPercentage has been given.
@@ -203,6 +207,10 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
 // @param positionSizeQuote Entry Quantity that has already been calculated in USDT or base pair. Defaults to full currentCapital.
 // @param leverage Futures leverage. Defaults to 1.
+// @param multiplyByLeverage. Multiply invested amount by leverage. Defaults to true. (As the old behaviour in Profit Sharing 1.0.)
+// @param hedgeMode Hedge mode. For an specific pair it will allow us to open a position in the opposite direction even if there is already one open. Defaults to false.
+// @param ignoreOpenContractCheck Ignore Open Contract Check. Allows us to open all the positions that we want for the same pair and in the directions that we want. Defaults to false.
+// @param marginMode Margin mode. Either cross (Full account might be liquidated) or isolated (Current position would be liquidated but not full account). Defaults to cross.
 // @param takeProfit Take Profit switch. Defaults to false if no takeProfitPercentage1 has been given.
 // @param takeProfitPercentage1 Take Profit Percentage from average entry price. If used while takeProfit is undefined then takeProfit is turned on.
 // @param stopLoss Stop Loss switch. Defaults to false if no stopLossPercentage has been given.
@@ -312,6 +320,10 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
 // @param positionSizeQuote Entry Quantity that has already been calculated in USDT or base pair. Defaults to full currentCapital.
 // @param leverage Futures leverage. Defaults to 1.
+// @param multiplyByLeverage. Multiply invested amount by leverage. Defaults to true. (As the old behaviour in Profit Sharing 1.0.)
+// @param hedgeMode Hedge mode. For an specific pair it will allow us to open a position in the opposite direction even if there is already one open. Defaults to false.
+// @param ignoreOpenContractCheck Ignore Open Contract Check. Allows us to open all the positions that we want for the same pair and in the directions that we want. Defaults to false.
+// @param marginMode Margin mode. Either cross (Full account might be liquidated) or isolated (Current position would be liquidated but not full account). Defaults to cross.
 // @param takeProfit Take Profit switch. Defaults to false if no takeProfitPercentage1 has been given.
 // @param takeProfitPercentage1 Take Profit Percentage from average entry price. If used while takeProfit is undefined then takeProfit is turned on.
 // @param stopLoss Stop Loss switch. Defaults to false if no stopLossPercentage has been given.
@@ -424,6 +436,10 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
 // @param positionSizeQuote Entry Quantity that has already been calculated in USDT or base pair. Defaults to full currentCapital.
 // @param leverage Futures leverage. Defaults to 1.
+// @param multiplyByLeverage. Multiply invested amount by leverage. Defaults to true. (As the old behaviour in Profit Sharing 1.0.)
+// @param hedgeMode Hedge mode. For an specific pair it will allow us to open a position in the opposite direction even if there is already one open. Defaults to false.
+// @param ignoreOpenContractCheck Ignore Open Contract Check. Allows us to open all the positions that we want for the same pair and in the directions that we want. Defaults to false.
+// @param marginMode Margin mode. Either cross (Full account might be liquidated) or isolated (Current position would be liquidated but not full account). Defaults to cross.
 // @param takeProfit Take Profit switch. Defaults to false if no takeProfitPercentage1 has been given.
 // @param takeProfitPercentage1 Take Profit Percentage from average entry price. If used while takeProfit is undefined then takeProfit is turned on.
 // @param stopLoss Stop Loss switch. Defaults to false if no stopLossPercentage has been given.
@@ -534,6 +550,10 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
 // @param exchangeAccountType Either 'futures' or 'spot'. Defaults to 'futures'.
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
 // @param leverage Futures leverage. Defaults to 1.
+// @param multiplyByLeverage. Multiply invested amount by leverage. Defaults to true. (As the old behaviour in Profit Sharing 1.0.)
+// @param hedgeMode Hedge mode. For an specific pair it will allow us to open a position in the opposite direction even if there is already one open. Defaults to false.
+// @param ignoreOpenContractCheck Ignore Open Contract Check. Allows us to open all the positions that we want for the same pair and in the directions that we want. Defaults to false.
+// @param marginMode Margin mode. Either cross (Full account might be liquidated) or isolated (Current position would be liquidated but not full account). Defaults to cross.
 // @param alertType Alert type. Defaults to 'webhook'.
 // @param signalId Defaults to LONG-pair.
 // @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
@@ -558,6 +578,10 @@ export longExit (string key = na, string exchange = na, string exchangeAccountTy
 // @param exchangeAccountType Either 'futures' or 'spot'. Defaults to 'futures'.
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
 // @param leverage Futures leverage. Defaults to 1.
+// @param multiplyByLeverage. Multiply invested amount by leverage. Defaults to true. (As the old behaviour in Profit Sharing 1.0.)
+// @param hedgeMode Hedge mode. For an specific pair it will allow us to open a position in the opposite direction even if there is already one open. Defaults to false.
+// @param ignoreOpenContractCheck Ignore Open Contract Check. Allows us to open all the positions that we want for the same pair and in the directions that we want. Defaults to false.
+// @param marginMode Margin mode. Either cross (Full account might be liquidated) or isolated (Current position would be liquidated but not full account). Defaults to cross.
 // @param alertType Alert type. Defaults to 'webhook'.
 // @param signalId Defaults to SHORT-pair.
 // @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
@@ -584,6 +608,10 @@ export shortExit (string key = na, string exchange = na, string exchangeAccountT
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
 // @param positionSizeQuote Entry Quantity that has already been calculated in USDT or base pair. Defaults to full currentCapital. ( Ignored for Signal Provider. )
 // @param leverage Futures leverage. Defaults to 1.
+// @param multiplyByLeverage. Multiply invested amount by leverage. Defaults to true. (As the old behaviour in Profit Sharing 1.0.)
+// @param hedgeMode Hedge mode. For an specific pair it will allow us to open a position in the opposite direction even if there is already one open. Defaults to false.
+// @param ignoreOpenContractCheck Ignore Open Contract Check. Allows us to open all the positions that we want for the same pair and in the directions that we want. Defaults to false.
+// @param marginMode Margin mode. Either cross (Full account might be liquidated) or isolated (Current position would be liquidated but not full account). Defaults to cross.
 // @param takeProfit Take Profit switch. Defaults to false if no takeProfitPercentage1 has been given.
 // @param takeProfitPercentage1 Take Profit Percentage from average entry price. If used while takeProfit is undefined then takeProfit is turned on.
 // @param stopLoss Stop Loss switch. Defaults to false if no stopLossPercentage has been given.
@@ -698,6 +726,10 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
 // @param positionSizeQuote Entry Quantity that has already been calculated in USDT or base pair. Defaults to full currentCapital. ( Ignored for Signal Provider. )
 // @param leverage Futures leverage. Defaults to 1.
+// @param multiplyByLeverage. Multiply invested amount by leverage. Defaults to true. (As the old behaviour in Profit Sharing 1.0.)
+// @param hedgeMode Hedge mode. For an specific pair it will allow us to open a position in the opposite direction even if there is already one open. Defaults to false.
+// @param ignoreOpenContractCheck Ignore Open Contract Check. Allows us to open all the positions that we want for the same pair and in the directions that we want. Defaults to false.
+// @param marginMode Margin mode. Either cross (Full account might be liquidated) or isolated (Current position would be liquidated but not full account). Defaults to cross.
 // @param takeProfit Take Profit switch. Defaults to false if no takeProfitPercentage1 has been given.
 // @param takeProfitPercentage1 Take Profit Percentage from average entry price. If used while takeProfit is undefined then takeProfit is turned on.
 // @param stopLoss Stop Loss switch. Defaults to false if no stopLossPercentage has been given.
@@ -812,6 +844,10 @@ export updateShortEntry (string key = na, string providerType = 'copytrader', st
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
 // @param positionSizeQuote Entry Quantity that has already been calculated in USDT or base pair. Defaults to full currentCapital. ( Ignored for Signal Provider. )
 // @param leverage Futures leverage. Defaults to 1.
+// @param multiplyByLeverage. Multiply invested amount by leverage. Defaults to true. (As the old behaviour in Profit Sharing 1.0.)
+// @param hedgeMode Hedge mode. For an specific pair it will allow us to open a position in the opposite direction even if there is already one open. Defaults to false.
+// @param ignoreOpenContractCheck Ignore Open Contract Check. Allows us to open all the positions that we want for the same pair and in the directions that we want. Defaults to false.
+// @param marginMode Margin mode. Either cross (Full account might be liquidated) or isolated (Current position would be liquidated but not full account). Defaults to cross.
 // @param takeProfit Take Profit switch. Defaults to false if no takeProfitPercentage1 has been given.
 // @param takeProfitPercentage1 Take Profit Percentage from average entry price. If used while takeProfit is undefined then takeProfit is turned on.
 // @param stopLoss Stop Loss switch. Defaults to false if no stopLossPercentage has been given.
@@ -843,6 +879,10 @@ export updateReverseLongEntry (string key = na, string providerType = 'copytrade
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
 // @param positionSizeQuote Entry Quantity that has already been calculated in USDT or base pair. Defaults to full currentCapital. ( Ignored for Signal Provider. )
 // @param leverage Futures leverage. Defaults to 1.
+// @param multiplyByLeverage. Multiply invested amount by leverage. Defaults to true. (As the old behaviour in Profit Sharing 1.0.)
+// @param hedgeMode Hedge mode. For an specific pair it will allow us to open a position in the opposite direction even if there is already one open. Defaults to false.
+// @param ignoreOpenContractCheck Ignore Open Contract Check. Allows us to open all the positions that we want for the same pair and in the directions that we want. Defaults to false.
+// @param marginMode Margin mode. Either cross (Full account might be liquidated) or isolated (Current position would be liquidated but not full account). Defaults to cross.
 // @param takeProfit Take Profit switch. Defaults to false if no takeProfitPercentage1 has been given.
 // @param takeProfitPercentage1 Take Profit Percentage from average entry price. If used while takeProfit is undefined then takeProfit is turned on.
 // @param stopLoss Stop Loss switch. Defaults to false if no stopLossPercentage has been given.
@@ -872,6 +912,10 @@ export updateReverseShortEntry (string key = na, string providerType = 'copytrad
 // @param exchangeAccountType Either 'futures' or 'spot'. Defaults to 'futures'.
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
 // @param leverage Futures leverage. Defaults to 1.
+// @param multiplyByLeverage. Multiply invested amount by leverage. Defaults to true. (As the old behaviour in Profit Sharing 1.0.)
+// @param hedgeMode Hedge mode. For an specific pair it will allow us to open a position in the opposite direction even if there is already one open. Defaults to false.
+// @param ignoreOpenContractCheck Ignore Open Contract Check. Allows us to open all the positions that we want for the same pair and in the directions that we want. Defaults to false.
+// @param marginMode Margin mode. Either cross (Full account might be liquidated) or isolated (Current position would be liquidated but not full account). Defaults to cross.
 // @param alertType Alert type. Defaults to 'webhook'.
 // @param signalId Defaults to LONG-pair.
 // @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
@@ -891,6 +935,10 @@ export reverseLongExit (string key = na, string exchange = na, string exchangeAc
 // @param exchangeAccountType Either 'futures' or 'spot'. Defaults to 'futures'.
 // @param pair Pair. E.g. 'BTCUSDT'. Defaults to syminfo.basecurrency + syminfo.currency which in most of the cases it's the current chart pair.
 // @param leverage Futures leverage. Defaults to 1.
+// @param multiplyByLeverage. Multiply invested amount by leverage. Defaults to true. (As the old behaviour in Profit Sharing 1.0.)
+// @param hedgeMode Hedge mode. For an specific pair it will allow us to open a position in the opposite direction even if there is already one open. Defaults to false.
+// @param ignoreOpenContractCheck Ignore Open Contract Check. Allows us to open all the positions that we want for the same pair and in the directions that we want. Defaults to false.
+// @param marginMode Margin mode. Either cross (Full account might be liquidated) or isolated (Current position would be liquidated but not full account). Defaults to cross.
 // @param alertType Alert type. Defaults to 'webhook'.
 // @param signalId Defaults to SHORT-pair.
 // @param partial If set to true the signal will be open so that it's completed in the main script. If set to false the signal is ready to be used. Defaults to false.
