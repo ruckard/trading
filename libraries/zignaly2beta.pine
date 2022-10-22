@@ -868,7 +868,7 @@ export updateReverseLongEntry (string key = na, string providerType = 'copytrade
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    string _message = updateLongEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage, partial)
+    string _message = updateLongEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, multiplyByLeverage, hedgeMode, ignoreOpenContractCheck, marginMode, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage, partial)
 
     _message
 
@@ -903,7 +903,7 @@ export updateReverseShortEntry (string key = na, string providerType = 'copytrad
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    string _message = updateShortEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage, partial)
+    string _message = updateShortEntry (key, providerType, exchange, exchangeAccountType, pair, positionSizeQuote, leverage, multiplyByLeverage, hedgeMode, ignoreOpenContractCheck, marginMode, takeProfit, takeProfitPercentage1, stopLoss, stopLossPercentage, trailingStopLoss, trailingStopTriggerPercentage, trailingStopDistancePercentage, currentCapital, alertType, priceDecimalDigits, p_signalId, breakEvenPercentage, partial)
 
     _message
 
@@ -926,7 +926,7 @@ export reverseLongExit (string key = na, string exchange = na, string exchangeAc
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    string _message = longExit (key, exchange, exchangeAccountType, pair, leverage, alertType, p_signalId, partial)
+    string _message = longExit (key, exchange, exchangeAccountType, pair, leverage, multiplyByLeverage, hedgeMode, ignoreOpenContractCheck, marginMode, alertType, p_signalId, partial)
 
     _message
 
@@ -949,6 +949,6 @@ export reverseShortExit (string key = na, string exchange = na, string exchangeA
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
-    string _message = shortExit (key, exchange, exchangeAccountType, pair, leverage, alertType, p_signalId, partial)
+    string _message = shortExit (key, exchange, exchangeAccountType, pair, leverage, multiplyByLeverage, hedgeMode, ignoreOpenContractCheck, marginMode, alertType, p_signalId, partial)
 
     _message
