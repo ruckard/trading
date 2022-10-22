@@ -115,7 +115,9 @@ getMessageWithKey (string message='', string key='NON_DEFINED_SECRET_KEY', bool 
 // @returns alert_message for opening long entries in Zignaly
 export longEntry (string key = na, string providerType = 'copytrader', string exchange = na, string exchangeAccountType = na, string pair = na, float positionSizeQuote = na, int leverage = na, bool multiplyByLeverage = na, bool hedgeMode = na, bool ignoreOpenContractCheck = na, string marginMode = na, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType = na, string integration = 'hybrid', int priceDecimalDigits = na, string signalId = na, bool partial = na) =>
 
-    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    string ignoreProviderTypeButUseIt = providerType
+
+    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, multiplyByLeverage=multiplyByLeverage, hedgeMode=hedgeMode, ignoreOpenContractCheck=ignoreOpenContractCheck, marginMode=marginMode, alertType=alertType)
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'LONG-' + getZignalyPair(pair)
@@ -228,7 +230,7 @@ export longEntry (string key = na, string providerType = 'copytrader', string ex
 // @returns alert_message for opening short entries in Zignaly
 export shortEntry (string key = na, string providerType = 'copytrader', string exchange = na, string exchangeAccountType = na, string pair = na, float positionSizeQuote = na, int leverage = na, bool multiplyByLeverage = na, bool hedgeMode = na, bool ignoreOpenContractCheck = na, string marginMode = na, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType = na, string integration = 'hybrid', int priceDecimalDigits = na, string signalId = na, bool partial = na) =>
 
-    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, multiplyByLeverage=multiplyByLeverage, hedgeMode=hedgeMode, ignoreOpenContractCheck=ignoreOpenContractCheck, marginMode=marginMode, alertType=alertType)
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'SHORT-' + getZignalyPair(pair)
@@ -341,7 +343,7 @@ export shortEntry (string key = na, string providerType = 'copytrader', string e
 // @returns alert_message for opening reverse long entries in Zignaly
 export reverseLongEntry (string key = na, string providerType = 'copytrader', string exchange = na, string exchangeAccountType = na, string pair = na, float positionSizeQuote = na, int leverage = na, bool multiplyByLeverage = na, bool hedgeMode = na, bool ignoreOpenContractCheck = na, string marginMode = na, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType = na, string integration = 'hybrid', int priceDecimalDigits = na, string signalId = na, bool partial = na) =>
 
-    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, multiplyByLeverage=multiplyByLeverage, hedgeMode=hedgeMode, ignoreOpenContractCheck=ignoreOpenContractCheck, marginMode=marginMode, alertType=alertType)
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
@@ -457,7 +459,7 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
 // @returns alert_message for opening reverse short entries in Zignaly
 export reverseShortEntry (string key = na, string providerType = 'copytrader', string exchange = na, string exchangeAccountType = na, string pair = na, float positionSizeQuote = na, int leverage = na, bool multiplyByLeverage = na, bool hedgeMode = na, bool ignoreOpenContractCheck = na, string marginMode = na, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType = na, string integration = 'hybrid', int priceDecimalDigits = na, string signalId = na, bool partial = na) =>
 
-    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, multiplyByLeverage=multiplyByLeverage, hedgeMode=hedgeMode, ignoreOpenContractCheck=ignoreOpenContractCheck, marginMode=marginMode, alertType=alertType)
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'REVERSE-' + getZignalyPair(pair)
@@ -561,7 +563,7 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
 // @returns alert_message for closing long entries in Zignaly
 export longExit (string key = na, string exchange = na, string exchangeAccountType = na, string pair = na, int leverage = na, bool multiplyByLeverage = na, bool hedgeMode = na, bool ignoreOpenContractCheck = na, string marginMode = na, string alertType = na, string signalId = na, bool partial = na) =>
 
-    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, multiplyByLeverage=multiplyByLeverage, hedgeMode=hedgeMode, ignoreOpenContractCheck=ignoreOpenContractCheck, marginMode=marginMode, alertType=alertType)
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'LONG-' + getZignalyPair(pair)
@@ -589,7 +591,7 @@ export longExit (string key = na, string exchange = na, string exchangeAccountTy
 // @returns alert_message for closing short entries in Zignaly
 export shortExit (string key = na, string exchange = na, string exchangeAccountType = na, string pair = na, int leverage = na, bool multiplyByLeverage = na, bool hedgeMode = na, bool ignoreOpenContractCheck = na, string marginMode = na, string alertType = na, string signalId = na, bool partial = na) =>
 
-    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, multiplyByLeverage=multiplyByLeverage, hedgeMode=hedgeMode, ignoreOpenContractCheck=ignoreOpenContractCheck, marginMode=marginMode, alertType=alertType)
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'SHORT-' + getZignalyPair(pair)
@@ -630,7 +632,7 @@ export shortExit (string key = na, string exchange = na, string exchangeAccountT
 export updateLongEntry (string key = na, string providerType = 'copytrader', string exchange = na, string exchangeAccountType = na, string pair = na, float positionSizeQuote = na, int leverage = na, bool multiplyByLeverage = na, bool hedgeMode = na, bool ignoreOpenContractCheck = na, string marginMode = na, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType = na, int priceDecimalDigits = na, string signalId = na, float breakEvenPercentage = na, bool partial = na) =>
 
     integration = 'hybrid' // Force default integration to be hybrid
-    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, multiplyByLeverage=multiplyByLeverage, hedgeMode=hedgeMode, ignoreOpenContractCheck=ignoreOpenContractCheck, marginMode=marginMode, alertType=alertType)
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'LONG-' + getZignalyPair(pair)
@@ -748,7 +750,7 @@ export updateLongEntry (string key = na, string providerType = 'copytrader', str
 export updateShortEntry (string key = na, string providerType = 'copytrader', string exchange = na, string exchangeAccountType = na, string pair = na, float positionSizeQuote = na, int leverage = na, bool multiplyByLeverage = na, bool hedgeMode = na, bool ignoreOpenContractCheck = na, string marginMode = na, bool takeProfit = na, float takeProfitPercentage1 = na, bool stopLoss = na, float stopLossPercentage = na, bool trailingStopLoss = na, float trailingStopTriggerPercentage = na, float trailingStopDistancePercentage = na, float currentCapital = na, string alertType = na, int priceDecimalDigits = na, string signalId = na, float breakEvenPercentage = na, bool partial = na) =>
 
     integration = 'hybrid' // Force default integration to be hybrid
-    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, alertType=alertType)
+    zignalyCommonAlertMessage = getZignalyCommonAlertMessage (exchange=exchange, exchangeAccountType=exchangeAccountType, pair=pair, leverage=leverage, multiplyByLeverage=multiplyByLeverage, hedgeMode=hedgeMode, ignoreOpenContractCheck=ignoreOpenContractCheck, marginMode=marginMode, alertType=alertType)
     string p_signalId = signalId
     if (na(p_signalId))
         p_signalId := 'SHORT-' + getZignalyPair(pair)
