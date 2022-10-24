@@ -441,7 +441,7 @@ export reverseLongEntry (string key = na, string providerType = 'copytrader', st
          ',' +
          _zignalyLongCommonAlertMessage +
          ',' +
-         '"' + 'entryPositionSizePercentage' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
+         '"' + 'entryPositionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
          _zignaleStopLossCombo +
          _zignaleTakeProfitCombo +
          _zignaleTrailingTakeProfitCombo
@@ -561,7 +561,7 @@ export reverseShortEntry (string key = na, string providerType = 'copytrader', s
          ',' +
          _zignalyShortCommonAlertMessage +
          ',' +
-         '"' + 'entryPositionSizePercentage' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
+         '"' + 'entryPositionSizePercentageFromQuoteTotal' + '":"' + '' +  _entryQuantityContractsPercentStr + '"' +
          _zignaleStopLossCombo +
          _zignaleTakeProfitCombo +
          _zignaleTrailingTakeProfitCombo
