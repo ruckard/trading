@@ -16,15 +16,15 @@ i_sqzmomMult = input.float(2.0,title='', group='Sqzmom Divergences', inline='Sqz
 i_sqzmomLengthKC=input.int(20, title='KC Length/MultFactor/TR {20/1.5/True}', group='Sqzmom Divergences', inline='SqzmomKC')
 i_sqzmomMultKC = input.float(1.5, title='', group='Sqzmom Divergences', inline='SqzmomKC')
 i_sqzmomUseTrueRange = input.bool(true, title='', group='Sqzmom Divergences', inline='SqzmomKC')
+i_sqzmomSource = input.source(ohlc4, title='Source {ohlc4}', group='Sqzmom Divergences')
 
 // INPUTS - END
 
 
 
 // SMILB functions - BEGIN
-sqzmom(length, mult, lengthKC, multKC, useTrueRange) =>
+sqzmom(length, mult, lengthKC, multKC, useTrueRange, source) =>
     // Calculate BB
-    source = close
     basis = ta.sma(source, length)
     dev = mult * ta.stdev(source, length)
     upperBB = basis + dev
@@ -60,7 +60,7 @@ sqzmom(length, mult, lengthKC, multKC, useTrueRange) =>
 // FUNCTIONS - END
 
 
-[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
+[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, i_sqzmomSource)
 
 // Squeeze Momentum - Plot - BEGIN
 plot(sqzmom_val, color=sqzmom_bcolor, style=plot.style_area, linewidth=4)
