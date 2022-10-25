@@ -15,16 +15,27 @@ i_sqzmomLength = input.int(20, title='BB Length/MultFactor {20/2.0}', group='Sqz
 i_sqzmomMult = input.float(2.0,title='', group='Sqzmom Divergences', inline='SqzmomBB')
 i_sqzmomLengthKC=input.int(20, title='KC Length/MultFactor/TR {20/1.5/True}', group='Sqzmom Divergences', inline='SqzmomKC')
 i_sqzmomMultKC = input.float(1.5, title='', group='Sqzmom Divergences', inline='SqzmomKC')
-i_sqzmomUseTrueRange = input.bool(true, title='', group='Sqzmom Divergences', inline='SqzmomKC')
+i_sqzmomUseTrueRange = input.bool(false, title='', group='Sqzmom Divergences', inline='SqzmomKC')
 i_sqzmomSource = input.source(ohlc4, title='Source {ohlc4}', group='Sqzmom Divergences')
+i_sqzmomSmoothHighAndLow = input.bool(true, title='Smooth High and Low', group='Sqzmom Divergences')
 
 // INPUTS - END
 
 
 
 // SMILB functions - BEGIN
-sqzmom(length, mult, lengthKC, multKC, useTrueRange, source) =>
+sqzmom(length, mult, lengthKC, multKC, useTrueRange, source, i_sqzmomSmoothHighAndLow) =>
     // Calculate BB
+    float smoothHigh = na
+    float smoothLow = na
+
+    if (i_sqzmomSmoothHighAndLow)
+        smoothHigh := (high + source)/2
+        smoothLow := (low + source)/2
+    else
+        smoothHigh := high
+        smoothLow := low
+
     basis = ta.sma(source, length)
     dev = mult * ta.stdev(source, length)
     upperBB = basis + dev
@@ -32,7 +43,7 @@ sqzmom(length, mult, lengthKC, multKC, useTrueRange, source) =>
 
     // Calculate KC
     ma = ta.sma(source, lengthKC)
-    _range = useTrueRange ? ta.tr : (high - low)
+    _range = useTrueRange ? ta.tr : (smoothHigh - smoothLow)
     rangema = ta.sma(_range, lengthKC)
     upperKC = ma + rangema * multKC
     lowerKC = ma - rangema * multKC
@@ -41,7 +52,7 @@ sqzmom(length, mult, lengthKC, multKC, useTrueRange, source) =>
     sqzOff = (lowerBB < lowerKC) and (upperBB > upperKC)
     noSqz  = (sqzOn == false) and (sqzOff == false)
 
-    val = ta.linreg(source - math.avg(math.avg(ta.highest(high, lengthKC), ta.lowest(low, lengthKC)),ta.sma(close,lengthKC)), lengthKC,0)
+    val = ta.linreg(source - math.avg(math.avg(ta.highest(smoothHigh, lengthKC), ta.lowest(smoothLow, lengthKC)),ta.sma(close,lengthKC)), lengthKC,0)
 
     bcolor = val > 0 ? ( val > nz(val[1]) ? color.lime : color.green ) : ( val < nz(val[1]) ? color.red : color.maroon )
     // TODO: Use string variables for colours so that final user can change the actual colour if he wants to.
@@ -60,7 +71,7 @@ sqzmom(length, mult, lengthKC, multKC, useTrueRange, source) =>
 // FUNCTIONS - END
 
 
-[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, i_sqzmomSource)
+[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, i_sqzmomSource, i_sqzmomSmoothHighAndLow)
 
 // Squeeze Momentum - Plot - BEGIN
 plot(sqzmom_val, color=sqzmom_bcolor, style=plot.style_area, linewidth=4)
