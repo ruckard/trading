@@ -1,0 +1,68 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © ruckard
+
+//@version=5
+
+// Current version: v20221025 ( B002 )
+// Tradingview Public description - BEGIN
+// Tradingview Public description - END
+
+indicator(title='TradingLatino Abajo B002', shorttitle='B002TLAbajo', overlay=false)
+
+// INPUTS - BEGIN
+
+i_sqzmomLength = input.int(20, title='BB Length/MultFactor {20/2.0}', group='Sqzmom Divergences', inline='SqzmomBB')
+i_sqzmomMult = input.float(2.0,title='', group='Sqzmom Divergences', inline='SqzmomBB')
+i_sqzmomLengthKC=input.int(20, title='KC Length/MultFactor/TR {20/1.5/True}', group='Sqzmom Divergences', inline='SqzmomKC')
+i_sqzmomMultKC = input.float(1.5, title='', group='Sqzmom Divergences', inline='SqzmomKC')
+i_sqzmomUseTrueRange = input.bool(true, title='', group='Sqzmom Divergences', inline='SqzmomKC')
+i_sqzmomSource = input.source(ohlc4, title='Source {ohlc4}', group='Sqzmom Divergences')
+
+// INPUTS - END
+
+
+
+// SMILB functions - BEGIN
+sqzmom(length, mult, lengthKC, multKC, useTrueRange, source) =>
+    // Calculate BB
+    basis = ta.sma(source, length)
+    dev = mult * ta.stdev(source, length)
+    upperBB = basis + dev
+    lowerBB = basis - dev
+
+    // Calculate KC
+    ma = ta.sma(source, lengthKC)
+    _range = useTrueRange ? ta.tr : (high - low)
+    rangema = ta.sma(_range, lengthKC)
+    upperKC = ma + rangema * multKC
+    lowerKC = ma - rangema * multKC
+
+    sqzOn  = (lowerBB > lowerKC) and (upperBB < upperKC)
+    sqzOff = (lowerBB < lowerKC) and (upperBB > upperKC)
+    noSqz  = (sqzOn == false) and (sqzOff == false)
+
+    val = ta.linreg(source - math.avg(math.avg(ta.highest(high, lengthKC), ta.lowest(low, lengthKC)),ta.sma(close,lengthKC)), lengthKC,0)
+
+    bcolor = val > 0 ? ( val > nz(val[1]) ? color.lime : color.green ) : ( val < nz(val[1]) ? color.red : color.maroon )
+    // TODO: Use string variables for colours so that final user can change the actual colour if he wants to.
+    scolor = noSqz ? color.blue : sqzOn ? color.black : color.gray
+
+    sqzon_percentage = (((upperKC-upperBB)/upperKC)*100)*(0.5) + (((lowerBB-lowerKC)/lowerBB)*100)*(0.5)
+    sqzoff_percentage = (((upperBB-upperKC)/upperBB)*100)*(0.5) + (((lowerKC-lowerBB)/lowerKC)*100)*(0.5)
+    float sqz_percentage = na
+    if sqzOn
+        sqz_percentage := sqzon_percentage
+    else if sqzOff
+        sqz_percentage := - sqzoff_percentage
+
+    [val, bcolor, scolor, sqz_percentage]
+
+// FUNCTIONS - END
+
+
+[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, i_sqzmomSource)
+
+// Squeeze Momentum - Plot - BEGIN
+plot(sqzmom_val, color=sqzmom_bcolor, style=plot.style_area, linewidth=4)
+plot(0, color=sqzmom_scolor, style=plot.style_cross, linewidth=2)
+// Squeeze Momentum - Plot - END
