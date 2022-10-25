@@ -3,11 +3,11 @@
 
 //@version=5
 
-// Current version: v20221025 ( A001 )
+// Current version: v20221025 ( B001 )
 // Tradingview Public description - BEGIN
 // Tradingview Public description - END
 
-indicator(title='TradingLatino Abajo A001', shorttitle='A001TLAbajo2210', overlay=false)
+indicator(title='TradingLatino Abajo B001', shorttitle='B001TLAbajo', overlay=false)
 
 // INPUTS - BEGIN
 
