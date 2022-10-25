@@ -17,10 +17,18 @@ i_sqzmomLengthKC=input.int(20, title='KC Length/MultFactor/TR {20/1.5/True}', gr
 i_sqzmomMultKC = input.float(1.5, title='', group='Sqzmom Divergences', inline='SqzmomKC')
 i_sqzmomUseTrueRange = input.bool(true, title='', group='Sqzmom Divergences', inline='SqzmomKC')
 i_sqzmomSource = input.source(ohlc4, title='Source {ohlc4}', group='Sqzmom Divergences')
+i_enableSqzmomSmooth = input.bool(true, title='Enable Smooth Source', group='Sqzmom Divergences')
+
+i_sqzmomSmoothMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Sqzmom Smooth MA {SMA/3/close}', group='Sqzmom Smooth MA', inline='SQZSmoothMA')
+i_sqzmomSmoothMaLength = input.int(3, minval = 1,  title = '', group='Sqzmom Smooth MA', inline='SQZSmoothMA')
+i_sqzmomSmoothMaSource = input.source(close, title = '', group='Sqzmom Smooth MA', inline='SQZSmoothMA')
 
 // INPUTS - END
 
-
+// MA - Functions - BEGIN
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : _maType == "WMA" ? ta.wma(_maSource, _maLength) : _maType == "HMA" ? ta.hma(_maSource, _maLength) : _maSource
+// MA - Functions - END
 
 // SMILB functions - BEGIN
 sqzmom(length, mult, lengthKC, multKC, useTrueRange, source) =>
@@ -59,8 +67,13 @@ sqzmom(length, mult, lengthKC, multKC, useTrueRange, source) =>
 
 // FUNCTIONS - END
 
+float sqzmomSource = na
+if (i_enableSqzmomSmooth)
+    sqzmomSource := f_Ma (i_sqzmomSmoothMaType, i_sqzmomSmoothMaSource, i_sqzmomSmoothMaLength)
+else
+    sqzmomSource := i_sqzmomSource
 
-[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, i_sqzmomSource)
+[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, sqzmomSource)
 
 // Squeeze Momentum - Plot - BEGIN
 plot(sqzmom_val, color=sqzmom_bcolor, style=plot.style_area, linewidth=4)
