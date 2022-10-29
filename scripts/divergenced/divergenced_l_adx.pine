@@ -342,6 +342,17 @@ i_enableShortRSIClosingAutoLevel = input.bool(true, title='(S) Auto Level {True,
 i_shortRSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
 i_shortRSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
 
+i_enableLongADXProtection = input.bool(false, title='Enable (L) ADX Protection {False, 20.0, 30.0}', group='ADX Protection', inline='LongADXProtection')
+i_longADXProtectionMinimum = input.float(20.0, title='', group='ADX Protection', inline='LongADXProtection', tooltip='Greater than')
+i_longADXProtectionMaximum = input.float(30.0, title='', group='ADX Protection', inline='LongADXProtection', tooltip='Less than')
+i_enableShortADXProtection = input.bool(false, title='Enable (S) ADX Protection {False, 20.0, 30.0}', group='ADX Protection', inline='ShortADXProtection')
+i_shortADXProtectionMinimum = input.float(20.0, title='', group='ADX Protection', inline='ShortADXProtection', tooltip='Greater than')
+i_shortADXProtectionMaximum = input.float(30.0, title='', group='ADX Protection', inline='ShortADXProtection', tooltip='Less than')
+i_enableADXProtectionCustomTimeframe = input.bool(false, title='Use Custom Timeframe {True, 3 hours}', group='ADX Protection', inline='ADXProtectionTimeframe')
+i_ADXProtectionCustomTimeframe = input.timeframe('180', title='', group='ADX Protection', inline='ADXProtectionTimeframe')
+i_ADXProtectionDiLength = input.int(14, minval=1, title='ADX DI Length', group='ADX Protection')
+i_ADXProtectionSmoothing = input.int(14, title='ADX Smoothing', minval=1, maxval=50, group='ADX Protection')
+
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
@@ -685,6 +696,35 @@ if (i_enableShortRSIClosingAutoLevel)
 else
     shortRSIClosingLevel := i_shortRSIClosingLevel
 
+// ADX protection substrategy
+adxProtectionLongCondition = true
+adxProtectionShortCondition = true
+
+[currentTimeframeProtectionDiPlus, currentTimeframeProtectionDiMinus, currentTimeframeProtectionAdx] = ta.dmi(i_ADXProtectionDiLength, i_ADXProtectionSmoothing)
+[higherTimeframeProtectionDiPlus, higherTimeframeProtectionDiMinus, higherTimeframeProtectionAdx] = request.security(syminfo.tickerid, i_ADXProtectionCustomTimeframe, ta.dmi(i_ADXProtectionDiLength, i_ADXProtectionSmoothing))
+
+float protectionAdx = na
+if (i_enableADXProtectionCustomTimeframe)
+    protectionAdx := higherTimeframeProtectionAdx
+else
+    protectionAdx := currentTimeframeProtectionAdx
+
+float longADXProtectionMinimumLevel = na
+float longADXProtectionMaximumLevel = na
+float shortADXProtectionMinimumLevel = na
+float shortADXProtectionMaximumLevel = na
+
+longADXProtectionMinimumLevel := i_longADXProtectionMinimum
+longADXProtectionMaximumLevel := i_longADXProtectionMaximum
+
+shortADXProtectionMinimumLevel := i_shortADXProtectionMinimum
+shortADXProtectionMaximumLevel := i_shortADXProtectionMaximum
+
+if ((protectionAdx < longADXProtectionMinimumLevel) or (protectionAdx >= longADXProtectionMaximumLevel))
+    adxProtectionLongCondition := false
+if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortADXProtectionMaximumLevel))
+    adxProtectionShortCondition := false
+
 // SQMMOMDivergence SubStrategy
 
 getSqzmomDivergences (p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange, p_shortSqzmomPriceMinimumDifference, p_enableShortSqzmomValMinimumDifference, p_shortSqzmomValMinimumDifference, p_enableShortSqzmomPriceMinimumDifference, p_longSqzmomPriceMinimumDifference, p_enableLongSqzmomValMinimumDifference, p_longSqzmomValMinimumDifference, p_enableLongSqzmomPriceMinimumDifference, p_colourConfirmation) =>
@@ -908,6 +948,11 @@ if (i_enableLongRSIProtection)
     longCondition := longCondition and rsiProtectionLongCondition
 if (i_enableShortRSIProtection)
     shortCondition := shortCondition and rsiProtectionShortCondition
+
+if (i_enableLongADXProtection)
+    longCondition := longCondition and adxProtectionLongCondition
+if (i_enableShortADXProtection)
+    shortCondition := shortCondition and adxProtectionShortCondition
 
 if (i_enableSecondaryDivergence)
     longCondition := longCondition and secondaryDivergenceLong
