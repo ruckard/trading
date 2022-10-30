@@ -346,6 +346,10 @@ i_ADXProtectionSmoothing = input.int(14, title='ADX Smoothing', minval=1, maxval
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+
+fvgFill = input.string(title='Filled FVG Type', defval='H/L', options=['Close', 'H/L'], group='FairValueGap')
+fvgMaxBarsback = input.int(100, 'Max bars back to find FVGs ?', minval=10, maxval=500, group='FairValueGap', tooltip='This will look for FVG\'s x bars back. The higher the number, the slower the script will run.')
+i_showFairValueGapDecision = input.bool(true, title='Show {False}', group='FairValueGap')
 // INPUTS - END
 
 
@@ -515,6 +519,36 @@ f_RsiMode(_src, _length, _round, _minimum, _maximum) =>
             _highest_occurence_value := _src[_i]
     _return = _highest_occurence_value
 
+// FairValueGap functions
+fvgGetMtfData(res, i=0) =>
+    request.security(
+      syminfo.tickerid,
+      res,
+      [
+      close[i+1] < low[i+2] and high[i] < low[i+2], // Bearish FVG
+      close[i+1] > high[i+2] and low[i] > high[i+2], // Bullish FVG
+      open[i],   high[i],   low[i],   close[i],   time[i], bar_index[i],
+      open[i+1], high[i+1], low[i+1], close[i+1], time[i+1], bar_index[i+1],
+      open[i+2], high[i+2], low[i+2], close[i+2], time[i+2], bar_index[i+2]
+      ],
+      gaps=barmerge.gaps_off,
+      lookahead=barmerge.lookahead_on
+      )
+
+isFvgFilled(type, old_bi, old_h, old_l, bi, h, l, c) => // bull/bear, open, high, low, close, bar_index, fvg bar index
+    isOld = bi - old_bi > fvgMaxBarsback
+
+    type == 'bull' ?
+      isOld or (fvgFill == 'Close' ? c : l) <= old_h
+      :
+      isOld or (fvgFill == 'Close' ? c : h) >= old_l
+
+isPriceInsideFvg(type, old_h, old_l, h, l, c) =>
+    type == 'bull' ?
+      l < old_l and (fvgFill == 'Close' ? c : l) > old_h
+      :
+      h > old_h and (fvgFill == 'Close' ? c : h) < old_l
+
 // FUNCTIONS - END
 
 
@@ -656,6 +690,70 @@ if ((protectionAdx < longADXProtectionMinimumLevel) or (protectionAdx >= longADX
     adxProtectionLongCondition := false
 if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortADXProtectionMaximumLevel))
     adxProtectionShortCondition := false
+
+// FairValueGap substrategy
+
+fairvaluegapTimeframe = timeframe.period
+
+// FairValueGap - Get All OHLC Data
+[bearishFvg, bullishFvg, fvgOpen, fvgHigh, fvgLow, fvgClose, fvgTime, fvgBarIndex, fvgOpen1, fvgHigh1, fvgLow1, fvgClose1, fvgTime1, fvgBarIndex1, fvgOpen2, fvgHigh2, fvgLow2, fvgClose2, fvgTime2, fvgBarIndex2] = fvgGetMtfData(fairvaluegapTimeframe)
+
+// FairValueGap - Save data to arrays
+var fvgBullIndexes = array.new_int(0)
+var fvgBullHighs = array.new_float(0)
+var fvgBullLows = array.new_float(0)
+var fvgBearIndexes = array.new_int(0)
+var fvgBearHighs = array.new_float(0)
+var fvgBearLows = array.new_float(0)
+
+if bullishFvg
+    array.push(fvgBullIndexes, fvgBarIndex)
+    array.push(fvgBullHighs, fvgHigh2)
+    array.push(fvgBullLows, fvgLow)
+else if bearishFvg
+    array.push(fvgBearIndexes, fvgBarIndex)
+    array.push(fvgBearHighs, fvgHigh)
+    array.push(fvgBearLows, fvgLow2)
+
+// FairValueGap - Delete filled fvgs
+if array.size(fvgBullIndexes) > 0
+    for i = array.size(fvgBullIndexes)-1 to 0
+        if isFvgFilled('bull', array.get(fvgBullIndexes,i), array.get(fvgBullHighs,i), array.get(fvgBullLows,i), fvgBarIndex, fvgHigh, fvgLow, fvgClose)
+            array.remove(fvgBullIndexes, i)
+            array.remove(fvgBullHighs, i)
+            array.remove(fvgBullLows, i)
+if array.size(fvgBearIndexes) > 0
+    for i = array.size(fvgBearIndexes)-1 to 0
+        if isFvgFilled('bear', array.get(fvgBearIndexes,i), array.get(fvgBearHighs,i), array.get(fvgBearLows,i), fvgBarIndex, fvgHigh, fvgLow, fvgClose)
+            array.remove(fvgBearIndexes, i)
+            array.remove(fvgBearHighs, i)
+            array.remove(fvgBearLows, i)
+
+// FairValueGap - Check if inside fvg
+inside_bull = false
+inside_bear = false
+
+if array.size(fvgBullIndexes) > 0
+    for i = array.size(fvgBullIndexes)-1 to 0
+        if isPriceInsideFvg('bull', array.get(fvgBullHighs,i), array.get(fvgBullLows,i), fvgHigh, fvgLow, fvgClose)
+            inside_bull := true
+if array.size(fvgBearIndexes) > 0
+    for i = array.size(fvgBearIndexes)-1 to 0
+        if isPriceInsideFvg('bear', array.get(fvgBearHighs,i), array.get(fvgBearLows,i), fvgHigh, fvgLow, fvgClose)
+            inside_bear := true
+
+// Final logic
+bool fairvaluegapLongShort = false
+bool fairvaluegapLong = false
+bool fairvaluegapShort = false
+
+if (( inside_bull == true ) and ( inside_bear == true ))
+    fairvaluegapLongShort := true
+else
+    if ( inside_bull == true )
+        fairvaluegapShort := true
+    else if ( inside_bear == true )
+        fairvaluegapLong := true
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
