@@ -239,7 +239,7 @@ i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
-i_atrStopLossMultiplier = input.float(2.0, title='(STOPTAKE) ATR Stop Loss Multiplier % {2.0}', minval=0.01)
+i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -342,7 +342,7 @@ i_enableShortRSIClosingAutoLevel = input.bool(true, title='(S) Auto Level {True,
 i_shortRSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
 i_shortRSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
 
-i_enableLongADXProtection = input.bool(false, title='Enable (L) ADX Protection {False, 20.0, 30.0}', group='ADX Protection', inline='LongADXProtection')
+i_enableLongADXProtection = input.bool(true, title='Enable (L) ADX Protection {True, 20.0, 30.0}', group='ADX Protection', inline='LongADXProtection')
 i_longADXProtectionMinimum = input.float(20.0, title='', group='ADX Protection', inline='LongADXProtection', tooltip='Greater than')
 i_longADXProtectionMaximum = input.float(30.0, title='', group='ADX Protection', inline='LongADXProtection', tooltip='Less than')
 i_enableShortADXProtection = input.bool(false, title='Enable (S) ADX Protection {False, 20.0, 30.0}', group='ADX Protection', inline='ShortADXProtection')
