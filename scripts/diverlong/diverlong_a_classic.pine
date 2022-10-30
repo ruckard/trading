@@ -10,6 +10,15 @@
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 1H timeframe.
+// Divergences trigger entry points.
+// Curie Closing lines trigger exit points.
+// We finally make sure that it's an actual divergence by checking two pairs at the same time.
+// More details about how divergence is found:
+// This strategy checks changes between the different sections of the Squeeze Momentum Indicator.
+// Light-Green to Dark-Green change is compared to former Light-Green to Dark-Green change.
+// If the squeeze value is smaller and at the same time the price is higher then we short.
+// Light-Red to Dark-Red change is compared to former Light-Red to Dark-Red change.
+// If the squeeze value is higher and at the same time the price is lower then we long.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
