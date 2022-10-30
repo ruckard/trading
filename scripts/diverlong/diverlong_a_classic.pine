@@ -355,6 +355,29 @@ i_ADXProtectionSmoothing = input.int(14, title='ADX Smoothing', minval=1, maxval
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+
+i_showSqzmomDivergences = input.bool(true, title='Show {True}', group='Sqzmom Divergences')
+i_enableSqzmomColourConfirmation = input.bool(false, title='Colour confirmation {False}', group='Sqzmom Divergences')
+
+i_sqzmomLength = input.int(20, title='BB Length/MultFactor {20/2.0}', group='Sqzmom Divergences', inline='SqzmomBB')
+i_sqzmomMult = input.float(2.0,title='', group='Sqzmom Divergences', inline='SqzmomBB')
+i_sqzmomLengthKC=input.int(20, title='KC Length/MultFactor/TR {20/1.5/True}', group='Sqzmom Divergences', inline='SqzmomKC')
+i_sqzmomMultKC = input.float(1.5, title='', group='Sqzmom Divergences', inline='SqzmomKC')
+i_sqzmomUseTrueRange = input.bool(true, title='', group='Sqzmom Divergences', inline='SqzmomKC')
+
+i_enableLongSqzmomPriceMinimumDifference = input.bool(true, 'Price Minimum Difference (Long) {True/0.15 %}', group='Sqzmom Divergences', inline='SqzmomLongPriceMinimumDifference')
+i_longSqzmomPriceMinimumDifference = input.float(0.15, title='', minval=0.01, group='Sqzmom Divergences', inline='SqzmomLongPriceMinimumDifference')
+i_enableShortSqzmomPriceMinimumDifference = input.bool(true, 'Price Minimum Difference (Short) {True/0.35 %}', group='Sqzmom Divergences', inline='SqzmomShortPriceMinimumDifference')
+i_shortSqzmomPriceMinimumDifference = input.float(0.35, title='', minval=0.01, group='Sqzmom Divergences', inline='SqzmomShortPriceMinimumDifference')
+
+i_enableLongSqzmomValMinimumDifference = input.bool(false, 'Val Minimum Difference (Long) {False/15.00 %}', group='Sqzmom Divergences', inline='SqzmomLongValMinimumDifference')
+i_longSqzmomValMinimumDifference = input.float(15.00, title='', minval=0.01, group='Sqzmom Divergences', inline='SqzmomLongValMinimumDifference')
+i_enableShortSqzmomValMinimumDifference = input.bool(true, 'Val Minimum Difference (Short) {True/150.00 %}', group='Sqzmom Divergences', inline='SqzmomShortValMinimumDifference')
+i_shortSqzmomValMinimumDifference = input.float(150.00, title='', minval=0.01, group='Sqzmom Divergences', inline='SqzmomShortValMinimumDifference')
+
+i_enableSecondaryDivergence = input.bool(false, title='LB/Pair {1/LTC}', group='Secondary Divergence', inline='SDLookbackPair')
+i_secondaryDivergenceLookback = input.int(1, title='', tooltip='LookBack Bars Number', group='Secondary Divergence', inline='SDLookbackPair')
+i_secondaryDivergencePair = input.symbol('BINANCE:LTCUSDTPERP', title='', group='Secondary Divergence',inline='SDLookbackPair')
 // INPUTS - END
 
 
@@ -524,6 +547,42 @@ f_RsiMode(_src, _length, _round, _minimum, _maximum) =>
             _highest_occurence_value := _src[_i]
     _return = _highest_occurence_value
 
+// SMILB functions - BEGIN
+sqzmom(length, mult, lengthKC, multKC, useTrueRange) =>
+    // Calculate BB
+    source = close
+    basis = ta.sma(source, length)
+    dev = mult * ta.stdev(source, length)
+    upperBB = basis + dev
+    lowerBB = basis - dev
+
+    // Calculate KC
+    ma = ta.sma(source, lengthKC)
+    _range = useTrueRange ? ta.tr : (high - low)
+    rangema = ta.sma(_range, lengthKC)
+    upperKC = ma + rangema * multKC
+    lowerKC = ma - rangema * multKC
+
+    sqzOn  = (lowerBB > lowerKC) and (upperBB < upperKC)
+    sqzOff = (lowerBB < lowerKC) and (upperBB > upperKC)
+    noSqz  = (sqzOn == false) and (sqzOff == false)
+
+    val = ta.linreg(source - math.avg(math.avg(ta.highest(high, lengthKC), ta.lowest(low, lengthKC)),ta.sma(close,lengthKC)), lengthKC,0)
+
+    bcolor = val > 0 ? ( val > nz(val[1]) ? color.lime : color.green ) : ( val < nz(val[1]) ? color.red : color.maroon )
+    // TODO: Use string variables for colours so that final user can change the actual colour if he wants to.
+    scolor = noSqz ? color.blue : sqzOn ? color.black : color.gray
+
+    sqzon_percentage = (((upperKC-upperBB)/upperKC)*100)*(0.5) + (((lowerBB-lowerKC)/lowerBB)*100)*(0.5)
+    sqzoff_percentage = (((upperBB-upperKC)/upperBB)*100)*(0.5) + (((lowerKC-lowerBB)/lowerKC)*100)*(0.5)
+    float sqz_percentage = na
+    if sqzOn
+        sqz_percentage := sqzon_percentage
+    else if sqzOff
+        sqz_percentage := - sqzoff_percentage
+
+    [val, bcolor, scolor, sqz_percentage]
+
 // FUNCTIONS - END
 
 
@@ -666,6 +725,136 @@ if ((protectionAdx < longADXProtectionMinimumLevel) or (protectionAdx >= longADX
 if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortADXProtectionMaximumLevel))
     adxProtectionShortCondition := false
 
+// SQMMOMDivergence SubStrategy
+
+getSqzmomDivergences (p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange, p_shortSqzmomPriceMinimumDifference, p_enableShortSqzmomValMinimumDifference, p_shortSqzmomValMinimumDifference, p_enableShortSqzmomPriceMinimumDifference, p_longSqzmomPriceMinimumDifference, p_enableLongSqzmomValMinimumDifference, p_longSqzmomValMinimumDifference, p_enableLongSqzmomPriceMinimumDifference, p_colourConfirmation) =>
+    // Short divergence means that next top height is smaller than previous top height and at the same time price is bigger than in the previous top height.
+    // Long divergence means that next bottom height is higher than previous bottom height and at the same time price is smaller than in the previous bottom height.
+
+    // Needed variables
+    var int sqzmom_top_changes = 0
+    var float sqzmom_top_val_a = na
+    var float sqzmom_top_price_a = na
+    var float sqzmom_top_val_b = na
+    var float sqzmom_top_price_b = na
+
+    var int sqzmom_bottom_changes = 0
+    var float sqzmom_bottom_val_a = na
+    var float sqzmom_bottom_price_a = na
+    var float sqzmom_bottom_val_b = na
+    var float sqzmom_bottom_price_b = na
+
+    [sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange)
+
+    // Gather data
+
+    bool sqzmom_top_change = ( sqzmom_bcolor[1] == color.lime )  and ( sqzmom_bcolor[0] == color.green )
+    bool sqzmom_bottom_change = ( sqzmom_bcolor[1] == color.red )  and ( sqzmom_bcolor[0] == color.maroon )
+
+    if (sqzmom_top_change)
+        sqzmom_top_changes := sqzmom_top_changes + 1
+
+    if (sqzmom_bottom_change)
+        sqzmom_bottom_changes := sqzmom_bottom_changes + 1
+
+    bool sqzmom_top_is_a = (sqzmom_top_changes % 2) == 0
+    bool sqzmom_top_is_b = (sqzmom_top_changes % 2) == 1
+
+    bool sqzmom_bottom_is_a = (sqzmom_bottom_changes % 2) == 0
+    bool sqzmom_bottom_is_b = (sqzmom_bottom_changes % 2) == 1
+
+    if (sqzmom_top_change and sqzmom_top_is_a)
+        sqzmom_top_val_a := sqzmom_val[1]
+        sqzmom_top_price_a := close[1]
+
+    if (sqzmom_top_change and sqzmom_top_is_b)
+        sqzmom_top_val_b := sqzmom_val[1]
+        sqzmom_top_price_b := close[1]
+
+    if (sqzmom_bottom_change and sqzmom_bottom_is_a)
+        sqzmom_bottom_val_a := sqzmom_val[1]
+        sqzmom_bottom_price_a := close[1]
+
+    if (sqzmom_bottom_change and sqzmom_bottom_is_b)
+        sqzmom_bottom_val_b := sqzmom_val[1]
+        sqzmom_bottom_price_b := close[1]
+
+    // Implement logic
+
+    bool _sqzmomDivergenceLong = false
+    bool _sqzmomDivergenceShort = false
+
+    // Short divergence - Section A
+    if (sqzmom_top_change and sqzmom_top_is_a and (sqzmom_top_val_a < sqzmom_top_val_b) and (sqzmom_top_price_a > sqzmom_top_price_b))
+        _sqzmomDivergenceShort := true
+        if (p_enableShortSqzmomPriceMinimumDifference)
+            shortSectionASqzmomMinimumPrice = sqzmom_top_price_b + (p_shortSqzmomPriceMinimumDifference * 0.01 * sqzmom_top_price_b)
+            shortSectionASqzmomPriceIsOverMinimum = sqzmom_top_price_a >= shortSectionASqzmomMinimumPrice
+            _sqzmomDivergenceShort := _sqzmomDivergenceShort and shortSectionASqzmomPriceIsOverMinimum
+        if (p_enableShortSqzmomValMinimumDifference)
+            shortSectionASqzmomMinimumVal = sqzmom_top_val_a + (p_shortSqzmomValMinimumDifference * 0.01 * sqzmom_top_val_a)
+            shortSectionASqzmomValIsOverMinimum = sqzmom_top_price_b >= shortSectionASqzmomMinimumVal
+            _sqzmomDivergenceShort := _sqzmomDivergenceShort and shortSectionASqzmomValIsOverMinimum
+    // Short divergence - Section B
+    if (sqzmom_top_change and sqzmom_top_is_b and (sqzmom_top_val_b < sqzmom_top_val_a) and (sqzmom_top_price_b > sqzmom_top_price_a))
+        _sqzmomDivergenceShort := true
+        if (p_enableShortSqzmomPriceMinimumDifference)
+            shortSectionBSqzmomMinimumPrice = sqzmom_top_price_a + (p_shortSqzmomPriceMinimumDifference * 0.01 * sqzmom_top_price_a)
+            shortSectionBSqzmomPriceIsOverMinimum = sqzmom_top_price_b >= shortSectionBSqzmomMinimumPrice
+            _sqzmomDivergenceShort := _sqzmomDivergenceShort and shortSectionBSqzmomPriceIsOverMinimum
+        if (p_enableShortSqzmomValMinimumDifference)
+            shortSectionBSqzmomMinimumVal = sqzmom_top_val_b + (p_shortSqzmomValMinimumDifference * 0.01 * sqzmom_top_val_b)
+            shortSectionBSqzmomValIsOverMinimum = sqzmom_top_val_a >= shortSectionBSqzmomMinimumVal
+            _sqzmomDivergenceShort := _sqzmomDivergenceShort and shortSectionBSqzmomValIsOverMinimum
+    // Long divergence - Section A
+    if (sqzmom_bottom_change and sqzmom_bottom_is_a and (sqzmom_bottom_val_a > sqzmom_bottom_val_b) and (sqzmom_bottom_price_a < sqzmom_bottom_price_b))
+        _sqzmomDivergenceLong := true
+        if (p_enableLongSqzmomPriceMinimumDifference)
+            longSectionASqzmomMinimumPrice = sqzmom_bottom_price_a + (p_longSqzmomPriceMinimumDifference * 0.01 * sqzmom_bottom_price_a)
+            longSectionASqzmomPriceIsOverMinimum = sqzmom_bottom_price_b >= longSectionASqzmomMinimumPrice
+            _sqzmomDivergenceLong := _sqzmomDivergenceLong and longSectionASqzmomPriceIsOverMinimum
+        if (p_enableLongSqzmomValMinimumDifference)
+            longSectionASqzmomMinimumVal = sqzmom_bottom_val_b + (p_longSqzmomValMinimumDifference * 0.01 * math.abs(sqzmom_bottom_val_b))
+            longSectionASqzmomValIsOverMinimum = sqzmom_bottom_val_a >= longSectionASqzmomMinimumVal
+            _sqzmomDivergenceLong := _sqzmomDivergenceLong and longSectionASqzmomValIsOverMinimum
+    // Long divergence - Section B
+    if (sqzmom_bottom_change and sqzmom_bottom_is_b and (sqzmom_bottom_val_b > sqzmom_bottom_val_a) and (sqzmom_bottom_price_b < sqzmom_bottom_price_a))
+        _sqzmomDivergenceLong := true
+        if (p_enableLongSqzmomPriceMinimumDifference)
+            longSqzmomSectionBMinimumPrice = sqzmom_bottom_price_b + (p_longSqzmomPriceMinimumDifference * 0.01 * sqzmom_bottom_price_b)
+            longSectionBSqzmomPriceIsOverMinimum = sqzmom_bottom_price_a >= longSqzmomSectionBMinimumPrice
+            _sqzmomDivergenceLong := _sqzmomDivergenceLong and longSectionBSqzmomPriceIsOverMinimum
+        if (p_enableLongSqzmomValMinimumDifference)
+            longSectionBSqzmomMinimumVal = sqzmom_bottom_val_a + (p_longSqzmomValMinimumDifference * 0.01 * math.abs(sqzmom_bottom_val_a))
+            longSectionBSqzmomValIsOverMinimum = sqzmom_bottom_val_b >= longSectionBSqzmomMinimumVal
+            _sqzmomDivergenceLong := _sqzmomDivergenceLong and longSectionBSqzmomValIsOverMinimum
+    bool r_sqzmomDivergenceLong = na
+    bool r_sqzmomDivergenceShort = na
+    if (p_colourConfirmation)
+        r_sqzmomDivergenceLong := _sqzmomDivergenceLong[1] and (sqzmom_bcolor[1] == sqzmom_bcolor[0])
+        r_sqzmomDivergenceShort := _sqzmomDivergenceShort[1] and (sqzmom_bcolor[1] == sqzmom_bcolor[0])
+    else
+        r_sqzmomDivergenceLong := _sqzmomDivergenceLong
+        r_sqzmomDivergenceShort := _sqzmomDivergenceShort
+    [r_sqzmomDivergenceLong, r_sqzmomDivergenceShort]
+
+[sqzmomDivergenceLong, sqzmomDivergenceShort] = getSqzmomDivergences (i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, i_shortSqzmomPriceMinimumDifference, i_enableShortSqzmomValMinimumDifference, i_shortSqzmomValMinimumDifference, i_enableShortSqzmomPriceMinimumDifference, i_longSqzmomPriceMinimumDifference, i_enableLongSqzmomValMinimumDifference, i_longSqzmomValMinimumDifference, i_enableLongSqzmomPriceMinimumDifference, i_enableSqzmomColourConfirmation)
+
+// Secondary Pair Divergence logic
+[currentSecondaryDivergenceLong, currentSecondaryDivergenceShort] = request.security(i_secondaryDivergencePair, timeframe.period, getSqzmomDivergences(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange, i_shortSqzmomPriceMinimumDifference, i_enableShortSqzmomValMinimumDifference, i_shortSqzmomValMinimumDifference, i_enableShortSqzmomPriceMinimumDifference, i_longSqzmomPriceMinimumDifference, i_enableLongSqzmomValMinimumDifference, i_longSqzmomValMinimumDifference, i_enableLongSqzmomPriceMinimumDifference, i_enableSqzmomColourConfirmation))
+
+bool currentSecondaryDivergenceLongFound = false
+for i = (i_secondaryDivergenceLookback - 1) to 0
+    if currentSecondaryDivergenceLong[i]
+        currentSecondaryDivergenceLongFound := true
+bool currentSecondaryDivergenceShortFound = false
+for i = (i_secondaryDivergenceLookback - 1) to 0
+    if currentSecondaryDivergenceShort[i]
+        currentSecondaryDivergenceShortFound := true
+
+bool secondaryDivergenceLong = currentSecondaryDivergenceLongFound
+bool secondaryDivergenceShort = currentSecondaryDivergenceShortFound
+
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
 bool longCondition1 = false
@@ -764,6 +953,10 @@ if (i_enableLongADXProtection)
     longCondition := longCondition and adxProtectionLongCondition
 if (i_enableShortADXProtection)
     shortCondition := shortCondition and adxProtectionShortCondition
+
+if (i_enableSecondaryDivergence)
+    longCondition := longCondition and secondaryDivergenceLong
+    shortCondition := shortCondition and secondaryDivergenceShort
 // Common Logic to go LONG/LONG or go SHORT/SHORT - END
 
 // Volatility - Plot - BEGIN
