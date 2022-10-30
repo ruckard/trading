@@ -198,8 +198,8 @@ _ZIGSIGNALPROVIDER_ = 'Signal Provider', _ZIGCOPYTRADERPROVIDER_ = 'Profit Shari
 i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider type', options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
 i_zignalyProviderType = (i_zignalyProviderTypePre == _ZIGCOPYTRADERPROVIDER_) ? 'copytrader' : 'signalprovider'
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
-i_strategyType = input.string(_REVERSE_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
-i_enableLongStrictStrategy = input.bool(false, '(STRAT) (L) Strict mode {False}')
+i_strategyType = input.string(_L_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
+i_enableLongStrictStrategy = input.bool(true, '(STRAT) (L) Strict mode {True}')
 i_enableShortStrictStrategy = input.bool(false, '(STRAT) (S) Strict mode {False}')
 i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Start Time {2021-01-01 00:00:00}')
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
@@ -207,8 +207,8 @@ i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {T
 i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
 
 // Curie Closing Lines - Inputs
-i_enableCurieClosingLines = input.bool(false, title = 'Use {False}', group='Curie Closing Lines', inline='CurieEnableShow')
-i_showCurieClosingLines = input.bool(false, title = 'Show {False}', group='Curie Closing Lines', inline='CurieEnableShow')
+i_enableCurieClosingLines = input.bool(true, title = 'Use {True}', group='Curie Closing Lines', inline='CurieEnableShow')
+i_showCurieClosingLines = input.bool(true, title = 'Show {True}', group='Curie Closing Lines', inline='CurieEnableShow')
 
 i_curieHighClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'High MA {SMA/20/ohlc4}', group='Curie Closing Lines', inline='High Closing Ma')
 i_curieHighClosingMaLength = input.int(20, minval = 1,  title = '', group='Curie Closing Lines', inline='High Closing Ma')
@@ -246,9 +246,9 @@ i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrig
 i_trailingTakeProfitPercentageOffset = input.float(25.0, '(TRAILING) Trailing Take Profit as a percentage of Trailing Take Profit Trigger (%) {25.0}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageOffsetPerOne = i_trailingTakeProfitPercentageOffset * 0.01
 // Break Even - Inputs
-i_breakEvenTrigger = input.float(1.0, '(BREAKEVEN) Break Even Trigger (%) {1.0}', minval=0, step=0.01)
+i_breakEvenTrigger = input.float(2.15, '(BREAKEVEN) Break Even Trigger (%) {2.15}', minval=0, step=0.01)
 i_breakEvenTriggerPerOne = i_breakEvenTrigger * 0.01
-i_breakEven = input.float(0.20, '(BREAKEVEN) Break Even Stop Loss (%) {0.20}', minval=0, step=0.01)
+i_breakEven = input.float(0.25, '(BREAKEVEN) Break Even Stop Loss (%) {0.25}', minval=0, step=0.01)
 i_breakEvenPerOne = i_breakEven * 0.01
 // Zignaly - Email (zignalye)
 _ZIGNALYE_ = 'Email', _ZIGNALYW_ = 'WebHook'
@@ -309,9 +309,9 @@ i_tooOldShortBarsNumber = input.int(6, title='', minval=1, maxval=100, step=1, g
 i_tooOldShortStopLoss = input.float(0.60, title='', tooltip='(OLD) Too Old Short order Stop Loss (%) {0.60}', minval=0, step=0.01, group='Too Old Orders', inline='Too Old Short Orders')
 i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
 
-i_enableLongRSIProtection = input.bool(false, title='Enable (L) RSI Protection {False, 45.0}', group='RSI Protection', inline='LongRSIProtection')
+i_enableLongRSIProtection = input.bool(true, title='Enable (L) RSI Protection {True, 45.0}', group='RSI Protection', inline='LongRSIProtection')
 i_longRSIProtectionLevel = input.float(45.0, title='', group='RSI Protection', inline='LongRSIProtection', tooltip='Not greater than')
-i_enableShortRSIProtection = input.bool(false, title='Enable (S) RSI Protection {False, 58.0}', group='RSI Protection', inline='ShortRSIProtection')
+i_enableShortRSIProtection = input.bool(true, title='Enable (S) RSI Protection {True, 58.0}', group='RSI Protection', inline='ShortRSIProtection')
 i_shortRSIProtectionLevel = input.float(58.0, title='', group='RSI Protection', inline='ShortRSIProtection', tooltip='Not lower than')
 i_enableRSIProtectionCustomTimeframe = input.bool(true, title='Use Custom Timeframe {True, 3 hours}', group='RSI Protection', inline='RSIProtectionTimeframe')
 i_RSIProtectionCustomTimeframe = input.timeframe('180', title='', group='RSI Protection', inline='RSIProtectionTimeframe')
@@ -329,7 +329,7 @@ i_DynamicRSIProtectionRound = input.float(5, minval=0.001, title='Dynamic Round'
 
 i_enableLongRSIClosing = input.bool(false, title='Enable (L) RSI Closing {False, 55.0}', group='RSI Closing', inline='LongRSIClosing')
 i_longRSIClosingLevel = input.float(55.0, title='', group='RSI Closing', inline='LongRSIClosing', tooltip='Close when crossing under')
-i_enableShortRSIClosing = input.bool(false, title='Enable (S) RSI Closing {False, 45.0}', group='RSI Closing', inline='ShortRSIClosing')
+i_enableShortRSIClosing = input.bool(true, title='Enable (S) RSI Closing {True, 45.0}', group='RSI Closing', inline='ShortRSIClosing')
 i_shortRSIClosingLevel = input.float(45.0, title='', group='RSI Closing', inline='ShortRSIClosing', tooltip='Close when crossing over')
 i_enableRSIClosingCustomTimeframe = input.bool(false, title='Use Custom Timeframe {False, 3 hours}', group='RSI Closing', inline='RSIClosingTimeframe')
 i_RSIClosingCustomTimeframe = input.timeframe('180', title='', group='RSI Closing', inline='RSIClosingTimeframe')
