@@ -349,7 +349,8 @@ i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
 i_fvgFillType = input.string(title='Filled FVG Type', defval='H/L', options=['Close', 'H/L'], group='FairValueGap')
 i_fvgMaxBarsback = input.int(100, 'Max bars back to find FVGs ?', minval=10, maxval=500, group='FairValueGap', tooltip='This will look for FVG\'s x bars back. The higher the number, the slower the script will run.')
-i_showFairValueGapDecision = input.bool(true, title='Show {False}', group='FairValueGap')
+i_showFairValueGapDecision = input.bool(true, title='Show Decision {False}', group='FairValueGap')
+i_showValueGaps = input.bool(true, title='Show Gaps {False}', group='FairValueGap')
 // INPUTS - END
 
 
@@ -882,6 +883,11 @@ plotshape(fairvaluegapLong, title='FairValueGap Up', style=shape.arrowup, color=
 plotshape(fairvaluegapShort, title='FairValueGap Down', style=shape.arrowdown, color=fairvaluegapShortColor, location=location.top)
 plotshape(fairvaluegapLongShort, title='FairValueGap UpAndDown', style=shape.square, color=fairvaluegapLongShortColor, location=location.top)
 // FairValueGap Decision - Plot - END
+
+fairvaluegapBullishColor = i_showValueGaps ? color.new(color.green, transp=0) : na
+fairvaluegapBearishColor = i_showValueGaps ? color.new(#ff0062, transp=0) : na
+plotshape(bullishFvg, title='FairValueGap Bullish', style=shape.labelup, color=fairvaluegapBullishColor, location=location.bottom)
+plotshape(bearishFvg, title='FairValueGap Bearish', style=shape.labeldown, color=fairvaluegapBearishColor, location=location.bottom)
 
 // Position price calculation - BEGIN
 float positionPrice = na
