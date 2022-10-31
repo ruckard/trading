@@ -749,11 +749,9 @@ bool fairvaluegapShort = false
 
 if (( inside_bull == true ) and ( inside_bear == true ))
     fairvaluegapLongShort := true
-else
-    if ( inside_bull == true )
-        fairvaluegapShort := true
-    else if ( inside_bear == true )
-        fairvaluegapLong := true
+
+fairvaluegapShort := bullishFvg
+fairvaluegapLong := bearishFvg
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
