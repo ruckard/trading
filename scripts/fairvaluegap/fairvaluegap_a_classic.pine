@@ -520,19 +520,19 @@ f_RsiMode(_src, _length, _round, _minimum, _maximum) =>
     _return = _highest_occurence_value
 
 // FairValueGap functions
-fvgGetMtfData(res, i=0) =>
+fvgGetMtfData(res) =>
     request.security(
       syminfo.tickerid,
       res,
       [
-      close[i+1] < low[i+2] and high[i] < low[i+2], // Bearish FVG
-      close[i+1] > high[i+2] and low[i] > high[i+2], // Bullish FVG
-      open[i],   high[i],   low[i],   close[i],   time[i], bar_index[i],
-      open[i+1], high[i+1], low[i+1], close[i+1], time[i+1], bar_index[i+1],
-      open[i+2], high[i+2], low[i+2], close[i+2], time[i+2], bar_index[i+2]
+      close[1] < low[2] and high[0] < low[2], // Bearish FVG
+      close[1] > high[2] and low[0] > high[2], // Bullish FVG
+      open[0],   high[0],   low[0],   close[0],   time[0], bar_index[0],
+      open[1], high[1], low[1], close[1], time[1], bar_index[1],
+      open[2], high[2], low[2], close[2], time[2], bar_index[2]
       ],
       gaps=barmerge.gaps_off,
-      lookahead=barmerge.lookahead_on
+      lookahead=barmerge.lookahead_off
       )
 
 isFvgFilled(type, old_bi, old_h, old_l, bi, h, l, c) => // bull/bear, open, high, low, close, bar_index, fvg bar index
