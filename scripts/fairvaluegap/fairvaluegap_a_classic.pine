@@ -347,8 +347,8 @@ i_ADXProtectionSmoothing = input.int(14, title='ADX Smoothing', minval=1, maxval
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
-fvgFill = input.string(title='Filled FVG Type', defval='H/L', options=['Close', 'H/L'], group='FairValueGap')
-fvgMaxBarsback = input.int(100, 'Max bars back to find FVGs ?', minval=10, maxval=500, group='FairValueGap', tooltip='This will look for FVG\'s x bars back. The higher the number, the slower the script will run.')
+i_fvgFillType = input.string(title='Filled FVG Type', defval='H/L', options=['Close', 'H/L'], group='FairValueGap')
+i_fvgMaxBarsback = input.int(100, 'Max bars back to find FVGs ?', minval=10, maxval=500, group='FairValueGap', tooltip='This will look for FVG\'s x bars back. The higher the number, the slower the script will run.')
 i_showFairValueGapDecision = input.bool(true, title='Show {False}', group='FairValueGap')
 // INPUTS - END
 
@@ -536,18 +536,18 @@ fvgGetMtfData(res) =>
       )
 
 isFvgFilled(type, old_bi, old_h, old_l, bi, h, l, c) => // bull/bear, open, high, low, close, bar_index, fvg bar index
-    isOld = bi - old_bi > fvgMaxBarsback
+    isOld = bi - old_bi > i_fvgMaxBarsback
 
     type == 'bull' ?
-      isOld or (fvgFill == 'Close' ? c : l) <= old_h
+      isOld or (i_fvgFillType == 'Close' ? c : l) <= old_h
       :
-      isOld or (fvgFill == 'Close' ? c : h) >= old_l
+      isOld or (i_fvgFillType == 'Close' ? c : h) >= old_l
 
 isPriceInsideFvg(type, old_h, old_l, h, l, c) =>
     type == 'bull' ?
-      l < old_l and (fvgFill == 'Close' ? c : l) > old_h
+      l < old_l and (i_fvgFillType == 'Close' ? c : l) > old_h
       :
-      h > old_h and (fvgFill == 'Close' ? c : h) < old_l
+      h > old_h and (i_fvgFillType == 'Close' ? c : h) < old_l
 
 // FUNCTIONS - END
 
