@@ -761,7 +761,7 @@ if bullishFvg // SHORT
     if (fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage)
         fairvaluegapRefillShort := true
 else if bearishFvg // LONG
-    fvpGapPercentage := ((fvgClose - fvgHigh) / fvgHigh) * 100
+    fvpGapPercentage := ((fvgLow2 - fvgClose) / fvgClose) * 100
     fvgGapRefillPercentage := fvpGapPercentage * i_longFvgGapRefillPerOne
     if (fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage)
         fairvaluegapRefillLong := true
