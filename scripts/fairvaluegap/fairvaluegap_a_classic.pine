@@ -352,7 +352,9 @@ i_fvgMaxBarsback = input.int(100, 'Max bars back to find FVGs ?', minval=10, max
 i_showFairValueGapDecision = input.bool(true, title='Show Decision {True}', group='FairValueGap')
 i_showValueGaps = input.bool(true, title='Show Gaps {True}', group='FairValueGap')
 i_longFvgMinimumTakeProfitPercentage = input.float(0.20, title='(L) Minimum Take Profit {0.20 %}', group='FairValueGap')
+i_longFvgMaximumTakeProfitPercentage = input.float(0.40, title='(L) Maximum Take Profit {0.40 %}', group='FairValueGap')
 i_shortFvgMinimumTakeProfitPercentage = input.float(0.20, title='(S) Minimum Take Profit {0.20 %}', group='FairValueGap')
+i_shortFvgMaximumTakeProfitPercentage = input.float(0.40, title='(S) Maximum Take Profit {0.40 %}', group='FairValueGap')
 i_longFvgGapRefillPercentage = input.float(80.0, title='(L) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
 i_longFvgGapRefillPerOne = i_longFvgGapRefillPercentage * 0.01
 i_shortFvgGapRefillPercentage = input.float(80.0, title='(S) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
@@ -758,12 +760,12 @@ bool fairvaluegapRefillShort = false
 if bullishFvg // SHORT
     fvpGapPercentage := ((fvgClose - fvgHigh2) / fvgHigh2) * 100
     fvgGapRefillPercentage := fvpGapPercentage * i_shortFvgGapRefillPerOne
-    if (fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage)
+    if ((fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_shortFvgMaximumTakeProfitPercentage))
         fairvaluegapRefillShort := true
 else if bearishFvg // LONG
     fvpGapPercentage := ((fvgLow2 - fvgClose) / fvgClose) * 100
     fvgGapRefillPercentage := fvpGapPercentage * i_longFvgGapRefillPerOne
-    if (fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage)
+    if ((fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_longFvgMaximumTakeProfitPercentage))
         fairvaluegapRefillLong := true
 
 // Final logic
