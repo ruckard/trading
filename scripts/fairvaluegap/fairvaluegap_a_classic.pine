@@ -360,6 +360,8 @@ i_longFvgGapRefillPerOne = i_longFvgGapRefillPercentage * 0.01
 i_shortFvgGapRefillPercentage = input.float(80.0, title='(S) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
 i_shortFvgGapRefillPerOne = i_shortFvgGapRefillPercentage * 0.01
 i_enableFvgTakeProfits = input.bool(true, title='Enable FVG based TakeProfits {True}', group='FairValueGap')
+i_longFvgMinimumGapPercentage = input.float(0.02, title='(L) Minimum Gap Percentage {0.02 %}', group='FairValueGap')
+i_shortFvgMinimumGapPercentage = input.float(0.02, title='(S) Minimum Gap Percentage {0.02 %}', group='FairValueGap')
 // INPUTS - END
 
 
@@ -755,20 +757,30 @@ if array.size(fvgBearIndexes) > 0
 // Gap distance
 float fvpGapPriceDistancePercentage = 0
 float fvgGapRefillPercentage = 0
+float fvpGapPercentage = 0
 bool fairvaluegapRefillLong = false
 bool fairvaluegapRefillShort = false
 bool fvgGapRefillPercentageIsWithinRange = false
+bool fvpGapPercentageAboveMinimum = false
 if bullishFvg // SHORT
     fvpGapPriceDistancePercentage := ((fvgClose - fvgHigh2) / fvgHigh2) * 100
     fvgGapRefillPercentage := fvpGapPriceDistancePercentage * i_shortFvgGapRefillPerOne
     fvgGapRefillPercentageIsWithinRange := ((fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_shortFvgMaximumTakeProfitPercentage))
-    if (fvgGapRefillPercentageIsWithinRange)
+
+    fvpGapPercentage := ((fvgLow - fvgHigh2) / fvgHigh2) * 100
+    fvpGapPercentageAboveMinimum := fvpGapPercentage >= i_shortFvgMinimumGapPercentage
+
+    if (fvgGapRefillPercentageIsWithinRange and fvpGapPercentageAboveMinimum)
         fairvaluegapRefillShort := true
 else if bearishFvg // LONG
     fvpGapPriceDistancePercentage := ((fvgLow2 - fvgClose) / fvgClose) * 100
     fvgGapRefillPercentage := fvpGapPriceDistancePercentage * i_longFvgGapRefillPerOne
     fvgGapRefillPercentageIsWithinRange := ((fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_longFvgMaximumTakeProfitPercentage))
-    if (fvgGapRefillPercentageIsWithinRange)
+
+    fvpGapPercentage := ((fvgLow2 - fvgHigh) / fvgHigh) * 100
+    fvpGapPercentageAboveMinimum := fvpGapPercentage >= i_longFvgMinimumGapPercentage
+
+    if (fvgGapRefillPercentageIsWithinRange and fvpGapPercentageAboveMinimum)
         fairvaluegapRefillLong := true
 
 // Final logic
