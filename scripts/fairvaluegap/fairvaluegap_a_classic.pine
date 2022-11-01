@@ -351,6 +351,12 @@ i_fvgFillType = input.string(title='Filled FVG Type', defval='H/L', options=['Cl
 i_fvgMaxBarsback = input.int(100, 'Max bars back to find FVGs ?', minval=10, maxval=500, group='FairValueGap', tooltip='This will look for FVG\'s x bars back. The higher the number, the slower the script will run.')
 i_showFairValueGapDecision = input.bool(true, title='Show Decision {False}', group='FairValueGap')
 i_showValueGaps = input.bool(true, title='Show Gaps {False}', group='FairValueGap')
+i_longFvgMinimumTakeProfitPercentage = input.float(0.20, title='(L) Minimum Take Profit {0.20 %}', group='FairValueGap')
+i_shortFvgMinimumTakeProfitPercentage = input.float(0.20, title='(S) Minimum Take Profit {0.20 %}', group='FairValueGap')
+i_longFvgGapRefillPercentage = input.float(80.0, title='(L) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
+i_longFvgGapRefillPerOne = i_longFvgGapRefillPercentage * 0.01
+i_shortFvgGapRefillPercentage = input.float(80.0, title='(S) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
+i_shortFvgGapRefillPerOne = i_shortFvgGapRefillPercentage * 0.01
 // INPUTS - END
 
 
@@ -743,6 +749,22 @@ if array.size(fvgBearIndexes) > 0
         if isPriceInsideFvg('bear', array.get(fvgBearHighs,i), array.get(fvgBearLows,i), fvgHigh, fvgLow, fvgClose)
             inside_bear := true
 
+// Gap distance
+float fvpGapPercentage = 0
+float fvgGapRefillPercentage = 0
+bool fairvaluegapRefillLong = false
+bool fairvaluegapRefillShort = false
+if bullishFvg // SHORT
+    fvpGapPercentage := ((fvgLow - fvgHigh2) / fvgHigh2) * 100
+    fvgGapRefillPercentage := fvpGapPercentage * i_shortFvgGapRefillPerOne
+    if (fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage)
+        fairvaluegapRefillShort := true
+else if bearishFvg // LONG
+    fvpGapPercentage := ((fvgLow2 - fvgHigh) / fvgHigh) * 100
+    fvgGapRefillPercentage := fvpGapPercentage * i_longFvgGapRefillPerOne
+    if (fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage)
+        fairvaluegapRefillLong := true
+
 // Final logic
 bool fairvaluegapLongShort = false
 bool fairvaluegapLong = false
@@ -751,8 +773,8 @@ bool fairvaluegapShort = false
 if (( inside_bull == true ) and ( inside_bear == true ))
     fairvaluegapLongShort := true
 
-fairvaluegapShort := bullishFvg
-fairvaluegapLong := bearishFvg
+fairvaluegapShort := bullishFvg and fairvaluegapRefillShort
+fairvaluegapLong := bearishFvg and fairvaluegapRefillLong
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
