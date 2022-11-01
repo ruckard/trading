@@ -757,15 +757,18 @@ float fvpGapPriceDistancePercentage = 0
 float fvgGapRefillPercentage = 0
 bool fairvaluegapRefillLong = false
 bool fairvaluegapRefillShort = false
+bool fvgGapRefillPercentageIsWithinRange = false
 if bullishFvg // SHORT
     fvpGapPriceDistancePercentage := ((fvgClose - fvgHigh2) / fvgHigh2) * 100
     fvgGapRefillPercentage := fvpGapPriceDistancePercentage * i_shortFvgGapRefillPerOne
-    if ((fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_shortFvgMaximumTakeProfitPercentage))
+    fvgGapRefillPercentageIsWithinRange := ((fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_shortFvgMaximumTakeProfitPercentage))
+    if (fvgGapRefillPercentageIsWithinRange)
         fairvaluegapRefillShort := true
 else if bearishFvg // LONG
     fvpGapPriceDistancePercentage := ((fvgLow2 - fvgClose) / fvgClose) * 100
     fvgGapRefillPercentage := fvpGapPriceDistancePercentage * i_longFvgGapRefillPerOne
-    if ((fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_longFvgMaximumTakeProfitPercentage))
+    fvgGapRefillPercentageIsWithinRange := ((fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_longFvgMaximumTakeProfitPercentage))
+    if (fvgGapRefillPercentageIsWithinRange)
         fairvaluegapRefillLong := true
 
 // Final logic
