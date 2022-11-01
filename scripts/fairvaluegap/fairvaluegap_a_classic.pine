@@ -357,6 +357,7 @@ i_longFvgGapRefillPercentage = input.float(80.0, title='(L) Gap Refill Percentag
 i_longFvgGapRefillPerOne = i_longFvgGapRefillPercentage * 0.01
 i_shortFvgGapRefillPercentage = input.float(80.0, title='(S) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
 i_shortFvgGapRefillPerOne = i_shortFvgGapRefillPercentage * 0.01
+i_enableFvgTakeProfits = input.bool(true, title='Enable FVG based TakeProfits {True}', group='FairValueGap')
 // INPUTS - END
 
 
@@ -1092,6 +1093,10 @@ else
     takeProfit := i_takeProfit
     takeProfitPerOne := i_takeProfitPerOne
 
+if i_enableFvgTakeProfits
+    takeProfit := fvgGapRefillPercentage
+    takeProfitPerOne := takeProfit * 0.01
+
 var float LongTakeProfit = na
 var float ShortTakeProfit = na
 
@@ -1101,11 +1106,18 @@ if (not insideABuyOrder)
 if (not insideASellOrder)
     ShortTakeProfit := close * (1 - takeProfitPerOne)
 
-// Final TakeProfit value based on actual position price
-if ((not insideABuyOrder[1]) and (insideABuyOrder))
-    LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
-if ((not insideASellOrder[1]) and (insideASellOrder))
-    ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
+if i_enableFvgTakeProfits
+    // Final TakeProfit value based on actual position price
+    if ((not insideABuyOrder[1]) and (insideABuyOrder))
+        LongTakeProfit := positionPrice * (1 + takeProfitPerOne[1]) // Make sure to use first candle value
+    if ((not insideASellOrder[1]) and (insideASellOrder))
+        ShortTakeProfit := positionPrice * (1 - takeProfitPerOne[1]) // Make sure to use first candle value
+else
+    // Final TakeProfit value based on actual position price
+    if ((not insideABuyOrder[1]) and (insideABuyOrder))
+        LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
+    if ((not insideASellOrder[1]) and (insideASellOrder))
+        ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
