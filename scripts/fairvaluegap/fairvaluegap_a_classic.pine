@@ -756,12 +756,12 @@ float fvgGapRefillPercentage = 0
 bool fairvaluegapRefillLong = false
 bool fairvaluegapRefillShort = false
 if bullishFvg // SHORT
-    fvpGapPercentage := ((fvgLow - fvgHigh2) / fvgHigh2) * 100
+    fvpGapPercentage := ((fvgClose - fvgHigh2) / fvgHigh2) * 100
     fvgGapRefillPercentage := fvpGapPercentage * i_shortFvgGapRefillPerOne
     if (fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage)
         fairvaluegapRefillShort := true
 else if bearishFvg // LONG
-    fvpGapPercentage := ((fvgLow2 - fvgHigh) / fvgHigh) * 100
+    fvpGapPercentage := ((fvgClose - fvgHigh) / fvgHigh) * 100
     fvgGapRefillPercentage := fvpGapPercentage * i_longFvgGapRefillPerOne
     if (fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage)
         fairvaluegapRefillLong := true
