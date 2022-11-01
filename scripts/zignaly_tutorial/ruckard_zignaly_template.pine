@@ -326,10 +326,10 @@ i_enableRSIClosingCustomTimeframe = input.bool(false, title='Use Custom Timefram
 i_RSIClosingCustomTimeframe = input.timeframe('180', title='', group='RSI Closing', inline='RSIClosingTimeframe')
 i_RSIClosingLength = input.int(14, minval=1, title='RSI Length', group='RSI Closing')
 i_RSIClosingSource = input.source(close, 'RSI Source', group='RSI Closing')
-i_enableLongRSIClosingAutoLevel = input.bool(true, title='(L) Auto Level {True, 55 bars, 42 bars}', group='RSI Closing', inline='longRSIClosingAutoLevel')
+i_enableLongRSIClosingAutoLevel = input.bool(false, title='(L) Auto Level {False, 55 bars, 42 bars}', group='RSI Closing', inline='longRSIClosingAutoLevel')
 i_longRSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='longRSIClosingAutoLevel')
 i_longRSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='longRSIClosingAutoLevel')
-i_enableShortRSIClosingAutoLevel = input.bool(true, title='(S) Auto Level {True, 55 bars, 42 bars}', group='RSI Closing', inline='shortRSIClosingAutoLevel')
+i_enableShortRSIClosingAutoLevel = input.bool(false, title='(S) Auto Level {False, 55 bars, 42 bars}', group='RSI Closing', inline='shortRSIClosingAutoLevel')
 i_shortRSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
 i_shortRSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
 
