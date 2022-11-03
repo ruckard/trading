@@ -358,10 +358,6 @@ i_longUvgMinimumTakeProfitPercentage = input.float(0.20, title='(L) Minimum Take
 i_longUvgMaximumTakeProfitPercentage = input.float(2.00, title='(L) Maximum Take Profit {2.00 %}', group='UnfairValueGap')
 i_shortUvgMinimumTakeProfitPercentage = input.float(0.20, title='(S) Minimum Take Profit {0.20 %}', group='UnfairValueGap')
 i_shortUvgMaximumTakeProfitPercentage = input.float(2.00, title='(S) Maximum Take Profit {2.00 %}', group='UnfairValueGap')
-i_longUvgGapRefillPercentage = input.float(80.0, title='(L) Gap Refill Percentage { 80.0 % }', group='UnfairValueGap')
-i_longUvgGapRefillPerOne = i_longUvgGapRefillPercentage * 0.01
-i_shortUvgGapRefillPercentage = input.float(80.0, title='(S) Gap Refill Percentage { 80.0 % }', group='UnfairValueGap')
-i_shortUvgGapRefillPerOne = i_shortUvgGapRefillPercentage * 0.01
 i_longUvgGapStopLossPercentage = input.float(110.0, title='(L) Gap StopLoss Percentage { 110.0 % }', group='UnfairValueGap')
 i_longUvgGapStopLossPerOne = i_longUvgGapStopLossPercentage * 0.01
 i_shortUvgGapStopLossPercentage = input.float(110.0, title='(S) Gap StopLoss Percentage { 110.0 % }', group='UnfairValueGap')
