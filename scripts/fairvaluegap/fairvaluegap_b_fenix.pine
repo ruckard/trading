@@ -349,6 +349,22 @@ i_ADXProtectionSmoothing = input.int(14, title='ADX Smoothing', minval=1, maxval
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+
+i_fvgFillType = input.string(title='Filled FVG Type', defval='H/L', options=['Close', 'H/L'], group='FairValueGap')
+i_fvgMaxBarsback = input.int(100, 'Max bars back to find FVGs ?', minval=10, maxval=500, group='FairValueGap', tooltip='This will look for FVG\'s x bars back. The higher the number, the slower the script will run.')
+i_showFairValueGapDecision = input.bool(true, title='Show Decision {True}', group='FairValueGap')
+i_showValueGaps = input.bool(true, title='Show Gaps {True}', group='FairValueGap')
+i_longFvgMinimumTakeProfitPercentage = input.float(0.20, title='(L) Minimum Take Profit {0.20 %}', group='FairValueGap')
+i_longFvgMaximumTakeProfitPercentage = input.float(0.40, title='(L) Maximum Take Profit {0.40 %}', group='FairValueGap')
+i_shortFvgMinimumTakeProfitPercentage = input.float(0.20, title='(S) Minimum Take Profit {0.20 %}', group='FairValueGap')
+i_shortFvgMaximumTakeProfitPercentage = input.float(0.40, title='(S) Maximum Take Profit {0.40 %}', group='FairValueGap')
+i_longFvgGapRefillPercentage = input.float(80.0, title='(L) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
+i_longFvgGapRefillPerOne = i_longFvgGapRefillPercentage * 0.01
+i_shortFvgGapRefillPercentage = input.float(80.0, title='(S) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
+i_shortFvgGapRefillPerOne = i_shortFvgGapRefillPercentage * 0.01
+i_enableFvgTakeProfits = input.bool(true, title='Enable FVG based TakeProfits {True}', group='FairValueGap')
+i_longFvgMinimumGapPercentage = input.float(0.02, title='(L) Minimum Gap Percentage {0.02 %}', group='FairValueGap')
+i_shortFvgMinimumGapPercentage = input.float(0.02, title='(S) Minimum Gap Percentage {0.02 %}', group='FairValueGap')
 // INPUTS - END
 
 
@@ -518,6 +534,36 @@ f_RsiMode(_src, _length, _round, _minimum, _maximum) =>
             _highest_occurence_value := _src[_i]
     _return = _highest_occurence_value
 
+// FairValueGap functions
+fvgGetMtfData(res) =>
+    request.security(
+      syminfo.tickerid,
+      res,
+      [
+      close[1] < low[2] and high[0] < low[2], // Bearish FVG
+      close[1] > high[2] and low[0] > high[2], // Bullish FVG
+      open[0],   high[0],   low[0],   close[0],   time[0], bar_index[0],
+      open[1], high[1], low[1], close[1], time[1], bar_index[1],
+      open[2], high[2], low[2], close[2], time[2], bar_index[2]
+      ],
+      gaps=barmerge.gaps_off,
+      lookahead=barmerge.lookahead_off
+      )
+
+isFvgFilled(type, old_bi, old_h, old_l, bi, h, l, c) => // bull/bear, open, high, low, close, bar_index, fvg bar index
+    isOld = bi - old_bi > i_fvgMaxBarsback
+
+    type == 'bull' ?
+      isOld or (i_fvgFillType == 'Close' ? c : l) <= old_h
+      :
+      isOld or (i_fvgFillType == 'Close' ? c : h) >= old_l
+
+isPriceInsideFvg(type, old_h, old_l, h, l, c) =>
+    type == 'bull' ?
+      l < old_l and (i_fvgFillType == 'Close' ? c : l) > old_h
+      :
+      h > old_h and (i_fvgFillType == 'Close' ? c : h) < old_l
+
 // FUNCTIONS - END
 
 
@@ -659,6 +705,97 @@ if ((protectionAdx < longADXProtectionMinimumLevel) or (protectionAdx >= longADX
     adxProtectionLongCondition := false
 if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortADXProtectionMaximumLevel))
     adxProtectionShortCondition := false
+
+// FairValueGap substrategy
+
+fairvaluegapTimeframe = timeframe.period
+
+// FairValueGap - Get All OHLC Data
+[bearishFvg, bullishFvg, fvgOpen, fvgHigh, fvgLow, fvgClose, fvgTime, fvgBarIndex, fvgOpen1, fvgHigh1, fvgLow1, fvgClose1, fvgTime1, fvgBarIndex1, fvgOpen2, fvgHigh2, fvgLow2, fvgClose2, fvgTime2, fvgBarIndex2] = fvgGetMtfData(fairvaluegapTimeframe)
+
+// FairValueGap - Save data to arrays
+var fvgBullIndexes = array.new_int(0)
+var fvgBullHighs = array.new_float(0)
+var fvgBullLows = array.new_float(0)
+var fvgBearIndexes = array.new_int(0)
+var fvgBearHighs = array.new_float(0)
+var fvgBearLows = array.new_float(0)
+
+if bullishFvg
+    array.push(fvgBullIndexes, fvgBarIndex)
+    array.push(fvgBullHighs, fvgHigh2)
+    array.push(fvgBullLows, fvgLow)
+else if bearishFvg
+    array.push(fvgBearIndexes, fvgBarIndex)
+    array.push(fvgBearHighs, fvgHigh)
+    array.push(fvgBearLows, fvgLow2)
+
+// FairValueGap - Delete filled fvgs
+if array.size(fvgBullIndexes) > 0
+    for i = array.size(fvgBullIndexes)-1 to 0
+        if isFvgFilled('bull', array.get(fvgBullIndexes,i), array.get(fvgBullHighs,i), array.get(fvgBullLows,i), fvgBarIndex, fvgHigh, fvgLow, fvgClose)
+            array.remove(fvgBullIndexes, i)
+            array.remove(fvgBullHighs, i)
+            array.remove(fvgBullLows, i)
+if array.size(fvgBearIndexes) > 0
+    for i = array.size(fvgBearIndexes)-1 to 0
+        if isFvgFilled('bear', array.get(fvgBearIndexes,i), array.get(fvgBearHighs,i), array.get(fvgBearLows,i), fvgBarIndex, fvgHigh, fvgLow, fvgClose)
+            array.remove(fvgBearIndexes, i)
+            array.remove(fvgBearHighs, i)
+            array.remove(fvgBearLows, i)
+
+// FairValueGap - Check if inside fvg
+inside_bull = false
+inside_bear = false
+
+if array.size(fvgBullIndexes) > 0
+    for i = array.size(fvgBullIndexes)-1 to 0
+        if isPriceInsideFvg('bull', array.get(fvgBullHighs,i), array.get(fvgBullLows,i), fvgHigh, fvgLow, fvgClose)
+            inside_bull := true
+if array.size(fvgBearIndexes) > 0
+    for i = array.size(fvgBearIndexes)-1 to 0
+        if isPriceInsideFvg('bear', array.get(fvgBearHighs,i), array.get(fvgBearLows,i), fvgHigh, fvgLow, fvgClose)
+            inside_bear := true
+
+// Gap distance
+float fvpGapPriceDistancePercentage = 0
+float fvgGapRefillPercentage = 0
+float fvpGapPercentage = 0
+bool fairvaluegapRefillLong = false
+bool fairvaluegapRefillShort = false
+bool fvgGapRefillPercentageIsWithinRange = false
+bool fvpGapPercentageAboveMinimum = false
+if bullishFvg // SHORT
+    fvpGapPriceDistancePercentage := ((fvgClose - fvgHigh2) / fvgHigh2) * 100
+    fvgGapRefillPercentage := fvpGapPriceDistancePercentage * i_shortFvgGapRefillPerOne
+    fvgGapRefillPercentageIsWithinRange := ((fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_shortFvgMaximumTakeProfitPercentage))
+
+    fvpGapPercentage := ((fvgLow - fvgHigh2) / fvgHigh2) * 100
+    fvpGapPercentageAboveMinimum := fvpGapPercentage >= i_shortFvgMinimumGapPercentage
+
+    if (fvgGapRefillPercentageIsWithinRange and fvpGapPercentageAboveMinimum)
+        fairvaluegapRefillShort := true
+else if bearishFvg // LONG
+    fvpGapPriceDistancePercentage := ((fvgLow2 - fvgClose) / fvgClose) * 100
+    fvgGapRefillPercentage := fvpGapPriceDistancePercentage * i_longFvgGapRefillPerOne
+    fvgGapRefillPercentageIsWithinRange := ((fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_longFvgMaximumTakeProfitPercentage))
+
+    fvpGapPercentage := ((fvgLow2 - fvgHigh) / fvgHigh) * 100
+    fvpGapPercentageAboveMinimum := fvpGapPercentage >= i_longFvgMinimumGapPercentage
+
+    if (fvgGapRefillPercentageIsWithinRange and fvpGapPercentageAboveMinimum)
+        fairvaluegapRefillLong := true
+
+// Final logic
+bool fairvaluegapLongShort = false
+bool fairvaluegapLong = false
+bool fairvaluegapShort = false
+
+if (( inside_bull == true ) and ( inside_bear == true ))
+    fairvaluegapLongShort := true
+
+fairvaluegapShort := bullishFvg and fairvaluegapRefillShort
+fairvaluegapLong := bearishFvg and fairvaluegapRefillLong
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
