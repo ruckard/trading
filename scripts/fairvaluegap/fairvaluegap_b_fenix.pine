@@ -6,7 +6,10 @@
 // Current version: v20221103 ( B001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a template for Ruckard strategies that interact with Zignaly.
+// Calculate a distance between the current price and latest Gap opposite end.
+// Open a TakeProfit towards 80% of the former distance.
+// The main logic assumes that the price is going to fill a big part of the recently created gap.
+// A ratio 1:4 ensures that StopLoss is not triggered by sudden small movements.
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 1H timeframe.
