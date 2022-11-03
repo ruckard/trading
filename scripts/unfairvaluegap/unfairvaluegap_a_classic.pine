@@ -362,13 +362,13 @@ i_longUvgGapStopLossPercentage = input.float(110.0, title='(L) Gap StopLoss Perc
 i_longUvgGapStopLossPerOne = i_longUvgGapStopLossPercentage * 0.01
 i_shortUvgGapStopLossPercentage = input.float(110.0, title='(S) Gap StopLoss Percentage { 110.0 % }', group='UnfairValueGap')
 i_shortUvgGapStopLossPerOne = i_shortUvgGapStopLossPercentage * 0.01
-i_longUvgGapTakeProfitPercentage = input.float(50.0, title='(L) Gap TakeProfit Percentage { 50.0 % }', group='UnfairValueGap')
+i_longUvgGapTakeProfitPercentage = input.float(30.0, title='(L) Gap TakeProfit Percentage { 30.0 % }', group='UnfairValueGap')
 i_longUvgGapTakeProfitPerOne = i_longUvgGapTakeProfitPercentage * 0.01
-i_shortUvgGapTakeProfitPercentage = input.float(50.0, title='(S) Gap TakeProfit Percentage { 50.0 % }', group='UnfairValueGap')
+i_shortUvgGapTakeProfitPercentage = input.float(30.0, title='(S) Gap TakeProfit Percentage { 30.0 % }', group='UnfairValueGap')
 i_shortUvgGapTakeProfitPerOne = i_shortUvgGapTakeProfitPercentage * 0.01
 i_enableUvgTakeProfits = input.bool(true, title='Enable UVG based TakeProfits {True}', group='UnfairValueGap')
-i_longUvgMinimumGapPercentage = input.float(0.02, title='(L) Minimum Gap Percentage {0.02 %}', group='UnfairValueGap')
-i_shortUvgMinimumGapPercentage = input.float(0.02, title='(S) Minimum Gap Percentage {0.02 %}', group='UnfairValueGap')
+i_longUvgMinimumGapPercentage = input.float(1.10, title='(L) Minimum Gap Percentage {1.10 %}', group='UnfairValueGap')
+i_shortUvgMinimumGapPercentage = input.float(1.10, title='(S) Minimum Gap Percentage {1.10 %}', group='UnfairValueGap')
 // INPUTS - END
 
 
