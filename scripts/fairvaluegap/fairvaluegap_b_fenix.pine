@@ -918,6 +918,20 @@ plotshape(higherTimeframeTrendMaLong, title='SideMA Up', style=shape.arrowup, co
 plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdown, color=higherTimeframeTrendMaShortColor, location=location.top)
 // Higher Timeframe Trend - Plot - END
 
+// FairValueGap Decision - Plot - BEGIN
+fairvaluegapLongColor = i_showFairValueGapDecision ? color.new(#00c3ff, transp=0) : na
+fairvaluegapShortColor = i_showFairValueGapDecision ? color.new(#ff0062, transp=0) : na
+fairvaluegapLongShortColor = i_showFairValueGapDecision ? color.new(color.yellow, transp=0) : na
+plotshape(fairvaluegapLong, title='FairValueGap Up', style=shape.arrowup, color=fairvaluegapLongColor, location=location.top)
+plotshape(fairvaluegapShort, title='FairValueGap Down', style=shape.arrowdown, color=fairvaluegapShortColor, location=location.top)
+plotshape(fairvaluegapLongShort, title='FairValueGap UpAndDown', style=shape.square, color=fairvaluegapLongShortColor, location=location.top)
+// FairValueGap Decision - Plot - END
+
+fairvaluegapBullishColor = i_showValueGaps ? color.new(color.green, transp=0) : na
+fairvaluegapBearishColor = i_showValueGaps ? color.new(#ff0062, transp=0) : na
+plotshape(bullishFvg, title='FairValueGap Bullish', style=shape.labelup, color=fairvaluegapBullishColor, location=location.bottom)
+plotshape(bearishFvg, title='FairValueGap Bearish', style=shape.labeldown, color=fairvaluegapBearishColor, location=location.bottom)
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
