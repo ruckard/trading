@@ -761,8 +761,8 @@ if array.size(uvgBearIndexes) > 0
 float uvgGapPriceDistancePercentage = 0
 float uvgGapRefillPercentage = 0
 float uvgGapPercentage = 0
-bool unfairvaluegapRefillLong = false
-bool unfairvaluegapRefillShort = false
+bool unfairvaluegapOppositeLong = false
+bool unfairvaluegapOppositeShort = false
 bool uvgGapRefillPercentageIsWithinRange = false
 bool uvgGapPercentageAboveMinimum = false
 if bullishUvg // LONG
@@ -774,7 +774,7 @@ if bullishUvg // LONG
     uvgGapPercentageAboveMinimum := uvgGapPercentage >= i_shortUvgMinimumGapPercentage
 
     if (uvgGapRefillPercentageIsWithinRange and uvgGapPercentageAboveMinimum)
-        unfairvaluegapRefillLong := true
+        unfairvaluegapOppositeLong := true
 else if bearishUvg // SHORT
     uvgGapPriceDistancePercentage := ((uvgLow2 - uvgClose) / uvgClose) * 100
     uvgGapRefillPercentage := uvgGapPriceDistancePercentage * i_longUvgGapRefillPerOne
@@ -784,7 +784,7 @@ else if bearishUvg // SHORT
     uvgGapPercentageAboveMinimum := uvgGapPercentage >= i_longUvgMinimumGapPercentage
 
     if (uvgGapRefillPercentageIsWithinRange and uvgGapPercentageAboveMinimum)
-        unfairvaluegapRefillShort := true
+        unfairvaluegapOppositeShort := true
 
 // Final logic
 bool unfairvaluegapLongShort = false
@@ -794,8 +794,8 @@ bool unfairvaluegapShort = false
 if (( unfairValueGapInsideBull == true ) and ( unfairValueGapInsideBear == true ))
     unfairvaluegapLongShort := true
 
-unfairvaluegapLong := bullishUvg and unfairvaluegapRefillLong
-unfairvaluegapShort := bearishUvg and unfairvaluegapRefillShort
+unfairvaluegapLong := bullishUvg and unfairvaluegapOppositeLong
+unfairvaluegapShort := bearishUvg and unfairvaluegapOppositeShort
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
