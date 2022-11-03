@@ -1071,7 +1071,10 @@ if (insideASellOrder and SHORT_CLOSE)
 // How much to LONG/GO LONG/SHORT/GO SHORT - BEGIN
 
 if i_enableUvgTakeProfits
-    orderStopLoss := uvgGapRefillPercentage / i_positionRatio
+    if LONG
+        orderStopLoss := uvgGapRefillPercentage * i_longUvgGapStopLossPerOne
+    else
+        orderStopLoss := uvgGapRefillPercentage * i_shortUvgGapStopLossPerOne
     orderStopLossPerOne := orderStopLoss * 0.01
 
 
