@@ -1052,6 +1052,11 @@ if (insideASellOrder and SHORT_CLOSE)
 
 // How much to LONG/GO LONG/SHORT/GO SHORT - BEGIN
 
+if i_enableFvgTakeProfits
+    orderStopLoss := fvgGapRefillPercentage / i_positionRatio
+    orderStopLossPerOne := orderStopLoss * 0.01
+
+
 // Custom take profit and stop loss
 var float LongStopLoss = na
 var float ShortStopLoss = na
@@ -1062,11 +1067,18 @@ if (i_enableStopLoss and (not insideABuyOrder))
 if (i_enableStopLoss and (not insideASellOrder))
     ShortStopLoss := close * (1 + orderStopLossPerOne)
 
-// Final StopLoss value based on actual position price
-if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
-    LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
-if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
-    ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+if i_enableFvgTakeProfits
+    // Final StopLoss value based on actual position price
+    if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
+        LongStopLoss := positionPrice * (1 - orderStopLossPerOne[1])
+    if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
+        ShortStopLoss := positionPrice * (1 + orderStopLossPerOne[1])
+else
+    // Final StopLoss value based on actual position price
+    if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
+        LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+    if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
+        ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 
 // Make sure LongStopLoss and ShortStopLoss are undefined
 // by default when i_enableStopLoss is set to false
@@ -1099,6 +1111,10 @@ else
     takeProfit := i_takeProfit
     takeProfitPerOne := i_takeProfitPerOne
 
+if i_enableFvgTakeProfits
+    takeProfit := fvgGapRefillPercentage
+    takeProfitPerOne := takeProfit * 0.01
+
 var float LongTakeProfit = na
 var float ShortTakeProfit = na
 
@@ -1108,11 +1124,18 @@ if (not insideABuyOrder)
 if (not insideASellOrder)
     ShortTakeProfit := close * (1 - takeProfitPerOne)
 
-// Final TakeProfit value based on actual position price
-if ((not insideABuyOrder[1]) and (insideABuyOrder))
-    LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
-if ((not insideASellOrder[1]) and (insideASellOrder))
-    ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
+if i_enableFvgTakeProfits
+    // Final TakeProfit value based on actual position price
+    if ((not insideABuyOrder[1]) and (insideABuyOrder))
+        LongTakeProfit := positionPrice * (1 + takeProfitPerOne[1]) // Make sure to use first candle value
+    if ((not insideASellOrder[1]) and (insideASellOrder))
+        ShortTakeProfit := positionPrice * (1 - takeProfitPerOne[1]) // Make sure to use first candle value
+else
+    // Final TakeProfit value based on actual position price
+    if ((not insideABuyOrder[1]) and (insideABuyOrder))
+        LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
+    if ((not insideASellOrder[1]) and (insideASellOrder))
+        ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
