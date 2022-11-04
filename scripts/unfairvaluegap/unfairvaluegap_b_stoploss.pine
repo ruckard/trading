@@ -1072,9 +1072,9 @@ if (insideASellOrder and SHORT_CLOSE)
 
 if i_enableUvgTakeProfits
     if LONG
-        orderStopLoss := uvgGapRefillPercentage * i_longUvgGapStopLossPerOne
+        orderStopLoss := uvgGapPriceDistancePercentage * i_longUvgGapStopLossPerOne
     else
-        orderStopLoss := uvgGapRefillPercentage * i_shortUvgGapStopLossPerOne
+        orderStopLoss := uvgGapPriceDistancePercentage * i_shortUvgGapStopLossPerOne
     orderStopLossPerOne := orderStopLoss * 0.01
 
 
