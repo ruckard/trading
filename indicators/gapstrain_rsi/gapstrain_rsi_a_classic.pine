@@ -14,6 +14,10 @@ i_fvgFillType = input.string(title='Filled FVG Type', defval='H/L', options=['Cl
 i_fvgMaxBarsback = input.int(100, 'Max bars back to find FVGs ?', minval=10, maxval=500, group='FairValueGap', tooltip='This will look for FVG\'s x bars back. The higher the number, the slower the script will run.')
 i_showFvgTotals = input.bool(true, title='Show Fvg Totals {True}', group='FairValueGap')
 
+i_gapstrainBullRsiLength = input.int(14, minval=1, title='RSI Length', group='Gapstrain RSI')
+i_gapstrainBearRsiLength = input.int(14, minval=1, title='RSI Length', group='Gapstrain RSI')
+i_showFvgRSIs = input.bool(true, title='Show Fvg RSIs {True}', group='Gapstrain RSI')
+
 // INPUTS - END
 
 
@@ -117,9 +121,20 @@ if array.size(fvgBearIndexes) > 0
     for i = array.size(fvgBearIndexes)-1 to 0
         fvgBearTotal := fvgBearTotal + math.abs(array.get(fvgBearHighs,i) - array.get(fvgBearLows,i))
 
+float currentTimeframeGapstrainBullRsi = ta.rsi(fvgBullTotal, i_gapstrainBullRsiLength)
+float currentTimeframeGapstrainBearRsi = ta.rsi(fvgBearTotal, i_gapstrainBearRsiLength)
+
+gapstrainBullRsi = currentTimeframeGapstrainBullRsi
+gapstrainBearRsi = currentTimeframeGapstrainBearRsi
+
 // FairValueGap Decision - Plot - BEGIN
 
 fvgBullTotalColor = i_showFvgTotals ? color.new(color.green, transp=0) : na
 fvgBearTotalColor = i_showFvgTotals ? color.new(#ff0062, transp=0) : na
 fvgBullTotalPlot = plot(fvgBullTotal, color = fvgBullTotalColor, title = 'Bull Fvg Total')
 fvgBearTotalPlot = plot(fvgBearTotal, color = fvgBearTotalColor, title = 'Bear Fvg Total')
+
+gapstrainBullRsiColor = i_showFvgRSIs ? color.new(color.green, transp=0) : na
+gapstrainBearRsiColor = i_showFvgRSIs ? color.new(#ff0062, transp=0) : na
+gapstrainBullRsiPlot = plot(gapstrainBullRsi, color = gapstrainBullRsiColor, title = 'Bull Fvg Total')
+gapstrainBearRsiPlot = plot(gapstrainBearRsi, color = gapstrainBearRsiColor, title = 'Bear Fvg Total')
