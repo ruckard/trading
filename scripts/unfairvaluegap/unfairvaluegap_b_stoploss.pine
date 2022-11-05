@@ -358,16 +358,16 @@ i_longUvgMinimumTakeProfitPercentage = input.float(0.20, title='(L) Minimum Take
 i_longUvgMaximumTakeProfitPercentage = input.float(5.00, title='(L) Maximum Take Profit {5.00 %}', group='UnfairValueGap')
 i_shortUvgMinimumTakeProfitPercentage = input.float(0.20, title='(S) Minimum Take Profit {0.20 %}', group='UnfairValueGap')
 i_shortUvgMaximumTakeProfitPercentage = input.float(5.00, title='(S) Maximum Take Profit {5.00 %}', group='UnfairValueGap')
-i_longUvgGapStopLossPercentage = input.float(110.0, title='(L) Gap StopLoss Percentage { 110.0 % }', group='UnfairValueGap')
+i_longUvgGapStopLossPercentage = input.float(45.0, title='(L) Gap StopLoss Percentage { 45.0 % }', group='UnfairValueGap')
 i_longUvgGapStopLossPerOne = i_longUvgGapStopLossPercentage * 0.01
 i_shortUvgGapStopLossPercentage = input.float(110.0, title='(S) Gap StopLoss Percentage { 110.0 % }', group='UnfairValueGap')
 i_shortUvgGapStopLossPerOne = i_shortUvgGapStopLossPercentage * 0.01
-i_longUvgGapTakeProfitPercentage = input.float(65.0, title='(L) Gap TakeProfit Percentage { 65.0 % }', group='UnfairValueGap')
+i_longUvgGapTakeProfitPercentage = input.float(62.0, title='(L) Gap TakeProfit Percentage { 62.0 % }', group='UnfairValueGap')
 i_longUvgGapTakeProfitPerOne = i_longUvgGapTakeProfitPercentage * 0.01
 i_shortUvgGapTakeProfitPercentage = input.float(65.0, title='(S) Gap TakeProfit Percentage { 65.0 % }', group='UnfairValueGap')
 i_shortUvgGapTakeProfitPerOne = i_shortUvgGapTakeProfitPercentage * 0.01
 i_enableUvgTakeProfits = input.bool(true, title='Enable UVG based TakeProfits {True}', group='UnfairValueGap')
-i_longUvgMinimumGapPercentage = input.float(0.80, title='(L) Minimum Gap Percentage {0.80 %}', group='UnfairValueGap')
+i_longUvgMinimumGapPercentage = input.float(1.30, title='(L) Minimum Gap Percentage {1.30 %}', group='UnfairValueGap')
 i_longUvgMaximumGapPercentage = input.float(1.70, title='(L) Maximum Gap Percentage {1.70 %}', group='UnfairValueGap')
 i_shortUvgMinimumGapPercentage = input.float(0.80, title='(S) Minimum Gap Percentage {0.80 %}', group='UnfairValueGap')
 i_shortUvgMaximumGapPercentage = input.float(10.00, title='(S) Maximum Gap Percentage {10.00 %}', group='UnfairValueGap')
