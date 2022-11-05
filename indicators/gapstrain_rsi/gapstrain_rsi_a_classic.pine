@@ -3,10 +3,10 @@
 
 //@version=5
 
-// Current version: v20221105 ( A001 )
+// Current version: v20221105 ( A002 )
 // Tradingview Public description - END
 
-indicator(title='GapstrainRSI A001', shorttitle='A001GapstrainRSI', overlay=false)
+indicator(title='GapstrainRSI A002', shorttitle='A002GapstrainRSI', overlay=false)
 
 // INPUTS - BEGIN
 
