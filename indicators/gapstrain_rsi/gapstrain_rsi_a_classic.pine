@@ -12,7 +12,7 @@ indicator(title='GapstrainRSI A001', shorttitle='A001GapstrainRSI', overlay=fals
 
 i_fvgFillType = input.string(title='Filled FVG Type', defval='H/L', options=['Close', 'H/L'], group='FairValueGap')
 i_fvgMaxBarsback = input.int(100, 'Max bars back to find FVGs ?', minval=10, maxval=500, group='FairValueGap', tooltip='This will look for FVG\'s x bars back. The higher the number, the slower the script will run.')
-i_showFvgTotals = input.bool(true, title='Show Fvg Totals {True}', group='FairValueGap')
+i_showFvgTotals = input.bool(false, title='Show Fvg Totals {False}', group='FairValueGap')
 
 i_gapstrainBullRsiLength = input.int(14, minval=1, title='RSI Length', group='Gapstrain RSI')
 i_gapstrainBearRsiLength = input.int(14, minval=1, title='RSI Length', group='Gapstrain RSI')
