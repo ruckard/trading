@@ -12,7 +12,7 @@
 // StopLoss will be tailored to be a bit higher than the filling-the-Gap distance so that it's not triggered at all.
 // This specific strategy also includes Risk Management.
 // 
-// It was originally tested at BTCUSDT pair and 4H timeframe.
+// It was originally tested at BTCUSDT pair and 1H timeframe.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
