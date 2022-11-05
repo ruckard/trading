@@ -1,0 +1,162 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © ruckard
+
+//@version=5
+
+// Current version: v20221105 ( A001 )
+// Tradingview Public description - END
+
+strategy('GapstrainRSI A001', shorttitle='A001GapstrainRSI', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+
+// INPUTS - BEGIN
+
+i_uvgFillType = input.string(title='Filled UVG Type', defval='H/L', options=['Close', 'H/L'], group='UnfairValueGap')
+i_uvgMaxBarsback = input.int(100, 'Max bars back to find UVGs ?', minval=10, maxval=500, group='UnfairValueGap', tooltip='This will look for UVG\'s x bars back. The higher the number, the slower the script will run.')
+i_showUnfairValueGapDecision = input.bool(true, title='Show Decision {True}', group='UnfairValueGap')
+i_showUnfairValueGaps = input.bool(true, title='Show Unfair Gaps {True}', group='UnfairValueGap')
+
+// INPUTS - END
+
+
+
+// Strategy - INIT - BEGIN
+
+// UnfairValueGap functions
+uvgGetMtfData(res) =>
+    request.security(
+      syminfo.tickerid,
+      res,
+      [
+      close[1] < low[2] and high[0] < low[2], // Bearish UVG
+      close[1] > high[2] and low[0] > high[2], // Bullish UVG
+      open[0],   high[0],   low[0],   close[0],   time[0], bar_index[0],
+      open[1], high[1], low[1], close[1], time[1], bar_index[1],
+      open[2], high[2], low[2], close[2], time[2], bar_index[2]
+      ],
+      gaps=barmerge.gaps_off,
+      lookahead=barmerge.lookahead_off
+      )
+
+isUvgFilled(type, old_bi, old_h, old_l, bi, h, l, c) => // bull/bear, open, high, low, close, bar_index, uvg bar index
+    isOld = bi - old_bi > i_uvgMaxBarsback
+
+    type == 'bull' ?
+      isOld or (i_uvgFillType == 'Close' ? c : l) <= old_h
+      :
+      isOld or (i_uvgFillType == 'Close' ? c : h) >= old_l
+
+isPriceInsideUvg(type, old_h, old_l, h, l, c) =>
+    type == 'bull' ?
+      l < old_l and (i_uvgFillType == 'Close' ? c : l) > old_h
+      :
+      h > old_h and (i_uvgFillType == 'Close' ? c : h) < old_l
+
+// FUNCTIONS - END
+
+
+// Strategy Body - BEGIN
+
+// UnfairValueGap substrategy
+
+unfairvaluegapTimeframe = timeframe.period
+
+// UnfairValueGap - Get All OHLC Data
+[bearishUvg, bullishUvg, uvgOpen, uvgHigh, uvgLow, uvgClose, uvgTime, uvgBarIndex, uvgOpen1, uvgHigh1, uvgLow1, uvgClose1, uvgTime1, uvgBarIndex1, uvgOpen2, uvgHigh2, uvgLow2, uvgClose2, uvgTime2, uvgBarIndex2] = uvgGetMtfData(unfairvaluegapTimeframe)
+
+// UnfairValueGap - Save data to arrays
+var uvgBullIndexes = array.new_int(0)
+var uvgBullHighs = array.new_float(0)
+var uvgBullLows = array.new_float(0)
+var uvgBearIndexes = array.new_int(0)
+var uvgBearHighs = array.new_float(0)
+var uvgBearLows = array.new_float(0)
+
+if bullishUvg
+    array.push(uvgBullIndexes, uvgBarIndex)
+    array.push(uvgBullHighs, uvgHigh2)
+    array.push(uvgBullLows, uvgLow)
+else if bearishUvg
+    array.push(uvgBearIndexes, uvgBarIndex)
+    array.push(uvgBearHighs, uvgHigh)
+    array.push(uvgBearLows, uvgLow2)
+
+// UnfairValueGap - Delete filled uvgs
+if array.size(uvgBullIndexes) > 0
+    for i = array.size(uvgBullIndexes)-1 to 0
+        if isUvgFilled('bull', array.get(uvgBullIndexes,i), array.get(uvgBullHighs,i), array.get(uvgBullLows,i), uvgBarIndex, uvgHigh, uvgLow, uvgClose)
+            array.remove(uvgBullIndexes, i)
+            array.remove(uvgBullHighs, i)
+            array.remove(uvgBullLows, i)
+if array.size(uvgBearIndexes) > 0
+    for i = array.size(uvgBearIndexes)-1 to 0
+        if isUvgFilled('bear', array.get(uvgBearIndexes,i), array.get(uvgBearHighs,i), array.get(uvgBearLows,i), uvgBarIndex, uvgHigh, uvgLow, uvgClose)
+            array.remove(uvgBearIndexes, i)
+            array.remove(uvgBearHighs, i)
+            array.remove(uvgBearLows, i)
+
+// UnfairValueGap - Check if inside uvg
+unfairValueGapInsideBull = false
+unfairValueGapInsideBear = false
+
+if array.size(uvgBullIndexes) > 0
+    for i = array.size(uvgBullIndexes)-1 to 0
+        if isPriceInsideUvg('bull', array.get(uvgBullHighs,i), array.get(uvgBullLows,i), uvgHigh, uvgLow, uvgClose)
+            unfairValueGapInsideBull := true
+if array.size(uvgBearIndexes) > 0
+    for i = array.size(uvgBearIndexes)-1 to 0
+        if isPriceInsideUvg('bear', array.get(uvgBearHighs,i), array.get(uvgBearLows,i), uvgHigh, uvgLow, uvgClose)
+            unfairValueGapInsideBear := true
+
+// Gap distance
+float uvgGapPriceDistancePercentage = 0
+float uvgGapRefillPercentage = 0
+float uvgGapPercentage = 0
+bool unfairvaluegapOppositeLong = false
+bool unfairvaluegapOppositeShort = false
+bool uvgGapRefillPercentageIsWithinRange = false
+bool uvgGapPercentageIsWithinRange = false
+if bullishUvg // LONG
+    uvgGapPriceDistancePercentage := ((uvgClose - uvgHigh2) / uvgHigh2) * 100
+    uvgGapRefillPercentage := uvgGapPriceDistancePercentage * i_longUvgGapTakeProfitPerOne
+    uvgGapRefillPercentageIsWithinRange := ((uvgGapRefillPercentage >= i_shortUvgMinimumTakeProfitPercentage) and (uvgGapRefillPercentage < i_shortUvgMaximumTakeProfitPercentage))
+
+    uvgGapPercentage := ((uvgLow - uvgHigh2) / uvgHigh2) * 100
+    uvgGapPercentageIsWithinRange := (uvgGapPercentage >= i_longUvgMinimumGapPercentage) and (uvgGapPercentage < i_longUvgMaximumGapPercentage)
+
+    if (uvgGapRefillPercentageIsWithinRange and uvgGapPercentageIsWithinRange)
+        unfairvaluegapOppositeLong := true
+else if bearishUvg // SHORT
+    uvgGapPriceDistancePercentage := ((uvgLow2 - uvgClose) / uvgClose) * 100
+    uvgGapRefillPercentage := uvgGapPriceDistancePercentage * i_shortUvgGapTakeProfitPerOne
+    uvgGapRefillPercentageIsWithinRange := ((uvgGapRefillPercentage >= i_longUvgMinimumTakeProfitPercentage) and (uvgGapRefillPercentage < i_longUvgMaximumTakeProfitPercentage))
+
+    uvgGapPercentage := ((uvgLow2 - uvgHigh) / uvgHigh) * 100
+    uvgGapPercentageIsWithinRange := (uvgGapPercentage >= i_shortUvgMinimumGapPercentage) and (uvgGapPercentage < i_shortUvgMaximumGapPercentage)
+
+    if (uvgGapRefillPercentageIsWithinRange and uvgGapPercentageIsWithinRange)
+        unfairvaluegapOppositeShort := true
+
+// Final logic
+bool unfairvaluegapLongShort = false
+bool unfairvaluegapLong = false
+bool unfairvaluegapShort = false
+
+if (( unfairValueGapInsideBull == true ) and ( unfairValueGapInsideBear == true ))
+    unfairvaluegapLongShort := true
+
+unfairvaluegapLong := bullishUvg and unfairvaluegapOppositeLong
+unfairvaluegapShort := bearishUvg and unfairvaluegapOppositeShort
+
+// UnfairValueGap Decision - Plot - BEGIN
+unfairvaluegapLongColor = i_showUnfairValueGapDecision ? color.new(#00c3ff, transp=0) : na
+unfairvaluegapShortColor = i_showUnfairValueGapDecision ? color.new(#ff0062, transp=0) : na
+unfairvaluegapLongShortColor = i_showUnfairValueGapDecision ? color.new(color.yellow, transp=0) : na
+plotshape(unfairvaluegapLong, title='UnfairValueGap Up', style=shape.arrowup, color=unfairvaluegapLongColor, location=location.top)
+plotshape(unfairvaluegapShort, title='UnfairValueGap Down', style=shape.arrowdown, color=unfairvaluegapShortColor, location=location.top)
+plotshape(unfairvaluegapLongShort, title='UnfairValueGap UpAndDown', style=shape.square, color=unfairvaluegapLongShortColor, location=location.top)
+// UnfairValueGap Decision - Plot - END
+
+unfairvaluegapBullishColor = i_showUnfairValueGaps ? color.new(color.green, transp=0) : na
+unfairvaluegapBearishColor = i_showUnfairValueGaps ? color.new(#ff0062, transp=0) : na
+plotshape(bullishUvg, title='UnfairValueGap Bullish', style=shape.labelup, color=unfairvaluegapBullishColor, location=location.bottom)
+plotshape(bearishUvg, title='UnfairValueGap Bearish', style=shape.labeldown, color=unfairvaluegapBearishColor, location=location.bottom)
