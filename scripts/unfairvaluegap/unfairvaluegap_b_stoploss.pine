@@ -3,7 +3,7 @@
 
 //@version=5
 
-// Current version: v20221105 ( B002 )
+// Current version: v20221105 ( B003 )
 // Tradingview Public description - BEGIN
 // 
 // Calculate a distance between the current price and latest Gap opposite end.
@@ -175,7 +175,7 @@
 
 // Tradingview Public description - END
 
-strategy('UnfairValueGap B002', shorttitle='B002UnfairValueGap', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('UnfairValueGap B003', shorttitle='B003UnfairValueGap', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/ZignalyBeta/21 as zig
