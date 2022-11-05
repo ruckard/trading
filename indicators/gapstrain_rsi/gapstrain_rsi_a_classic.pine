@@ -12,8 +12,7 @@ strategy('GapstrainRSI A001', shorttitle='A001GapstrainRSI', overlay=true, max_b
 
 i_fvgFillType = input.string(title='Filled FVG Type', defval='H/L', options=['Close', 'H/L'], group='FairValueGap')
 i_fvgMaxBarsback = input.int(100, 'Max bars back to find FVGs ?', minval=10, maxval=500, group='FairValueGap', tooltip='This will look for FVG\'s x bars back. The higher the number, the slower the script will run.')
-i_showFairValueGapDecision = input.bool(true, title='Show Decision {True}', group='FairValueGap')
-i_showFairValueGaps = input.bool(true, title='Show Unfair Gaps {True}', group='FairValueGap')
+i_showFvgTotals = input.bool(true, title='Show Fvg Totals {True}', group='FairValueGap')
 
 // INPUTS - END
 
@@ -107,56 +106,20 @@ if array.size(fvgBearIndexes) > 0
         if isPriceInsideFvg('bear', array.get(fvgBearHighs,i), array.get(fvgBearLows,i), fvgHigh, fvgLow, fvgClose)
             fairValueGapInsideBear := true
 
-// Gap distance
-float fvgGapPriceDistancePercentage = 0
-float fvgGapRefillPercentage = 0
-float fvgGapPercentage = 0
-bool fairvaluegapOppositeLong = false
-bool fairvaluegapOppositeShort = false
-bool fvgGapRefillPercentageIsWithinRange = false
-bool fvgGapPercentageIsWithinRange = false
-if bullishFvg // LONG
-    fvgGapPriceDistancePercentage := ((fvgClose - fvgHigh2) / fvgHigh2) * 100
-    fvgGapRefillPercentage := fvgGapPriceDistancePercentage * i_longFvgGapTakeProfitPerOne
-    fvgGapRefillPercentageIsWithinRange := ((fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_shortFvgMaximumTakeProfitPercentage))
+// GapsTrainRSI - Total calculus
+float fvgBullTotal = 0.0
+if array.size(fvgBullIndexes) > 0
+    for i = array.size(fvgBullIndexes)-1 to 0
+        fvgBullTotal := fvgBullTotal + math.abs(array.get(fvgBullHighs,i) - array.get(fvgBullLows,i))
 
-    fvgGapPercentage := ((fvgLow - fvgHigh2) / fvgHigh2) * 100
-    fvgGapPercentageIsWithinRange := (fvgGapPercentage >= i_longFvgMinimumGapPercentage) and (fvgGapPercentage < i_longFvgMaximumGapPercentage)
-
-    if (fvgGapRefillPercentageIsWithinRange and fvgGapPercentageIsWithinRange)
-        fairvaluegapOppositeLong := true
-else if bearishFvg // SHORT
-    fvgGapPriceDistancePercentage := ((fvgLow2 - fvgClose) / fvgClose) * 100
-    fvgGapRefillPercentage := fvgGapPriceDistancePercentage * i_shortFvgGapTakeProfitPerOne
-    fvgGapRefillPercentageIsWithinRange := ((fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_longFvgMaximumTakeProfitPercentage))
-
-    fvgGapPercentage := ((fvgLow2 - fvgHigh) / fvgHigh) * 100
-    fvgGapPercentageIsWithinRange := (fvgGapPercentage >= i_shortFvgMinimumGapPercentage) and (fvgGapPercentage < i_shortFvgMaximumGapPercentage)
-
-    if (fvgGapRefillPercentageIsWithinRange and fvgGapPercentageIsWithinRange)
-        fairvaluegapOppositeShort := true
-
-// Final logic
-bool fairvaluegapLongShort = false
-bool fairvaluegapLong = false
-bool fairvaluegapShort = false
-
-if (( fairValueGapInsideBull == true ) and ( fairValueGapInsideBear == true ))
-    fairvaluegapLongShort := true
-
-fairvaluegapLong := bullishFvg and fairvaluegapOppositeLong
-fairvaluegapShort := bearishFvg and fairvaluegapOppositeShort
+float fvgBearTotal = 0.0
+if array.size(fvgBearIndexes) > 0
+    for i = array.size(fvgBearIndexes)-1 to 0
+        fvgBearTotal := fvgBearTotal + math.abs(array.get(fvgBearHighs,i) - array.get(fvgBearLows,i))
 
 // FairValueGap Decision - Plot - BEGIN
-fairvaluegapLongColor = i_showFairValueGapDecision ? color.new(#00c3ff, transp=0) : na
-fairvaluegapShortColor = i_showFairValueGapDecision ? color.new(#ff0062, transp=0) : na
-fairvaluegapLongShortColor = i_showFairValueGapDecision ? color.new(color.yellow, transp=0) : na
-plotshape(fairvaluegapLong, title='FairValueGap Up', style=shape.arrowup, color=fairvaluegapLongColor, location=location.top)
-plotshape(fairvaluegapShort, title='FairValueGap Down', style=shape.arrowdown, color=fairvaluegapShortColor, location=location.top)
-plotshape(fairvaluegapLongShort, title='FairValueGap UpAndDown', style=shape.square, color=fairvaluegapLongShortColor, location=location.top)
-// FairValueGap Decision - Plot - END
 
-fairvaluegapBullishColor = i_showFairValueGaps ? color.new(color.green, transp=0) : na
-fairvaluegapBearishColor = i_showFairValueGaps ? color.new(#ff0062, transp=0) : na
-plotshape(bullishFvg, title='FairValueGap Bullish', style=shape.labelup, color=fairvaluegapBullishColor, location=location.bottom)
-plotshape(bearishFvg, title='FairValueGap Bearish', style=shape.labeldown, color=fairvaluegapBearishColor, location=location.bottom)
+fvgBullTotalColor = i_showFvgTotals ? color.new(color.green, transp=0) : na
+fvgBearTotalColor = i_showFvgTotals ? color.new(#ff0062, transp=0) : na
+fvgBullTotalPlot = plot(fvgBullTotal, color = fvgBullTotalColor, title = 'Bull Fvg Total')
+fvgBearTotalPlot = plot(fvgBearTotal, color = fvgBearTotalColor, title = 'Bear Fvg Total')
