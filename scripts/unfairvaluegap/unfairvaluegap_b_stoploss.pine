@@ -368,7 +368,9 @@ i_shortUvgGapTakeProfitPercentage = input.float(65.0, title='(S) Gap TakeProfit 
 i_shortUvgGapTakeProfitPerOne = i_shortUvgGapTakeProfitPercentage * 0.01
 i_enableUvgTakeProfits = input.bool(true, title='Enable UVG based TakeProfits {True}', group='UnfairValueGap')
 i_longUvgMinimumGapPercentage = input.float(0.80, title='(L) Minimum Gap Percentage {0.80 %}', group='UnfairValueGap')
+i_longUvgMaximumGapPercentage = input.float(1.70, title='(L) Maximum Gap Percentage {1.70 %}', group='UnfairValueGap')
 i_shortUvgMinimumGapPercentage = input.float(0.80, title='(S) Minimum Gap Percentage {0.80 %}', group='UnfairValueGap')
+i_shortUvgMaximumGapPercentage = input.float(10.00, title='(S) Maximum Gap Percentage {10.00 %}', group='UnfairValueGap')
 // INPUTS - END
 
 
@@ -768,16 +770,16 @@ float uvgGapPercentage = 0
 bool unfairvaluegapOppositeLong = false
 bool unfairvaluegapOppositeShort = false
 bool uvgGapRefillPercentageIsWithinRange = false
-bool uvgGapPercentageAboveMinimum = false
+bool uvgGapPercentageIsWithinRange = false
 if bullishUvg // LONG
     uvgGapPriceDistancePercentage := ((uvgClose - uvgHigh2) / uvgHigh2) * 100
     uvgGapRefillPercentage := uvgGapPriceDistancePercentage * i_longUvgGapTakeProfitPerOne
     uvgGapRefillPercentageIsWithinRange := ((uvgGapRefillPercentage >= i_shortUvgMinimumTakeProfitPercentage) and (uvgGapRefillPercentage < i_shortUvgMaximumTakeProfitPercentage))
 
     uvgGapPercentage := ((uvgLow - uvgHigh2) / uvgHigh2) * 100
-    uvgGapPercentageAboveMinimum := uvgGapPercentage >= i_longUvgMinimumGapPercentage
+    uvgGapPercentageIsWithinRange := (uvgGapPercentage >= i_longUvgMinimumGapPercentage) and (uvgGapPercentage < i_longUvgMaximumGapPercentage)
 
-    if (uvgGapRefillPercentageIsWithinRange and uvgGapPercentageAboveMinimum)
+    if (uvgGapRefillPercentageIsWithinRange and uvgGapPercentageIsWithinRange)
         unfairvaluegapOppositeLong := true
 else if bearishUvg // SHORT
     uvgGapPriceDistancePercentage := ((uvgLow2 - uvgClose) / uvgClose) * 100
@@ -785,9 +787,9 @@ else if bearishUvg // SHORT
     uvgGapRefillPercentageIsWithinRange := ((uvgGapRefillPercentage >= i_longUvgMinimumTakeProfitPercentage) and (uvgGapRefillPercentage < i_longUvgMaximumTakeProfitPercentage))
 
     uvgGapPercentage := ((uvgLow2 - uvgHigh) / uvgHigh) * 100
-    uvgGapPercentageAboveMinimum := uvgGapPercentage >= i_shortUvgMinimumGapPercentage
+    uvgGapPercentageIsWithinRange := (uvgGapPercentage >= i_shortUvgMinimumGapPercentage) and (uvgGapPercentage < i_shortUvgMaximumGapPercentage)
 
-    if (uvgGapRefillPercentageIsWithinRange and uvgGapPercentageAboveMinimum)
+    if (uvgGapRefillPercentageIsWithinRange and uvgGapPercentageIsWithinRange)
         unfairvaluegapOppositeShort := true
 
 // Final logic
