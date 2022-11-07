@@ -802,7 +802,6 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
     adxProtectionShortCondition := false
 
 // Filledvaluegap substrategy
-
 color fvgBullLinesColor = i_showFvgLines ? i_fvgBullLinesColor : na
 color fvgBearLinesColor = i_showFvgLines ? i_fvgBearLinesColor : na
 
