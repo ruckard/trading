@@ -954,6 +954,18 @@ plotshape(higherTimeframeTrendMaLong, title='SideMA Up', style=shape.arrowup, co
 plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdown, color=higherTimeframeTrendMaShortColor, location=location.top)
 // Higher Timeframe Trend - Plot - END
 
+// FilledValueGap - Plot - BEGIN
+//Bullish FVG
+bullFvgMaxPlot = plot(bullFvgMax, 'Bullish FVG Maximum', na)
+bullFvgMinPlot = plot(bullFvgMin, 'Bullish FVG Minimum', na)
+fill(bullFvgMaxPlot, bullFvgMinPlot, bullishFvgCondition ? na : i_fvgBullColor, 'Bullish FVG')
+
+//Bearish FVG
+bearFvgMaxPlot = plot(bearFvgMax, 'Bearish FVG Maximum', na)
+bearFvgMinPlot = plot(bearFvgMin, 'Bearish FVG Minimum', na)
+fill(bearFvgMaxPlot, bearFvgMinPlot, bearishFvgCondition ? na : i_fvgBearColor, 'Bearish FVG')
+// FilledValueGap - Plot - END
+
 // Position price calculation - BEGIN
 float positionPrice = na
 if (insideASellOrder or insideABuyOrder)
