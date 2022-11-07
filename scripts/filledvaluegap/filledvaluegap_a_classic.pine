@@ -348,6 +348,18 @@ i_ADXProtectionSmoothing = input.int(14, title='ADX Smoothing', minval=1, maxval
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+
+i_fvgThreshold = input.float(0, 'Percentage {0.0}', minval = 0, group='FairValueGap')
+i_enableFvgAutoThreshold = input(true, 'Auto Threshold {True}', group='FairValueGap')
+i_maximumUnfilledGaps = input(5, 'Show Last Unfilled Gaps {5}', group='FairValueGap')
+i_showFvgDash = input(false, 'Show Dashboard {False}', group='FairValueGap')
+i_showUnfilledGaps = input(false, 'Show All Unfilled Gaps {False}', group='FairValueGap')
+i_showFvgLines = input(false, 'Show FVG lines {False}', group='FairValueGap')
+i_fvgTimeframe = input.timeframe('', 'Timeframe {Chart}', group='FairValueGap')
+i_fvgBullColor = input.color(color.new(#0cb51a, 75), 'Bullish FVG Color', group='FairValueGap')
+i_fvgBearColor = input.color(color.new(#ff1100, 75), 'Bearish FVG Color', group='FairValueGap')
+i_fvgBullLinesColor = input.color(color.new(#0cb51a, 75), 'Bullish FVG Lines Color', group='FairValueGap')
+i_fvgBearLinesColor = input.color(color.new(#ff1100, 75), 'Bearish FVG Lines Color', group='FairValueGap')
 // INPUTS - END
 
 
@@ -517,6 +529,136 @@ f_RsiMode(_src, _length, _round, _minimum, _maximum) =>
             _highest_occurence_value := _src[_i]
     _return = _highest_occurence_value
 
+fvgGetOhlc()=> [close[1], open[1], high, low, high[2], low[2]]
+
+detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fvgSrcH2)=>
+    var float fvgMinimum = na
+    var float fvgMaximum = na
+    var int fvgIsFilled = 0
+    var int fvgTotal = 0
+    var int fvgFillX1 = 0
+    var int fvgDuration = 0
+
+    //Check if historical FVG's are filled
+    _idx = 0
+    for l in fvgLines
+        line.set_x2(l, bar_index)
+
+        fvgIsFilledConditionTurn = p_fvgSrcL <= line.get_y2(l)
+
+        if fvgIsFilledConditionTurn
+            array.remove(fvgLines, _idx)
+
+            fvgIsFilled += 1
+            fvgDuration += bar_index - line.get_x1(l)
+        _idx += 1
+
+    _idx := 0
+    for l in discardedFvgLines
+        fvgIsFilledConditionTurn = p_fvgSrcL <= line.get_y2(l)
+
+        if fvgIsFilledConditionTurn
+            array.remove(discardedFvgLines, _idx)
+
+            fvgIsFilled += 1
+            fvgDuration += bar_index - line.get_x1(l)
+        _idx += 1
+
+    //Test for FVG
+    if fvgCondition
+        //If FVG is unfilled store line in array
+        if fvgMaximum[1] != fvgMinimum[1]
+            level = fvgMinimum
+            array.unshift(fvgLines, line.new(bar_index - 1, level, bar_index, level, color = fvgCss, style = line.style_dashed))
+
+            if (not i_showUnfilledGaps)
+                if (array.size(fvgLines) > i_maximumUnfilledGaps)
+                    pop_l = array.pop(fvgLines)
+                    array.push(discardedFvgLines, pop_l)
+        else
+            fvgIsFilled += 1
+            fvgDuration += bar_index - fvgFillX1
+
+        fvgMaximum := p_fvgSrcL
+        fvgMinimum := p_fvgSrcH2
+
+        fvgTotal += 1
+        fvgFillX1 := bar_index
+
+    fvgMaximum := math.max(math.min(fvgMaximum, p_fvgSrcL), fvgMinimum)
+    fvgMinimum := fvgMinimum
+
+    fvgIsFilledCondition = (fvgMaximum == fvgMinimum) and (fvgMaximum[1] != fvgMinimum)
+
+    fvgFillX1 := fvgIsFilledCondition ? bar_index : fvgFillX1
+
+    [fvgMaximum, fvgMinimum, fvgIsFilled, fvgDuration, fvgTotal, fvgIsFilledCondition]
+
+detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fvgSrcL2)=>
+    var float fvgMinimum = na
+    var float fvgMaximum = na
+    var int fvgIsFilled = 0
+    var int fvgTotal = 0
+    var int fvgFillX1 = 0
+    var int fvgDuration = 0
+
+    //Check if historical FVG's are filled
+    _idx = 0
+    for l in fvgLines
+        line.set_x2(l, bar_index)
+
+        fvgIsFilledConditionTurn = p_fvgSrcH >= line.get_y2(l)
+
+        if fvgIsFilledConditionTurn
+            array.remove(fvgLines, _idx)
+
+            fvgIsFilled += 1
+            fvgDuration += bar_index - line.get_x1(l)
+
+        _idx += 1
+
+    _idx := 0
+    for l in discardedFvgLines
+        fvgIsFilledConditionTurn = p_fvgSrcH >= line.get_y2(l)
+
+        if fvgIsFilledConditionTurn
+            array.remove(discardedFvgLines, _idx)
+
+            fvgIsFilled += 1
+            fvgDuration += bar_index - line.get_x1(l)
+
+        _idx += 1
+
+    //Test for FVG
+    if fvgCondition
+        //If FVG is unfvgIsFilled store line in array
+        if fvgMaximum[1] != fvgMinimum[1]
+            level = fvgMaximum
+            array.unshift(fvgLines, line.new(bar_index - 1, level, bar_index, level, color = fvgCss, style = line.style_dashed))
+
+            if (not i_showUnfilledGaps)
+                if (array.size(fvgLines) > i_maximumUnfilledGaps)
+                    pop_l = array.pop(fvgLines)
+                    array.push(discardedFvgLines, pop_l)
+        else
+            fvgIsFilled += 1
+            fvgDuration += bar_index - fvgFillX1
+
+        fvgMaximum := p_fvgSrcL2
+        fvgMinimum := p_fvgSrcH
+
+        fvgTotal += 1
+        fvgFillX1 := bar_index
+
+    fvgMaximum := fvgMaximum
+    fvgMinimum := math.min(math.max(fvgMinimum, p_fvgSrcH), fvgMaximum)
+
+    fvgIsFilledCondition = fvgMaximum == fvgMinimum and fvgMaximum[1] != fvgMinimum
+
+    fvgFillX1 := fvgIsFilledCondition ? bar_index : fvgFillX1
+
+    [fvgMaximum, fvgMinimum, fvgIsFilled, fvgDuration, fvgTotal, fvgIsFilledCondition]
+
 // FUNCTIONS - END
 
 
@@ -658,6 +800,38 @@ if ((protectionAdx < longADXProtectionMinimumLevel) or (protectionAdx >= longADX
     adxProtectionLongCondition := false
 if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortADXProtectionMaximumLevel))
     adxProtectionShortCondition := false
+
+// Filledvaluegap substrategy
+
+color fvgBullLinesColor = i_showFvgLines ? i_fvgBullLinesColor : na
+color fvgBearLinesColor = i_showFvgLines ? i_fvgBearLinesColor : na
+
+var bullFvgLines = array.new_line(0)
+var discardedBullFvgLines = array.new_line(0)
+var bearFvgLines = array.new_line(0)
+var discardedBearFvgLines = array.new_line(0)
+
+fvgTimeframeChange = timeframe.change(i_fvgTimeframe)
+[fvgSrcC1, fvgSrcO1, fvgSrcH, fvgSrcL, fvgSrcH2, fvgSrcL2] = request.security(syminfo.tickerid, i_fvgTimeframe, fvgGetOhlc())
+fvgDeltaPercentage = (fvgSrcC1 - fvgSrcO1) / fvgSrcO1 * 100
+threshold = i_enableFvgAutoThreshold ? ( ta.cum(math.abs(fvgTimeframeChange ? fvgDeltaPercentage : 0)) / bar_index * 2 ) : i_fvgThreshold
+
+bullishFvgCondition = (fvgSrcL > fvgSrcH2) and (fvgSrcC1 > fvgSrcH2) and (fvgDeltaPercentage > threshold) and fvgTimeframeChange
+[bullFvgMax, bullFvgMin, bullFvgFilled, bull_fvgDuration, bullFvgTotal, bullFvgFilledCondition] = detectBullFvg(bullishFvgCondition, bullFvgLines, discardedBullFvgLines, fvgBullLinesColor, fvgSrcL, fvgSrcH2)
+
+bearishFvgCondition = (fvgSrcH < fvgSrcL2) and (fvgSrcC1 < fvgSrcL2) and (-fvgDeltaPercentage > threshold) and fvgTimeframeChange
+[bearFvgMax, bearFvgMin, bearFvgFilled, bear_fvgDuration, bearFvgTotal, bearFvgFilledCondition] = detectBearFvg(bearishFvgCondition, bearFvgLines, discardedBearFvgLines, fvgBearLinesColor, fvgSrcH, fvgSrcL2)
+
+bool filledvaluegapLong = false
+bool filledvaluegapShort = false
+
+if (bullFvgFilled and bearFvgFilled) // Avoid high volatility
+    filledvaluegapLong := false
+    filledvaluegapShort := false
+else if (bullFvgFilled)
+    filledvaluegapLong := true
+else if (bearFvgFilled)
+    filledvaluegapShort := true
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
