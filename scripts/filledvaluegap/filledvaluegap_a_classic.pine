@@ -534,7 +534,7 @@ fvgGetOhlc()=> [close[1], open[1], high, low, high[2], low[2]]
 detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fvgSrcH2)=>
     var float fvgMinimum = na
     var float fvgMaximum = na
-    var int fvgIsFilled = 0
+    var int fvgFilledNumber = 0
     var int fvgTotal = 0
     var int fvgFillX1 = 0
     var int fvgDuration = 0
@@ -549,7 +549,7 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
         if fvgIsFilledConditionTurn
             array.remove(fvgLines, _idx)
 
-            fvgIsFilled += 1
+            fvgFilledNumber += 1
             fvgDuration += bar_index - line.get_x1(l)
         _idx += 1
 
@@ -560,7 +560,7 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
         if fvgIsFilledConditionTurn
             array.remove(discardedFvgLines, _idx)
 
-            fvgIsFilled += 1
+            fvgFilledNumber += 1
             fvgDuration += bar_index - line.get_x1(l)
         _idx += 1
 
@@ -576,7 +576,7 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
                     pop_l = array.pop(fvgLines)
                     array.push(discardedFvgLines, pop_l)
         else
-            fvgIsFilled += 1
+            fvgFilledNumber += 1
             fvgDuration += bar_index - fvgFillX1
 
         fvgMaximum := p_fvgSrcL
@@ -592,12 +592,12 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
 
     fvgFillX1 := fvgIsFilledCondition ? bar_index : fvgFillX1
 
-    [fvgMaximum, fvgMinimum, fvgIsFilled, fvgDuration, fvgTotal, fvgIsFilledCondition]
+    [fvgMaximum, fvgMinimum, fvgFilledNumber, fvgDuration, fvgTotal, fvgIsFilledCondition]
 
 detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fvgSrcL2)=>
     var float fvgMinimum = na
     var float fvgMaximum = na
-    var int fvgIsFilled = 0
+    var int fvgFilledNumber = 0
     var int fvgTotal = 0
     var int fvgFillX1 = 0
     var int fvgDuration = 0
@@ -612,7 +612,7 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
         if fvgIsFilledConditionTurn
             array.remove(fvgLines, _idx)
 
-            fvgIsFilled += 1
+            fvgFilledNumber += 1
             fvgDuration += bar_index - line.get_x1(l)
 
         _idx += 1
@@ -624,7 +624,7 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
         if fvgIsFilledConditionTurn
             array.remove(discardedFvgLines, _idx)
 
-            fvgIsFilled += 1
+            fvgFilledNumber += 1
             fvgDuration += bar_index - line.get_x1(l)
 
         _idx += 1
@@ -641,7 +641,7 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
                     pop_l = array.pop(fvgLines)
                     array.push(discardedFvgLines, pop_l)
         else
-            fvgIsFilled += 1
+            fvgFilledNumber += 1
             fvgDuration += bar_index - fvgFillX1
 
         fvgMaximum := p_fvgSrcL2
@@ -657,7 +657,7 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
 
     fvgFillX1 := fvgIsFilledCondition ? bar_index : fvgFillX1
 
-    [fvgMaximum, fvgMinimum, fvgIsFilled, fvgDuration, fvgTotal, fvgIsFilledCondition]
+    [fvgMaximum, fvgMinimum, fvgFilledNumber, fvgDuration, fvgTotal, fvgIsFilledCondition]
 
 // FUNCTIONS - END
 
@@ -817,20 +817,20 @@ fvgDeltaPercentage = (fvgSrcC1 - fvgSrcO1) / fvgSrcO1 * 100
 threshold = i_enableFvgAutoThreshold ? ( ta.cum(math.abs(fvgTimeframeChange ? fvgDeltaPercentage : 0)) / bar_index * 2 ) : i_fvgThreshold
 
 bullishFvgCondition = (fvgSrcL > fvgSrcH2) and (fvgSrcC1 > fvgSrcH2) and (fvgDeltaPercentage > threshold) and fvgTimeframeChange
-[bullFvgMax, bullFvgMin, bullFvgFilled, bull_fvgDuration, bullFvgTotal, bullFvgFilledCondition] = detectBullFvg(bullishFvgCondition, bullFvgLines, discardedBullFvgLines, fvgBullLinesColor, fvgSrcL, fvgSrcH2)
+[bullFvgMax, bullFvgMin, bullFvgFilledNumber, bull_fvgDuration, bullFvgTotal, bullFvgFilledCondition] = detectBullFvg(bullishFvgCondition, bullFvgLines, discardedBullFvgLines, fvgBullLinesColor, fvgSrcL, fvgSrcH2)
 
 bearishFvgCondition = (fvgSrcH < fvgSrcL2) and (fvgSrcC1 < fvgSrcL2) and (-fvgDeltaPercentage > threshold) and fvgTimeframeChange
-[bearFvgMax, bearFvgMin, bearFvgFilled, bear_fvgDuration, bearFvgTotal, bearFvgFilledCondition] = detectBearFvg(bearishFvgCondition, bearFvgLines, discardedBearFvgLines, fvgBearLinesColor, fvgSrcH, fvgSrcL2)
+[bearFvgMax, bearFvgMin, bearFvgFilledNumber, bear_fvgDuration, bearFvgTotal, bearFvgFilledCondition] = detectBearFvg(bearishFvgCondition, bearFvgLines, discardedBearFvgLines, fvgBearLinesColor, fvgSrcH, fvgSrcL2)
 
 bool filledvaluegapLong = false
 bool filledvaluegapShort = false
 
-if (bullFvgFilled and bearFvgFilled) // Avoid high volatility
+if (bullFvgFilledNumber and bearFvgFilledNumber) // Avoid high volatility
     filledvaluegapLong := false
     filledvaluegapShort := false
-else if (bullFvgFilled)
+else if (bullFvgFilledNumber)
     filledvaluegapLong := true
-else if (bearFvgFilled)
+else if (bearFvgFilledNumber)
     filledvaluegapShort := true
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
