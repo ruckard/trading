@@ -821,15 +821,18 @@ bullishFvgCondition = (fvgSrcL > fvgSrcH2) and (fvgSrcC1 > fvgSrcH2) and (fvgDel
 bearishFvgCondition = (fvgSrcH < fvgSrcL2) and (fvgSrcC1 < fvgSrcL2) and (-fvgDeltaPercentage > threshold) and fvgTimeframeChange
 [bearFvgMax, bearFvgMin, bearFvgFilledNumber, bear_fvgDuration, bearFvgTotal, bearFvgFilledCondition] = detectBearFvg(bearishFvgCondition, bearFvgLines, discardedBearFvgLines, fvgBearLinesColor, fvgSrcH, fvgSrcL2)
 
+bool bullFvgIsFilled = (bullFvgFilledNumber[1] + 1) == (bullFvgFilledNumber)
+bool bearFvgIsFilled = (bearFvgFilledNumber[1] + 1) == (bearFvgFilledNumber)
+
 bool filledvaluegapLong = false
 bool filledvaluegapShort = false
 
-if (bullFvgFilledNumber and bearFvgFilledNumber) // Avoid high volatility
+if (bullFvgIsFilled and bearFvgIsFilled) // Avoid high volatility
     filledvaluegapLong := false
     filledvaluegapShort := false
-else if (bullFvgFilledNumber)
+else if (bullFvgIsFilled)
     filledvaluegapLong := true
-else if (bearFvgFilledNumber)
+else if (bearFvgIsFilled)
     filledvaluegapShort := true
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
