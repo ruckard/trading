@@ -581,7 +581,6 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
                     array.push(discardedFvgLines, pop_l)
         else
             fvgFilledNumber += 1
-            fvgRecentlyFilledNumber += 1
             fvgDuration += bar_index - fvgFillX1
 
         fvgMaximum := p_fvgSrcL
@@ -649,7 +648,6 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
                     array.push(discardedFvgLines, pop_l)
         else
             fvgFilledNumber += 1
-            fvgRecentlyFilledNumber += 1
             fvgDuration += bar_index - fvgFillX1
 
         fvgMaximum := p_fvgSrcL2
