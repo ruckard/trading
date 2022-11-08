@@ -586,7 +586,7 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
         fvgFillX1 := bar_index
 
     fvgMaximum := math.max(math.min(fvgMaximum, p_fvgSrcL), fvgMinimum)
-    fvgMinimum := fvgMinimum
+    // fvgMinimum := fvgMinimum
 
     fvgIsFilledCondition = (fvgMaximum == fvgMinimum) and (fvgMaximum[1] != fvgMinimum)
 
@@ -650,7 +650,7 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
         fvgTotal += 1
         fvgFillX1 := bar_index
 
-    fvgMaximum := fvgMaximum
+    // fvgMaximum := fvgMaximum
     fvgMinimum := math.min(math.max(fvgMinimum, p_fvgSrcH), fvgMaximum)
 
     fvgIsFilledCondition = fvgMaximum == fvgMinimum and fvgMaximum[1] != fvgMinimum
