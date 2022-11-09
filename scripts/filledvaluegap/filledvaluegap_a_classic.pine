@@ -538,8 +538,6 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
     var float fvgMaximum = na
     var int fvgFilledNumber = 0
     var int fvgTotal = 0
-    var int fvgFillX1 = 0
-    var int fvgDuration = 0
     int fvgRecentlyFilledNumber = 0
 
     //Check if historical FVG's are filled
@@ -554,7 +552,6 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
             if ( bar_index <= ((line.get_x1(l)) + p_longFilledGapsLookback) )
                 fvgRecentlyFilledNumber += 1
             fvgFilledNumber += 1
-            fvgDuration += bar_index - line.get_x1(l)
         _idx += 1
 
     _idx := 0
@@ -565,46 +562,35 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
             array.remove(discardedFvgLines, _idx)
 
             fvgFilledNumber += 1
-            fvgDuration += bar_index - line.get_x1(l)
         _idx += 1
 
     //Test for FVG
     if fvgCondition
-        //If FVG is unfilled store line in array
-        if fvgMaximum[1] != fvgMinimum[1]
-            level = fvgMinimum
-            array.unshift(fvgLines, line.new(bar_index - 1, level, bar_index, level, color = fvgCss, style = line.style_dashed))
+        level = fvgMinimum
+        array.unshift(fvgLines, line.new(bar_index - 1, level, bar_index, level, color = fvgCss, style = line.style_dashed))
 
-            if (not i_showUnfilledGaps)
-                if (array.size(fvgLines) > i_maximumUnfilledGaps)
-                    pop_l = array.pop(fvgLines)
-                    array.push(discardedFvgLines, pop_l)
-        else
-            fvgFilledNumber += 1
-            fvgDuration += bar_index - fvgFillX1
+        if (not i_showUnfilledGaps)
+            if (array.size(fvgLines) > i_maximumUnfilledGaps)
+                pop_l = array.pop(fvgLines)
+                array.push(discardedFvgLines, pop_l)
 
         fvgMaximum := p_fvgSrcL
         fvgMinimum := p_fvgSrcH2
 
         fvgTotal += 1
-        fvgFillX1 := bar_index
 
     fvgMaximum := math.max(math.min(fvgMaximum, p_fvgSrcL), fvgMinimum)
     // fvgMinimum := fvgMinimum
 
     fvgIsFilledCondition = (fvgMaximum == fvgMinimum) and (fvgMaximum[1] != fvgMinimum)
 
-    fvgFillX1 := fvgIsFilledCondition ? bar_index : fvgFillX1
-
-    [fvgMaximum, fvgMinimum, fvgFilledNumber, fvgDuration, fvgTotal, fvgIsFilledCondition, fvgRecentlyFilledNumber]
+    [fvgMaximum, fvgMinimum, fvgFilledNumber, fvgTotal, fvgIsFilledCondition, fvgRecentlyFilledNumber]
 
 detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fvgSrcL2, p_shortFilledGapsLookback)=>
     var float fvgMinimum = na
     var float fvgMaximum = na
     var int fvgFilledNumber = 0
     var int fvgTotal = 0
-    var int fvgFillX1 = 0
-    var int fvgDuration = 0
     int fvgRecentlyFilledNumber = 0
 
     //Check if historical FVG's are filled
@@ -618,8 +604,9 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
             array.remove(fvgLines, _idx)
             if ( bar_index <= ((line.get_x1(l)) + p_shortFilledGapsLookback) )
                 fvgRecentlyFilledNumber += 1
+            else
+                fvgRecentlyFilledNumber += 100
             fvgFilledNumber += 1
-            fvgDuration += bar_index - line.get_x1(l)
 
         _idx += 1
 
@@ -631,39 +618,30 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
             array.remove(discardedFvgLines, _idx)
 
             fvgFilledNumber += 1
-            fvgDuration += bar_index - line.get_x1(l)
 
         _idx += 1
 
     //Test for FVG
     if fvgCondition
-        //If FVG is unfvgIsFilled store line in array
-        if fvgMaximum[1] != fvgMinimum[1]
-            level = fvgMaximum
-            array.unshift(fvgLines, line.new(bar_index - 1, level, bar_index, level, color = fvgCss, style = line.style_dashed))
+        level = fvgMaximum
+        array.unshift(fvgLines, line.new(bar_index - 1, level, bar_index, level, color = fvgCss, style = line.style_dashed))
 
-            if (not i_showUnfilledGaps)
-                if (array.size(fvgLines) > i_maximumUnfilledGaps)
-                    pop_l = array.pop(fvgLines)
-                    array.push(discardedFvgLines, pop_l)
-        else
-            fvgFilledNumber += 1
-            fvgDuration += bar_index - fvgFillX1
+        if (not i_showUnfilledGaps)
+            if (array.size(fvgLines) > i_maximumUnfilledGaps)
+                pop_l = array.pop(fvgLines)
+                array.push(discardedFvgLines, pop_l)
 
         fvgMaximum := p_fvgSrcL2
         fvgMinimum := p_fvgSrcH
 
         fvgTotal += 1
-        fvgFillX1 := bar_index
 
     // fvgMaximum := fvgMaximum
     fvgMinimum := math.min(math.max(fvgMinimum, p_fvgSrcH), fvgMaximum)
 
     fvgIsFilledCondition = fvgMaximum == fvgMinimum and fvgMaximum[1] != fvgMinimum
 
-    fvgFillX1 := fvgIsFilledCondition ? bar_index : fvgFillX1
-
-    [fvgMaximum, fvgMinimum, fvgFilledNumber, fvgDuration, fvgTotal, fvgIsFilledCondition, fvgRecentlyFilledNumber]
+    [fvgMaximum, fvgMinimum, fvgFilledNumber, fvgTotal, fvgIsFilledCondition, fvgRecentlyFilledNumber]
 
 // FUNCTIONS - END
 
@@ -825,10 +803,10 @@ fvgDeltaPercentage = (fvgSrcC1 - fvgSrcO1) / fvgSrcO1 * 100
 threshold = i_enableFvgAutoThreshold ? ( ta.cum(math.abs(fvgTimeframeChange ? fvgDeltaPercentage : 0)) / bar_index * 2 ) : i_fvgThreshold
 
 bullishFvgCondition = (fvgSrcL > fvgSrcH2) and (fvgSrcC1 > fvgSrcH2) and (fvgDeltaPercentage > threshold) and fvgTimeframeChange
-[bullFvgMax, bullFvgMin, bullFvgFilledNumber, bull_fvgDuration, bullFvgTotal, bullFvgFilledCondition, bullFvgRecentlyFilledNumber] = detectBullFvg(bullishFvgCondition, bullFvgLines, discardedBullFvgLines, fvgBullLinesColor, fvgSrcL, fvgSrcH2, i_longFilledGapsLookback)
+[bullFvgMax, bullFvgMin, bullFvgFilledNumber, bullFvgTotal, bullFvgFilledCondition, bullFvgRecentlyFilledNumber] = detectBullFvg(bullishFvgCondition, bullFvgLines, discardedBullFvgLines, fvgBullLinesColor, fvgSrcL, fvgSrcH2, i_longFilledGapsLookback)
 
 bearishFvgCondition = (fvgSrcH < fvgSrcL2) and (fvgSrcC1 < fvgSrcL2) and (-fvgDeltaPercentage > threshold) and fvgTimeframeChange
-[bearFvgMax, bearFvgMin, bearFvgFilledNumber, bear_fvgDuration, bearFvgTotal, bearFvgFilledCondition, bearFvgRecentlyFilledNumber] = detectBearFvg(bearishFvgCondition, bearFvgLines, discardedBearFvgLines, fvgBearLinesColor, fvgSrcH, fvgSrcL2, i_shortFilledGapsLookback)
+[bearFvgMax, bearFvgMin, bearFvgFilledNumber, bearFvgTotal, bearFvgFilledCondition, bearFvgRecentlyFilledNumber] = detectBearFvg(bearishFvgCondition, bearFvgLines, discardedBearFvgLines, fvgBearLinesColor, fvgSrcH, fvgSrcL2, i_shortFilledGapsLookback)
 
 bullFvgRecentlyFilledTotal := bullFvgRecentlyFilledTotal + bullFvgRecentlyFilledNumber
 bearFvgRecentlyFilledTotal := bearFvgRecentlyFilledTotal + bearFvgRecentlyFilledNumber
