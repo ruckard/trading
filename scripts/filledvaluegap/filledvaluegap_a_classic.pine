@@ -566,7 +566,7 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
 
     //Test for FVG
     if fvgCondition
-        level = fvgMinimum
+        level = p_fvgSrcH2
         array.unshift(fvgLines, line.new(bar_index - 1, level, bar_index, level, color = fvgCss, style = line.style_dashed))
 
         if (not i_showUnfilledGaps)
@@ -623,7 +623,7 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
 
     //Test for FVG
     if fvgCondition
-        level = fvgMaximum
+        level = p_fvgSrcL2
         array.unshift(fvgLines, line.new(bar_index - 1, level, bar_index, level, color = fvgCss, style = line.style_dashed))
 
         if (not i_showUnfilledGaps)
