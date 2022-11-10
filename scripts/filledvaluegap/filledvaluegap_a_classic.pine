@@ -604,8 +604,6 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
             array.remove(fvgLines, _idx)
             if ( bar_index <= ((line.get_x1(l)) + p_shortFilledGapsLookback) )
                 fvgRecentlyFilledNumber += 1
-            else
-                fvgRecentlyFilledNumber += 100
             fvgFilledNumber += 1
 
         _idx += 1
