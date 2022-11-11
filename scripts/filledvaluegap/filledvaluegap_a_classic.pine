@@ -548,9 +548,9 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
         fvgIsFilledConditionTurn = p_fvgSrcL <= line.get_y2(l)
 
         if fvgIsFilledConditionTurn
-            array.remove(fvgLines, _idx)
             if ( bar_index <= ((line.get_x1(l)) + p_longFilledGapsLookback) )
                 fvgRecentlyFilledNumber += 1
+            array.remove(fvgLines, _idx)
             fvgFilledNumber += 1
         _idx += 1
 
@@ -601,11 +601,10 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
         fvgIsFilledConditionTurn = p_fvgSrcH >= line.get_y2(l)
 
         if fvgIsFilledConditionTurn
-            array.remove(fvgLines, _idx)
             if ( bar_index <= ((line.get_x1(l)) + p_shortFilledGapsLookback) )
                 fvgRecentlyFilledNumber += 1
+            array.remove(fvgLines, _idx)
             fvgFilledNumber += 1
-
         _idx += 1
 
     _idx := 0
