@@ -539,6 +539,7 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
     var int fvgFilledNumber = 0
     var int fvgTotal = 0
     int fvgRecentlyFilledNumber = 0
+    newBullFvgLines = array.new_line(0)
 
     //Check if historical FVG's are filled
     _idx = 0
@@ -550,10 +551,16 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
         if fvgIsFilledConditionTurn
             if ( bar_index <= ((line.get_x1(l)) + p_longFilledGapsLookback) )
                 fvgRecentlyFilledNumber += 1
-            array.remove(fvgLines, _idx)
             fvgFilledNumber += 1
         else
+            array.push(newBullFvgLines, l)
             _idx += 1
+
+    // Clear fvgLines
+    array.clear(fvgLines)
+    // So that you can replace it with newBullFvgLines
+    for l in newBullFvgLines
+        array.unshift(fvgLines,l)
 
     _idx := 0
     for l in discardedFvgLines
@@ -593,6 +600,7 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
     var int fvgFilledNumber = 0
     var int fvgTotal = 0
     int fvgRecentlyFilledNumber = 0
+    newBearFvgLines = array.new_line(0)
 
     //Check if historical FVG's are filled
     _idx = 0
@@ -604,10 +612,16 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
         if fvgIsFilledConditionTurn
             if ( bar_index <= ((line.get_x1(l)) + p_shortFilledGapsLookback) )
                 fvgRecentlyFilledNumber += 1
-            array.remove(fvgLines, _idx)
             fvgFilledNumber += 1
         else
+            array.push(newBearFvgLines, l)
             _idx += 1
+
+    // Clear fvgLines
+    array.clear(fvgLines)
+    // So that you can replace it with newBearFvgLines
+    for l in newBearFvgLines
+        array.unshift(fvgLines,l)
 
     _idx := 0
     for l in discardedFvgLines
