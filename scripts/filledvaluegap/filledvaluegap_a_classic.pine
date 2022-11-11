@@ -552,7 +552,8 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
                 fvgRecentlyFilledNumber += 1
             array.remove(fvgLines, _idx)
             fvgFilledNumber += 1
-        _idx += 1
+        else
+            _idx += 1
 
     _idx := 0
     for l in discardedFvgLines
@@ -605,7 +606,8 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
                 fvgRecentlyFilledNumber += 1
             array.remove(fvgLines, _idx)
             fvgFilledNumber += 1
-        _idx += 1
+        else
+            _idx += 1
 
     _idx := 0
     for l in discardedFvgLines
