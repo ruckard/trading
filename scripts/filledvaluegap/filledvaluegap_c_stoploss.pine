@@ -1170,7 +1170,7 @@ if i_enableUvgTakeProfits
     if LONG
         orderStopLoss := bullFvgFilledGapPriceDistancePercentage * i_longUvgGapStopLossPerOne
     else
-        orderStopLoss := bullFvgFilledGapPriceDistancePercentage * i_shortUvgGapStopLossPerOne
+        orderStopLoss := bearFvgFilledGapPriceDistancePercentage * i_shortUvgGapStopLossPerOne
     orderStopLossPerOne := orderStopLoss * 0.01
 
 
