@@ -11,7 +11,7 @@
 // StopLoss might be set depending on the Gap distance.
 // This specific strategy also includes Risk Management.
 // 
-// It was originally tested at BTCUSDT pair and 1H timeframe.
+// It was originally tested at BTCDOMUSDT pair and 1H timeframe.
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
