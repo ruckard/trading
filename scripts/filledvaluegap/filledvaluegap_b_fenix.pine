@@ -6,7 +6,9 @@
 // Current version: v20221112 ( B001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a template for Ruckard strategies that interact with Zignaly.
+// Open a position in the opposite direction of filling the gap.
+// The main logic assumes that even if the price is going to fill a big part of the recently created gap (or the full gap), then the price action will continue to keep on with the current trend.
+// StopLoss might be set depending on the Gap distance.
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 1H timeframe.
