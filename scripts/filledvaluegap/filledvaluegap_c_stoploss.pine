@@ -360,6 +360,24 @@ i_fvgBullColor = input.color(color.new(#0cb51a, 75), 'Bullish FVG Color', group=
 i_fvgBearColor = input.color(color.new(#ff1100, 75), 'Bearish FVG Color', group='FairValueGap')
 i_fvgBullLinesColor = input.color(color.new(#0cb51a, 75), 'Bullish FVG Lines Color', group='FairValueGap')
 i_fvgBearLinesColor = input.color(color.new(#ff1100, 75), 'Bearish FVG Lines Color', group='FairValueGap')
+
+i_longUvgMinimumTakeProfitPercentage = input.float(0.20, title='(L) Minimum Take Profit {0.20 %}', group='UnfairValueGap')
+i_longUvgMaximumTakeProfitPercentage = input.float(5.00, title='(L) Maximum Take Profit {5.00 %}', group='UnfairValueGap')
+i_shortUvgMinimumTakeProfitPercentage = input.float(0.20, title='(S) Minimum Take Profit {0.20 %}', group='UnfairValueGap')
+i_shortUvgMaximumTakeProfitPercentage = input.float(5.00, title='(S) Maximum Take Profit {5.00 %}', group='UnfairValueGap')
+i_longUvgGapStopLossPercentage = input.float(45.0, title='(L) Gap StopLoss Percentage { 45.0 % }', group='UnfairValueGap')
+i_longUvgGapStopLossPerOne = i_longUvgGapStopLossPercentage * 0.01
+i_shortUvgGapStopLossPercentage = input.float(110.0, title='(S) Gap StopLoss Percentage { 110.0 % }', group='UnfairValueGap')
+i_shortUvgGapStopLossPerOne = i_shortUvgGapStopLossPercentage * 0.01
+i_longUvgGapTakeProfitPercentage = input.float(62.0, title='(L) Gap TakeProfit Percentage { 62.0 % }', group='UnfairValueGap')
+i_longUvgGapTakeProfitPerOne = i_longUvgGapTakeProfitPercentage * 0.01
+i_shortUvgGapTakeProfitPercentage = input.float(65.0, title='(S) Gap TakeProfit Percentage { 65.0 % }', group='UnfairValueGap')
+i_shortUvgGapTakeProfitPerOne = i_shortUvgGapTakeProfitPercentage * 0.01
+i_enableUvgTakeProfits = input.bool(true, title='Enable UVG based TakeProfits {True}', group='UnfairValueGap')
+i_longUvgMinimumGapPercentage = input.float(1.30, title='(L) Minimum Gap Percentage {1.30 %}', group='UnfairValueGap')
+i_longUvgMaximumGapPercentage = input.float(1.70, title='(L) Maximum Gap Percentage {1.70 %}', group='UnfairValueGap')
+i_shortUvgMinimumGapPercentage = input.float(0.80, title='(S) Minimum Gap Percentage {0.80 %}', group='UnfairValueGap')
+i_shortUvgMaximumGapPercentage = input.float(10.00, title='(S) Maximum Gap Percentage {10.00 %}', group='UnfairValueGap')
 // INPUTS - END
 
 
@@ -529,7 +547,7 @@ f_RsiMode(_src, _length, _round, _minimum, _maximum) =>
             _highest_occurence_value := _src[_i]
     _return = _highest_occurence_value
 
-fvgGetOhlc()=> [close[1], open[1], high, low, high[2], low[2]]
+fvgGetOhlc()=> [close[1], open[1], high, low, high[2], low[2], close]
 
 detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fvgSrcH2, p_longFilledGapsLookback)=>
     var float fvgMinimum = na
@@ -809,12 +827,39 @@ var int bullFvgRecentlyFilledTotal = 0
 var int bearFvgRecentlyFilledTotal = 0
 
 fvgTimeframeChange = timeframe.change(i_fvgTimeframe)
-[fvgSrcC1, fvgSrcO1, fvgSrcH, fvgSrcL, fvgSrcH2, fvgSrcL2] = request.security(syminfo.tickerid, i_fvgTimeframe, fvgGetOhlc())
+[fvgSrcC1, fvgSrcO1, fvgSrcH, fvgSrcL, fvgSrcH2, fvgSrcL2, fvgSrcC] = request.security(syminfo.tickerid, i_fvgTimeframe, fvgGetOhlc())
 
-bullishFvgCondition = (fvgSrcL > fvgSrcH2) and (fvgSrcC1 > fvgSrcH2) and fvgTimeframeChange
+float uvgGapPriceDistancePercentage = 0
+float uvgGapRefillPercentage = 0
+float uvgGapPercentage = 0
+bool uvgGapRefillPercentageIsWithinRange = false
+bool uvgGapPercentageIsWithinRange = false
+
+preBullishFvgCondition = (fvgSrcL > fvgSrcH2) and (fvgSrcC1 > fvgSrcH2) and fvgTimeframeChange
+preBearishFvgCondition = (fvgSrcH < fvgSrcL2) and (fvgSrcC1 < fvgSrcL2) and fvgTimeframeChange
+if preBullishFvgCondition // LONG
+    uvgGapPriceDistancePercentage := ((fvgSrcC - fvgSrcH2) / fvgSrcH2) * 100
+    uvgGapRefillPercentage := uvgGapPriceDistancePercentage * i_longUvgGapTakeProfitPerOne
+    uvgGapRefillPercentageIsWithinRange := ((uvgGapRefillPercentage >= i_shortUvgMinimumTakeProfitPercentage) and (uvgGapRefillPercentage < i_shortUvgMaximumTakeProfitPercentage))
+
+    uvgGapPercentage := ((fvgSrcL - fvgSrcH2) / fvgSrcH2) * 100
+    uvgGapPercentageIsWithinRange := (uvgGapPercentage >= i_longUvgMinimumGapPercentage) and (uvgGapPercentage < i_longUvgMaximumGapPercentage)
+else if preBearishFvgCondition // SHORT
+    uvgGapPriceDistancePercentage := ((fvgSrcL2 - fvgSrcC) / fvgSrcC) * 100
+    uvgGapRefillPercentage := uvgGapPriceDistancePercentage * i_shortUvgGapTakeProfitPerOne
+    uvgGapRefillPercentageIsWithinRange := ((uvgGapRefillPercentage >= i_longUvgMinimumTakeProfitPercentage) and (uvgGapRefillPercentage < i_longUvgMaximumTakeProfitPercentage))
+
+    uvgGapPercentage := ((fvgSrcL2 - fvgSrcH) / fvgSrcH) * 100
+    uvgGapPercentageIsWithinRange := (uvgGapPercentage >= i_shortUvgMinimumGapPercentage) and (uvgGapPercentage < i_shortUvgMaximumGapPercentage)
+
+bullishFvgCondition = preBullishFvgCondition
+if i_enableUvgTakeProfits
+    bullishFvgCondition := bullishFvgCondition and uvgGapRefillPercentageIsWithinRange and uvgGapPercentageIsWithinRange
 [bullFvgMax, bullFvgMin, bullFvgFilledNumber, bullFvgTotal, bullFvgFilledCondition, bullFvgRecentlyFilledNumber] = detectBullFvg(bullishFvgCondition, bullFvgLines, discardedBullFvgLines, fvgBullLinesColor, fvgSrcL, fvgSrcH2, i_longFilledGapsLookback)
 
-bearishFvgCondition = (fvgSrcH < fvgSrcL2) and (fvgSrcC1 < fvgSrcL2) and fvgTimeframeChange
+bearishFvgCondition = preBearishFvgCondition
+if i_enableUvgTakeProfits
+    bearishFvgCondition := bearishFvgCondition and uvgGapRefillPercentageIsWithinRange and uvgGapPercentageIsWithinRange
 [bearFvgMax, bearFvgMin, bearFvgFilledNumber, bearFvgTotal, bearFvgFilledCondition, bearFvgRecentlyFilledNumber] = detectBearFvg(bearishFvgCondition, bearFvgLines, discardedBearFvgLines, fvgBearLinesColor, fvgSrcH, fvgSrcL2, i_shortFilledGapsLookback)
 
 bullFvgRecentlyFilledTotal := bullFvgRecentlyFilledTotal + bullFvgRecentlyFilledNumber
