@@ -1259,6 +1259,8 @@ else
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
+if (currentCapital < 0.0)
+    currentCapital := 0.0
 
 var float customQuantity = na
 
