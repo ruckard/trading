@@ -557,6 +557,7 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
     int fvgRecentlyFilledNumber = 0
     newBullFvgLines = array.new_line(0)
     newGapPriceDistancePercentages = array.new_float(0)
+    float fvgFilledGapPriceDistancePercentage = na
 
     //Check if historical FVG's are filled
     _idx = 0
@@ -568,6 +569,7 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
         if fvgIsFilledConditionTurn
             if ( bar_index <= ((line.get_x1(l)) + p_longFilledGapsLookback) )
                 fvgRecentlyFilledNumber += 1
+            fvgFilledGapPriceDistancePercentage := array.get(gapPriceDistancePercentages, _idx)
             fvgFilledNumber += 1
         else
             array.push(newBullFvgLines, l)
@@ -615,7 +617,7 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
 
     fvgIsFilledCondition = (fvgMaximum == fvgMinimum) and (fvgMaximum[1] != fvgMinimum)
 
-    [fvgMaximum, fvgMinimum, fvgFilledNumber, fvgTotal, fvgIsFilledCondition, fvgRecentlyFilledNumber]
+    [fvgMaximum, fvgMinimum, fvgFilledNumber, fvgTotal, fvgIsFilledCondition, fvgRecentlyFilledNumber, fvgFilledGapPriceDistancePercentage]
 
 detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fvgSrcL2, p_shortFilledGapsLookback, gapPriceDistancePercentages, p_uvgGapPriceDistancePercentage)=>
     var float fvgMinimum = na
@@ -625,6 +627,7 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
     int fvgRecentlyFilledNumber = 0
     newBearFvgLines = array.new_line(0)
     newGapPriceDistancePercentages = array.new_float(0)
+    float fvgFilledGapPriceDistancePercentage = na
 
     //Check if historical FVG's are filled
     _idx = 0
@@ -636,6 +639,7 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
         if fvgIsFilledConditionTurn
             if ( bar_index <= ((line.get_x1(l)) + p_shortFilledGapsLookback) )
                 fvgRecentlyFilledNumber += 1
+            fvgFilledGapPriceDistancePercentage := array.get(gapPriceDistancePercentages, _idx)
             fvgFilledNumber += 1
         else
             array.push(newBearFvgLines, l)
@@ -684,7 +688,7 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
 
     fvgIsFilledCondition = fvgMaximum == fvgMinimum and fvgMaximum[1] != fvgMinimum
 
-    [fvgMaximum, fvgMinimum, fvgFilledNumber, fvgTotal, fvgIsFilledCondition, fvgRecentlyFilledNumber]
+    [fvgMaximum, fvgMinimum, fvgFilledNumber, fvgTotal, fvgIsFilledCondition, fvgRecentlyFilledNumber, fvgFilledGapPriceDistancePercentage]
 
 // FUNCTIONS - END
 
@@ -871,12 +875,12 @@ else if preBearishFvgCondition // SHORT
 bullishFvgCondition = preBullishFvgCondition
 if i_enableUvgTakeProfits
     bullishFvgCondition := bullishFvgCondition and uvgGapRefillPercentageIsWithinRange and uvgGapPercentageIsWithinRange
-[bullFvgMax, bullFvgMin, bullFvgFilledNumber, bullFvgTotal, bullFvgFilledCondition, bullFvgRecentlyFilledNumber] = detectBullFvg(bullishFvgCondition, bullFvgLines, discardedBullFvgLines, fvgBullLinesColor, fvgSrcL, fvgSrcH2, i_longFilledGapsLookback, bullGapPriceDistancePercentages, uvgGapPriceDistancePercentage)
+[bullFvgMax, bullFvgMin, bullFvgFilledNumber, bullFvgTotal, bullFvgFilledCondition, bullFvgRecentlyFilledNumber, bullFvgFilledGapPriceDistancePercentage] = detectBullFvg(bullishFvgCondition, bullFvgLines, discardedBullFvgLines, fvgBullLinesColor, fvgSrcL, fvgSrcH2, i_longFilledGapsLookback, bullGapPriceDistancePercentages, uvgGapPriceDistancePercentage)
 
 bearishFvgCondition = preBearishFvgCondition
 if i_enableUvgTakeProfits
     bearishFvgCondition := bearishFvgCondition and uvgGapRefillPercentageIsWithinRange and uvgGapPercentageIsWithinRange
-[bearFvgMax, bearFvgMin, bearFvgFilledNumber, bearFvgTotal, bearFvgFilledCondition, bearFvgRecentlyFilledNumber] = detectBearFvg(bearishFvgCondition, bearFvgLines, discardedBearFvgLines, fvgBearLinesColor, fvgSrcH, fvgSrcL2, i_shortFilledGapsLookback, bearGapPriceDistancePercentages, uvgGapPriceDistancePercentage)
+[bearFvgMax, bearFvgMin, bearFvgFilledNumber, bearFvgTotal, bearFvgFilledCondition, bearFvgRecentlyFilledNumber, bearFvgFilledGapPriceDistancePercentage] = detectBearFvg(bearishFvgCondition, bearFvgLines, discardedBearFvgLines, fvgBearLinesColor, fvgSrcH, fvgSrcL2, i_shortFilledGapsLookback, bearGapPriceDistancePercentages, uvgGapPriceDistancePercentage)
 
 bullFvgRecentlyFilledTotal := bullFvgRecentlyFilledTotal + bullFvgRecentlyFilledNumber
 bearFvgRecentlyFilledTotal := bearFvgRecentlyFilledTotal + bearFvgRecentlyFilledNumber
