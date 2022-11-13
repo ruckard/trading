@@ -190,8 +190,8 @@ i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider
 i_zignalyProviderType = (i_zignalyProviderTypePre == _ZIGCOPYTRADERPROVIDER_) ? 'copytrader' : 'signalprovider'
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
 i_strategyType = input.string(_REVERSE_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
-i_enableLongStrictStrategy = input.bool(false, '(STRAT) (L) Strict mode {False}')
-i_enableShortStrictStrategy = input.bool(false, '(STRAT) (S) Strict mode {False}')
+i_enableLongStrictStrategy = input.bool(true, '(STRAT) (L) Strict mode {True}')
+i_enableShortStrictStrategy = input.bool(true, '(STRAT) (S) Strict mode {True}')
 i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Start Time {2021-01-01 00:00:00}')
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
@@ -346,6 +346,12 @@ i_ADXProtectionSmoothing = input.int(14, title='ADX Smoothing', minval=1, maxval
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+
+// Random substrategy - Inputs
+i_randomRandomness = input.int(0, title='(RANDOM) Randomness {0}', group='Random', tooltip='Make the result a little bit more different.')
+i_randomSpaceDimensions = input.int(3, title='(RANDOM) Space Dimensions {3}', minval=1, group='Random', tooltip='3 means random numbers between 1 and 1000 which it is 10 power to 3.')
+i_randomModTrigger = input.int(10, title='(RANDOM) Mod Trigger {0}', minval=2, group='Random', tooltip='Trigger an entry if the random numbers modulus this number is 0.')
+
 // INPUTS - END
 
 
@@ -515,6 +521,13 @@ f_RsiMode(_src, _length, _round, _minimum, _maximum) =>
             _highest_occurence_value := _src[_i]
     _return = _highest_occurence_value
 
+// Random functions
+candlePrng(p_seed) => // Simple Pseudo-Random Number Generator based on candle values and time
+    float germinate = ohlc4 * (time_close + p_seed) * math.pi
+    int germinateFloor = math.floor(germinate)
+    float pseudoRandomNumber = germinate - germinateFloor
+    pseudoRandomNumber
+
 // FUNCTIONS - END
 
 
@@ -656,6 +669,34 @@ if ((protectionAdx < longADXProtectionMinimumLevel) or (protectionAdx >= longADX
     adxProtectionLongCondition := false
 if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortADXProtectionMaximumLevel))
     adxProtectionShortCondition := false
+
+// Random substrategy
+// Example:
+// i_randomRandomness = 0
+// i_randomSpaceDimensions = 3
+// i_randomModTrigger = 10
+// Step 1. The seed is made out of the bar current time_close and i_randomRandomness
+// Step 2. Get a random number between 0 and 1 which it's based on the seed
+// Step 3. Calculate the randomness space ( 3 -> 1000 ; 4 -> 10000 ).
+// Step 4. Convert the random number between 0 and 1 so that it is an integer inside that randomness space.
+// Step 5. Check thanks to the mod function if we have won the lottery about entering a new trade.
+//
+// Step 1. Seed: 1668377712032
+// Step 2. Random: 0.238546
+// Step 3. 10 ^ 3 = 1000
+// Step 4. 238
+// Step 5. 238 mod 10 == 0 --> False
+
+bool randomLongCondition = false
+bool randomShortCondition = false
+
+float randomFloatFound = candlePrng(i_randomRandomness)
+int randomSpaceMultiplier = f_getContractMultiplier(i_randomSpaceDimensions)
+int randomNumberToMod = math.floor(randomFloatFound * randomSpaceMultiplier)
+
+randomLongCondition := (randomNumberToMod % i_randomModTrigger) == 0
+
+randomShortCondition := not (randomLongCondition)
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
