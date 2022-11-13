@@ -6,7 +6,7 @@
 // Current version: v20221113 ( A001 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a template for Ruckard strategies that interact with Zignaly.
+// Entries are open in a random manner.
 // This specific strategy also includes Risk Management.
 // 
 // It was originally tested at BTCUSDT pair and 1H timeframe.
