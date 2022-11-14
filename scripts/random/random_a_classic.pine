@@ -696,7 +696,7 @@ int randomNumberToMod = math.floor(randomFloatFound * randomSpaceMultiplier)
 
 randomLongCondition := (randomNumberToMod % i_randomModTrigger) == 0
 
-randomShortCondition := not (randomLongCondition)
+randomShortCondition := (randomNumberToMod % (i_randomModTrigger + 1)) == 0
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
