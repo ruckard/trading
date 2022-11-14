@@ -523,7 +523,7 @@ f_RsiMode(_src, _length, _round, _minimum, _maximum) =>
 
 // Random functions
 candlePrng(p_seed) => // Simple Pseudo-Random Number Generator based on candle values and time
-    float germinate = ohlc4 * (time_close + p_seed) * math.pi
+    float germinate = ((ohlc4 * (time_close + p_seed) * math.pi) / math.pi) / 1000000000
     int germinateFloor = math.floor(germinate)
     float pseudoRandomNumber = germinate - germinateFloor
     pseudoRandomNumber
