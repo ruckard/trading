@@ -349,8 +349,8 @@ i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
 // Random substrategy - Inputs
 i_randomRandomness = input.int(0, title='(RANDOM) Randomness {0}', group='Random', tooltip='Make the result a little bit more different.')
-i_randomSpaceDimensions = input.int(3, title='(RANDOM) Space Dimensions {3}', minval=1, group='Random', tooltip='3 means random numbers between 1 and 1000 which it is 10 power to 3.')
-i_randomModTrigger = input.int(10, title='(RANDOM) Mod Trigger {0}', minval=2, group='Random', tooltip='Trigger an entry if the random numbers modulus this number is 0.')
+i_randomModule = input.int(100, title='(RANDOM) Maximum tickets {100}', minval=2, group='Random', tooltip='How many tickets the lottery has.')
+i_randomTrigger = input.int(0, title='(RANDOM) Winning number {0}', minval=0, group='Random', tooltip='Your winning ticket number. Do not use the lottery maximum number as your winning ticket.')
 
 // INPUTS - END
 
@@ -673,30 +673,27 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 // Random substrategy
 // Example:
 // i_randomRandomness = 0
-// i_randomSpaceDimensions = 3
-// i_randomModTrigger = 10
+// i_randomModule = 1000
+// i_randomTrigger = 10
 // Step 1. The seed is made out of the bar current time_close and i_randomRandomness
 // Step 2. Get a random number between 0 and 1 which it's based on the seed
-// Step 3. Calculate the randomness space ( 3 -> 1000 ; 4 -> 10000 ).
-// Step 4. Convert the random number between 0 and 1 so that it is an integer inside that randomness space.
-// Step 5. Check thanks to the mod function if we have won the lottery about entering a new trade.
+// Step 3. Convert the random number between 0 and 1 so that it is an integer inside 1000 range.
+// Step 4. Check if we have won the lottery.
 //
 // Step 1. Seed: 1668377712032
 // Step 2. Random: 0.238546
-// Step 3. 10 ^ 3 = 1000
-// Step 4. 238
-// Step 5. 238 mod 10 == 0 --> False
+// Step 3. 238
+// Step 4. 238 == 10 --> False
 
 bool randomLongCondition = false
 bool randomShortCondition = false
 
 float randomFloatFound = candlePrng(i_randomRandomness)
-int randomSpaceMultiplier = f_getContractMultiplier(i_randomSpaceDimensions)
-int randomNumberInSpace = math.floor(randomFloatFound * randomSpaceMultiplier)
+int randomNumberInSpace = math.floor(randomFloatFound * i_randomModule)
 
-randomLongCondition := randomNumberInSpace == ( i_randomModTrigger + 0 )
+randomLongCondition := randomNumberInSpace == (( i_randomTrigger + 0 ) % i_randomModule)
 
-randomShortCondition := randomNumberInSpace == ( i_randomModTrigger + 1 )
+randomShortCondition := randomNumberInSpace == (( i_randomTrigger + 1 ) % i_randomModule)
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
