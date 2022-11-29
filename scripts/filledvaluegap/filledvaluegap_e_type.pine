@@ -374,6 +374,12 @@ i_shortUvgMaximumGapPercentage = input.float(10.00, title='(S) Maximum Gap Perce
 
 // Strategy - INIT - BEGIN
 
+type fvgLine
+    int startTime // x1
+    int endTime // x2
+    float endPrice // y2
+    float startPrice // level when created
+
 string stringNA = na
 
 onStartTimeInterval = (not i_strategyStartTimeOn) or (time >= i_strategyStartTime)
@@ -545,17 +551,17 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
     var int fvgFilledNumber = 0
     var int fvgTotal = 0
     int fvgRecentlyFilledNumber = 0
-    newBullFvgLines = array.new_line(0)
+    newBullFvgLines = array.new<fvgLine>()
 
     //Check if historical FVG's are filled
     _idx = 0
     for l in fvgLines
-        line.set_x2(l, bar_index)
+        l.endTime := bar_index
 
-        fvgIsFilledConditionTurn = p_fvgSrcL <= line.get_y2(l)
+        fvgIsFilledConditionTurn = p_fvgSrcL <= l.endPrice
 
         if fvgIsFilledConditionTurn
-            if ( bar_index <= ((line.get_x1(l)) + p_longFilledGapsLookback) )
+            if ( bar_index <= (l.startTime + p_longFilledGapsLookback) )
                 fvgRecentlyFilledNumber += 1
             fvgFilledNumber += 1
         else
@@ -570,7 +576,7 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
 
     _idx := 0
     for l in discardedFvgLines
-        fvgIsFilledConditionTurn = p_fvgSrcL <= line.get_y2(l)
+        fvgIsFilledConditionTurn = p_fvgSrcL <= l.endPrice
 
         if fvgIsFilledConditionTurn
             array.remove(discardedFvgLines, _idx)
@@ -581,7 +587,7 @@ detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fv
     //Test for FVG
     if fvgCondition
         level = p_fvgSrcH2
-        array.unshift(fvgLines, line.new(bar_index - 1, level, bar_index, level, color = fvgCss, style = line.style_dashed))
+        array.unshift(fvgLines, fvgLine.new(startTime = bar_index - 1, startPrice = level, endTime = bar_index, endPrice = level))
 
         if (not i_showUnfilledGaps)
             if (array.size(fvgLines) > i_maximumUnfilledGaps)
@@ -606,17 +612,17 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
     var int fvgFilledNumber = 0
     var int fvgTotal = 0
     int fvgRecentlyFilledNumber = 0
-    newBearFvgLines = array.new_line(0)
+    newBearFvgLines = array.new<fvgLine>()
 
     //Check if historical FVG's are filled
     _idx = 0
     for l in fvgLines
-        line.set_x2(l, bar_index)
+        l.endTime := bar_index
 
-        fvgIsFilledConditionTurn = p_fvgSrcH >= line.get_y2(l)
+        fvgIsFilledConditionTurn = p_fvgSrcH >= l.endPrice
 
         if fvgIsFilledConditionTurn
-            if ( bar_index <= ((line.get_x1(l)) + p_shortFilledGapsLookback) )
+            if ( bar_index <= (l.startTime + p_shortFilledGapsLookback) )
                 fvgRecentlyFilledNumber += 1
             fvgFilledNumber += 1
         else
@@ -631,7 +637,7 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
 
     _idx := 0
     for l in discardedFvgLines
-        fvgIsFilledConditionTurn = p_fvgSrcH >= line.get_y2(l)
+        fvgIsFilledConditionTurn = p_fvgSrcH >= l.endPrice
 
         if fvgIsFilledConditionTurn
             array.remove(discardedFvgLines, _idx)
@@ -643,7 +649,7 @@ detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fv
     //Test for FVG
     if fvgCondition
         level = p_fvgSrcL2
-        array.unshift(fvgLines, line.new(bar_index - 1, level, bar_index, level, color = fvgCss, style = line.style_dashed))
+        array.unshift(fvgLines, fvgLine.new(startTime = bar_index - 1, startPrice = level, endTime = bar_index, endPrice = level))
 
         if (not i_showUnfilledGaps)
             if (array.size(fvgLines) > i_maximumUnfilledGaps)
@@ -805,13 +811,14 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
     adxProtectionShortCondition := false
 
 // Filledvaluegap substrategy
+
 color fvgBullLinesColor = i_showFvgLines ? i_fvgBullLinesColor : na
 color fvgBearLinesColor = i_showFvgLines ? i_fvgBearLinesColor : na
 
-var bullFvgLines = array.new_line(0)
-var discardedBullFvgLines = array.new_line(0)
-var bearFvgLines = array.new_line(0)
-var discardedBearFvgLines = array.new_line(0)
+var bullFvgLines = array.new<fvgLine>()
+var discardedBullFvgLines = array.new<fvgLine>()
+var bearFvgLines = array.new<fvgLine>()
+var discardedBearFvgLines = array.new<fvgLine>()
 
 var int bullFvgRecentlyFilledTotal = 0
 var int bearFvgRecentlyFilledTotal = 0
