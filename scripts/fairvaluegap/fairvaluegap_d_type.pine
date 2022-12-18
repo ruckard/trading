@@ -870,30 +870,22 @@ bool bearFvgIsFilled = (bearFvgRecentlyFilledTotal[1] + 1) == (bearFvgRecentlyFi
 // Gap distance
 float fvpGapPriceDistancePercentage = 0
 float fvgGapRefillPercentage = 0
-float fvpGapPercentage = 0
 bool fairvaluegapRefillLong = false
 bool fairvaluegapRefillShort = false
-bool fvgGapRefillPercentageIsWithinRange = false
-bool fvpGapPercentageAboveMinimum = false
+bool fvgGapRefillPercentageIsWithinTakeProfitRange = false
 if bullishFvgCondition // SHORT
     fvpGapPriceDistancePercentage := ((fvgSrcC - fvgSrcH2) / fvgSrcH2) * 100
     fvgGapRefillPercentage := fvpGapPriceDistancePercentage * i_shortFvgGapRefillPerOne
-    fvgGapRefillPercentageIsWithinRange := ((fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_shortFvgMaximumTakeProfitPercentage))
+    fvgGapRefillPercentageIsWithinTakeProfitRange := ((fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_shortFvgMaximumTakeProfitPercentage))
 
-    fvpGapPercentage := ((fvgSrcL - fvgSrcH2) / fvgSrcH2) * 100
-    fvpGapPercentageAboveMinimum := fvpGapPercentage >= i_shortFvgMinimumGapPercentage
-
-    if (fvgGapRefillPercentageIsWithinRange and fvpGapPercentageAboveMinimum)
+    if (fvgGapRefillPercentageIsWithinTakeProfitRange)
         fairvaluegapRefillShort := true
 else if bearishFvgCondition // LONG
     fvpGapPriceDistancePercentage := ((fvgSrcL2 - fvgSrcC) / fvgSrcC) * 100
     fvgGapRefillPercentage := fvpGapPriceDistancePercentage * i_longFvgGapRefillPerOne
-    fvgGapRefillPercentageIsWithinRange := ((fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_longFvgMaximumTakeProfitPercentage))
+    fvgGapRefillPercentageIsWithinTakeProfitRange := ((fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_longFvgMaximumTakeProfitPercentage))
 
-    fvpGapPercentage := ((fvgSrcL2 - fvgSrcH) / fvgSrcH) * 100
-    fvpGapPercentageAboveMinimum := fvpGapPercentage >= i_longFvgMinimumGapPercentage
-
-    if (fvgGapRefillPercentageIsWithinRange and fvpGapPercentageAboveMinimum)
+    if (fvgGapRefillPercentageIsWithinTakeProfitRange)
         fairvaluegapRefillLong := true
 
 // Final logic
