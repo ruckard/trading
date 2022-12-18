@@ -554,7 +554,7 @@ f_RsiMode(_src, _length, _round, _minimum, _maximum) =>
             _highest_occurence_value := _src[_i]
     _return = _highest_occurence_value
 
-fvgGetOhlc()=> [close[1], open[1], high, low, high[2], low[2]]
+fvgGetOhlc()=> [close, open, close[1], open[1], high, low, high[2], low[2]]
 
 detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fvgSrcH2, p_longFilledGapsLookback)=>
     var float fvgMinimum = na
@@ -835,7 +835,7 @@ var int bullFvgRecentlyFilledTotal = 0
 var int bearFvgRecentlyFilledTotal = 0
 
 fvgTimeframeChange = timeframe.change(i_fvgTimeframe)
-[fvgSrcC1, fvgSrcO1, fvgSrcH, fvgSrcL, fvgSrcH2, fvgSrcL2] = request.security(syminfo.tickerid, i_fvgTimeframe, fvgGetOhlc())
+[fvgSrcC, fvgSrcO, fvgSrcC1, fvgSrcO1, fvgSrcH, fvgSrcL, fvgSrcH2, fvgSrcL2] = request.security(syminfo.tickerid, i_fvgTimeframe, fvgGetOhlc())
 fvgDeltaPercentage = (fvgSrcC1 - fvgSrcO1) / fvgSrcO1 * 100
 threshold = i_enableFvgAutoThreshold ? ( ta.cum(math.abs(fvgTimeframeChange ? fvgDeltaPercentage : 0)) / bar_index * 2 ) : i_fvgThreshold
 
