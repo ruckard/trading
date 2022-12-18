@@ -350,6 +350,16 @@ i_ADXProtectionSmoothing = input.int(14, title='ADX Smoothing', minval=1, maxval
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
+i_longFvgMinimumTakeProfitPercentage = input.float(0.28, title='(L) Minimum Take Profit {0.28 %}', group='FairValueGap')
+i_longFvgMaximumTakeProfitPercentage = input.float(0.38, title='(L) Maximum Take Profit {0.38 %}', group='FairValueGap')
+i_shortFvgMinimumTakeProfitPercentage = input.float(0.20, title='(S) Minimum Take Profit {0.20 %}', group='FairValueGap')
+i_shortFvgMaximumTakeProfitPercentage = input.float(0.40, title='(S) Maximum Take Profit {0.40 %}', group='FairValueGap')
+i_longFvgGapRefillPercentage = input.float(11.10, title='(L) Gap Refill Percentage { 11.10 % }', group='FairValueGap')
+i_longFvgGapRefillPerOne = i_longFvgGapRefillPercentage * 0.01
+i_shortFvgGapRefillPercentage = input.float(80.0, title='(S) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
+i_shortFvgGapRefillPerOne = i_shortFvgGapRefillPercentage * 0.01
+i_enableFvgTakeProfits = input.bool(true, title='Enable FVG based TakeProfits {True}', group='FairValueGap')
+
 i_fvgThreshold = input.float(0, 'Percentage {0.0}', minval = 0, group='FairValueGap')
 i_enableFvgAutoThreshold = input(true, 'Auto Threshold {True}', group='FairValueGap')
 i_maximumUnfilledGaps = input(5, 'Show Last Unfilled Gaps {5}', group='FairValueGap')
