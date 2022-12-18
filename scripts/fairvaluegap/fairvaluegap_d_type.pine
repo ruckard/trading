@@ -909,7 +909,7 @@ fairvaluegapLong := bearishFvgCondition and fairvaluegapRefillLong
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
-bool longCondition1 = filledvaluegapLong
+bool longCondition1 = fairvaluegapLong
 bool longCondition2 = false
 bool longCondition3 = false
 bool longCondition4 = false
@@ -917,7 +917,7 @@ bool longCondition5 = false
 // Define here your, at most, 5 long conditions. Use false if not used. - END
 
 // Define here your, at most, 5 short conditions. Use false if not used. - BEGIN
-bool shortCondition1 = filledvaluegapShort
+bool shortCondition1 = fairvaluegapShort
 bool shortCondition2 = false
 bool shortCondition3 = false
 bool shortCondition4 = false
