@@ -277,18 +277,18 @@ i_atrVolatilitySource = input.source(close, title='', group='ATR Volatility Prot
 i_atrVolatilityMinimumMultiplier = input.float(1.10, title='Min/Max {1.10/2.00}', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
 i_atrVolatilityMaximumMultiplier = input.float(2.00, title='', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
 
-i_higherTimeframeTrendMaEnforce = input.bool(true, title='Use {True}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
-i_showHigherTimeframeTrendMa = input.bool(true, title='Show {True}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
+i_higherTimeframeTrendMaEnforce = input.bool(false, title='Use {False}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
+i_showHigherTimeframeTrendMa = input.bool(false, title='Show {False}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
 
-i_higherTimeframeTrendMaTimeframe = input.timeframe('180', title='Timeframe/Offset {3 hours/0 bars}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
+i_higherTimeframeTrendMaTimeframe = input.timeframe('60', title='Timeframe/Offset {1 hour/0 bars}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
 
-i_higherTimeframeTrendMaOffset = input.int(12, title='', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
+i_higherTimeframeTrendMaOffset = input.int(0, title='', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
 
-i_higherTimeframeTrendFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Fast MA {EMA/10/close}', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
+i_higherTimeframeTrendFastMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Fast MA {EMA/10/close}', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
 i_higherTimeframeTrendFastMaLength = input.int(10, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
 i_higherTimeframeTrendFastMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
 
-i_higherTimeframeTrendSlowMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Slow MA {EMA/55/close}', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
+i_higherTimeframeTrendSlowMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Slow MA {EMA/55/close}', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
 i_higherTimeframeTrendSlowMaLength = input.int(55, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
 i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
 
