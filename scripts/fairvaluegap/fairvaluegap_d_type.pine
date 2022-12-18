@@ -867,16 +867,45 @@ bearFvgRecentlyFilledTotal := bearFvgRecentlyFilledTotal + bearFvgRecentlyFilled
 bool bullFvgIsFilled = (bullFvgRecentlyFilledTotal[1] + 1) == (bullFvgRecentlyFilledTotal)
 bool bearFvgIsFilled = (bearFvgRecentlyFilledTotal[1] + 1) == (bearFvgRecentlyFilledTotal)
 
-bool filledvaluegapLong = false
-bool filledvaluegapShort = false
+// Gap distance
+float fvpGapPriceDistancePercentage = 0
+float fvgGapRefillPercentage = 0
+float fvpGapPercentage = 0
+bool fairvaluegapRefillLong = false
+bool fairvaluegapRefillShort = false
+bool fvgGapRefillPercentageIsWithinRange = false
+bool fvpGapPercentageAboveMinimum = false
+if bullishFvgCondition // SHORT
+    fvpGapPriceDistancePercentage := ((fvgSrcC - fvgSrcH2) / fvgSrcH2) * 100
+    fvgGapRefillPercentage := fvpGapPriceDistancePercentage * i_shortFvgGapRefillPerOne
+    fvgGapRefillPercentageIsWithinRange := ((fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_shortFvgMaximumTakeProfitPercentage))
 
-if (bullFvgIsFilled and bearFvgIsFilled) // Avoid high volatility
-    filledvaluegapLong := false
-    filledvaluegapShort := false
-else if (bullFvgIsFilled)
-    filledvaluegapLong := true
-else if (bearFvgIsFilled)
-    filledvaluegapShort := true
+    fvpGapPercentage := ((fvgSrcL - fvgSrcH2) / fvgSrcH2) * 100
+    fvpGapPercentageAboveMinimum := fvpGapPercentage >= i_shortFvgMinimumGapPercentage
+
+    if (fvgGapRefillPercentageIsWithinRange and fvpGapPercentageAboveMinimum)
+        fairvaluegapRefillShort := true
+else if bearishFvgCondition // LONG
+    fvpGapPriceDistancePercentage := ((fvgSrcL2 - fvgSrcC) / fvgSrcC) * 100
+    fvgGapRefillPercentage := fvpGapPriceDistancePercentage * i_longFvgGapRefillPerOne
+    fvgGapRefillPercentageIsWithinRange := ((fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_longFvgMaximumTakeProfitPercentage))
+
+    fvpGapPercentage := ((fvgSrcL2 - fvgSrcH) / fvgSrcH) * 100
+    fvpGapPercentageAboveMinimum := fvpGapPercentage >= i_longFvgMinimumGapPercentage
+
+    if (fvgGapRefillPercentageIsWithinRange and fvpGapPercentageAboveMinimum)
+        fairvaluegapRefillLong := true
+
+// Final logic
+// bool fairvaluegapLongShort = false
+bool fairvaluegapLong = false
+bool fairvaluegapShort = false
+
+// if (( inside_bull == true ) and ( inside_bear == true ))
+//     fairvaluegapLongShort := true
+
+fairvaluegapShort := bullishFvgCondition and fairvaluegapRefillShort
+fairvaluegapLong := bearishFvgCondition and fairvaluegapRefillLong
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
