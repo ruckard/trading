@@ -226,7 +226,7 @@ i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Bre
 i_enableRiskRewardRatio = input.bool(true, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {True}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
-i_positionRatio = input.float(0.8, title='(STRAT) Risk/Reward Ratio % {0.8}', minval=0.01)
+i_positionRatio = input.float(0.44, title='(STRAT) Risk/Reward Ratio % {0.44}', minval=0.01)
 i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
@@ -361,7 +361,7 @@ i_shortFvgGapRefillPerOne = i_shortFvgGapRefillPercentage * 0.01
 i_enableFvgTakeProfits = input.bool(false, title='Enable FVG based TakeProfits {False}', group='FairValueGap')
 
 i_fvgThreshold = input.float(0, 'Percentage {0.0}', minval = 0, group='FairValueGap')
-i_enableFvgAutoThreshold = input(true, 'Auto Threshold {True}', group='FairValueGap')
+i_enableFvgAutoThreshold = input(false, 'Auto Threshold {False}', group='FairValueGap')
 i_maximumUnfilledGaps = input(5, 'Show Last Unfilled Gaps {5}', group='FairValueGap')
 i_longFilledGapsLookback = input.int(5, '(L) Number of bars to lookback for filled gaps {5}', group='FairValueGap')
 i_shortFilledGapsLookback = input.int(5, '(S) Number of bars to lookback for filled gaps {5}', group='FairValueGap')
