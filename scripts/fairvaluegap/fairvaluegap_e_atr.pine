@@ -223,17 +223,17 @@ i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
 i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
-i_enableRiskRewardRatio = input.bool(false, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {False}')
+i_enableRiskRewardRatio = input.bool(true, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {True}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
-i_positionRatio = input.float(0.25, title='(STRAT) Risk/Reward Ratio % {0.25}', minval=0.01)
+i_positionRatio = input.float(0.8, title='(STRAT) Risk/Reward Ratio % {0.8}', minval=0.01)
 i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
-i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+i_atrStopLossMultiplier = input.float(0.9, title='(STOPTAKE) ATR Stop Loss Multiplier % {0.9}', minval=0.01)
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -350,18 +350,18 @@ i_ADXProtectionSmoothing = input.int(14, title='ADX Smoothing', minval=1, maxval
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
-i_longFvgMinimumTakeProfitPercentage = input.float(0.18, title='(L) Minimum Take Profit {0.18 %}', group='FairValueGap')
-i_longFvgMaximumTakeProfitPercentage = input.float(0.38, title='(L) Maximum Take Profit {0.38 %}', group='FairValueGap')
+i_longFvgMinimumTakeProfitPercentage = input.float(0.28, title='(L) Minimum Take Profit {0.28 %}', group='FairValueGap')
+i_longFvgMaximumTakeProfitPercentage = input.float(10.0, title='(L) Maximum Take Profit {10.0 %}', group='FairValueGap')
 i_shortFvgMinimumTakeProfitPercentage = input.float(0.20, title='(S) Minimum Take Profit {0.20 %}', group='FairValueGap')
-i_shortFvgMaximumTakeProfitPercentage = input.float(0.40, title='(S) Maximum Take Profit {0.40 %}', group='FairValueGap')
-i_longFvgGapRefillPercentage = input.float(80.0, title='(L) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
+i_shortFvgMaximumTakeProfitPercentage = input.float(10.0, title='(S) Maximum Take Profit {10.0 %}', group='FairValueGap')
+i_longFvgGapRefillPercentage = input.float(11.10, title='(L) Gap Refill Percentage { 11.10 % }', group='FairValueGap')
 i_longFvgGapRefillPerOne = i_longFvgGapRefillPercentage * 0.01
 i_shortFvgGapRefillPercentage = input.float(80.0, title='(S) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
 i_shortFvgGapRefillPerOne = i_shortFvgGapRefillPercentage * 0.01
-i_enableFvgTakeProfits = input.bool(true, title='Enable FVG based TakeProfits {True}', group='FairValueGap')
+i_enableFvgTakeProfits = input.bool(false, title='Enable FVG based TakeProfits {False}', group='FairValueGap')
 
 i_fvgThreshold = input.float(0, 'Percentage {0.0}', minval = 0, group='FairValueGap')
-i_enableFvgAutoThreshold = input(false, 'Auto Threshold {False}', group='FairValueGap')
+i_enableFvgAutoThreshold = input(true, 'Auto Threshold {True}', group='FairValueGap')
 i_maximumUnfilledGaps = input(5, 'Show Last Unfilled Gaps {5}', group='FairValueGap')
 i_longFilledGapsLookback = input.int(5, '(L) Number of bars to lookback for filled gaps {5}', group='FairValueGap')
 i_shortFilledGapsLookback = input.int(5, '(S) Number of bars to lookback for filled gaps {5}', group='FairValueGap')
@@ -375,10 +375,10 @@ i_fvgBullLinesColor = input.color(color.new(#0cb51a, 75), 'Bullish FVG Lines Col
 i_fvgBearLinesColor = input.color(color.new(#ff1100, 75), 'Bearish FVG Lines Color', group='FairValueGap')
 
 i_enableGapPercentageFilter = input.bool(true, title='Enable Gap Percentage Filter {True}', group='UnfairValueGap')
-i_longUvgMinimumGapPercentage = input.float(0.02, title='(L) Minimum Gap Percentage {0.02 %}', group='UnfairValueGap')
-i_longUvgMaximumGapPercentage = input.float(10.00, title='(L) Maximum Gap Percentage {10.00 %}', group='UnfairValueGap')
-i_shortUvgMinimumGapPercentage = input.float(0.02, title='(S) Minimum Gap Percentage {0.02 %}', group='UnfairValueGap')
-i_shortUvgMaximumGapPercentage = input.float(10.00, title='(S) Maximum Gap Percentage {10.00 %}', group='UnfairValueGap')
+i_longUvgMinimumGapPercentage = input.float(0.10, title='(L) Minimum Gap Percentage {0.10 %}', group='UnfairValueGap')
+i_longUvgMaximumGapPercentage = input.float(1.60, title='(L) Maximum Gap Percentage {1.60 %}', group='UnfairValueGap')
+i_shortUvgMinimumGapPercentage = input.float(0.10, title='(S) Minimum Gap Percentage {0.10 %}', group='UnfairValueGap')
+i_shortUvgMaximumGapPercentage = input.float(1.60, title='(S) Maximum Gap Percentage {1.60 %}', group='UnfairValueGap')
 // INPUTS - END
 
 
