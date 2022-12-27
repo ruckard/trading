@@ -665,6 +665,13 @@ if ((protectionAdx < longADXProtectionMinimumLevel) or (protectionAdx >= longADX
 if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortADXProtectionMaximumLevel))
     adxProtectionShortCondition := false
 
+// Trailering logic
+bool traileringLong = false
+bool traileringShort = false
+
+traileringLong := (hour == 0)
+traileringShort := (hour == 12)
+
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
 bool longCondition1 = false
