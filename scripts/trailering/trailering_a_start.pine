@@ -370,7 +370,7 @@ float customBreakEven = customBreakEvenPerOne
 float traileringTakeProfitPerOne = na
 float traileringTakeProfit = traileringTakeProfitPerOne
 float maximumProfitExcursion = na
-float maximumProfitPrice = na
+var float maximumProfitPrice = na
 
 // Dynamic Trailing Take Profit - Variables
 
