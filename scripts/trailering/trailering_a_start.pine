@@ -1053,11 +1053,11 @@ if (not insideASellOrder)
     ShortTakeProfit := close * (1 - takeProfitPerOne)
 
 if (i_enableTraileringTakeProfit)
-    if (insideABuyOrder)
+    if (insideABuyOrder[1] and insideABuyOrder)
         LongTakeProfit := (positionPrice * (1 + takeProfitPerOne)) + (i_TakeProfitMaximumProfitExcursionRatio * maximumProfitExcursion)
         traileringTakeProfitPerOne := (LongTakeProfit - positionPrice) / positionPrice
         traileringTakeProfit := traileringTakeProfitPerOne * 100
-    if (insideASellOrder)
+    if (insideASellOrder[1] and insideASellOrder)
         ShortTakeProfit := (positionPrice * (1 - takeProfitPerOne)) - (i_TakeProfitMaximumProfitExcursionRatio * maximumProfitExcursion)
         traileringTakeProfitPerOne := (positionPrice - ShortTakeProfit) / ShortTakeProfit
         traileringTakeProfit := traileringTakeProfitPerOne * 100
