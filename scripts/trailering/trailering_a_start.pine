@@ -352,6 +352,10 @@ i_TakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit Max
 i_StopLossMaximumProfitExcursionRatio = input.float(1.0, title='StopLoss Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
 i_StopLossMaximumLossExcursionRatio = input.float(1.0, title='StopLoss Maximum Loss Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
 i_enableTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
+i_traileringLongOffset = input.int(0, title='(L) Trailering Offset {0}', group='Trailering')
+i_traileringShortOffset = input.int(0, title='(S) Trailering Offset {0}', group='Trailering')
+i_traileringLongPeriod = input.int(24, minval=2, title='(L) Trailering Period {0}', group='Trailering')
+i_traileringShortPeriod = input.int(24, minval=2, title='(S) Trailering Period {0}', group='Trailering')
 // INPUTS - END
 
 
@@ -677,8 +681,8 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 bool traileringLong = false
 bool traileringShort = false
 
-traileringLong := (hour == 0)
-traileringShort := (hour == 12)
+traileringLong := (bar_index + i_traileringLongOffset) % i_traileringLongPeriod == 0
+traileringShort := (bar_index + i_traileringShortOffset) % i_traileringShortPeriod == 0
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
