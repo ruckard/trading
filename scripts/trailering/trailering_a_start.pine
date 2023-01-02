@@ -349,6 +349,7 @@ i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
 i_enableTraileringTakeProfit = input.bool(true, title='Enable Trailering TakeProfit (%) {True}', group='Trailering')
 i_TakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
+i_enableTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 // INPUTS - END
 
 
@@ -1022,6 +1023,21 @@ else
         LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
     if ((not insideASellOrder[1]) and (insideASellOrder))
         ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
+
+// Trailering - Plot - BEGIN
+
+float maximumProfitPricePlotPrice = ((insideABuyOrder or insideASellOrder) and i_enableTraileringDebug) ? maximumProfitPrice : na
+maximumProfitPricePlot = plot(maximumProfitPricePlotPrice, color=color.yellow, style=plot.style_linebr, title="Maximum Profit Price")
+
+float takeProfitPlotPrice = na
+if (insideABuyOrder)
+    takeProfitPlotPrice := LongTakeProfit
+if (insideASellOrder)
+    takeProfitPlotPrice := ShortTakeProfit
+takeProfitPlotPrice := ((insideABuyOrder or insideASellOrder) and i_enableTraileringDebug) ? takeProfitPlotPrice : na
+takeProfitPricePlot = plot(takeProfitPlotPrice, color=color.lime, style=plot.style_linebr, title="Take Profit Price")
+
+// Trailering - Plot - END
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
