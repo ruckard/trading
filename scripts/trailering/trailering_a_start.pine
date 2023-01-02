@@ -972,6 +972,8 @@ if (i_enableTraileringTakeProfit)
 // Custom take profit and stop loss
 var float LongStopLoss = na
 var float ShortStopLoss = na
+var float InitialLongStopLoss = na
+var float InitialShortStopLoss = na
 
 // Initial StopLoss value based on last closed candle
 if (i_enableStopLoss and (not insideABuyOrder))
@@ -984,6 +986,11 @@ if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
     LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
 if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
     ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+
+if ((i_enableTraileringTakeProfit) and (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder))))
+    InitialLongStopLoss := LongStopLoss
+if ((i_enableTraileringTakeProfit) and (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder))))
+    InitialShortStopLoss := ShortStopLoss
 
 // Make sure LongStopLoss and ShortStopLoss are undefined
 // by default when i_enableStopLoss is set to false
@@ -1008,7 +1015,7 @@ if ( i_enableCustomBreakEven and insideASellOrder and customBreakEvenNeedsTrigge
 
 if (i_enableTraileringTakeProfit)
     if (insideABuyOrder)
-        LongStopLoss := (positionPrice * (1 - orderStopLossPerOne)) + ((i_StopLossMaximumProfitExcursionRatio * maximumProfitExcursion) + (i_StopLossMaximumLossExcursionRatio * maximumLossExcursion))
+        LongStopLoss := InitialLongStopLoss + ((i_StopLossMaximumProfitExcursionRatio * maximumProfitExcursion) + (i_StopLossMaximumLossExcursionRatio * maximumLossExcursion))
         if (LongStopLoss >= positionPrice) // Breakeven StopLoss
             traileringStopLossPerOne := (LongStopLoss - positionPrice) / positionPrice
             traileringStopLoss := traileringStopLossPerOne * 100
@@ -1018,7 +1025,7 @@ if (i_enableTraileringTakeProfit)
             traileringStopLoss := traileringStopLossPerOne * 100
             customBreakEven := na
     if (insideASellOrder)
-        ShortStopLoss := (positionPrice * (1 + orderStopLossPerOne)) - ((i_StopLossMaximumProfitExcursionRatio * maximumProfitExcursion) + (i_StopLossMaximumLossExcursionRatio * maximumLossExcursion))
+        ShortStopLoss := InitialShortStopLoss - ((i_StopLossMaximumProfitExcursionRatio * maximumProfitExcursion) + (i_StopLossMaximumLossExcursionRatio * maximumLossExcursion))
         if (LongStopLoss <= positionPrice) // Breakeven StopLoss
             traileringStopLossPerOne := (positionPrice - ShortStopLoss) / ShortStopLoss
             traileringStopLoss := traileringStopLossPerOne * 100
