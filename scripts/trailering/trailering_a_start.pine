@@ -1085,6 +1085,14 @@ if (insideASellOrder)
 takeProfitPlotPrice := ((insideABuyOrder or insideASellOrder) and i_enableTraileringDebug) ? takeProfitPlotPrice : na
 takeProfitPricePlot = plot(takeProfitPlotPrice, color=color.lime, style=plot.style_linebr, title="Take Profit Price")
 
+float stopLossPlotPrice = na
+if (insideABuyOrder)
+    stopLossPlotPrice := LongStopLoss
+if (insideASellOrder)
+    stopLossPlotPrice := ShortStopLoss
+stopLossPlotPrice := ((insideABuyOrder or insideASellOrder) and i_enableTraileringDebug) ? stopLossPlotPrice : na
+stopLossPricePlot = plot(stopLossPlotPrice, color=color.red, style=plot.style_linebr, title="Stop Loss Price")
+
 // Trailering - Plot - END
 
 float entryQuantity = na
