@@ -958,12 +958,16 @@ if (i_enableTraileringTakeProfit)
     if ((not insideABuyOrder[1]) and (insideABuyOrder))
         if (close <= positionPrice)
             maximumLossPrice := close
+        else
+            maximumLossPrice := positionPrice
     else if (insideABuyOrder)
         if (close <= maximumLossPrice[1])
             maximumLossPrice := close
     if ((not insideASellOrder[1]) and (insideASellOrder))
         if (close >= positionPrice)
             maximumLossPrice := close
+        else
+            maximumLossPrice := positionPrice
     else if (insideASellOrder)
         if (close >= maximumLossPrice[1])
             maximumLossPrice := close
