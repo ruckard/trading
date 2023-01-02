@@ -372,7 +372,7 @@ float customBreakEven = customBreakEvenPerOne
 
 float traileringTakeProfitPerOne = na
 float traileringTakeProfit = traileringTakeProfitPerOne
-float maximumProfitExcursion = na
+float maximumProfitExcursion = 0.0
 var float maximumProfitPrice = na
 
 float traileringStopLossPerOne = na
@@ -939,12 +939,16 @@ if (i_enableTraileringTakeProfit)
     if ((not insideABuyOrder[1]) and (insideABuyOrder))
         if (close >= positionPrice)
             maximumProfitPrice := close
+        else
+            maximumProfitPrice := positionPrice
     else if (insideABuyOrder)
         if (close >= maximumProfitPrice[1])
             maximumProfitPrice := close
     if ((not insideASellOrder[1]) and (insideASellOrder))
         if (close <= positionPrice)
             maximumProfitPrice := close
+        else
+            maximumProfitPrice := positionPrice
     else if (insideASellOrder)
         if (close <= maximumProfitPrice[1])
             maximumProfitPrice := close
