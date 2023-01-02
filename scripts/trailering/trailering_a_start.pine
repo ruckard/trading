@@ -1008,21 +1008,21 @@ if (i_enableTraileringTakeProfit)
         if (LongStopLoss >= positionPrice) // Breakeven StopLoss
             traileringStopLossPerOne := (LongStopLoss - positionPrice) / positionPrice
             traileringStopLoss := traileringStopLossPerOne * 100
-            breakEvenPercentage := traileringStopLoss
+            customBreakEven := traileringStopLoss
         else
             traileringStopLossPerOne := (positionPrice - LongStopLoss) / LongStopLoss
             traileringStopLoss := traileringStopLossPerOne * 100
-            breakEvenPercentage := na
+            customBreakEven := na
     if (insideASellOrder)
         ShortStopLoss := (positionPrice * (1 + orderStopLossPerOne)) - ((i_StopLossMaximumProfitExcursionRatio * maximumProfitExcursion) + (i_StopLossMaximumLossExcursionRatio * maximumLossExcursion))
         if (LongStopLoss <= positionPrice) // Breakeven StopLoss
             traileringStopLossPerOne := (positionPrice - ShortStopLoss) / ShortStopLoss
             traileringStopLoss := traileringStopLossPerOne * 100
-            breakEvenPercentage := traileringStopLoss
+            customBreakEven := traileringStopLoss
         else
             traileringStopLossPerOne := (ShortStopLoss - positionPrice) / positionPrice
             traileringStopLoss := traileringStopLossPerOne * 100
-            breakEvenPercentage := na
+            customBreakEven := na
 
 var float takeProfit = na
 var float takeProfitPerOne = na
