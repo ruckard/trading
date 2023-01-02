@@ -1026,7 +1026,7 @@ if (i_enableTraileringTakeProfit)
             customBreakEven := na
     if (insideASellOrder)
         ShortStopLoss := InitialShortStopLoss - ((i_StopLossMaximumProfitExcursionRatio * maximumProfitExcursion) + (i_StopLossMaximumLossExcursionRatio * maximumLossExcursion))
-        if (LongStopLoss <= positionPrice) // Breakeven StopLoss
+        if (ShortStopLoss <= positionPrice) // Breakeven StopLoss
             traileringStopLossPerOne := (positionPrice - ShortStopLoss) / ShortStopLoss
             traileringStopLoss := traileringStopLossPerOne * 100
             customBreakEven := traileringStopLoss
