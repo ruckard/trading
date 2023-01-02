@@ -377,7 +377,7 @@ var float maximumProfitPrice = na
 
 float traileringStopLossPerOne = na
 float traileringStopLoss = traileringStopLossPerOne
-float maximumLossExcursion = na
+float maximumLossExcursion = 0.0
 var float maximumLossPrice = na
 
 // Dynamic Trailing Take Profit - Variables
