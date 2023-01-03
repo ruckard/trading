@@ -3,7 +3,7 @@
 
 //@version=5
 
-// Current version: v20230103 ( A003 )
+// Current version: v20230103 ( A004 )
 // Tradingview Public description - BEGIN
 // 
 // This strategy tries to minimize StopLoss and maximize TakeProfit based on the maximum excursion (positive or negative) of price. It is meant to be used as a LongOnly strategy and at the same time as a ShortOnly strategy.
@@ -172,7 +172,7 @@
 
 // Tradingview Public description - END
 
-strategy('Trailering A003', shorttitle='A003Trailering', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Trailering A004', shorttitle='A004Trailering', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/ZignalyBeta/21 as zig
