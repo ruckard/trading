@@ -364,7 +364,7 @@ i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
 i_enableTraileringTakeProfit = input.bool(true, title='Enable Trailering TakeProfit (%) {True}', group='Trailering')
 i_TakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
-i_TakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit Maximum Loss Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
+i_TakeProfitMaximumLossExcursionRatio = input.float(5.0, title='TakeProfit Maximum Loss Excursion Ratio % {5.0}', minval=0.01, group='Trailering')
 i_StopLossMaximumProfitExcursionRatio = input.float(1.0, title='StopLoss Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
 i_StopLossMaximumLossExcursionRatio = input.float(1.0, title='StopLoss Maximum Loss Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
 i_enableTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
