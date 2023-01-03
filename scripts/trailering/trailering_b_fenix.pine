@@ -211,8 +211,8 @@ i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider
 i_zignalyProviderType = (i_zignalyProviderTypePre == _ZIGCOPYTRADERPROVIDER_) ? 'copytrader' : 'signalprovider'
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
 i_strategyType = input.string(_REVERSE_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
-i_enableLongStrictStrategy = input.bool(false, '(STRAT) (L) Strict mode {False}')
-i_enableShortStrictStrategy = input.bool(false, '(STRAT) (S) Strict mode {False}')
+i_enableLongStrictStrategy = input.bool(true, '(STRAT) (L) Strict mode {True}')
+i_enableShortStrictStrategy = input.bool(true, '(STRAT) (S) Strict mode {True}')
 i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Start Time {2021-01-01 00:00:00}')
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
 i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
@@ -236,22 +236,22 @@ i_curieSource = input.source(ohlc4, title = 'Source {ohlc4}', group='Curie Closi
 
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
-i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
+i_enableTakeProfit = input.bool(true, '(STOPTAKE) Take Profit? {True}')
 i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
 i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
-i_enableRiskRewardRatio = input.bool(false, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {False}')
+i_enableRiskRewardRatio = input.bool(true, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {True}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
-i_positionRatio = input.float(1.5, title='(STRAT) Risk/Reward Ratio % {1.5}', minval=0.01)
+i_positionRatio = input.float(1.0, title='(STRAT) Risk/Reward Ratio % {1.0}', minval=0.01)
 i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
-i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+i_atrStopLossMultiplier = input.float(5.0, title='(STOPTAKE) ATR Stop Loss Multiplier % {5.0}', minval=0.01)
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
