@@ -17,6 +17,15 @@
 // (...)
 // ImplementedStrategy foo - END
 //
+// ImplementedStrategy explanation - BEGIN
+// ImplementedStrategy explanation - END
+//
+// In addition the former strategy also includes Risk Management.
+//
+// ImplementedStrategy suggested pair and timeframe - BEGIN
+// ImplementedStrategy suggested pair and timeframe - END
+//
+// Template public description - BEGIN
 // Before using this documentation it's recommended that you:
 // [LIST]
 // [*] Use default TradingView strategy script or another script and setup its associated alert manually. Just make the alert pop-up in the screen.
@@ -175,6 +184,10 @@
 // [*] This strategy tries to match the Pine Script Coding Conventions as best as possible.
 // [*] You can check my 'Ruckard TradingLatino' strategy for a more complex strategy that it's also integrated with Zignaly. Unfortunatley it does not use Pine Script Coding Conventions as much.
 // [/LIST]
+// Template public description - END
+
+// ImplementedStrategy public description - BEGIN
+// ImplementedStrategy public description - END
 
 // Tradingview Public description - END
 
@@ -185,7 +198,7 @@ import ruckard/ZignalyBeta/21 as zig
 
 // INPUTS - BEGIN
 
-// Strategy - Inputs
+// Template inputs - BEGIN
 i_enableZignalyAlert = input(true, '(ZIG) Enable Alert message {True}')
 i_zignalyServiceSecretKey = input.string('MYSECRETKEY', '(ZIG) Service Secret Key {MYSECRETKEY}')
 _ZIGHYBRIDINTEGRATION_ = 'Hybrid', _ZIGTVONLYINTEGRATION_ = 'TradingView only'
@@ -352,9 +365,10 @@ i_ADXProtectionSmoothing = input.int(14, title='ADX Smoothing', minval=1, maxval
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
 i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
-// INPUTS - END
+// Template inputs - END
 
-
+// ImplementedStrategy inputs - BEGIN
+// ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
 
@@ -410,7 +424,7 @@ var int i_tooRecentMinutesNumber_ms = i_tooRecentMinutesNumber * 60 * 1000 // Co
 
 // Strategy - INIT - END
 
-// FUNCTIONS - BEGIN
+// Template functions - BEGIN
 
 // Decimals - Functions
 f_getContractMultiplier(_contractMaximumDecimalNumber) =>
@@ -521,11 +535,13 @@ f_RsiMode(_src, _length, _round, _minimum, _maximum) =>
             _highest_occurence_value := _src[_i]
     _return = _highest_occurence_value
 
-// FUNCTIONS - END
+// Template functions - END
 
+// ImplementedStrategy functions - BEGIN
+// ImplementedStrategy functions - END
 
 // Strategy Body - BEGIN
-
+// Template substrategies - BEGIN
 // Higher Timeframe Trend substrategy
 
 higherTimeframeTrend = request.security(syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, getTrend (i_higherTimeframeTrendFastMaType, i_higherTimeframeTrendFastMaLength, i_higherTimeframeTrendFastMaSource, i_higherTimeframeTrendSlowMaType, i_higherTimeframeTrendSlowMaLength, i_higherTimeframeTrendSlowMaSource, i_higherTimeframeTrendMaOffset))
@@ -662,6 +678,10 @@ if ((protectionAdx < longADXProtectionMinimumLevel) or (protectionAdx >= longADX
     adxProtectionLongCondition := false
 if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortADXProtectionMaximumLevel))
     adxProtectionShortCondition := false
+// Template substrategies - END
+
+// ImplementedStrategy substrategies - BEGIN
+// ImplementedStrategy substrategies - END
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
@@ -783,6 +803,9 @@ higherTimeframeTrendMaShortColor = i_showHigherTimeframeTrendMa ? color.new(#ff0
 plotshape(higherTimeframeTrendMaLong, title='SideMA Up', style=shape.arrowup, color=higherTimeframeTrendMaLongColor, location=location.top)
 plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdown, color=higherTimeframeTrendMaShortColor, location=location.top)
 // Higher Timeframe Trend - Plot - END
+
+// ImplementedStrategy - Plot - BEGIN
+// ImplementedStrategy - Plot - END
 
 // Position price calculation - BEGIN
 float positionPrice = na
