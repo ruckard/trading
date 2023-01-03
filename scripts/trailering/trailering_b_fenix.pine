@@ -24,6 +24,7 @@
 // In addition the former strategy also includes Risk Management.
 //
 // ImplementedStrategy suggested pair and timeframe - BEGIN
+// It was originally tested at BTCUSDT pair and 1H timeframe.
 // ImplementedStrategy suggested pair and timeframe - END
 //
 // Template public description - BEGIN
