@@ -6,10 +6,16 @@
 // Current version: v20221103 ( A012 )
 // Tradingview Public description - BEGIN
 // 
-// This strategy serves as a template for Ruckard strategies that interact with Zignaly.
-// This specific strategy also includes Risk Management.
-// 
-// It was originally tested at BTCUSDT pair and 1H timeframe.
+// This is a template for Ruckard strategies that interact with Zignaly.
+// Template sections are not supposed to be modified and are similar to:
+// Template foo - BEGIN
+// (...)
+// Template foo - END
+//
+// Sections meant to be added with your own strategy logic are similar to:
+// ImplementedStrategy foo - BEGIN
+// (...)
+// ImplementedStrategy foo - END
 //
 // Before using this documentation it's recommended that you:
 // [LIST]
