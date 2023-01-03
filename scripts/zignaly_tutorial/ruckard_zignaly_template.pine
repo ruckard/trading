@@ -328,15 +328,6 @@ i_RSIProtectionCustomTimeframe = input.timeframe('180', title='', group='RSI Pro
 i_RSIProtectionLength = input.int(14, minval=1, title='RSI Length', group='RSI Protection')
 i_RSIProtectionSource = input.source(close, 'RSI Source', group='RSI Protection')
 
-i_enableLongDynamicRSIProtection = input.bool(false, title='(L) Dynamic RSI Level {False, 0.0, 50.0}', group='RSI Protection', inline='LongDynamicRSIProtection')
-i_longDynamicRSIProtectionMinimum = input.float(0, minval=0, maxval=100, title='', group='RSI Protection', inline='LongDynamicRSIProtection')
-i_longDynamicRSIProtectionMaximum = input.float(50, minval=0, maxval=100, title='', group='RSI Protection', inline='LongDynamicRSIProtection')
-i_enableShortDynamicRSIProtection = input.bool(false, title='(S) Dynamic RSI Level {False, 50.0, 100.0}', group='RSI Protection', inline='ShortDynamicRSIProtection')
-i_shortDynamicRSIProtectionMinimum = input.float(50, minval=0, maxval=100, title='', group='RSI Protection', inline='ShortDynamicRSIProtection')
-i_shortDynamicRSIProtectionMaximum = input.float(100, minval=0, maxval=100, title='', group='RSI Protection', inline='ShortDynamicRSIProtection')
-i_DynamicRSIProtectionLength = input.int(35, minval=1, title='Dynamic Length', group='RSI Protection')
-i_DynamicRSIProtectionRound = input.float(5, minval=0.001, title='Dynamic Round', group='RSI Protection')
-
 i_enableLongRSIClosing = input.bool(false, title='Enable (L) RSI Closing {False, 55.0}', group='RSI Closing', inline='LongRSIClosing')
 i_longRSIClosingLevel = input.float(55.0, title='', group='RSI Closing', inline='LongRSIClosing', tooltip='Close when crossing under')
 i_enableShortRSIClosing = input.bool(false, title='Enable (S) RSI Closing {False, 45.0}', group='RSI Closing', inline='ShortRSIClosing')
@@ -516,25 +507,6 @@ getTooOldOrderShortCloseAdvice () =>
     tooOldOrderShortCloseAdvice = is_valid_open_sell_order and isTooOld and isALosingOrder
     tooOldOrderShortCloseAdvice
 
-// RSI protection functions
-f_RsiModeOccurance(_value, _src, _length, _round, _minimum, _maximum) =>
-    int _current_value_occurance = 0
-    for _i = 0 to _length
-        if ((_src[_i] >= _minimum) and (_src[_i] < _maximum))
-            if (_src[_i] == _value)
-                _current_value_occurance := _current_value_occurance + 1
-    _return = _current_value_occurance
-
-f_RsiMode(_src, _length, _round, _minimum, _maximum) =>
-    float _highest_occurence_value = 0.0
-    int _highest_occurance_number = 0
-    for _i = 0 to _length
-        _current_value_occurance = f_RsiModeOccurance(_src[_i], _src, _length, _round, _minimum, _maximum)
-        if (_current_value_occurance > _highest_occurance_number)
-            _highest_occurance_number := _current_value_occurance
-            _highest_occurence_value := _src[_i]
-    _return = _highest_occurence_value
-
 // Template functions - END
 
 // ImplementedStrategy functions - BEGIN
@@ -599,23 +571,11 @@ if (i_enableRSIProtectionCustomTimeframe)
 else
     protectionRsi := currentTimeframeProtectionRsi
 
-float roundedProtectionRsi = math.floor(protectionRsi / i_DynamicRSIProtectionRound) * i_DynamicRSIProtectionRound
-
-float dynamicLongRSIProtection = f_RsiMode(roundedProtectionRsi, i_DynamicRSIProtectionLength, i_DynamicRSIProtectionRound, i_longDynamicRSIProtectionMinimum, i_longDynamicRSIProtectionMaximum)
-float dynamicShortRSIProtection = f_RsiMode(roundedProtectionRsi, i_DynamicRSIProtectionLength, i_DynamicRSIProtectionRound, i_shortDynamicRSIProtectionMinimum, i_shortDynamicRSIProtectionMaximum)
-
 float longRSIProtectionLevel = na
 float shortRSIProtectionLevel = na
 
-if (i_enableLongDynamicRSIProtection)
-    longRSIProtectionLevel := dynamicLongRSIProtection
-else
-    longRSIProtectionLevel := i_longRSIProtectionLevel
-
-if (i_enableShortDynamicRSIProtection)
-    shortRSIProtectionLevel := dynamicShortRSIProtection
-else
-    shortRSIProtectionLevel := i_shortRSIProtectionLevel
+longRSIProtectionLevel := i_longRSIProtectionLevel
+shortRSIProtectionLevel := i_shortRSIProtectionLevel
 
 if (protectionRsi > longRSIProtectionLevel)
     rsiProtectionLongCondition := false
