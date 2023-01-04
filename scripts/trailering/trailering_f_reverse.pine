@@ -389,6 +389,20 @@ float orderStopLoss = orderStopLossPerOne
 float customBreakEvenPerOne = na
 float customBreakEven = customBreakEvenPerOne
 
+// ImplementedStrategy init variables - BEGIN
+
+float traileringTakeProfitPerOne = na
+float traileringTakeProfit = traileringTakeProfitPerOne
+float maximumProfitExcursion = 0.0
+var float maximumProfitPrice = na
+
+float traileringStopLossPerOne = na
+float traileringStopLoss = traileringStopLossPerOne
+float maximumLossExcursion = 0.0
+var float maximumLossPrice = na
+
+// ImplementedStrategy init variables - END
+
 // Dynamic Trailing Take Profit - Variables
 
 var int buyOrderOpenBarIndex = na
