@@ -672,6 +672,16 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 
 // Virtual Trailering Position - BEGIN
 
+float virtLongMaximumProfitExcursion = 0.0
+var float virtLongMaximumProfitPrice = na
+float virtLongMaximumLossExcursion = 0.0
+var float virtLongMaximumLossPrice = na
+
+float virtShortMaximumProfitExcursion = 0.0
+var float virtShortMaximumProfitPrice = na
+float virtShortMaximumLossExcursion = 0.0
+var float virtShortMaximumLossPrice = na
+
 bool virtTraileringBoth = false
 virtTraileringBoth := (bar_index + i_virtTraileringOffset) % i_virtTraileringPeriod == 0
 
@@ -700,6 +710,58 @@ if (not virtInsideAPosition) or ((not virtInsideAPosition[1]) and virtInsideAPos
     traileringAtrShortTakeProfitPrice := tmpTraileringAtrShortTakeProfitPrice
     virtLongTakeProfit := traileringAtrLongTakeProfitPrice
     virtShortTakeProfit := traileringAtrShortTakeProfitPrice
+
+// maximumProfitExcursion - BEGIN
+
+// Long
+if ((not virtInsideAPosition[1]) and virtInsideAPosition)
+    if (close >= virtPositionPrice)
+        virtLongMaximumProfitPrice := close
+    else
+        virtLongMaximumProfitPrice := virtPositionPrice
+else if (virtInsideAPosition)
+    if (close >= virtLongMaximumProfitPrice[1])
+        virtLongMaximumProfitPrice := close
+virtLongMaximumProfitExcursion := math.abs(virtLongMaximumProfitPrice - virtPositionPrice)
+
+// Short
+if ((not virtInsideAPosition[1]) and virtInsideAPosition)
+    if (close <= virtPositionPrice)
+        virtShortMaximumProfitPrice := close
+    else
+        virtShortMaximumProfitPrice := virtPositionPrice
+else if (virtInsideAPosition)
+    if (close <= virtShortMaximumProfitPrice[1])
+        virtShortMaximumProfitPrice := close
+virtShortMaximumProfitExcursion := math.abs(virtShortMaximumProfitPrice - virtPositionPrice)
+
+// maximumProfitExcursion - END
+
+// maximumLossExcursion - BEGIN
+
+// Long
+if ((not virtInsideAPosition[1]) and virtInsideAPosition)
+    if (close <= virtPositionPrice)
+        virtLongMaximumLossPrice := close
+    else
+        virtLongMaximumLossPrice := virtPositionPrice
+else if (insideABuyOrder)
+    if (close <= virtLongMaximumLossPrice[1])
+        virtLongMaximumLossPrice := close
+virtLongMaximumLossExcursion := math.abs(virtLongMaximumLossPrice - virtPositionPrice)
+
+// Short
+if ((not virtInsideAPosition[1]) and virtInsideAPosition)
+    if (close >= virtPositionPrice)
+        virtShortMaximumLossPrice := close
+    else
+        virtShortMaximumLossPrice := virtPositionPrice
+else if (insideASellOrder)
+    if (close >= virtShortMaximumLossPrice[1])
+        virtShortMaximumLossPrice := close
+virtShortMaximumLossExcursion := math.abs(virtShortMaximumLossPrice - virtPositionPrice)
+
+// maximumLossExcursion - END
 
 if (virtInsideAPosition)
     // Long
