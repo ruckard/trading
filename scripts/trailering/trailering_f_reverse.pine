@@ -765,13 +765,13 @@ virtShortMaximumLossExcursion := math.abs(virtShortMaximumLossPrice - virtPositi
 
 if (virtInsideAPosition)
     // Long
-    virtExpectedTakeProfit := traileringAtrLongTakeProfitPrice + ((i_virtTakeProfitMaximumProfitExcursionRatio * virtMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * virtMaximumLossExcursion))
+    virtExpectedTakeProfit := traileringAtrLongTakeProfitPrice + ((i_virtTakeProfitMaximumProfitExcursionRatio * virtLongMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * virtLongMaximumLossExcursion))
     if (virtExpectedTakeProfit >= virtPositionPrice)
         virtLongTakeProfit := virtExpectedTakeProfit
     else
         virtLongTakeProfit := (virtPositionPrice * (1 + i_breakEvenPerOne))
     // Short
-    virtExpectedTakeProfit := traileringAtrShortTakeProfitPrice - ((i_virtTakeProfitMaximumProfitExcursionRatio * virtMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * virtMaximumLossExcursion))
+    virtExpectedTakeProfit := traileringAtrShortTakeProfitPrice - ((i_virtTakeProfitMaximumProfitExcursionRatio * virtShortMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * virtShortMaximumLossExcursion))
     if (virtExpectedTakeProfit <= virtPositionPrice)
         virtShortTakeProfit := virtExpectedTakeProfit
     else
