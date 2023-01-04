@@ -361,6 +361,18 @@ i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 // Template inputs - END
 
 // ImplementedStrategy inputs - BEGIN
+
+i_enableTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
+
+i_virtTakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
+i_virtTakeProfitMaximumLossExcursionRatio = input.float(5.0, title='TakeProfit Maximum Loss Excursion Ratio % {5.0}', minval=0.01, group='Trailering')
+i_virtTraileringOffset = input.int(0, title='Trailering Offset {0}', group='Trailering')
+i_virtTraileringPeriod = input.int(24, minval=2, title='Trailering Period {24}', group='Trailering')
+
+i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
+i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
+i_traileringAtrTakeProfitMultiplier = input.float(1.9, title='ATR Take Profit Multiplier % {1.9}', minval=0.01, group='Trailering')
+
 // ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
