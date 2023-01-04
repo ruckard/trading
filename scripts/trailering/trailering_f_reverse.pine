@@ -721,6 +721,14 @@ if ((not virtTraileringBoth[1]) and (virtTraileringBoth))
 
 // Virtual Trailering Position - END
 
+// Trailering substrategy - BEGIN
+bool traileringLong = false
+bool traileringShort = false
+
+traileringLong := virtInsideAPosition[1] and virtShortTakeProfitWasReached and (close <= virtPositionPrice) and (virtPositionPrice >= (close * (1 + i_breakEvenPerOne)))
+traileringShort := virtInsideAPosition[1] and virtLongTakeProfitWasReached and (close >= virtPositionPrice) and (virtPositionPrice <= (close * (1 - i_breakEvenPerOne)))
+// Trailering substrategy - END
+
 // ImplementedStrategy substrategies - END
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
