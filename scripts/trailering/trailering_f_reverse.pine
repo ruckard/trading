@@ -670,10 +670,56 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 
 // ImplementedStrategy substrategies - BEGIN
 
-// Virtual Trailering logic
-bool virtTraileringBoth = false
+// Virtual Trailering Position - BEGIN
 
+bool virtTraileringBoth = false
 virtTraileringBoth := (bar_index + i_virtTraileringOffset) % i_virtTraileringPeriod == 0
+
+var bool virtInsideAPosition = false
+var float virtPositionPrice = close
+
+var float traileringAtrLongTakeProfitPrice = na
+var float traileringAtrShortTakeProfitPrice = na
+var float traileringLongTakeProfitPerOne = na
+var float traileringShortTakeProfitPerOne = na
+
+var float virtLongTakeProfit = na
+var float virtShortTakeProfit = na
+var float virtExpectedTakeProfit = na
+
+virtLongTakeProfitWasReached = (virtLongTakeProfit >= low[1]) and (virtLongTakeProfit <= high[1])
+virtShortTakeProfitWasReached =  (virtShortTakeProfit >= low[1]) and (virtShortTakeProfit <= high[1])
+if (virtInsideAPosition[1] and (virtLongTakeProfitWasReached or virtShortTakeProfitWasReached))
+    virtInsideAPosition := false
+
+tmpTraileringAtrLongTakeProfitPrice = i_traileringAtrTakeProfitSource + (ta.atr(i_traileringAtrTakeProfitLength) * i_traileringAtrTakeProfitMultiplier)
+tmpTraileringAtrShortTakeProfitPrice = i_traileringAtrTakeProfitSource - (ta.atr(i_traileringAtrTakeProfitLength) * i_traileringAtrTakeProfitMultiplier)
+
+if (not virtInsideAPosition) or ((not virtInsideAPosition[1]) and virtInsideAPosition)
+    traileringAtrLongTakeProfitPrice := tmpTraileringAtrLongTakeProfitPrice
+    traileringAtrShortTakeProfitPrice := tmpTraileringAtrShortTakeProfitPrice
+    virtLongTakeProfit := traileringAtrLongTakeProfitPrice
+    virtShortTakeProfit := traileringAtrShortTakeProfitPrice
+
+if (virtInsideAPosition)
+    // Long
+    virtExpectedTakeProfit := traileringAtrLongTakeProfitPrice + ((i_virtTakeProfitMaximumProfitExcursionRatio * virtMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * virtMaximumLossExcursion))
+    if (virtExpectedTakeProfit >= virtPositionPrice)
+        virtLongTakeProfit := virtExpectedTakeProfit
+    else
+        virtLongTakeProfit := (virtPositionPrice * (1 + i_breakEvenPerOne))
+    // Short
+    virtExpectedTakeProfit := traileringAtrShortTakeProfitPrice - ((i_virtTakeProfitMaximumProfitExcursionRatio * virtMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * virtMaximumLossExcursion))
+    if (virtExpectedTakeProfit <= virtPositionPrice)
+        virtShortTakeProfit := virtExpectedTakeProfit
+    else
+        virtShortTakeProfit := (virtPositionPrice * (1 - i_breakEvenPerOne))
+
+if ((not virtTraileringBoth[1]) and (virtTraileringBoth))
+    virtInsideAPosition := true
+    virtPositionPrice := close
+
+// Virtual Trailering Position - END
 
 // ImplementedStrategy substrategies - END
 
