@@ -1042,7 +1042,7 @@ else
 
 if (i_enableTraileringTakeProfit)
     if (insideABuyOrder)
-        LongStopLoss := InitialLongStopLoss + ((i_StopLossMaximumProfitExcursionRatio * maximumProfitExcursion) + (i_StopLossMaximumLossExcursionRatio * maximumLossExcursion) + (positionPrice * takeProfitPerOne * i_StopLossTimedRatio * (bar_index - buyOrderOpenBarIndex)))
+        LongStopLoss := InitialLongStopLoss + (positionPrice * takeProfitPerOne * i_StopLossTimedRatio * (bar_index - buyOrderOpenBarIndex))
         if (LongStopLoss >= positionPrice) // Breakeven StopLoss
             traileringStopLossPerOne := (LongStopLoss - positionPrice) / positionPrice
             traileringStopLoss := traileringStopLossPerOne * 100
@@ -1052,7 +1052,7 @@ if (i_enableTraileringTakeProfit)
             traileringStopLoss := traileringStopLossPerOne * 100
             customBreakEven := na
     if (insideASellOrder)
-        ShortStopLoss := InitialShortStopLoss - ((i_StopLossMaximumProfitExcursionRatio * maximumProfitExcursion) + (i_StopLossMaximumLossExcursionRatio * maximumLossExcursion) + (positionPrice * takeProfitPerOne * i_StopLossTimedRatio * (bar_index - sellOrderOpenBarIndex)))
+        ShortStopLoss := InitialShortStopLoss - (positionPrice * takeProfitPerOne * i_StopLossTimedRatio * (bar_index - sellOrderOpenBarIndex))
         if (ShortStopLoss <= positionPrice) // Breakeven StopLoss
             traileringStopLossPerOne := (positionPrice - ShortStopLoss) / ShortStopLoss
             traileringStopLoss := traileringStopLossPerOne * 100
@@ -1074,7 +1074,7 @@ if (not insideASellOrder)
 
 if (i_enableTraileringTakeProfit)
     if (insideABuyOrder[1] and insideABuyOrder)
-        expectedTakeProfit := (positionPrice * (1 + takeProfitPerOne)) + ((i_TakeProfitMaximumProfitExcursionRatio * maximumProfitExcursion) - ((i_TakeProfitMaximumLossExcursionRatio * maximumLossExcursion) + (positionPrice * takeProfitPerOne * i_TakeProfitTimedRatio * (bar_index - buyOrderOpenBarIndex))) )
+        expectedTakeProfit := (positionPrice * (1 + takeProfitPerOne)) - (positionPrice * takeProfitPerOne * i_TakeProfitTimedRatio * (bar_index - buyOrderOpenBarIndex))
         if (expectedTakeProfit >= positionPrice)
             LongTakeProfit := expectedTakeProfit
         else
@@ -1082,7 +1082,7 @@ if (i_enableTraileringTakeProfit)
         traileringTakeProfitPerOne := (LongTakeProfit - positionPrice) / positionPrice
         traileringTakeProfit := traileringTakeProfitPerOne * 100
     if (insideASellOrder[1] and insideASellOrder)
-        expectedTakeProfit := (positionPrice * (1 - takeProfitPerOne)) - ((i_TakeProfitMaximumProfitExcursionRatio * maximumProfitExcursion) - ((i_TakeProfitMaximumLossExcursionRatio * maximumLossExcursion) + (positionPrice * takeProfitPerOne * i_TakeProfitTimedRatio * (bar_index - sellOrderOpenBarIndex))))
+        expectedTakeProfit := (positionPrice * (1 - takeProfitPerOne)) + (positionPrice * takeProfitPerOne * i_TakeProfitTimedRatio * (bar_index - sellOrderOpenBarIndex))
         if (expectedTakeProfit <= positionPrice)
             ShortTakeProfit := expectedTakeProfit
         else
