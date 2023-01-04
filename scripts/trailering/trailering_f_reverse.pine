@@ -669,6 +669,12 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 // Template substrategies - END
 
 // ImplementedStrategy substrategies - BEGIN
+
+// Virtual Trailering logic
+bool virtTraileringBoth = false
+
+virtTraileringBoth := (bar_index + i_virtTraileringOffset) % i_virtTraileringPeriod == 0
+
 // ImplementedStrategy substrategies - END
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
