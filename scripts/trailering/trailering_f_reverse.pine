@@ -782,10 +782,6 @@ if (virtInsideAPosition)
     else
         virtShortTakeProfit := (virtPositionPrice * (1 - i_breakEvenPerOne))
 
-if ((not virtTraileringBoth[1]) and (virtTraileringBoth))
-    virtInsideAPosition := true
-    virtPositionPrice := close
-
 // Virtual Trailering Position - END
 
 // Trailering substrategy - BEGIN
