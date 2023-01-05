@@ -1106,13 +1106,12 @@ if ( i_enableCustomBreakEven and insideASellOrder and customBreakEvenNeedsTrigge
 var float takeProfit = na
 var float takeProfitPerOne = na
 
-if (not i_enableTraileringTakeProfit)
-    if i_enableRiskRewardRatio
-        takeProfit := orderStopLoss * i_positionRatio
-        takeProfitPerOne := takeProfit / 100
-    else
-        takeProfit := i_takeProfit
-        takeProfitPerOne := i_takeProfitPerOne
+if i_enableRiskRewardRatio
+    takeProfit := orderStopLoss * i_positionRatio
+    takeProfitPerOne := takeProfit / 100
+else
+    takeProfit := i_takeProfit
+    takeProfitPerOne := i_takeProfitPerOne
 
 var float LongTakeProfit = na
 var float ShortTakeProfit = na
