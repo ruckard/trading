@@ -673,6 +673,16 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 
 // Virtual Trailering Position - BEGIN
 
+bool virtTraileringBoth = false
+virtTraileringBoth := (bar_index + i_virtTraileringOffset) % i_virtTraileringPeriod == 0
+
+var bool virtInsideAPosition = false
+var float virtPositionPrice = close
+
+if ((not virtTraileringBoth[1]) and (virtTraileringBoth))
+    virtInsideAPosition := true
+    virtPositionPrice := close
+
 float virtLongMaximumProfitExcursion = 0.0
 var float virtLongMaximumProfitPrice = na
 float virtLongMaximumLossExcursion = 0.0
@@ -682,12 +692,6 @@ float virtShortMaximumProfitExcursion = 0.0
 var float virtShortMaximumProfitPrice = na
 float virtShortMaximumLossExcursion = 0.0
 var float virtShortMaximumLossPrice = na
-
-bool virtTraileringBoth = false
-virtTraileringBoth := (bar_index + i_virtTraileringOffset) % i_virtTraileringPeriod == 0
-
-var bool virtInsideAPosition = false
-var float virtPositionPrice = close
 
 var float traileringAtrLongTakeProfitPrice = na
 var float traileringAtrShortTakeProfitPrice = na
