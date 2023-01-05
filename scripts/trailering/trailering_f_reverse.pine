@@ -363,7 +363,7 @@ i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 // ImplementedStrategy inputs - BEGIN
 
 i_enableTraileringTakeProfit = input.bool(true, title='Enable Trailering TakeProfit {True}', group='Trailering')
-i_enableTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
+i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 
 i_virtTakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
 i_virtTakeProfitMaximumLossExcursionRatio = input.float(5.0, title='TakeProfit Maximum Loss Excursion Ratio % {5.0}', minval=0.01, group='Trailering')
@@ -916,6 +916,20 @@ plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdow
 // Higher Timeframe Trend - Plot - END
 
 // ImplementedStrategy - Plot - BEGIN
+
+// Virtual Trailering - Plot - BEGIN
+
+float virtLongTakeProfitPlotPrice = na
+float virtShortTakeProfitPlotPrice = na
+
+virtLongTakeProfitPlotPrice := (virtInsideAPosition and i_enableVirtTraileringDebug) ? virtLongTakeProfit : na
+virtShortTakeProfitPlotPrice := (virtInsideAPosition and i_enableVirtTraileringDebug) ? virtShortTakeProfit : na
+
+longTakeProfitPricePlot = plot(virtLongTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(L) Virtual Take Profit Price")
+shortTakeProfitPricePlot = plot(virtShortTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(S) Virtual Take Profit Price")
+
+// Virtual Trailering - Plot - END
+
 // ImplementedStrategy - Plot - END
 
 // Position price calculation - BEGIN
