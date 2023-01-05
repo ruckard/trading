@@ -746,7 +746,7 @@ if ((not virtInsideAPosition[1]) and virtInsideAPosition)
         virtLongMaximumLossPrice := close
     else
         virtLongMaximumLossPrice := virtPositionPrice
-else if (insideABuyOrder)
+else if (virtInsideAPosition)
     if (close <= virtLongMaximumLossPrice[1])
         virtLongMaximumLossPrice := close
 virtLongMaximumLossExcursion := math.abs(virtLongMaximumLossPrice - virtPositionPrice)
@@ -757,7 +757,7 @@ if ((not virtInsideAPosition[1]) and virtInsideAPosition)
         virtShortMaximumLossPrice := close
     else
         virtShortMaximumLossPrice := virtPositionPrice
-else if (insideASellOrder)
+else if (virtInsideAPosition)
     if (close >= virtShortMaximumLossPrice[1])
         virtShortMaximumLossPrice := close
 virtShortMaximumLossExcursion := math.abs(virtShortMaximumLossPrice - virtPositionPrice)
