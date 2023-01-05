@@ -673,8 +673,11 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 
 // Virtual Trailering Position - BEGIN
 
+traileringAtrIsPossible = bar_index >= i_traileringAtrTakeProfitLength
+
 bool virtTraileringBoth = false
 virtTraileringBoth := (bar_index + i_virtTraileringOffset) % i_virtTraileringPeriod == 0
+virtTraileringBoth := virtTraileringBoth and traileringAtrIsPossible
 
 var bool virtInsideAPosition = false
 var float virtPositionPrice = close
@@ -771,16 +774,16 @@ virtShortMaximumLossExcursion := math.abs(virtShortMaximumLossPrice - virtPositi
 if (virtInsideAPosition)
     // Long
     virtExpectedTakeProfit := traileringAtrLongTakeProfitPrice + ((i_virtTakeProfitMaximumProfitExcursionRatio * virtLongMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * virtLongMaximumLossExcursion))
-    if (virtExpectedTakeProfit >= virtPositionPrice)
+    if (virtExpectedTakeProfit >= (virtPositionPrice * (1 + i_breakEvenPerOne)))
         virtLongTakeProfit := virtExpectedTakeProfit
     else
-        virtLongTakeProfit := (virtPositionPrice * (1 + i_breakEvenPerOne))
+        virtLongTakeProfit := virtLongTakeProfit[1]
     // Short
     virtExpectedTakeProfit := traileringAtrShortTakeProfitPrice - ((i_virtTakeProfitMaximumProfitExcursionRatio * virtShortMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * virtShortMaximumLossExcursion))
-    if (virtExpectedTakeProfit <= virtPositionPrice)
+    if (virtExpectedTakeProfit <= (virtPositionPrice * (1 - i_breakEvenPerOne)))
         virtShortTakeProfit := virtExpectedTakeProfit
     else
-        virtShortTakeProfit := (virtPositionPrice * (1 - i_breakEvenPerOne))
+        virtShortTakeProfit := virtShortTakeProfit[1]
 
 // Virtual Trailering Position - END
 
