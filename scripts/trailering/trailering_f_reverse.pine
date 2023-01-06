@@ -682,10 +682,11 @@ virtTraileringBoth := virtTraileringBoth and traileringAtrIsPossible
 var bool virtInsideAPosition = false
 var float virtPositionPrice = close
 
-if ((not insideASellOrder) and (not insideABuyOrder))
-    if ((not virtTraileringBoth[1]) and (virtTraileringBoth))
-        virtInsideAPosition := true
-        virtPositionPrice := close
+if (not virtInsideAPosition)
+    if ((not insideASellOrder) and (not insideABuyOrder))
+        if ((not virtTraileringBoth[1]) and (virtTraileringBoth))
+            virtInsideAPosition := true
+            virtPositionPrice := close
 
 float virtLongMaximumProfitExcursion = 0.0
 var float virtLongMaximumProfitPrice = na
