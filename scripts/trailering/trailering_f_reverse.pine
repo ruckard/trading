@@ -1133,20 +1133,20 @@ if ((not insideASellOrder[1]) and (insideASellOrder))
     ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
 
 if (i_enableTraileringTakeProfit)
-    if (not insideABuyOrder[1] and LONG) or ((not insideABuyOrder[1]) and (insideABuyOrder))
+    if (not insideABuyOrder[1] and LONG) or ((not insideABuyOrder[1]) and (insideABuyOrder)) or (LONG[1] and (not (insideABuyOrder)))
         LongTakeProfit := virtPositionPrice
         takeProfitPerOne := ( virtPositionPrice / positionPrice ) - 1
         takeProfit := takeProfitPerOne * 100
         orderStopLossPerOne := takeProfitPerOne / i_positionRatio
         orderStopLoss := orderStopLossPerOne * 100
         LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
-    if (not insideASellOrder[1] and SHORT) or ((not insideASellOrder[1]) and (insideASellOrder))
+    if (not insideASellOrder[1] and SHORT) or ((not insideASellOrder[1]) and (insideASellOrder)) or (SHORT[1] and (not (insideASellOrder)))
         ShortTakeProfit := virtPositionPrice
         takeProfitPerOne := ( positionPrice / virtPositionPrice ) - 1
         takeProfit := takeProfitPerOne * 100
         orderStopLossPerOne := takeProfitPerOne / i_positionRatio
         orderStopLoss := orderStopLossPerOne * 100
-        ShortStopLoss := positionPrice * (1 - orderStopLossPerOne)
+        ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
