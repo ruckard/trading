@@ -679,15 +679,6 @@ bool virtTraileringBoth = false
 virtTraileringBoth := (bar_index + i_virtTraileringOffset) % i_virtTraileringPeriod == 0
 virtTraileringBoth := virtTraileringBoth and traileringAtrIsPossible
 
-var bool virtInsideAPosition = false
-var float virtPositionPrice = close
-
-if (not virtInsideAPosition)
-    if ((not insideASellOrder) and (not insideABuyOrder))
-        if ((not virtTraileringBoth[1]) and (virtTraileringBoth))
-            virtInsideAPosition := true
-            virtPositionPrice := close
-
 float virtLongMaximumProfitExcursion = 0.0
 var float virtLongMaximumProfitPrice = na
 float virtLongMaximumLossExcursion = 0.0
@@ -709,6 +700,17 @@ var float virtExpectedTakeProfit = na
 
 virtLongTakeProfitIsReached = (virtLongTakeProfit >= low) and (virtLongTakeProfit <= high)
 virtShortTakeProfitIsReached =  (virtShortTakeProfit >= low) and (virtShortTakeProfit <= high)
+
+var bool virtInsideAPosition = false
+var float virtPositionPrice = close
+
+if (not (virtLongTakeProfitIsReached[1] or virtShortTakeProfitIsReached[1]))
+    if (not virtInsideAPosition)
+        if ((not insideASellOrder) and (not insideABuyOrder))
+            if ((not virtTraileringBoth[1]) and (virtTraileringBoth))
+                virtInsideAPosition := true
+                virtPositionPrice := close
+
 if (virtInsideAPosition[1] and (virtLongTakeProfitIsReached or virtShortTakeProfitIsReached))
     virtInsideAPosition := false
 
@@ -1017,6 +1019,11 @@ if i_enableShortRSIClosing
 if SHORT_CLOSE
     SHORT := false
 // Decide if a SHORT/SHORT entry should be closed - END
+
+// Make sure that positionPrice is not updated in the case where we just have reached the TakeProfit.
+if (i_enableTraileringTakeProfit)
+    if ((not (insideASellOrder or insideABuyOrder)) and (virtLongTakeProfitIsReached[1] or virtShortTakeProfitIsReached[1]))
+        positionPrice := positionPrice[1]
 
 // orderStopLoss is just here just in case
 // we implement i_longStopLoss and i_shortStopLoss
