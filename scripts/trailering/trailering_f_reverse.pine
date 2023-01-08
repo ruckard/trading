@@ -698,6 +698,8 @@ var float virtLongTakeProfit = na
 var float virtShortTakeProfit = na
 var float virtExpectedTakeProfit = na
 
+var bool resetVirtVariables = false
+
 virtLongTakeProfitIsReached = (virtLongTakeProfit >= low) and (virtLongTakeProfit <= high)
 virtShortTakeProfitIsReached =  (virtShortTakeProfit >= low) and (virtShortTakeProfit <= high)
 
@@ -705,11 +707,13 @@ var bool virtInsideAPosition = false
 var float virtPositionPrice = close
 
 if (not (virtLongTakeProfitIsReached[1] or virtShortTakeProfitIsReached[1]))
-    if (not virtInsideAPosition)
-        if ((not insideASellOrder) and (not insideABuyOrder))
-            if ((not virtTraileringBoth[1]) and (virtTraileringBoth))
-                virtInsideAPosition := true
-                virtPositionPrice := close
+    if ((not insideASellOrder) and (not insideABuyOrder))
+        if ((not virtTraileringBoth[1]) and (virtTraileringBoth))
+            if (virtInsideAPosition)
+                resetVirtVariables := true
+            virtInsideAPosition := true
+            virtPositionPrice := close
+
 
 if (virtInsideAPosition[1] and (virtLongTakeProfitIsReached or virtShortTakeProfitIsReached))
     virtInsideAPosition := false
@@ -717,11 +721,14 @@ if (virtInsideAPosition[1] and (virtLongTakeProfitIsReached or virtShortTakeProf
 tmpTraileringAtrLongTakeProfitPrice = i_traileringAtrTakeProfitSource + (ta.atr(i_traileringAtrTakeProfitLength) * i_traileringAtrTakeProfitMultiplier)
 tmpTraileringAtrShortTakeProfitPrice = i_traileringAtrTakeProfitSource - (ta.atr(i_traileringAtrTakeProfitLength) * i_traileringAtrTakeProfitMultiplier)
 
-if (not virtInsideAPosition) or ((not virtInsideAPosition[1]) and virtInsideAPosition)
+if (not virtInsideAPosition) or ((not virtInsideAPosition[1]) and virtInsideAPosition) or resetVirtVariables
     traileringAtrLongTakeProfitPrice := tmpTraileringAtrLongTakeProfitPrice
     traileringAtrShortTakeProfitPrice := tmpTraileringAtrShortTakeProfitPrice
     virtLongTakeProfit := traileringAtrLongTakeProfitPrice
     virtShortTakeProfit := traileringAtrShortTakeProfitPrice
+
+if resetVirtVariables
+    resetVirtVariables := false
 
 // maximumProfitExcursion - BEGIN
 
