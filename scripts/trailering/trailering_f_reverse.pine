@@ -727,9 +727,6 @@ if (not virtInsideAPosition) or ((not virtInsideAPosition[1]) and virtInsideAPos
     virtLongTakeProfit := traileringAtrLongTakeProfitPrice
     virtShortTakeProfit := traileringAtrShortTakeProfitPrice
 
-if resetVirtVariables
-    resetVirtVariables := false
-
 // maximumProfitExcursion - BEGIN
 
 // Long
@@ -759,7 +756,7 @@ virtShortMaximumProfitExcursion := math.abs(virtShortMaximumProfitPrice - virtPo
 // maximumLossExcursion - BEGIN
 
 // Long
-if ((not virtInsideAPosition[1]) and virtInsideAPosition)
+if (resetVirtVariables or ((not virtInsideAPosition[1]) and virtInsideAPosition))
     if (close <= virtPositionPrice)
         virtLongMaximumLossPrice := close
     else
@@ -770,7 +767,7 @@ else if (virtInsideAPosition)
 virtLongMaximumLossExcursion := math.abs(virtLongMaximumLossPrice - virtPositionPrice)
 
 // Short
-if ((not virtInsideAPosition[1]) and virtInsideAPosition)
+if (resetVirtVariables or ((not virtInsideAPosition[1]) and virtInsideAPosition))
     if (close >= virtPositionPrice)
         virtShortMaximumLossPrice := close
     else
@@ -779,6 +776,9 @@ else if (virtInsideAPosition)
     if (close >= virtShortMaximumLossPrice[1])
         virtShortMaximumLossPrice := close
 virtShortMaximumLossExcursion := math.abs(virtShortMaximumLossPrice - virtPositionPrice)
+
+if resetVirtVariables
+    resetVirtVariables := false
 
 // maximumLossExcursion - END
 
