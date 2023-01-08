@@ -372,7 +372,7 @@ i_virtTraileringPeriod = input.int(24, minval=2, title='Trailering Period {24}',
 
 i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
 i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
-i_traileringAtrTakeProfitMultiplier = input.float(1.9, title='ATR Take Profit Multiplier % {1.9}', minval=0.01, group='Trailering')
+i_traileringAtrTakeProfitMultiplier = input.float(1.25, title='ATR Take Profit Multiplier % {1.25}', minval=0.01, group='Trailering')
 
 // ImplementedStrategy inputs - END
 
