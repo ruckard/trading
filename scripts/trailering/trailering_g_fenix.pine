@@ -374,6 +374,10 @@ i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take P
 i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
 i_traileringAtrTakeProfitMultiplier = input.float(1.25, title='ATR Take Profit Multiplier % {1.25}', minval=0.01, group='Trailering')
 
+i_volumeBounceType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Volume MA {SMA/7/close}', group='Volume Bounce', inline='VolumeBounce')
+i_volumeBounceLength = input.int(7, minval = 1,  title = '', group='Volume Bounce', inline='VolumeBounce')
+i_volumeBounceRatio = input.float(1.65, title='Ratio % {1.65}', minval=0.01, group='Volume Bounce')
+
 // ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
@@ -805,6 +809,19 @@ bool traileringShort = false
 traileringLong := virtInsideAPosition[1] and virtShortTakeProfitIsReached and (close <= virtPositionPrice) and (virtPositionPrice >= (close * (1 + i_breakEvenPerOne)))
 traileringShort := virtInsideAPosition[1] and virtLongTakeProfitIsReached and (close >= virtPositionPrice) and (virtPositionPrice <= (close * (1 - i_breakEvenPerOne)))
 // Trailering substrategy - END
+
+// Volume Bounce substrategy - BEGIN
+
+bool volumeBounceLong = false
+bool volumeBounceShort = false
+
+volumeBounceMA = f_Ma (i_volumeBounceType, volume, i_volumeBounceLength)
+volumeBounceRatio = volume / volumeBounceMA
+
+volumeBounceLong := volumeBounceRatio >= i_volumeBounceRatio
+volumeBounceShort := volumeBounceRatio >= i_volumeBounceRatio
+
+// Volume Bounce substrategy - END
 
 // ImplementedStrategy substrategies - END
 
