@@ -357,7 +357,7 @@ i_ADXProtectionDiLength = input.int(14, minval=1, title='ADX DI Length', group='
 i_ADXProtectionSmoothing = input.int(14, title='ADX Smoothing', minval=1, maxval=50, group='ADX Protection')
 
 i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
-i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
+i_subStrategiesMinimum = input.int(2, title='(STRAT) Substrategies minimum [2]')
 // Template inputs - END
 
 // ImplementedStrategy inputs - BEGIN
