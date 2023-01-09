@@ -816,7 +816,7 @@ bool volumeBounceLong = false
 bool volumeBounceShort = false
 
 volumeBounceMA = f_Ma (i_volumeBounceType, volume, i_volumeBounceLength)
-volumeBounceRatio = volume / volumeBounceMA
+volumeBounceRatio = (volume - volumeBounceMA) / volumeBounceMA
 
 volumeBounceLong := volumeBounceRatio >= i_volumeBounceRatio
 volumeBounceShort := volumeBounceRatio >= i_volumeBounceRatio
