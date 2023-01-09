@@ -930,6 +930,20 @@ plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdow
 // Higher Timeframe Trend - Plot - END
 
 // ImplementedStrategy - Plot - BEGIN
+
+// Virtual Trailering - Plot - BEGIN
+
+float virtLongTakeProfitPlotPrice = na
+float virtShortTakeProfitPlotPrice = na
+
+virtLongTakeProfitPlotPrice := (virtInsideAPosition and i_enableVirtTraileringDebug) ? virtLongTakeProfit : na
+virtShortTakeProfitPlotPrice := (virtInsideAPosition and i_enableVirtTraileringDebug) ? virtShortTakeProfit : na
+
+longTakeProfitPricePlot = plot(virtLongTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(L) Virtual Take Profit Price")
+shortTakeProfitPricePlot = plot(virtShortTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(S) Virtual Take Profit Price")
+
+// Virtual Trailering - Plot - END
+
 // ImplementedStrategy - Plot - END
 
 // Position price calculation - BEGIN
