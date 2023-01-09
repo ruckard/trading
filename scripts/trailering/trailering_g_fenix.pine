@@ -376,7 +376,8 @@ i_traileringAtrTakeProfitMultiplier = input.float(1.25, title='ATR Take Profit M
 
 i_volumeBounceType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Volume MA {SMA/7/close}', group='Volume Bounce', inline='VolumeBounce')
 i_volumeBounceLength = input.int(7, minval = 1,  title = '', group='Volume Bounce', inline='VolumeBounce')
-i_volumeBounceRatio = input.float(1.65, title='Ratio % {1.65}', minval=0.01, group='Volume Bounce')
+i_volumeBounceMinimumRatio = input.float(1.65, title='Min Ratio % {1.65}', minval=0.01, group='Volume Bounce')
+i_volumeBounceMaximumRatio = input.float(1.78, title='Max Ratio % {1.78}', minval=0.01, group='Volume Bounce')
 
 // ImplementedStrategy inputs - END
 
@@ -818,8 +819,8 @@ bool volumeBounceShort = false
 volumeBounceMA = f_Ma (i_volumeBounceType, volume, i_volumeBounceLength)
 volumeBounceRatio = (volume - volumeBounceMA) / volumeBounceMA
 
-volumeBounceLong := volumeBounceRatio >= i_volumeBounceRatio
-volumeBounceShort := volumeBounceRatio >= i_volumeBounceRatio
+volumeBounceLong := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volumeBounceRatio <= i_volumeBounceMaximumRatio)
+volumeBounceShort := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volumeBounceRatio <= i_volumeBounceMaximumRatio)
 
 // Volume Bounce substrategy - END
 
