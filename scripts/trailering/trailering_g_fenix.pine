@@ -375,7 +375,7 @@ i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit S
 i_traileringAtrTakeProfitMultiplier = input.float(1.25, title='ATR Take Profit Multiplier % {1.25}', minval=0.01, group='Trailering')
 
 i_volumeBounceMinimumRatio = input.float(3.0, title='Min Ratio % {3.0}', minval=0.01, group='Volume Bounce')
-i_volumeBounceMaximumRatio = input.float(4.0, title='Max Ratio % {4.0}', minval=0.01, group='Volume Bounce')
+i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=0.01, group='Volume Bounce')
 
 // ImplementedStrategy inputs - END
 
