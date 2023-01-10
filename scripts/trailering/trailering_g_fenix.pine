@@ -374,10 +374,8 @@ i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take P
 i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
 i_traileringAtrTakeProfitMultiplier = input.float(1.25, title='ATR Take Profit Multiplier % {1.25}', minval=0.01, group='Trailering')
 
-i_volumeBounceType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Volume MA {SMA/7/close}', group='Volume Bounce', inline='VolumeBounce')
-i_volumeBounceLength = input.int(7, minval = 1,  title = '', group='Volume Bounce', inline='VolumeBounce')
-i_volumeBounceMinimumRatio = input.float(1.60, title='Min Ratio % {1.60}', minval=0.01, group='Volume Bounce')
-i_volumeBounceMaximumRatio = input.float(1.78, title='Max Ratio % {1.78}', minval=0.01, group='Volume Bounce')
+i_volumeBounceMinimumRatio = input.float(3.0, title='Min Ratio % {3.0}', minval=0.01, group='Volume Bounce')
+i_volumeBounceMaximumRatio = input.float(4.0, title='Max Ratio % {4.0}', minval=0.01, group='Volume Bounce')
 
 // ImplementedStrategy inputs - END
 
@@ -816,8 +814,7 @@ traileringShort := virtInsideAPosition[1] and virtLongTakeProfitIsReached and (c
 bool volumeBounceLong = false
 bool volumeBounceShort = false
 
-volumeBounceMA = f_Ma (i_volumeBounceType, volume, i_volumeBounceLength)
-volumeBounceRatio = (volume - volumeBounceMA) / volumeBounceMA
+volumeBounceRatio = volume / volume[1]
 
 volumeBounceLong := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volumeBounceRatio <= i_volumeBounceMaximumRatio)
 volumeBounceShort := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volumeBounceRatio <= i_volumeBounceMaximumRatio)
