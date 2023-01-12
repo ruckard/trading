@@ -313,12 +313,12 @@ i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enfo
 // Too old order - Inputs
 i_enableTooOldLongOrderClose = input.bool(false, title='Enable/Bars/SL (L) {False/6/1.20 %}', group='Too Old Orders', inline='Too Old Long Orders')
 i_tooOldLongBarsNumber = input.int(6, title='', minval=1, maxval=100, step=1, group='Too Old Orders', inline='Too Old Long Orders')
-i_tooOldLongStopLoss = input.float(1.20, title='', tooltip='(OLD) Too Old Long order Stop Loss (%) {1.20}', minval=0, step=0.01, group='Too Old Orders', inline='Too Old Long Orders')
+i_tooOldLongStopLoss = input.float(1.20, title='', tooltip='(OLD) Too Old Long order Stop Loss (%) {1.20}', minval=-100.0, step=0.01, group='Too Old Orders', inline='Too Old Long Orders')
 i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
 
 i_enableTooOldShortOrderClose = input.bool(false, title='Enable/Bars/SL (S) {False/6/0.60 %}', group='Too Old Orders', inline='Too Old Short Orders')
 i_tooOldShortBarsNumber = input.int(6, title='', minval=1, maxval=100, step=1, group='Too Old Orders', inline='Too Old Short Orders')
-i_tooOldShortStopLoss = input.float(0.60, title='', tooltip='(OLD) Too Old Short order Stop Loss (%) {0.60}', minval=0, step=0.01, group='Too Old Orders', inline='Too Old Short Orders')
+i_tooOldShortStopLoss = input.float(0.60, title='', tooltip='(OLD) Too Old Short order Stop Loss (%) {0.60}', minval=-100.0, step=0.01, group='Too Old Orders', inline='Too Old Short Orders')
 i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
 
 i_enableLongRSIProtection = input.bool(false, title='Enable (L) RSI Protection {False, 45.0}', group='RSI Protection', inline='LongRSIProtection')
