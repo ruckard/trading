@@ -694,6 +694,18 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 // Template substrategies - END
 
 // ImplementedStrategy substrategies - BEGIN
+
+// SergioSqueeze substrategy - BEGIN
+bool sergiosqueezeLong = false
+bool sergiosqueezeShort = false
+
+[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
+
+sergiosqueezeLong := (sqzmom_bcolor[1] != color.lime) and (sqzmom_bcolor == color.lime)
+sergiosqueezeShort := (sqzmom_bcolor[1] != color.red) and (sqzmom_bcolor == color.red)
+
+// SergioSqueeze substrategy - END
+
 // ImplementedStrategy substrategies - END
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
