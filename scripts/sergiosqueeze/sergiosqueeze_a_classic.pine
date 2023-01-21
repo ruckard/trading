@@ -249,7 +249,7 @@ i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing
 i_enableBreakEven = input.bool(true, title='(BREAKEVEN) Enable Break Even (%) {True}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
 i_enableRiskRewardRatio = input.bool(true, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {True}')
-i_enableRiskBreakevenTriggerRatio = input.bool(false, title='(BREAKEVEN) Calculate Breakeven Trigger from R/BET Ratio (%) {True}')
+i_enableRiskBreakevenTriggerRatio = input.bool(true, title='(BREAKEVEN) Calculate Breakeven Trigger from R/BET Ratio (%) {True}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
 i_positionRatio = input.float(1.25, title='(STRAT) Risk/Reward Ratio % {1.25}', minval=0.01)
