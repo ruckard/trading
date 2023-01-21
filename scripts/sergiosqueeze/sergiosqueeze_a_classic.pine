@@ -18,6 +18,12 @@
 // ImplementedStrategy foo - END
 //
 // ImplementedStrategy explanation - BEGIN
+//
+// When SqueezeMomentum indicator shines we open long if SqueezeMomentum is positive, short if SqueezeMomentum is negative.
+// We exit when the colour no longer shines.
+// StopLoss is set to 1.5 x ATR.
+// Breakeven is set to 0.66 Breakeven/Risk Ratio.
+//
 // ImplementedStrategy explanation - END
 //
 // In addition the former strategy also includes Risk Management.
