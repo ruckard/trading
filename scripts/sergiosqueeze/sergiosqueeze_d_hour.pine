@@ -377,6 +377,8 @@ i_sqzmomLengthKC=input.int(20, title='KC Length/MultFactor/TR {20/1.5/True}', gr
 i_sqzmomMultKC = input.float(1.5, title='', group='Sqzmom Divergences', inline='SqzmomKC')
 i_sqzmomUseTrueRange = input.bool(true, title='', group='Sqzmom Divergences', inline='SqzmomKC')
 
+i_enableCurrentTimeframeSqueezeColorClose = input.bool(true, title = 'Close based on Colour {True}', group='Szqmom Close', inline='CurieEnableShow')
+
 // ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
@@ -748,6 +750,9 @@ bool sergiosqueezeShort = false
 sqzIsHTNewLime = request.security(syminfo.tickerid, fun_get_higher_timeframe(), getSqzIsNewLime(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
 sqzIsHTNewRed = request.security(syminfo.tickerid, fun_get_higher_timeframe(), getSqzIsNewRed(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
 
+sqzIsNewLime = getSqzIsNewLime(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
+sqzIsNewRed = getSqzIsNewRed(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
+
 if newHigherTimeframeTrendMaBar
     sergiosqueezeLong := sqzIsHTNewLime
     sergiosqueezeShort := sqzIsHTNewRed
@@ -935,6 +940,9 @@ if i_enableTooOldLongOrderClose
 if i_enableLongRSIClosing
     LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(closingRsi, longRSIClosingLevel) )
 
+if i_enableCurrentTimeframeSqueezeColorClose
+    LONG_CLOSE := LONG_CLOSE or sqzIsNewRed
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
     LONG := false
@@ -955,6 +963,9 @@ if i_enableTooOldShortOrderClose
 
 if i_enableShortRSIClosing
     SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(closingRsi, shortRSIClosingLevel) )
+
+if i_enableCurrentTimeframeSqueezeColorClose
+    SHORT_CLOSE := SHORT_CLOSE or sqzIsNewLime
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
