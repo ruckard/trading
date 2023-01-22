@@ -745,12 +745,12 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 bool sergiosqueezeLong = false
 bool sergiosqueezeShort = false
 
-sqzIsNewLime = request.security(syminfo.tickerid, fun_get_higher_timeframe(), getSqzIsNewLime(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
-sqzIsNewRed = request.security(syminfo.tickerid, fun_get_higher_timeframe(), getSqzIsNewRed(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
+sqzIsHTNewLime = request.security(syminfo.tickerid, fun_get_higher_timeframe(), getSqzIsNewLime(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
+sqzIsHTNewRed = request.security(syminfo.tickerid, fun_get_higher_timeframe(), getSqzIsNewRed(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
 
 if newHigherTimeframeTrendMaBar
-    sergiosqueezeLong := sqzIsNewLime
-    sergiosqueezeShort := sqzIsNewRed
+    sergiosqueezeLong := sqzIsHTNewLime
+    sergiosqueezeShort := sqzIsHTNewRed
 
 // SergioSqueeze substrategy - END
 
