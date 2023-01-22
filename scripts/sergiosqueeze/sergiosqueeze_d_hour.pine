@@ -379,6 +379,36 @@ i_sqzmomUseTrueRange = input.bool(true, title='', group='Sqzmom Divergences', in
 
 i_enableCurrentTimeframeSqueezeColorClose = input.bool(true, title = 'Close based on Colour {True}', group='Szqmom Close', inline='CurieEnableShow')
 
+SQZMOM_LIGHTRED_COLOUR='red'
+SQZMOM_DARKRED_COLOUR='maroon'
+SQZMOM_LIGHTGREEN_COLOUR='lime'
+SQZMOM_DARKGREEN_COLOUR='green'
+
+i_sqzmomHTFLongOpenColorString = input.string(SQZMOM_LIGHTGREEN_COLOUR, title='HTF (L) Open Color', options=[SQZMOM_LIGHTRED_COLOUR, SQZMOM_DARKRED_COLOUR, SQZMOM_LIGHTGREEN_COLOUR, SQZMOM_DARKGREEN_COLOUR], group='HTF Squeeze Colour')
+i_sqzmomHTFShortOpenColorString = input.string(SQZMOM_LIGHTRED_COLOUR, title='HTF (S) Open Color', options=[SQZMOM_LIGHTRED_COLOUR, SQZMOM_DARKRED_COLOUR, SQZMOM_LIGHTGREEN_COLOUR, SQZMOM_DARKGREEN_COLOUR], group='HTF Squeeze Colour')
+
+i_sqzmomLongCloseColorString = input.string(SQZMOM_LIGHTRED_COLOUR, title='(L) Close Color', options=[SQZMOM_LIGHTRED_COLOUR, SQZMOM_DARKRED_COLOUR, SQZMOM_LIGHTGREEN_COLOUR, SQZMOM_DARKGREEN_COLOUR], group='Squeeze Colour')
+i_sqzmomShortCloseColorString = input.string(SQZMOM_LIGHTGREEN_COLOUR, title='(S) Close Color', options=[SQZMOM_LIGHTRED_COLOUR, SQZMOM_DARKRED_COLOUR, SQZMOM_LIGHTGREEN_COLOUR, SQZMOM_DARKGREEN_COLOUR], group='Squeeze Colour')
+
+getColorFromString(string p_colorString) =>
+    color returnColor = na
+    if (p_colorString == SQZMOM_LIGHTRED_COLOUR)
+        returnColor := color.red
+    if (p_colorString == SQZMOM_DARKRED_COLOUR)
+        returnColor := color.maroon
+    if (p_colorString == SQZMOM_LIGHTGREEN_COLOUR)
+        returnColor := color.lime
+    if (p_colorString == SQZMOM_DARKGREEN_COLOUR)
+        returnColor := color.green
+
+    returnColor
+
+i_sqzmomHTFLongOpenColor = getColorFromString(i_sqzmomHTFLongOpenColorString)
+i_sqzmomHTFShortOpenColor = getColorFromString(i_sqzmomHTFShortOpenColorString)
+
+i_sqzmomLongCloseColor = getColorFromString(i_sqzmomLongCloseColorString)
+i_sqzmomShortCloseColor = getColorFromString(i_sqzmomShortCloseColorString)
+
 // ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
@@ -603,13 +633,9 @@ fun_get_higher_timeframe() =>
         Timeframe := '12M'
     Timeframe
 
-getSqzIsNewLime(p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange) =>
+getSqzIsNewColor(p_color, p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange) =>
     [_sqzmom_val, _sqzmom_bcolor, _sqzmom_scolor, _sqz_percentage] = sqzmom(p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange)
-    (_sqzmom_bcolor[1] != color.lime) and (_sqzmom_bcolor == color.lime)
-
-getSqzIsNewRed(p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange) =>
-    [_sqzmom_val, _sqzmom_bcolor, _sqzmom_scolor, _sqz_percentage] = sqzmom(p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange)
-    (_sqzmom_bcolor[1] != color.red) and (_sqzmom_bcolor == color.red)
+    (_sqzmom_bcolor[1] != p_color) and (_sqzmom_bcolor == p_color)
 
 // ImplementedStrategy functions - END
 
@@ -747,15 +773,15 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 bool sergiosqueezeLong = false
 bool sergiosqueezeShort = false
 
-sqzIsHTNewLime = request.security(syminfo.tickerid, fun_get_higher_timeframe(), getSqzIsNewLime(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
-sqzIsHTNewRed = request.security(syminfo.tickerid, fun_get_higher_timeframe(), getSqzIsNewRed(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
+sqzIsHTNewLongOpen = request.security(syminfo.tickerid, fun_get_higher_timeframe(), getSqzIsNewColor(i_sqzmomHTFLongOpenColor, i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
+sqzIsHTNewShortOpen = request.security(syminfo.tickerid, fun_get_higher_timeframe(), getSqzIsNewColor(i_sqzmomHTFShortOpenColor, i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
 
-sqzIsNewLime = getSqzIsNewLime(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
-sqzIsNewRed = getSqzIsNewRed(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
+sqzIsNewLongClose = getSqzIsNewColor(i_sqzmomLongCloseColor, i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
+sqzIsNewShortClose = getSqzIsNewColor(i_sqzmomShortCloseColor, i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
 
 if newHigherTimeframeTrendMaBar
-    sergiosqueezeLong := sqzIsHTNewLime
-    sergiosqueezeShort := sqzIsHTNewRed
+    sergiosqueezeLong := sqzIsHTNewLongOpen
+    sergiosqueezeShort := sqzIsHTNewShortOpen
 
 // SergioSqueeze substrategy - END
 
@@ -941,7 +967,7 @@ if i_enableLongRSIClosing
     LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(closingRsi, longRSIClosingLevel) )
 
 if i_enableCurrentTimeframeSqueezeColorClose
-    LONG_CLOSE := LONG_CLOSE or sqzIsNewRed
+    LONG_CLOSE := LONG_CLOSE or sqzIsNewLongClose
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if LONG_CLOSE
@@ -965,7 +991,7 @@ if i_enableShortRSIClosing
     SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(closingRsi, shortRSIClosingLevel) )
 
 if i_enableCurrentTimeframeSqueezeColorClose
-    SHORT_CLOSE := SHORT_CLOSE or sqzIsNewLime
+    SHORT_CLOSE := SHORT_CLOSE or sqzIsNewShortClose
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if SHORT_CLOSE
