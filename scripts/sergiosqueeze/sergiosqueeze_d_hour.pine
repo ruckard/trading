@@ -565,6 +565,50 @@ sqzmom(length, mult, lengthKC, multKC, useTrueRange) =>
 
     [val, bcolor, scolor, sqz_percentage]
 
+// Improved from:
+// Get higher timeframe.period automatically
+// Name: Support Resistance MTF
+// User: LonesomeTheBlue
+// https://www.tradingview.com/script/E9l1xAQd-Support-Resistance-MTF/
+// Timeframe period functions
+fun_get_higher_timeframe() =>
+    Timeframe = timeframe.period
+    if (timeframe.period == '1')
+        Timeframe := '15'
+    else if (timeframe.period == '3')
+        Timeframe := '15'
+    else if (timeframe.period == '5')
+        Timeframe := '60'
+    else if (timeframe.period == '15')
+        Timeframe := '60'
+    else if (timeframe.period == '30')
+        Timeframe := '120'
+    else if (timeframe.period == '45')
+        Timeframe := '120'
+    else if (timeframe.period == '60')
+        Timeframe := '240'
+    else if (timeframe.period == '120')
+        Timeframe := '1D'
+    else if (timeframe.period == '180')
+        Timeframe := '1D'
+    else if (timeframe.period == '240')
+        Timeframe := '1D'
+    else if (timeframe.period == 'D')
+        Timeframe := '1W'
+    else if (timeframe.period == 'W')
+        Timeframe := '1M'
+    else if (timeframe.period == 'M')
+        Timeframe := '12M'
+    Timeframe
+
+getSqzIsNewLime(p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange) =>
+    [_sqzmom_val, _sqzmom_bcolor, _sqzmom_scolor, _sqz_percentage] = sqzmom(p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange)
+    (_sqzmom_bcolor[1] != color.lime) and (_sqzmom_bcolor == color.lime)
+
+getSqzIsNewRed(p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange) =>
+    [_sqzmom_val, _sqzmom_bcolor, _sqzmom_scolor, _sqz_percentage] = sqzmom(p_sqzmomLength, p_sqzmomMult, p_sqzmomLengthKC, p_sqzmomMultKC, p_sqzmomUseTrueRange)
+    (_sqzmom_bcolor[1] != color.red) and (_sqzmom_bcolor == color.red)
+
 // ImplementedStrategy functions - END
 
 // Strategy Body - BEGIN
@@ -701,10 +745,12 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 bool sergiosqueezeLong = false
 bool sergiosqueezeShort = false
 
-[sqzmom_val, sqzmom_bcolor, sqzmom_scolor, sqz_percentage] = sqzmom(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange)
+sqzIsNewLime = request.security(syminfo.tickerid, fun_get_higher_timeframe(), getSqzIsNewLime(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
+sqzIsNewRed = request.security(syminfo.tickerid, fun_get_higher_timeframe(), getSqzIsNewRed(i_sqzmomLength, i_sqzmomMult, i_sqzmomLengthKC, i_sqzmomMultKC, i_sqzmomUseTrueRange))
 
-sergiosqueezeLong := (sqzmom_bcolor[1] != color.lime) and (sqzmom_bcolor == color.lime)
-sergiosqueezeShort := (sqzmom_bcolor[1] != color.red) and (sqzmom_bcolor == color.red)
+if newHigherTimeframeTrendMaBar
+    sergiosqueezeLong := sqzIsNewLime
+    sergiosqueezeShort := sqzIsNewRed
 
 // SergioSqueeze substrategy - END
 
