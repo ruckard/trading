@@ -259,8 +259,8 @@ _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
-i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
-i_atrStopLossMultiplier = input.float(1.0, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.0}', minval=0.01)
+i_atrStopLossSource = input.source(ohlc4, title = '(STOPTAKE) ATR Stop Loss Source [ohlc4]')
+i_atrStopLossMultiplier = input.float(1.25, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.25}', minval=0.01)
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -304,18 +304,18 @@ i_atrVolatilitySource = input.source(close, title='', group='ATR Volatility Prot
 i_atrVolatilityMinimumMultiplier = input.float(1.10, title='Min/Max {1.10/2.00}', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
 i_atrVolatilityMaximumMultiplier = input.float(2.00, title='', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
 
-i_higherTimeframeTrendMaEnforce = input.bool(false, title='Use {False}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
+i_higherTimeframeTrendMaEnforce = input.bool(true, title='Use {True}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
 i_showHigherTimeframeTrendMa = input.bool(false, title='Show {False}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
 
-i_higherTimeframeTrendMaTimeframe = input.timeframe('60', title='Timeframe/Offset {1 hour/0 bars}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
+i_higherTimeframeTrendMaTimeframe = input.timeframe('240', title='Timeframe/Offset {4 hours/0 bars}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
 
 i_higherTimeframeTrendMaOffset = input.int(0, title='', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
 
-i_higherTimeframeTrendFastMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Fast MA {EMA/10/close}', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
+i_higherTimeframeTrendFastMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Fast MA {EMA/10/close}', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
 i_higherTimeframeTrendFastMaLength = input.int(10, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
 i_higherTimeframeTrendFastMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
 
-i_higherTimeframeTrendSlowMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Slow MA {EMA/55/close}', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
+i_higherTimeframeTrendSlowMaType = input.string(defval = 'EMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Slow MA {EMA/55/close}', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
 i_higherTimeframeTrendSlowMaLength = input.int(55, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
 i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
 
@@ -384,11 +384,11 @@ SQZMOM_DARKRED_COLOUR='maroon'
 SQZMOM_LIGHTGREEN_COLOUR='lime'
 SQZMOM_DARKGREEN_COLOUR='green'
 
-i_sqzmomHTFLongOpenColorString = input.string(SQZMOM_LIGHTGREEN_COLOUR, title='HTF (L) Open Color', options=[SQZMOM_LIGHTRED_COLOUR, SQZMOM_DARKRED_COLOUR, SQZMOM_LIGHTGREEN_COLOUR, SQZMOM_DARKGREEN_COLOUR], group='HTF Squeeze Colour')
-i_sqzmomHTFShortOpenColorString = input.string(SQZMOM_LIGHTRED_COLOUR, title='HTF (S) Open Color', options=[SQZMOM_LIGHTRED_COLOUR, SQZMOM_DARKRED_COLOUR, SQZMOM_LIGHTGREEN_COLOUR, SQZMOM_DARKGREEN_COLOUR], group='HTF Squeeze Colour')
+i_sqzmomHTFLongOpenColorString = input.string(SQZMOM_LIGHTGREEN_COLOUR, title='HTF (L) Open Color {lime}', options=[SQZMOM_LIGHTRED_COLOUR, SQZMOM_DARKRED_COLOUR, SQZMOM_LIGHTGREEN_COLOUR, SQZMOM_DARKGREEN_COLOUR], group='HTF Squeeze Colour')
+i_sqzmomHTFShortOpenColorString = input.string(SQZMOM_LIGHTRED_COLOUR, title='HTF (S) Open Color {red}', options=[SQZMOM_LIGHTRED_COLOUR, SQZMOM_DARKRED_COLOUR, SQZMOM_LIGHTGREEN_COLOUR, SQZMOM_DARKGREEN_COLOUR], group='HTF Squeeze Colour')
 
-i_sqzmomLongCloseColorString = input.string(SQZMOM_LIGHTRED_COLOUR, title='(L) Close Color', options=[SQZMOM_LIGHTRED_COLOUR, SQZMOM_DARKRED_COLOUR, SQZMOM_LIGHTGREEN_COLOUR, SQZMOM_DARKGREEN_COLOUR], group='Squeeze Colour')
-i_sqzmomShortCloseColorString = input.string(SQZMOM_LIGHTGREEN_COLOUR, title='(S) Close Color', options=[SQZMOM_LIGHTRED_COLOUR, SQZMOM_DARKRED_COLOUR, SQZMOM_LIGHTGREEN_COLOUR, SQZMOM_DARKGREEN_COLOUR], group='Squeeze Colour')
+i_sqzmomLongCloseColorString = input.string(SQZMOM_DARKGREEN_COLOUR, title='(L) Close Color {green}', options=[SQZMOM_LIGHTRED_COLOUR, SQZMOM_DARKRED_COLOUR, SQZMOM_LIGHTGREEN_COLOUR, SQZMOM_DARKGREEN_COLOUR], group='Squeeze Colour')
+i_sqzmomShortCloseColorString = input.string(SQZMOM_DARKRED_COLOUR, title='(S) Close Color {maroon}', options=[SQZMOM_LIGHTRED_COLOUR, SQZMOM_DARKRED_COLOUR, SQZMOM_LIGHTGREEN_COLOUR, SQZMOM_DARKGREEN_COLOUR], group='Squeeze Colour')
 
 getColorFromString(string p_colorString) =>
     color returnColor = na
