@@ -217,7 +217,7 @@ _ZIGSIGNALPROVIDER_ = 'Signal Provider', _ZIGCOPYTRADERPROVIDER_ = 'Profit Shari
 i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider type', options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
 i_zignalyProviderType = (i_zignalyProviderTypePre == _ZIGCOPYTRADERPROVIDER_) ? 'copytrader' : 'signalprovider'
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
-i_strategyType = input.string(_REVERSE_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
+i_strategyType = input.string(_L_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
 i_enableLongStrictStrategy = input.bool(false, '(STRAT) (L) Strict mode {False}')
 i_enableShortStrictStrategy = input.bool(false, '(STRAT) (S) Strict mode {False}')
 i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Start Time {2021-01-01 00:00:00}')
@@ -243,24 +243,22 @@ i_curieSource = input.source(ohlc4, title = 'Source {ohlc4}', group='Curie Closi
 
 // Order comments based debug
 i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
-i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
+i_enableTakeProfit = input.bool(true, '(STOPTAKE) Take Profit? {True}')
 i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
 i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
-i_enableRiskRewardRatio = input.bool(false, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {False}')
-i_enableRiskBreakevenTriggerRatio = input.bool(false, title='(BREAKEVEN) Calculate Breakeven Trigger from R/BET Ratio (%) {False}')
+i_enableRiskRewardRatio = input.bool(true, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {True}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
-i_positionRatio = input.float(1.5, title='(STRAT) Risk/Reward Ratio % {1.5}', minval=0.01)
-i_breakevenTriggerRatio = input.float(1.0, title='(BREAKEVEN) Risk/BreakEvenTrigger Ratio % {1.0}', minval=0.01)
+i_positionRatio = input.float(0.44, title='(STRAT) Risk/Reward Ratio % {0.44}', minval=0.01)
 i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
 i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
 i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
 i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
-i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+i_atrStopLossMultiplier = input.float(0.9, title='(STOPTAKE) ATR Stop Loss Multiplier % {0.9}', minval=0.01)
 // Trailing Take Profit - Inputs
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, '(TRAILING) Trailing Take Profit Trigger (%) {2.5}', minval=0, step=0.01)
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
@@ -370,9 +368,46 @@ i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 // Template inputs - END
 
 // ImplementedStrategy inputs - BEGIN
+
+i_longFvgMinimumTakeProfitPercentage = input.float(0.28, title='(L) Minimum Take Profit {0.28 %}', group='FairValueGap')
+i_longFvgMaximumTakeProfitPercentage = input.float(10.0, title='(L) Maximum Take Profit {10.0 %}', group='FairValueGap')
+i_shortFvgMinimumTakeProfitPercentage = input.float(0.20, title='(S) Minimum Take Profit {0.20 %}', group='FairValueGap')
+i_shortFvgMaximumTakeProfitPercentage = input.float(10.0, title='(S) Maximum Take Profit {10.0 %}', group='FairValueGap')
+i_longFvgGapRefillPercentage = input.float(11.10, title='(L) Gap Refill Percentage { 11.10 % }', group='FairValueGap')
+i_longFvgGapRefillPerOne = i_longFvgGapRefillPercentage * 0.01
+i_shortFvgGapRefillPercentage = input.float(80.0, title='(S) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
+i_shortFvgGapRefillPerOne = i_shortFvgGapRefillPercentage * 0.01
+i_enableFvgTakeProfits = input.bool(false, title='Enable FVG based TakeProfits {False}', group='FairValueGap')
+
+i_fvgThreshold = input.float(0, 'Percentage {0.0}', minval = 0, group='FairValueGap')
+i_enableFvgAutoThreshold = input(false, 'Auto Threshold {False}', group='FairValueGap')
+i_maximumUnfilledGaps = input(5, 'Show Last Unfilled Gaps {5}', group='FairValueGap')
+i_longFilledGapsLookback = input.int(5, '(L) Number of bars to lookback for filled gaps {5}', group='FairValueGap')
+i_shortFilledGapsLookback = input.int(5, '(S) Number of bars to lookback for filled gaps {5}', group='FairValueGap')
+i_showFvgDash = input(false, 'Show Dashboard {False}', group='FairValueGap')
+i_showUnfilledGaps = input(false, 'Show All Unfilled Gaps {False}', group='FairValueGap')
+i_showFvgLines = input(false, 'Show FVG lines {False}', group='FairValueGap')
+i_fvgTimeframe = input.timeframe('', 'Timeframe {Chart}', group='FairValueGap')
+i_fvgBullColor = input.color(color.new(#0cb51a, 75), 'Bullish FVG Color', group='FairValueGap')
+i_fvgBearColor = input.color(color.new(#ff1100, 75), 'Bearish FVG Color', group='FairValueGap')
+i_fvgBullLinesColor = input.color(color.new(#0cb51a, 75), 'Bullish FVG Lines Color', group='FairValueGap')
+i_fvgBearLinesColor = input.color(color.new(#ff1100, 75), 'Bearish FVG Lines Color', group='FairValueGap')
+
+i_enableGapPercentageFilter = input.bool(true, title='Enable Gap Percentage Filter {True}', group='UnfairValueGap')
+i_longUvgMinimumGapPercentage = input.float(0.10, title='(L) Minimum Gap Percentage {0.10 %}', group='UnfairValueGap')
+i_longUvgMaximumGapPercentage = input.float(1.60, title='(L) Maximum Gap Percentage {1.60 %}', group='UnfairValueGap')
+i_shortUvgMinimumGapPercentage = input.float(0.10, title='(S) Minimum Gap Percentage {0.10 %}', group='UnfairValueGap')
+i_shortUvgMaximumGapPercentage = input.float(1.60, title='(S) Maximum Gap Percentage {1.60 %}', group='UnfairValueGap')
+
 // ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
+
+type fvgLine
+    int startTime // x1
+    int endTime // x2
+    float endPrice // y2
+    float startPrice // level when created
 
 string stringNA = na
 
@@ -521,6 +556,132 @@ getTooOldOrderShortCloseAdvice () =>
 // Template functions - END
 
 // ImplementedStrategy functions - BEGIN
+
+fvgGetOhlc()=> [close, open, close[1], open[1], high, low, high[2], low[2]]
+
+detectBullFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcL, p_fvgSrcH2, p_longFilledGapsLookback)=>
+    var float fvgMinimum = na
+    var float fvgMaximum = na
+    var int fvgFilledNumber = 0
+    var int fvgTotal = 0
+    int fvgRecentlyFilledNumber = 0
+    newBullFvgLines = array.new<fvgLine>()
+
+    //Check if historical FVG's are filled
+    _idx = 0
+    for l in fvgLines
+        l.endTime := bar_index
+
+        fvgIsFilledConditionTurn = p_fvgSrcL <= l.endPrice
+
+        if fvgIsFilledConditionTurn
+            if ( bar_index <= (l.startTime + p_longFilledGapsLookback) )
+                fvgRecentlyFilledNumber += 1
+            fvgFilledNumber += 1
+        else
+            array.push(newBullFvgLines, l)
+            _idx += 1
+
+    // Clear fvgLines
+    array.clear(fvgLines)
+    // So that you can replace it with newBullFvgLines
+    for l in newBullFvgLines
+        array.unshift(fvgLines,l)
+
+    _idx := 0
+    for l in discardedFvgLines
+        fvgIsFilledConditionTurn = p_fvgSrcL <= l.endPrice
+
+        if fvgIsFilledConditionTurn
+            array.remove(discardedFvgLines, _idx)
+
+            fvgFilledNumber += 1
+        _idx += 1
+
+    //Test for FVG
+    if fvgCondition
+        level = p_fvgSrcH2
+        array.unshift(fvgLines, fvgLine.new(startTime = bar_index - 1, startPrice = level, endTime = bar_index, endPrice = level))
+
+        if (not i_showUnfilledGaps)
+            if (array.size(fvgLines) > i_maximumUnfilledGaps)
+                pop_l = array.pop(fvgLines)
+                array.push(discardedFvgLines, pop_l)
+
+        fvgMaximum := p_fvgSrcL
+        fvgMinimum := p_fvgSrcH2
+
+        fvgTotal += 1
+
+    fvgMaximum := math.max(math.min(fvgMaximum, p_fvgSrcL), fvgMinimum)
+    // fvgMinimum := fvgMinimum
+
+    fvgIsFilledCondition = (fvgMaximum == fvgMinimum) and (fvgMaximum[1] != fvgMinimum)
+
+    [fvgMaximum, fvgMinimum, fvgFilledNumber, fvgTotal, fvgIsFilledCondition, fvgRecentlyFilledNumber]
+
+detectBearFvg(fvgCondition, fvgLines, discardedFvgLines, fvgCss, p_fvgSrcH, p_fvgSrcL2, p_shortFilledGapsLookback)=>
+    var float fvgMinimum = na
+    var float fvgMaximum = na
+    var int fvgFilledNumber = 0
+    var int fvgTotal = 0
+    int fvgRecentlyFilledNumber = 0
+    newBearFvgLines = array.new<fvgLine>()
+
+    //Check if historical FVG's are filled
+    _idx = 0
+    for l in fvgLines
+        l.endTime := bar_index
+
+        fvgIsFilledConditionTurn = p_fvgSrcH >= l.endPrice
+
+        if fvgIsFilledConditionTurn
+            if ( bar_index <= (l.startTime + p_shortFilledGapsLookback) )
+                fvgRecentlyFilledNumber += 1
+            fvgFilledNumber += 1
+        else
+            array.push(newBearFvgLines, l)
+            _idx += 1
+
+    // Clear fvgLines
+    array.clear(fvgLines)
+    // So that you can replace it with newBearFvgLines
+    for l in newBearFvgLines
+        array.unshift(fvgLines,l)
+
+    _idx := 0
+    for l in discardedFvgLines
+        fvgIsFilledConditionTurn = p_fvgSrcH >= l.endPrice
+
+        if fvgIsFilledConditionTurn
+            array.remove(discardedFvgLines, _idx)
+
+            fvgFilledNumber += 1
+
+        _idx += 1
+
+    //Test for FVG
+    if fvgCondition
+        level = p_fvgSrcL2
+        array.unshift(fvgLines, fvgLine.new(startTime = bar_index - 1, startPrice = level, endTime = bar_index, endPrice = level))
+
+        if (not i_showUnfilledGaps)
+            if (array.size(fvgLines) > i_maximumUnfilledGaps)
+                pop_l = array.pop(fvgLines)
+                array.push(discardedFvgLines, pop_l)
+
+        fvgMaximum := p_fvgSrcL2
+        fvgMinimum := p_fvgSrcH
+
+        fvgTotal += 1
+
+    // fvgMaximum := fvgMaximum
+    fvgMinimum := math.min(math.max(fvgMinimum, p_fvgSrcH), fvgMaximum)
+
+    fvgIsFilledCondition = fvgMaximum == fvgMinimum and fvgMaximum[1] != fvgMinimum
+
+    [fvgMaximum, fvgMinimum, fvgFilledNumber, fvgTotal, fvgIsFilledCondition, fvgRecentlyFilledNumber]
+
 // ImplementedStrategy functions - END
 
 // Strategy Body - BEGIN
@@ -652,6 +813,85 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 // Template substrategies - END
 
 // ImplementedStrategy substrategies - BEGIN
+
+// Fairvaluegap substrategy
+
+color fvgBullLinesColor = i_showFvgLines ? i_fvgBullLinesColor : na
+color fvgBearLinesColor = i_showFvgLines ? i_fvgBearLinesColor : na
+
+var bullFvgLines = array.new<fvgLine>()
+var discardedBullFvgLines = array.new<fvgLine>()
+var bearFvgLines = array.new<fvgLine>()
+var discardedBearFvgLines = array.new<fvgLine>()
+
+var int bullFvgRecentlyFilledTotal = 0
+var int bearFvgRecentlyFilledTotal = 0
+
+fvgTimeframeChange = timeframe.change(i_fvgTimeframe)
+[fvgSrcC, fvgSrcO, fvgSrcC1, fvgSrcO1, fvgSrcH, fvgSrcL, fvgSrcH2, fvgSrcL2] = request.security(syminfo.tickerid, i_fvgTimeframe, fvgGetOhlc())
+fvgDeltaPercentage = (fvgSrcC1 - fvgSrcO1) / fvgSrcO1 * 100
+threshold = i_enableFvgAutoThreshold ? ( ta.cum(math.abs(fvgTimeframeChange ? fvgDeltaPercentage : 0)) / bar_index * 2 ) : i_fvgThreshold
+
+float uvgGapPercentage = 0
+bool uvgGapPercentageIsWithinRange = false
+
+preBullishFvgCondition = (fvgSrcL > fvgSrcH2) and (fvgSrcC1 > fvgSrcH2) and (fvgDeltaPercentage > threshold) and fvgTimeframeChange
+preBearishFvgCondition = (fvgSrcH < fvgSrcL2) and (fvgSrcC1 < fvgSrcL2) and (-fvgDeltaPercentage > threshold) and fvgTimeframeChange
+if preBullishFvgCondition // LONG
+    uvgGapPercentage := ((fvgSrcL - fvgSrcH2) / fvgSrcH2) * 100
+    uvgGapPercentageIsWithinRange := (uvgGapPercentage >= i_longUvgMinimumGapPercentage) and (uvgGapPercentage < i_longUvgMaximumGapPercentage)
+else if preBearishFvgCondition // SHORT
+    uvgGapPercentage := ((fvgSrcL2 - fvgSrcH) / fvgSrcH) * 100
+    uvgGapPercentageIsWithinRange := (uvgGapPercentage >= i_shortUvgMinimumGapPercentage) and (uvgGapPercentage < i_shortUvgMaximumGapPercentage)
+
+bullishFvgCondition = preBullishFvgCondition
+if i_enableGapPercentageFilter
+    bullishFvgCondition := bullishFvgCondition and uvgGapPercentageIsWithinRange
+[bullFvgMax, bullFvgMin, bullFvgFilledNumber, bullFvgTotal, bullFvgFilledCondition, bullFvgRecentlyFilledNumber] = detectBullFvg(bullishFvgCondition, bullFvgLines, discardedBullFvgLines, fvgBullLinesColor, fvgSrcL, fvgSrcH2, i_longFilledGapsLookback)
+
+bearishFvgCondition = preBearishFvgCondition
+if i_enableGapPercentageFilter
+    bearishFvgCondition := bearishFvgCondition and uvgGapPercentageIsWithinRange
+[bearFvgMax, bearFvgMin, bearFvgFilledNumber, bearFvgTotal, bearFvgFilledCondition, bearFvgRecentlyFilledNumber] = detectBearFvg(bearishFvgCondition, bearFvgLines, discardedBearFvgLines, fvgBearLinesColor, fvgSrcH, fvgSrcL2, i_shortFilledGapsLookback)
+
+bullFvgRecentlyFilledTotal := bullFvgRecentlyFilledTotal + bullFvgRecentlyFilledNumber
+bearFvgRecentlyFilledTotal := bearFvgRecentlyFilledTotal + bearFvgRecentlyFilledNumber
+
+bool bullFvgIsFilled = (bullFvgRecentlyFilledTotal[1] + 1) == (bullFvgRecentlyFilledTotal)
+bool bearFvgIsFilled = (bearFvgRecentlyFilledTotal[1] + 1) == (bearFvgRecentlyFilledTotal)
+
+// Gap distance
+float fvpGapPriceDistancePercentage = 0
+float fvgGapRefillPercentage = 0
+bool fairvaluegapRefillLong = false
+bool fairvaluegapRefillShort = false
+bool fvgGapRefillPercentageIsWithinTakeProfitRange = false
+if bullishFvgCondition // SHORT
+    fvpGapPriceDistancePercentage := ((fvgSrcC - fvgSrcH2) / fvgSrcH2) * 100
+    fvgGapRefillPercentage := fvpGapPriceDistancePercentage * i_shortFvgGapRefillPerOne
+    fvgGapRefillPercentageIsWithinTakeProfitRange := ((fvgGapRefillPercentage >= i_shortFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_shortFvgMaximumTakeProfitPercentage))
+
+    if (fvgGapRefillPercentageIsWithinTakeProfitRange)
+        fairvaluegapRefillShort := true
+else if bearishFvgCondition // LONG
+    fvpGapPriceDistancePercentage := ((fvgSrcL2 - fvgSrcC) / fvgSrcC) * 100
+    fvgGapRefillPercentage := fvpGapPriceDistancePercentage * i_longFvgGapRefillPerOne
+    fvgGapRefillPercentageIsWithinTakeProfitRange := ((fvgGapRefillPercentage >= i_longFvgMinimumTakeProfitPercentage) and (fvgGapRefillPercentage < i_longFvgMaximumTakeProfitPercentage))
+
+    if (fvgGapRefillPercentageIsWithinTakeProfitRange)
+        fairvaluegapRefillLong := true
+
+// Final logic
+// bool fairvaluegapLongShort = false
+bool fairvaluegapLong = false
+bool fairvaluegapShort = false
+
+// if (( inside_bull == true ) and ( inside_bear == true ))
+//     fairvaluegapLongShort := true
+
+fairvaluegapShort := bullishFvgCondition and fairvaluegapRefillShort
+fairvaluegapLong := bearishFvgCondition and fairvaluegapRefillLong
+
 // ImplementedStrategy substrategies - END
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
@@ -916,6 +1156,11 @@ if (insideASellOrder and SHORT_CLOSE)
 
 // How much to LONG/GO LONG/SHORT/GO SHORT - BEGIN
 
+if i_enableFvgTakeProfits
+    orderStopLoss := fvgGapRefillPercentage / i_positionRatio
+    orderStopLossPerOne := orderStopLoss * 0.01
+
+
 // Custom take profit and stop loss
 var float LongStopLoss = na
 var float ShortStopLoss = na
@@ -926,11 +1171,18 @@ if (i_enableStopLoss and (not insideABuyOrder))
 if (i_enableStopLoss and (not insideASellOrder))
     ShortStopLoss := close * (1 + orderStopLossPerOne)
 
-// Final StopLoss value based on actual position price
-if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
-    LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
-if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
-    ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+if i_enableFvgTakeProfits
+    // Final StopLoss value based on actual position price
+    if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
+        LongStopLoss := positionPrice * (1 - orderStopLossPerOne[1])
+    if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
+        ShortStopLoss := positionPrice * (1 + orderStopLossPerOne[1])
+else
+    // Final StopLoss value based on actual position price
+    if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
+        LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+    if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
+        ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
 
 // Make sure LongStopLoss and ShortStopLoss are undefined
 // by default when i_enableStopLoss is set to false
@@ -963,6 +1215,10 @@ else
     takeProfit := i_takeProfit
     takeProfitPerOne := i_takeProfitPerOne
 
+if i_enableFvgTakeProfits
+    takeProfit := fvgGapRefillPercentage
+    takeProfitPerOne := takeProfit * 0.01
+
 var float LongTakeProfit = na
 var float ShortTakeProfit = na
 
@@ -972,11 +1228,18 @@ if (not insideABuyOrder)
 if (not insideASellOrder)
     ShortTakeProfit := close * (1 - takeProfitPerOne)
 
-// Final TakeProfit value based on actual position price
-if ((not insideABuyOrder[1]) and (insideABuyOrder))
-    LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
-if ((not insideASellOrder[1]) and (insideASellOrder))
-    ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
+if i_enableFvgTakeProfits
+    // Final TakeProfit value based on actual position price
+    if ((not insideABuyOrder[1]) and (insideABuyOrder))
+        LongTakeProfit := positionPrice * (1 + takeProfitPerOne[1]) // Make sure to use first candle value
+    if ((not insideASellOrder[1]) and (insideASellOrder))
+        ShortTakeProfit := positionPrice * (1 - takeProfitPerOne[1]) // Make sure to use first candle value
+else
+    // Final TakeProfit value based on actual position price
+    if ((not insideABuyOrder[1]) and (insideABuyOrder))
+        LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
+    if ((not insideASellOrder[1]) and (insideASellOrder))
+        ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
