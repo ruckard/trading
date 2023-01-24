@@ -217,7 +217,7 @@ _ZIGSIGNALPROVIDER_ = 'Signal Provider', _ZIGCOPYTRADERPROVIDER_ = 'Profit Shari
 i_zignalyProviderTypePre = input.string(_ZIGCOPYTRADERPROVIDER_, '(ZIG) Provider type', options=[_ZIGSIGNALPROVIDER_, _ZIGCOPYTRADERPROVIDER_])
 i_zignalyProviderType = (i_zignalyProviderTypePre == _ZIGCOPYTRADERPROVIDER_) ? 'copytrader' : 'signalprovider'
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
-i_strategyType = input.string(_L_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
+i_strategyType = input.string(_REVERSE_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
 i_enableLongStrictStrategy = input.bool(false, '(STRAT) (L) Strict mode {False}')
 i_enableShortStrictStrategy = input.bool(false, '(STRAT) (S) Strict mode {False}')
 i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Start Time {2021-01-01 00:00:00}')
@@ -251,7 +251,7 @@ i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Bre
 i_enableRiskRewardRatio = input.bool(true, title='(STOPTAKE) Calculate Take Profit from R/R Ratio (%) {True}')
 i_takeProfit = input.float(1.1, title='(STOPTAKE) Take Profit % {3.0}')
 i_takeProfitPerOne = i_takeProfit / 100
-i_positionRatio = input.float(0.44, title='(STRAT) Risk/Reward Ratio % {0.44}', minval=0.01)
+i_positionRatio = input.float(0.25, title='(STRAT) Risk/Reward Ratio % {0.25}', minval=0.01)
 i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
@@ -302,10 +302,10 @@ i_atrVolatilitySource = input.source(close, title='', group='ATR Volatility Prot
 i_atrVolatilityMinimumMultiplier = input.float(1.10, title='Min/Max {1.10/2.00}', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
 i_atrVolatilityMaximumMultiplier = input.float(2.00, title='', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
 
-i_higherTimeframeTrendMaEnforce = input.bool(false, title='Use {False}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
+i_higherTimeframeTrendMaEnforce = input.bool(true, title='Use {True}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
 i_showHigherTimeframeTrendMa = input.bool(false, title='Show {False}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
 
-i_higherTimeframeTrendMaTimeframe = input.timeframe('60', title='Timeframe/Offset {1 hour/0 bars}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
+i_higherTimeframeTrendMaTimeframe = input.timeframe('1D', title='Timeframe/Offset {1 hour/0 bars}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
 
 i_higherTimeframeTrendMaOffset = input.int(0, title='', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
 
@@ -371,11 +371,11 @@ i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
 i_longFvgMinimumTakeProfitPercentage = input.float(0.28, title='(L) Minimum Take Profit {0.28 %}', group='FairValueGap')
 i_longFvgMaximumTakeProfitPercentage = input.float(10.0, title='(L) Maximum Take Profit {10.0 %}', group='FairValueGap')
-i_shortFvgMinimumTakeProfitPercentage = input.float(0.20, title='(S) Minimum Take Profit {0.20 %}', group='FairValueGap')
+i_shortFvgMinimumTakeProfitPercentage = input.float(0.28, title='(S) Minimum Take Profit {0.28 %}', group='FairValueGap')
 i_shortFvgMaximumTakeProfitPercentage = input.float(10.0, title='(S) Maximum Take Profit {10.0 %}', group='FairValueGap')
-i_longFvgGapRefillPercentage = input.float(11.10, title='(L) Gap Refill Percentage { 11.10 % }', group='FairValueGap')
+i_longFvgGapRefillPercentage = input.float(33.00, title='(L) Gap Refill Percentage { 33.00 % }', group='FairValueGap')
 i_longFvgGapRefillPerOne = i_longFvgGapRefillPercentage * 0.01
-i_shortFvgGapRefillPercentage = input.float(80.0, title='(S) Gap Refill Percentage { 80.0 % }', group='FairValueGap')
+i_shortFvgGapRefillPercentage = input.float(11.0, title='(S) Gap Refill Percentage { 11.0 % }', group='FairValueGap')
 i_shortFvgGapRefillPerOne = i_shortFvgGapRefillPercentage * 0.01
 i_enableFvgTakeProfits = input.bool(false, title='Enable FVG based TakeProfits {False}', group='FairValueGap')
 
