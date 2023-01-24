@@ -18,6 +18,12 @@
 // ImplementedStrategy foo - END
 //
 // ImplementedStrategy explanation - BEGIN
+//
+// Calculate a distance between the current price and latest Gap opposite end.
+// Open a TakeProfit towards 80% of the former distance.
+// The main logic assumes that the price is going to fill a big part of the recently created gap.
+// A ratio 1:4 ensures that StopLoss is not triggered by sudden small movements.
+//
 // ImplementedStrategy explanation - END
 //
 // In addition the former strategy also includes Risk Management.
