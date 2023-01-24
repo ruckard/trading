@@ -1016,6 +1016,19 @@ plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdow
 // Higher Timeframe Trend - Plot - END
 
 // ImplementedStrategy - Plot - BEGIN
+
+// FilledValueGap - Plot - BEGIN
+//Bullish FVG
+bullFvgMaxPlot = plot(bullFvgMax, 'Bullish FVG Maximum', na)
+bullFvgMinPlot = plot(bullFvgMin, 'Bullish FVG Minimum', na)
+fill(bullFvgMaxPlot, bullFvgMinPlot, bullishFvgCondition ? na : i_fvgBullColor, 'Bullish FVG')
+
+//Bearish FVG
+bearFvgMaxPlot = plot(bearFvgMax, 'Bearish FVG Maximum', na)
+bearFvgMinPlot = plot(bearFvgMin, 'Bearish FVG Minimum', na)
+fill(bearFvgMaxPlot, bearFvgMinPlot, bearishFvgCondition ? na : i_fvgBearColor, 'Bearish FVG')
+// FilledValueGap - Plot - END
+
 // ImplementedStrategy - Plot - END
 
 // Position price calculation - BEGIN
