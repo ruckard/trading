@@ -235,18 +235,23 @@ i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrig
 i_trailingTakeProfitPercentageOffset = input.float(25.0, title='(%)', minval=0, step=0.01, group='Take Profit', inline='TrailingTakeProfit', tooltip='Start Trailing Stop on 1.2% with a 0.3% distance. Explanation: 25% of 1.2 = 0.3). Default: Disabled. Default: 1.2%. Default: 25.0%')
 i_trailingTakeProfitPercentageOffsetPerOne = i_trailingTakeProfitPercentageOffset * 0.01
 
-i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
+// Stop Loss - Inputs
+i_enableStopLoss = input.bool(true, 'Stop Loss', group='Stop Loss', inline='StopLossSimple')
+i_stopLoss = input.float(7.0, title='(%)', minval=0.01, group='Stop Loss', inline='StopLossSimple', tooltip='Make sure this is Enabled if you want to be able to Stop Loss in any of its forms like, e.g., based on ATR. Default: true. Default: 7.0%') * 0.01
+
+_SLConstant_ = 'Constant', _SLATR_ = 'ATR'
+i_stopLossTypePre = input.string(_SLATR_, 'Type', options=[_SLConstant_, _SLATR_], group='Stop Loss', inline='StopLossType', tooltip='Default: ' + _SLATR_)
+i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
+
+i_atrStopLossLength = input.int(14, minval = 1,  title = 'ATR Stop Loss', group='Stop Loss', inline='StopLossATR')
+i_atrStopLossSource = input.source(close, title = '', group='Stop Loss', inline='StopLossATR')
+i_atrStopLossMultiplier = input.float(1.5, title='', minval=0.01, group='Stop Loss', inline='StopLossATR', tooltip='Default: 1.50 times a 14 length ATR based on close values.')
+
 i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
 i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
 i_enableRiskBreakevenTriggerRatio = input.bool(false, title='(BREAKEVEN) Calculate Breakeven Trigger from R/BET Ratio (%) {False}')
 i_breakevenTriggerRatio = input.float(1.0, title='(BREAKEVEN) Risk/BreakEvenTrigger Ratio % {1.0}', minval=0.01)
-i_stopLoss = input.float(7.0, title='(STOPTAKE) Stop Loss % {7.0}', minval=0.01) / 100
-_SLConstant_ = 'Constant', _SLATR_ = 'ATR'
-i_stopLossTypePre = input.string(_SLATR_, '(STOPTAKE) Stop Loss type', options=[_SLConstant_, _SLATR_])
-i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
-i_atrStopLossLength = input.int(14, minval = 1,  title = '(STOPTAKE) ATR Stop Loss Length [14]')
-i_atrStopLossSource = input.source(close, title = '(STOPTAKE) ATR Stop Loss Source [close]')
-i_atrStopLossMultiplier = input.float(1.5, title='(STOPTAKE) ATR Stop Loss Multiplier % {1.5}', minval=0.01)
+
 // Break Even - Inputs
 i_breakEvenTrigger = input.float(1.0, '(BREAKEVEN) Break Even Trigger (%) {1.0}', minval=0, step=0.01)
 i_breakEvenTriggerPerOne = i_breakEvenTrigger * 0.01
