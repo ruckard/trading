@@ -298,20 +298,20 @@ i_atrVolatilitySource = input.source(close, title='', group='ATR Volatility Prot
 i_atrVolatilityMinimumMultiplier = input.float(1.10, title='Minimum/Maximum (%)', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
 i_atrVolatilityMaximumMultiplier = input.float(2.00, title='', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax', tooltip='Defaults:\nMinimum: 1.10 %.\nMaximum: 2.00 %.')
 
-i_higherTimeframeTrendMaEnforce = input.bool(false, title='Use {False}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
-i_showHigherTimeframeTrendMa = input.bool(false, title='Show {False}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
+// Enforce Higher Timeframe Trend - Inputs
+i_higherTimeframeTrendMaEnforce = input.bool(false, title='Enable', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
+i_showHigherTimeframeTrendMa = input.bool(false, title='Show', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow', tooltip='Defaults:\nEnable: False.\nShow: False.')
 
-i_higherTimeframeTrendMaTimeframe = input.timeframe('60', title='Timeframe/Offset {1 hour/0 bars}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
+i_higherTimeframeTrendMaTimeframe = input.timeframe('60', title='Timeframe/Offset', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
+i_higherTimeframeTrendMaOffset = input.int(0, title='', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset', tooltip='Defaults:\nTimeframe: 1 hour.\nOffset: 0 bars.')
 
-i_higherTimeframeTrendMaOffset = input.int(0, title='', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
-
-i_higherTimeframeTrendFastMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Fast MA {EMA/10/close}', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
+i_higherTimeframeTrendFastMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Fast MA', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
 i_higherTimeframeTrendFastMaLength = input.int(10, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
-i_higherTimeframeTrendFastMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
+i_higherTimeframeTrendFastMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa', tooltip='Defaults:\nType: VWMA.\nLength: 10.\nSource: close.')
 
-i_higherTimeframeTrendSlowMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Slow MA {EMA/55/close}', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
+i_higherTimeframeTrendSlowMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Slow MA', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
 i_higherTimeframeTrendSlowMaLength = input.int(55, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
-i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
+i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa', tooltip='Defaults:\nType: VWMA.\nLength: 55.\nSource: close.')
 
 // Too old order - Inputs
 i_enableTooOldLongOrderClose = input.bool(false, title='Enable/Bars/SL (L) {False/6/1.20 %}', group='Too Old Orders', inline='Too Old Long Orders')
