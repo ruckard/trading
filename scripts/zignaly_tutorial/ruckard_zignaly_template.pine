@@ -206,14 +206,19 @@ i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, title='Integr
 i_zignalyIntegrationType = (i_zignalyIntegrationTypePre == _ZIGHYBRIDINTEGRATION_) ? 'hybrid' : 'nonhybrid'
 
 string i_zignalyProviderType = 'copytrader'
+
+// Strategy - Inputs
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
-i_strategyType = input.string(_REVERSE_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
-i_enableLongStrictStrategy = input.bool(false, '(STRAT) (L) Strict mode {False}')
-i_enableShortStrictStrategy = input.bool(false, '(STRAT) (S) Strict mode {False}')
-i_strategyStartTime = input.time(timestamp('01 Jan 2021'), '(STRAT) Strategy Start Time {2021-01-01 00:00:00}')
-i_strategyStopTime = input.time(timestamp('31 Dec 2021'), '(STRAT) Strategy Stop Time {2021-12-31 00:00:00}')
-i_strategyStartTimeOn = input.bool(true, '(STRAT) Strategy Start Time forced? {True}')
-i_strategyStopTimeOn = input.bool(false, '(STRAT) Strategy Stop Time forced? {False}')
+i_strategyType = input.string(_REVERSE_, 'Type', options=[L_S, _L_, _S_, _REVERSE_], group='Strategy', inline='StrategyType', tooltip='Default: ' + _REVERSE_)
+
+i_enableLongStrictStrategy = input.bool(false, title='(L) Strict mode', group='Strategy', inline='StrategyStrictMode')
+i_enableShortStrictStrategy = input.bool(false, '(S)', group='Strategy', inline='StrategyStrictMode', tooltip='Ignore other side advice when being in a single side. E.g. If type is set to Long Only do not close the trade when Short would have opened a trade. (L) = Long. (S) = Short. Default for (L): false. Default for (S): false.')
+i_strategyStartTimeOn = input.bool(true, title='', group='Strategy', inline='StrategyStartTime')
+i_strategyStartTime = input.time(timestamp('01 Jan 2021'), title= 'Starts at:', group='Strategy', inline='StrategyStartTime', tooltip='Default: Enabled. Starts at 2021-01-01 00:00:00.')
+
+i_strategyStopTimeOn = input.bool(false, title='', group='Strategy', inline='StrategyStopTime')
+i_strategyStopTime = input.time(timestamp('31 Dec 2021'), title= 'Ends at:', group='Strategy', inline='StrategyStopTime', tooltip='Default: Disabled. Ends at 2021-12-31 00:00:00.')
+
 
 // Curie Closing Lines - Inputs
 i_enableCurieClosingLines = input.bool(false, title = 'Use {False}', group='Curie Closing Lines', inline='CurieEnableShow')
