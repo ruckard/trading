@@ -199,11 +199,12 @@ import ruckard/Zignaly2Beta/2 as zig
 // INPUTS - BEGIN
 
 // Template inputs - BEGIN
-i_enableZignalyAlert = input(true, '(ZIG) Enable Alert message {True}')
-i_zignalyServiceSecretKey = input.string('MYSECRETKEY', '(ZIG) Service Secret Key {MYSECRETKEY}')
+i_enableZignalyAlert = input(true, title='Enable Alerts', group='Zignaly', inline='ZignalyEnable', tooltip='Enable Alert Message')
+i_zignalyServiceSecretKey = input.string('MYSECRETKEY', title='Service Secret Key', group='Zignaly', inline='ZignalySecretKey', tooltip='MYSECRETKEY')
 _ZIGHYBRIDINTEGRATION_ = 'Hybrid', _ZIGTVONLYINTEGRATION_ = 'TradingView only'
-i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, '(ZIG) Integration type', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_])
+i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, title='Integration', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_], group='Zignaly', inline='ZignalySecretKey', tooltip='Default: ' + _ZIGHYBRIDINTEGRATION_)
 i_zignalyIntegrationType = (i_zignalyIntegrationTypePre == _ZIGHYBRIDINTEGRATION_) ? 'hybrid' : 'nonhybrid'
+
 string i_zignalyProviderType = 'copytrader'
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
 i_strategyType = input.string(_REVERSE_, '(STRAT) Strategy Type', options=[L_S, _L_, _S_, _REVERSE_])
