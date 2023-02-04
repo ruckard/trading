@@ -269,16 +269,25 @@ i_breakevenTriggerRatio = input.float(1.0, title='Risk/BreakEvenTrigger Ratio', 
 
 i_enableCustomBreakEven = input.bool(false, title='Custom Break Even', group='Break Even', inline='BreakEvenCustom', tooltip='Default: Disabled. Use a custom coded breakeven instead of the default one. Default: Disabled.')
 
-i_CapitalQuote = input.float(100.0, title='(CAPITAL) Capital quote invested per order in USDT units {100.0}')
-i_CapitalPercentage = input.float(25.0, title='(CAPITAL) Capital percentage invested per order (%) {25.0}', minval=0, step=0.01) * 0.01
 // Risk Management - Inputs
+i_CapitalQuote = input.float(100.0, title='USDT units per order', group='Risk Management', inline='CapitalQuote', tooltip='Deprecated and ignored. This could be used as a SignalProvider to force a given amount to Zignaly itself. TODO: We need to repurpose it for the Profit Sharing 2.0 new amount option. Default: 100.0.')
+i_CapitalPercentage = input.float(25.0, title='Capital invested per order (%)', minval=0, step=0.01, group='Risk Management', inline='CapitalPercentage', tooltip='Sets each order quantity to this percentage of the initial capital. Default: 25.0 %.') * 0.01
+
 _SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None', _CUSTOM_ = 'Custom', _FORCED_ = 'Forced'
-i_riskManagementTypePre = input.string(_SCOMPOUND_, '(RISKM) Risk Management Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_])
+i_riskManagementTypePre = input.string(_SCOMPOUND_, 'Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_], group='Risk Management', inline='RiskManagementType', tooltip=
+ str.upper(_SAFE_) + ': Quantity is automatically choosen. When the StopLoss is hit you are only going to loose the Maximum loss per trade setting applied to your initial capital.\n' +
+ str.upper(_SCOMPOUND_) + ': Quantity is automatically choosen. When the StopLoss is hit you are only going to loose the Maximum loss per trade setting applied to your current capital.\n' +
+ str.upper(_NONE_) + ': Quantity will be your current total capital.\n' +
+ str.upper(_CUSTOM_) + ': Quantity will be set based on Capital invested per order (%).\n' +
+ str.upper(_FORCED_) + ': Quantity will be set based on Capital invested per order (%).\n' +
+ 'Default: ' + _SCOMPOUND_)
 i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
-i_riskManagementMaximumLossPerTrade = input.float(1.0, title='(RISKM) Maximum loss per trade % {1.0}') / 100
-i_riskManagementMaximumLossPerDay = input.float(6.0, title='(RISKM) Maximum loss per day % {6.0}') / 100
-i_riskManagementMaximumLossPerWeek = input.float(8.0, title='(RISKM) Maximum loss per week % {8.0}') / 100
-i_riskManagementMaximumLossPerMonth = input.float(10.0, title='(RISKM) Maximum loss per month % {10.0}') / 100
+
+i_riskManagementMaximumLossPerTrade = input.float(1.0, title='Maximum loss per trade (%)', group='Risk Management', inline='RiskManagementMaximumLossPerTrade', tooltip='How much of your initial or current capital you want to lose as a maximum per trade. It only works in ' + _SAFE_ + ' type and in ' + _SCOMPOUND_ + ' type. ' + 'Default: 1.0 %.') * 0.01
+
+i_riskManagementMaximumLossPerDay = input.float(6.0, title='... per D/W/M (%)', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
+i_riskManagementMaximumLossPerWeek = input.float(8.0, title='', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
+i_riskManagementMaximumLossPerMonth = input.float(10.0, title='', group='Risk Management', inline='RiskManagementMaximumLossPerDay', tooltip='Try not to lose more than this percentage per choosen period.\nPlease notice that these settings are ignored when using ' + _NONE_ + ' or ' + _FORCED_ + ' types. ' + '\nDefaults: \nDay (D): 6.0 %. \nWeek (W): 8.0 %. \nMonth (M): 10.0 %') * 0.01
 
 i_enableVolatilityProtection = input.bool(false, title='Enable {False}', group='ATR Volatility Protection')
 i_showAtrVolatilityMultiplier = input.bool(false, title='Show {False}', group='ATR Volatility Protection')
