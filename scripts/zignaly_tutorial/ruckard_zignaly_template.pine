@@ -199,14 +199,24 @@ import ruckard/Zignaly2Beta/2 as zig
 // INPUTS - BEGIN
 
 // Template inputs - BEGIN
+
+// Zignaly - Inputs
 i_enableZignalyAlert = input(true, title='Enable Alerts', group='Zignaly', inline='ZignalyEnable', tooltip='Enable Alert Message')
 i_zignalyServiceSecretKey = input.string('MYSECRETKEY', title='Service Secret Key', group='Zignaly', inline='ZignalySecretKey', tooltip='MYSECRETKEY')
 _ZIGHYBRIDINTEGRATION_ = 'Hybrid', _ZIGTVONLYINTEGRATION_ = 'TradingView only'
 i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, title='Integration', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_], group='Zignaly', inline='ZignalySecretKey', tooltip='Default: ' + _ZIGHYBRIDINTEGRATION_)
 i_zignalyIntegrationType = (i_zignalyIntegrationTypePre == _ZIGHYBRIDINTEGRATION_) ? 'hybrid' : 'nonhybrid'
-i_enableOrderCommentDebug = input.bool(false, title='DEBUG on order comments', group='Zignaly', inline='ZignalyDebug', tooltip='Default: Disabled.')
 
 string i_zignalyProviderType = 'copytrader'
+string i_zignalyAlertType = 'webhook'
+string i_zignalyExchange = 'Zignaly'
+
+_ZIGEXTYPESPOT_ = 'spot', _ZIGEXFUTURES_ = 'futures'
+i_zignalyExchangeType = input.string(_ZIGEXFUTURES_, title='Exchange Type', options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_], group='Zignaly', inline='ZignalyExchangeType', tooltip='Default: ' + _ZIGEXFUTURES_)
+i_zignalyLeverage = input.int(1, 'Leverage', minval=1, step=1, maxval=125, group='Zignaly', inline='ZignalyLeverage', tooltip='Default: 1x')
+var i_zignalyLeverage_str = str.tostring(i_zignalyLeverage)  // It needs to run only once
+
+i_enableOrderCommentDebug = input.bool(false, title='DEBUG on order comments', group='Zignaly', inline='ZignalyDebug', tooltip='Default: Disabled.')
 
 // Strategy - Inputs
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
@@ -259,16 +269,6 @@ i_breakevenTriggerRatio = input.float(1.0, title='Risk/BreakEvenTrigger Ratio', 
 
 i_enableCustomBreakEven = input.bool(false, title='Custom Break Even', group='Break Even', inline='BreakEvenCustom', tooltip='Default: Disabled. Use a custom coded breakeven instead of the default one. Default: Disabled.')
 
-// Zignaly - Email (zignalye)
-_ZIGNALYE_ = 'Email', _ZIGNALYW_ = 'WebHook'
-i_zignalyAlertTypePre = input.string(_ZIGNALYW_, '(ZIG) Zignaly Alert Type {WebHook}', options=[_ZIGNALYW_, _ZIGNALYE_])
-i_zignalyAlertType = (i_zignalyAlertTypePre == _ZIGNALYW_) ? 'webhook' : 'email'
-_ZIGEXZIGNALY_ = 'Zignaly', _ZIGEXBINANCE_ = 'Binance', _ZIGEXKUCOIN_ = 'Kucoin'
-i_zignalyExchange = input.string(_ZIGEXZIGNALY_, '(ZIG) Exchange {Zignaly}', options=[_ZIGEXZIGNALY_, _ZIGEXBINANCE_, _ZIGEXKUCOIN_])
-_ZIGEXTYPESPOT_ = 'spot', _ZIGEXFUTURES_ = 'futures'
-i_zignalyExchangeType = input.string(_ZIGEXFUTURES_, '(ZIG) Exchange Type {Futures}', options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_])
-i_zignalyLeverage = input.int(1, '(ZIG) Leverage {1}', minval=1, step=1, maxval=125)
-var i_zignalyLeverage_str = str.tostring(i_zignalyLeverage)  // It needs to run only once
 i_priceDecimalDigits = input.int(2, 'Number of decimal digits for Prices {2}', minval=0, maxval=10, step=1)
 // Decimal - Inputs
 i_contractMaximumDecimalNumber = input.int(3, title='(DECIMAL) Maximum number of decimal for contracts {3}', minval=0)
