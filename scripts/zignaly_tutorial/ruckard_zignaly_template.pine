@@ -247,16 +247,18 @@ i_atrStopLossLength = input.int(14, minval = 1,  title = 'ATR Stop Loss', group=
 i_atrStopLossSource = input.source(close, title = '', group='Stop Loss', inline='StopLossATR')
 i_atrStopLossMultiplier = input.float(1.5, title='', minval=0.01, group='Stop Loss', inline='StopLossATR', tooltip='Default: 1.50 times a 14 length ATR based on close values.')
 
-i_enableBreakEven = input.bool(false, title='(BREAKEVEN) Enable Break Even (%) {False}')
-i_enableCustomBreakEven = input.bool(false, title='(BREAKEVEN) Enable Custom Break Even (%) {False}')
-i_enableRiskBreakevenTriggerRatio = input.bool(false, title='(BREAKEVEN) Calculate Breakeven Trigger from R/BET Ratio (%) {False}')
-i_breakevenTriggerRatio = input.float(1.0, title='(BREAKEVEN) Risk/BreakEvenTrigger Ratio % {1.0}', minval=0.01)
-
 // Break Even - Inputs
-i_breakEvenTrigger = input.float(1.0, '(BREAKEVEN) Break Even Trigger (%) {1.0}', minval=0, step=0.01)
+i_enableBreakEven = input.bool(false, title='Break Even', group='Break Even', inline='BreakEvenSimple')
+i_breakEvenTrigger = input.float(1.0, '(%)', minval=0, step=0.01, group='Break Even', inline='BreakEvenSimple')
 i_breakEvenTriggerPerOne = i_breakEvenTrigger * 0.01
-i_breakEven = input.float(0.20, '(BREAKEVEN) Break Even Stop Loss (%) {0.20}', minval=0, step=0.01)
+i_breakEven = input.float(0.20, '(%)', minval=0, step=0.01, group='Break Even', inline='BreakEvenSimple', tooltip='Default: Disabled. Default: When the price reaches 1.0 % set a 0.20% Stop Loss.')
 i_breakEvenPerOne = i_breakEven * 0.01
+
+i_enableRiskBreakevenTriggerRatio = input.bool(false, title='Use this', group='Break Even', inline='BreakEvenTriggerRatio')
+i_breakevenTriggerRatio = input.float(1.0, title='Risk/BreakEvenTrigger Ratio', minval=0.01, group='Break Even', inline='BreakEvenTriggerRatio', tooltip='Default: Disabled. Default: Breakeven Trigger is calculated from a 1.0% Risk/BreakEvenTrigger Ratio. This is similar to how Take Profit might be calculated based on the traditional Risk/Reward ratio.')
+
+i_enableCustomBreakEven = input.bool(false, title='Custom Break Even', group='Break Even', inline='BreakEvenCustom', tooltip='Default: Disabled. Use a custom coded breakeven instead of the default one. Default: Disabled.')
+
 // Zignaly - Email (zignalye)
 _ZIGNALYE_ = 'Email', _ZIGNALYW_ = 'WebHook'
 i_zignalyAlertTypePre = input.string(_ZIGNALYW_, '(ZIG) Zignaly Alert Type {WebHook}', options=[_ZIGNALYW_, _ZIGNALYE_])
