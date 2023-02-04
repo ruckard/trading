@@ -289,13 +289,14 @@ i_riskManagementMaximumLossPerDay = input.float(6.0, title='... per D/W/M (%)', 
 i_riskManagementMaximumLossPerWeek = input.float(8.0, title='', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
 i_riskManagementMaximumLossPerMonth = input.float(10.0, title='', group='Risk Management', inline='RiskManagementMaximumLossPerDay', tooltip='Try not to lose more than this percentage per choosen period.\nPlease notice that these settings are ignored when using ' + _NONE_ + ' or ' + _FORCED_ + ' types. ' + '\nDefaults: \nDay (D): 6.0 %. \nWeek (W): 8.0 %. \nMonth (M): 10.0 %') * 0.01
 
-i_enableVolatilityProtection = input.bool(false, title='Enable {False}', group='ATR Volatility Protection')
-i_showAtrVolatilityMultiplier = input.bool(false, title='Show {False}', group='ATR Volatility Protection')
+// Volatility Protection - Inputs
+i_enableVolatilityProtection = input.bool(false, title='Enable', group='ATR Volatility Protection', inline='ATRVolatilityProtectionEnable')
+i_showAtrVolatilityMultiplier = input.bool(false, title='Show', group='ATR Volatility Protection', inline='ATRVolatilityProtectionEnable', tooltip='Defaults:\nEnable: False.\nShow: False.')
 
-i_atrVolatilityLength = input.int(14, minval = 1,  title='{14/close/1.10 %}', group='ATR Volatility Protection', inline='ATRVolatilitySettings')
-i_atrVolatilitySource = input.source(close, title='', group='ATR Volatility Protection', inline='ATRVolatilitySettings')
-i_atrVolatilityMinimumMultiplier = input.float(1.10, title='Min/Max {1.10/2.00}', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
-i_atrVolatilityMaximumMultiplier = input.float(2.00, title='', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
+i_atrVolatilityLength = input.int(14, minval = 1,  title='ATR', group='ATR Volatility Protection', inline='ATRVolatilityATR')
+i_atrVolatilitySource = input.source(close, title='', group='ATR Volatility Protection', inline='ATRVolatilityATR', tooltip='Defaults:\nLength: 14.\nSource: close.')
+i_atrVolatilityMinimumMultiplier = input.float(1.10, title='Minimum/Maximum (%)', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
+i_atrVolatilityMaximumMultiplier = input.float(2.00, title='', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax', tooltip='Defaults:\nMinimum: 1.10 %.\nMaximum: 2.00 %.')
 
 i_higherTimeframeTrendMaEnforce = input.bool(false, title='Use {False}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
 i_showHigherTimeframeTrendMa = input.bool(false, title='Show {False}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
