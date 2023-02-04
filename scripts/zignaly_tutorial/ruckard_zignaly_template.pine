@@ -204,6 +204,7 @@ i_zignalyServiceSecretKey = input.string('MYSECRETKEY', title='Service Secret Ke
 _ZIGHYBRIDINTEGRATION_ = 'Hybrid', _ZIGTVONLYINTEGRATION_ = 'TradingView only'
 i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, title='Integration', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_], group='Zignaly', inline='ZignalySecretKey', tooltip='Default: ' + _ZIGHYBRIDINTEGRATION_)
 i_zignalyIntegrationType = (i_zignalyIntegrationTypePre == _ZIGHYBRIDINTEGRATION_) ? 'hybrid' : 'nonhybrid'
+i_enableOrderCommentDebug = input.bool(false, title='DEBUG on order comments', group='Zignaly', inline='ZignalyDebug', tooltip='Default: Disabled.')
 
 string i_zignalyProviderType = 'copytrader'
 
@@ -219,8 +220,6 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), title= 'Starts at:', 
 i_strategyStopTimeOn = input.bool(false, title='', group='Strategy', inline='StrategyStopTime')
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), title= 'Ends at:', group='Strategy', inline='StrategyStopTime', tooltip='Default: Disabled. Ends at 2021-12-31 00:00:00.')
 
-// Order comments based debug
-i_enableOrderCommentDebug = input.bool(false, title='(DEBUG) Enable debug on order comments {False}')
 i_enableTakeProfit = input.bool(false, '(STOPTAKE) Take Profit? {false}')
 i_enableStopLoss = input.bool(true, '(STOPTAKE) Stop Loss? {True}')
 i_enableTrailingTakeProfit = input.bool(false, title='(TRAILING) Enable Trailing Take Profit (%) {False}')
