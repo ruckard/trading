@@ -324,14 +324,17 @@ i_tooOldShortBarsNumber = input.int(6, title='', minval=1, maxval=100, step=1, g
 i_tooOldShortStopLoss = input.float(0.60, title='', minval=0, step=0.01, group='Too Old Orders', inline='Too Old Short Orders', tooltip='Close when the order is older than the number of bars and less than the specified StopLoss percentage.\nYou can use negative values in order to have something similar to a BreakEven.\n(L): Long\n(S): Short\nDefaults:\nEnable: False.\nBars Number: 6.\nStop Loss (%): 0.60 %.')
 i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
 
-i_enableLongRSIProtection = input.bool(false, title='Enable (L) RSI Protection {False, 45.0}', group='RSI Protection', inline='LongRSIProtection')
-i_longRSIProtectionLevel = input.float(45.0, title='', group='RSI Protection', inline='LongRSIProtection', tooltip='Not greater than')
-i_enableShortRSIProtection = input.bool(false, title='Enable (S) RSI Protection {False, 58.0}', group='RSI Protection', inline='ShortRSIProtection')
-i_shortRSIProtectionLevel = input.float(58.0, title='', group='RSI Protection', inline='ShortRSIProtection', tooltip='Not lower than')
-i_enableRSIProtectionCustomTimeframe = input.bool(true, title='Use Custom Timeframe {True, 3 hours}', group='RSI Protection', inline='RSIProtectionTimeframe')
-i_RSIProtectionCustomTimeframe = input.timeframe('180', title='', group='RSI Protection', inline='RSIProtectionTimeframe')
-i_RSIProtectionLength = input.int(14, minval=1, title='RSI Length', group='RSI Protection')
-i_RSIProtectionSource = input.source(close, 'RSI Source', group='RSI Protection')
+// RSI Protection - Inputs
+i_enableLongRSIProtection = input.bool(false, title='(L)', group='RSI Protection', inline='RSIProtection')
+i_longRSIProtectionLevel = input.float(45.0, title='', group='RSI Protection', inline='RSIProtection', tooltip='Not greater than')
+i_enableShortRSIProtection = input.bool(false, title='(S)', group='RSI Protection', inline='RSIProtection')
+i_shortRSIProtectionLevel = input.float(58.0, title='', group='RSI Protection', inline='RSIProtection', tooltip='Defaults:\n(L): Long. Disabled.\n (L): Not greater than 45.0.\n(S): Short. Disabled.\n(S). Not lower than 58.0.')
+
+i_enableRSIProtectionCustomTimeframe = input.bool(true, title='Custom Timeframe', group='RSI Protection', inline='RSIProtectionTimeframe')
+i_RSIProtectionCustomTimeframe = input.timeframe('180', title='', group='RSI Protection', inline='RSIProtectionTimeframe', tooltip='Default: Enabled.\n Default: 3 hours.')
+
+i_RSIProtectionLength = input.int(14, minval=1, title='RSI', group='RSI Protection', inline='RSIProtectionRSI')
+i_RSIProtectionSource = input.source(close, title='', group='RSI Protection', inline='RSIProtectionRSI', tooltip='Defaults:\nLength: 14.\n Source: close.')
 
 // Curie Closing Lines - Inputs
 i_enableCurieClosingLines = input.bool(false, title = 'Use {False}', group='Curie Closing Lines', inline='CurieEnableShow')
