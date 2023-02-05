@@ -201,7 +201,7 @@ import ruckard/Zignaly2Beta/2 as zig
 // Template inputs - BEGIN
 
 // Zignaly - Inputs
-i_enableZignalyAlert = input(true, title='Enable Alerts', group='Zignaly', inline='ZignalyEnable', tooltip='Enable Alert Message')
+i_enableZignalyAlert = input(true, title='Alert Message', group='Zignaly', inline='ZignalyEnable', tooltip='Enable Alert Message for Zignaly.\nDefault: Enabled.')
 i_zignalyServiceSecretKey = input.string('MYSECRETKEY', title='Service Secret Key', group='Zignaly', inline='ZignalySecretKey', tooltip='MYSECRETKEY')
 _ZIGHYBRIDINTEGRATION_ = 'Hybrid', _ZIGTVONLYINTEGRATION_ = 'TradingView only'
 i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, title='Integration', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_], group='Zignaly', inline='ZignalySecretKey', tooltip='Default: ' + _ZIGHYBRIDINTEGRATION_)
@@ -223,12 +223,12 @@ L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reve
 i_strategyType = input.string(_REVERSE_, 'Type', options=[L_S, _L_, _S_, _REVERSE_], group='Strategy', inline='StrategyType', tooltip='Default: ' + _REVERSE_)
 
 i_enableLongStrictStrategy = input.bool(false, title='(L) Strict mode', group='Strategy', inline='StrategyStrictMode')
-i_enableShortStrictStrategy = input.bool(false, '(S)', group='Strategy', inline='StrategyStrictMode', tooltip='Ignore other side advice when being in a single side. E.g. If type is set to Long Only do not close the trade when Short would have opened a trade. (L) = Long. (S) = Short. Default for (L): false. Default for (S): false.')
+i_enableShortStrictStrategy = input.bool(false, '(S)', group='Strategy', inline='StrategyStrictMode', tooltip='Ignore other side advice when being in a single side.\nE.g. If type is set to Long Only do not close the trade when Short would have opened a trade.\n(L) = Long.\n(S) = Short.\nDefault for (L): Disabled.\nDefault for (S): Disabled.')
 i_strategyStartTimeOn = input.bool(true, title='', group='Strategy', inline='StrategyStartTime')
-i_strategyStartTime = input.time(timestamp('01 Jan 2021'), title= 'Starts at:', group='Strategy', inline='StrategyStartTime', tooltip='Default: Enabled. Starts at 2021-01-01 00:00:00.')
+i_strategyStartTime = input.time(timestamp('01 Jan 2021'), title= 'Starts at:', group='Strategy', inline='StrategyStartTime', tooltip='Default: Enabled.\nStarts at 2021-01-01 00:00:00.')
 
 i_strategyStopTimeOn = input.bool(false, title='', group='Strategy', inline='StrategyStopTime')
-i_strategyStopTime = input.time(timestamp('31 Dec 2021'), title= 'Ends at:', group='Strategy', inline='StrategyStopTime', tooltip='Default: Disabled. Ends at 2021-12-31 00:00:00.')
+i_strategyStopTime = input.time(timestamp('31 Dec 2021'), title= 'Ends at:', group='Strategy', inline='StrategyStopTime', tooltip='Default: Disabled.\n Ends at 2021-12-31 00:00:00.')
 
 // SubStrategies - Inputs
 i_subStrategiesLookback = input.int(1, title='Lookback', group='SubStrategies', inline='SubStrategies')
@@ -236,22 +236,22 @@ i_subStrategiesMinimum = input.int(1, title='Minimum', group='SubStrategies', in
 
 // Take Profit - Inputs
 i_enableTakeProfit = input.bool(false, title='Take Profit', group='Take Profit', inline='TakeProfitSimple')
-i_takeProfit = input.float(1.10, title='(%)', group='Take Profit', inline='TakeProfitSimple', tooltip='Make sure this is Enabled if you want to be able to Take Profit and any of its forms like, e.g., based on Risk/Reward Ratio. Default: Disabled. Default: 1.10%.')
+i_takeProfit = input.float(1.10, title='(%)', group='Take Profit', inline='TakeProfitSimple', tooltip='Make sure this is Enabled if you want to be able to Take Profit and any of its forms like, e.g., based on Risk/Reward Ratio.\nDefault: Disabled.\nDefault: 1.10%.')
 i_takeProfitPerOne = i_takeProfit / 100
 
 i_enableRiskRewardRatio = input.bool(false, title='Use this', group='Take Profit', inline='TakeProfitRiskRewardRatio')
-i_positionRatio = input.float(1.50, title='Risk/Reward Ratio', minval=0.01, group='Take Profit', inline='TakeProfitRiskRewardRatio', tooltip='Default: Disabled. Default: 1.50%')
+i_positionRatio = input.float(1.50, title='Risk/Reward Ratio', minval=0.01, group='Take Profit', inline='TakeProfitRiskRewardRatio', tooltip='Default: Disabled.\nDefault: 1.50%')
 
 // Trailing Take Profit - Inputs
 i_enableTrailingTakeProfit = input.bool(false, title='', group='Take Profit', inline='TrailingTakeProfit')
 i_trailingTakeProfitPercentageTrigger = input.float(1.2, title='Trailing Take Profit (%)', minval=0, step=0.01, group='Take Profit', inline='TrailingTakeProfit')
 i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
-i_trailingTakeProfitPercentageOffset = input.float(25.0, title='(%)', minval=0, step=0.01, group='Take Profit', inline='TrailingTakeProfit', tooltip='Start Trailing Stop on 1.2% with a 0.3% distance. Explanation: 25% of 1.2 = 0.3). Default: Disabled. Default: 1.2%. Default: 25.0%')
+i_trailingTakeProfitPercentageOffset = input.float(25.0, title='(%)', minval=0, step=0.01, group='Take Profit', inline='TrailingTakeProfit', tooltip='Start Trailing Stop on 1.2% with a 0.3% distance.\nExplanation: 25% of 1.2 = 0.3.\nDefaults:\nEnable: False.\nTrigger at: 1.2 %.\nPercentage offset: 25.0 % .')
 i_trailingTakeProfitPercentageOffsetPerOne = i_trailingTakeProfitPercentageOffset * 0.01
 
 // Stop Loss - Inputs
 i_enableStopLoss = input.bool(true, 'Stop Loss', group='Stop Loss', inline='StopLossSimple')
-i_stopLoss = input.float(7.0, title='(%)', minval=0.01, group='Stop Loss', inline='StopLossSimple', tooltip='Make sure this is Enabled if you want to be able to Stop Loss in any of its forms like, e.g., based on ATR. Default: true. Default: 7.0%') * 0.01
+i_stopLoss = input.float(7.0, title='(%)', minval=0.01, group='Stop Loss', inline='StopLossSimple', tooltip='Make sure this is Enabled if you want to be able to Stop Loss in any of its forms like, e.g., based on ATR.\nDefaults:\nEnable: true.\nStop Loss: 7.0%') * 0.01
 
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLATR_, 'Type', options=[_SLConstant_, _SLATR_], group='Stop Loss', inline='StopLossType', tooltip='Default: ' + _SLATR_)
@@ -265,17 +265,17 @@ i_atrStopLossMultiplier = input.float(1.5, title='', minval=0.01, group='Stop Lo
 i_enableBreakEven = input.bool(false, title='Break Even', group='Break Even', inline='BreakEvenSimple')
 i_breakEvenTrigger = input.float(1.0, '(%)', minval=0, step=0.01, group='Break Even', inline='BreakEvenSimple')
 i_breakEvenTriggerPerOne = i_breakEvenTrigger * 0.01
-i_breakEven = input.float(0.20, '(%)', minval=0, step=0.01, group='Break Even', inline='BreakEvenSimple', tooltip='Default: Disabled. Default: When the price reaches 1.0 % set a 0.20% Stop Loss.')
+i_breakEven = input.float(0.20, '(%)', minval=0, step=0.01, group='Break Even', inline='BreakEvenSimple', tooltip='Default: Disabled.\nDefault: When the price reaches 1.0 % set a 0.20% Stop Loss.')
 i_breakEvenPerOne = i_breakEven * 0.01
 
 i_enableRiskBreakevenTriggerRatio = input.bool(false, title='Use this', group='Break Even', inline='BreakEvenTriggerRatio')
-i_breakevenTriggerRatio = input.float(1.0, title='Risk/BreakEvenTrigger Ratio', minval=0.01, group='Break Even', inline='BreakEvenTriggerRatio', tooltip='Default: Disabled. Default: Breakeven Trigger is calculated from a 1.0% Risk/BreakEvenTrigger Ratio. This is similar to how Take Profit might be calculated based on the traditional Risk/Reward ratio.')
+i_breakevenTriggerRatio = input.float(1.0, title='Risk/BreakEvenTrigger Ratio', minval=0.01, group='Break Even', inline='BreakEvenTriggerRatio', tooltip='Default: Disabled.\nDefault: Breakeven Trigger is calculated from a 1.0% Risk/BreakEvenTrigger Ratio.\nThis is similar to how Take Profit might be calculated based on the traditional Risk/Reward ratio.')
 
-i_enableCustomBreakEven = input.bool(false, title='Custom Break Even', group='Break Even', inline='BreakEvenCustom', tooltip='Default: Disabled. Use a custom coded breakeven instead of the default one. Default: Disabled.')
+i_enableCustomBreakEven = input.bool(false, title='Custom Break Even', group='Break Even', inline='BreakEvenCustom', tooltip='Use a custom coded breakeven instead of the default one.\nDefault: Disabled.')
 
 // Risk Management - Inputs
-i_CapitalQuote = input.float(100.0, title='USDT units per order', group='Risk Management', inline='CapitalQuote', tooltip='Deprecated and ignored. This could be used as a SignalProvider to force a given amount to Zignaly itself. TODO: We need to repurpose it for the Profit Sharing 2.0 new amount option. Default: 100.0.')
-i_CapitalPercentage = input.float(25.0, title='Capital invested per order (%)', minval=0, step=0.01, group='Risk Management', inline='CapitalPercentage', tooltip='Sets each order quantity to this percentage of the initial capital. Default: 25.0 %.') * 0.01
+i_CapitalQuote = input.float(100.0, title='USDT units per order', group='Risk Management', inline='CapitalQuote', tooltip='Deprecated and ignored. This could be used as a SignalProvider to force a given amount to Zignaly itself. TODO: We need to repurpose it for the Profit Sharing 2.0 new amount option.\nDefault: 100.0.')
+i_CapitalPercentage = input.float(25.0, title='Capital invested per order (%)', minval=0, step=0.01, group='Risk Management', inline='CapitalPercentage', tooltip='Sets each order quantity to this percentage of the initial capital.\nDefault: 25.0 %.') * 0.01
 
 _SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None', _CUSTOM_ = 'Custom', _FORCED_ = 'Forced'
 i_riskManagementTypePre = input.string(_SCOMPOUND_, 'Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_], group='Risk Management', inline='RiskManagementType', tooltip=
@@ -287,7 +287,7 @@ i_riskManagementTypePre = input.string(_SCOMPOUND_, 'Type', options=[_SAFE_, _SC
  'Default: ' + _SCOMPOUND_)
 i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
 
-i_riskManagementMaximumLossPerTrade = input.float(1.0, title='Maximum loss per trade (%)', group='Risk Management', inline='RiskManagementMaximumLossPerTrade', tooltip='How much of your initial or current capital you want to lose as a maximum per trade. It only works in ' + _SAFE_ + ' type and in ' + _SCOMPOUND_ + ' type. ' + 'Default: 1.0 %.') * 0.01
+i_riskManagementMaximumLossPerTrade = input.float(1.0, title='Maximum loss per trade (%)', group='Risk Management', inline='RiskManagementMaximumLossPerTrade', tooltip='How much of your initial or current capital you want to lose as a maximum per trade.\nIt only works in ' + _SAFE_ + ' type and in ' + _SCOMPOUND_ + ' type. ' + '\nDefault: 1.0 %.') * 0.01
 
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='... per D/W/M (%)', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
 i_riskManagementMaximumLossPerWeek = input.float(8.0, title='', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
@@ -388,7 +388,7 @@ i_shortADXProtectionMinimum = input.float(20.0, title='', group='ADX Protection'
 i_shortADXProtectionMaximum = input.float(30.0, title='', group='ADX Protection', inline='ShortADXProtection', tooltip='Do not open a new order if ADX is inside this 20.0 - 30.0 range. \n(S): Short.\nDefaults:\nEnable: false.\nMinimum: 20.0.\nMaximum: 30.0.')
 
 i_enableADXProtectionCustomTimeframe = input.bool(false, title='Custom Timeframe', group='ADX Protection', inline='ADXProtectionTimeframe')
-i_ADXProtectionCustomTimeframe = input.timeframe('180', title='', group='ADX Protection', inline='ADXProtectionTimeframe', tooltip='Default: Disabled.\n Default: 3 hours.')
+i_ADXProtectionCustomTimeframe = input.timeframe('180', title='', group='ADX Protection', inline='ADXProtectionTimeframe', tooltip='Default: Disabled.\nDefault: 3 hours.')
 
 i_ADXProtectionDiLength = input.int(14, minval=1, title='ADX', group='ADX Protection', inline='ADXProtectionADX')
 i_ADXProtectionSmoothing = input.int(14, title='', minval=1, maxval=50, group='ADX Protection', inline='ADXProtectionADX', tooltip='Defaults:\nLength: 14.\nSmoothing: 14.')
