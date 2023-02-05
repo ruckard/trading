@@ -230,6 +230,10 @@ i_strategyStartTime = input.time(timestamp('01 Jan 2021'), title= 'Starts at:', 
 i_strategyStopTimeOn = input.bool(false, title='', group='Strategy', inline='StrategyStopTime')
 i_strategyStopTime = input.time(timestamp('31 Dec 2021'), title= 'Ends at:', group='Strategy', inline='StrategyStopTime', tooltip='Default: Disabled. Ends at 2021-12-31 00:00:00.')
 
+// SubStrategies - Inputs
+i_subStrategiesLookback = input.int(1, title='Lookback', group='SubStrategies', inline='SubStrategies')
+i_subStrategiesMinimum = input.int(1, title='Minimum', group='SubStrategies', inline='SubStrategies', tooltip='Take a look at the 1 latest candles and then if a minimum of 1 substrategy triggers to open a trade then open the trade.\nDefaults:\nLookback: 1\nMinimum: 1')
+
 // Take Profit - Inputs
 i_enableTakeProfit = input.bool(false, title='Take Profit', group='Take Profit', inline='TakeProfitSimple')
 i_takeProfit = input.float(1.10, title='(%)', group='Take Profit', inline='TakeProfitSimple', tooltip='Make sure this is Enabled if you want to be able to Take Profit and any of its forms like, e.g., based on Risk/Reward Ratio. Default: Disabled. Default: 1.10%.')
@@ -388,9 +392,6 @@ i_ADXProtectionCustomTimeframe = input.timeframe('180', title='', group='ADX Pro
 
 i_ADXProtectionDiLength = input.int(14, minval=1, title='ADX', group='ADX Protection', inline='ADXProtectionADX')
 i_ADXProtectionSmoothing = input.int(14, title='', minval=1, maxval=50, group='ADX Protection', inline='ADXProtectionADX', tooltip='Defaults:\nLength: 14.\nSmoothing: 14.')
-
-i_subStrategiesLookback = input.int(1, title='(STRAT) Substrategies Lookback [1]')
-i_subStrategiesMinimum = input.int(1, title='(STRAT) Substrategies minimum [1]')
 
 // Misc - Inputs
 i_priceDecimalDigits = input.int(2, title='Number of decimal digits for Prices', minval=0, maxval=10, step=1, group='Misc', inline='Misc1', tooltip='Default: 2')
