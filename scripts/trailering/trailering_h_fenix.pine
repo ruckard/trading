@@ -871,16 +871,16 @@ volumeBounceShort := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volu
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
-bool longCondition1 = false
-bool longCondition2 = false
+bool longCondition1 = traileringLong
+bool longCondition2 = volumeBounceLong
 bool longCondition3 = false
 bool longCondition4 = false
 bool longCondition5 = false
 // Define here your, at most, 5 long conditions. Use false if not used. - END
 
 // Define here your, at most, 5 short conditions. Use false if not used. - BEGIN
-bool shortCondition1 = false
-bool shortCondition2 = false
+bool shortCondition1 = traileringShort
+bool shortCondition2 = volumeBounceShort
 bool shortCondition3 = false
 bool shortCondition4 = false
 bool shortCondition5 = false
