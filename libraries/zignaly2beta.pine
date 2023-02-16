@@ -35,18 +35,18 @@ getZignalyCommonAlertMessage (string exchange='zignaly', string exchangeAccountT
         else
             p_multiplyByLeverage := 'false'
 
-    string p_hedgeMode = 'true'
+    string p_hedgeMode = 'false'
     if (na(hedgeMode))
-        p_hedgeMode := 'true'
+        p_hedgeMode := 'false'
     else
         if (hedgeMode)
             p_hedgeMode := 'true'
         else
             p_hedgeMode := 'false'
 
-    string p_ignoreOpenContractCheck = 'true'
+    string p_ignoreOpenContractCheck = 'false'
     if (na(ignoreOpenContractCheck))
-        p_ignoreOpenContractCheck := 'true'
+        p_ignoreOpenContractCheck := 'false'
     else
         if (ignoreOpenContractCheck)
             p_ignoreOpenContractCheck := 'true'
