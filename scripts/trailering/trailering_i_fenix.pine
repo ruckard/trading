@@ -406,11 +406,31 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 // Template inputs - END
 
 // ImplementedStrategy inputs - BEGIN
+
+i_enableTraileringTakeProfit = input.bool(true, title='Enable Trailering TakeProfit {True}', group='Trailering')
+i_enableTraileringStopLoss = input.bool(true, title='Enable Trailering StopLoss {True}', group='Trailering')
+i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
+
+i_virtTakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
+i_virtTakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit Maximum Loss Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
+i_virtTraileringOffset = input.int(0, title='Trailering Offset {0}', group='Trailering')
+i_virtTraileringPeriod = input.int(24, minval=2, title='Trailering Period {24}', group='Trailering')
+
+i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
+i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
+i_traileringAtrTakeProfitMultiplier = input.float(1.25, title='ATR Take Profit Multiplier % {1.25}', minval=0.01, group='Trailering')
+
+i_traileringTakeProfitPercentage = input.float(130.0, minval = 0.001, title='Take Profit Percentage {130.0 %}', group='Trailering')
+i_traileringTakeProfitPerOne = i_traileringTakeProfitPercentage * 0.01
+
+i_volumeBounceMinimumRatio = input.float(2.5, title='Min Ratio % {2.5}', minval=0.01, group='Volume Bounce')
+i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=0.01, group='Volume Bounce')
+
 // ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
 
-var offsetString = ''
+var offsetString = '-' + str.tostring(i_virtTraileringOffset)
 var longSignalIdString = 'LONG-' + syminfo.ticker + offsetString
 var shortSignalIdString = 'SHORT-' + syminfo.ticker + offsetString
 var reverseSignalIdString = 'REVERSE-' + syminfo.ticker + offsetString
@@ -426,6 +446,20 @@ float orderStopLoss = orderStopLossPerOne
 
 float customBreakEvenPerOne = na
 float customBreakEven = customBreakEvenPerOne
+
+// ImplementedStrategy init variables - BEGIN
+
+float traileringTakeProfitPerOne = na
+float traileringTakeProfit = traileringTakeProfitPerOne
+float maximumProfitExcursion = 0.0
+var float maximumProfitPrice = na
+
+float traileringStopLossPerOne = na
+float traileringStopLoss = traileringStopLossPerOne
+float maximumLossExcursion = 0.0
+var float maximumLossPrice = na
+
+// ImplementedStrategy init variables - END
 
 // Dynamic Trailing Take Profit - Variables
 
@@ -693,6 +727,154 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 // Template substrategies - END
 
 // ImplementedStrategy substrategies - BEGIN
+
+// Virtual Trailering Position - BEGIN
+
+traileringAtrIsPossible = bar_index >= i_traileringAtrTakeProfitLength
+
+bool virtTraileringBoth = false
+virtTraileringBoth := (bar_index + i_virtTraileringOffset) % i_virtTraileringPeriod == 0
+virtTraileringBoth := virtTraileringBoth and traileringAtrIsPossible
+
+float virtLongMaximumProfitExcursion = 0.0
+var float virtLongMaximumProfitPrice = na
+float virtLongMaximumLossExcursion = 0.0
+var float virtLongMaximumLossPrice = na
+
+float virtShortMaximumProfitExcursion = 0.0
+var float virtShortMaximumProfitPrice = na
+float virtShortMaximumLossExcursion = 0.0
+var float virtShortMaximumLossPrice = na
+
+var float traileringAtrLongTakeProfitPrice = na
+var float traileringAtrShortTakeProfitPrice = na
+var float traileringLongTakeProfitPerOne = na
+var float traileringShortTakeProfitPerOne = na
+
+var float virtLongTakeProfit = na
+var float virtShortTakeProfit = na
+var float virtExpectedTakeProfit = na
+
+var bool resetVirtVariables = false
+
+virtLongTakeProfitIsReached = (virtLongTakeProfit >= low) and (virtLongTakeProfit <= high)
+virtShortTakeProfitIsReached =  (virtShortTakeProfit >= low) and (virtShortTakeProfit <= high)
+
+var bool virtInsideAPosition = false
+var float virtPositionPrice = close
+
+if (not (virtLongTakeProfitIsReached[1] or virtShortTakeProfitIsReached[1]))
+    if ((not insideASellOrder) and (not insideABuyOrder))
+        if ((not virtTraileringBoth[1]) and (virtTraileringBoth))
+            if (virtInsideAPosition)
+                resetVirtVariables := true
+            virtInsideAPosition := true
+            virtPositionPrice := close
+
+
+if (virtInsideAPosition[1] and (virtLongTakeProfitIsReached or virtShortTakeProfitIsReached))
+    virtInsideAPosition := false
+
+tmpTraileringAtrLongTakeProfitPrice = i_traileringAtrTakeProfitSource + (ta.atr(i_traileringAtrTakeProfitLength) * i_traileringAtrTakeProfitMultiplier)
+tmpTraileringAtrShortTakeProfitPrice = i_traileringAtrTakeProfitSource - (ta.atr(i_traileringAtrTakeProfitLength) * i_traileringAtrTakeProfitMultiplier)
+
+if (not virtInsideAPosition) or ((not virtInsideAPosition[1]) and virtInsideAPosition) or resetVirtVariables
+    traileringAtrLongTakeProfitPrice := tmpTraileringAtrLongTakeProfitPrice
+    traileringAtrShortTakeProfitPrice := tmpTraileringAtrShortTakeProfitPrice
+    virtLongTakeProfit := traileringAtrLongTakeProfitPrice
+    virtShortTakeProfit := traileringAtrShortTakeProfitPrice
+
+// maximumProfitExcursion - BEGIN
+
+// Long
+if ((not virtInsideAPosition[1]) and virtInsideAPosition)
+    if (close >= virtPositionPrice)
+        virtLongMaximumProfitPrice := close
+    else
+        virtLongMaximumProfitPrice := virtPositionPrice
+else if (virtInsideAPosition)
+    if (close >= virtLongMaximumProfitPrice[1])
+        virtLongMaximumProfitPrice := close
+virtLongMaximumProfitExcursion := math.abs(virtLongMaximumProfitPrice - virtPositionPrice)
+
+// Short
+if ((not virtInsideAPosition[1]) and virtInsideAPosition)
+    if (close <= virtPositionPrice)
+        virtShortMaximumProfitPrice := close
+    else
+        virtShortMaximumProfitPrice := virtPositionPrice
+else if (virtInsideAPosition)
+    if (close <= virtShortMaximumProfitPrice[1])
+        virtShortMaximumProfitPrice := close
+virtShortMaximumProfitExcursion := math.abs(virtShortMaximumProfitPrice - virtPositionPrice)
+
+// maximumProfitExcursion - END
+
+// maximumLossExcursion - BEGIN
+
+// Long
+if (resetVirtVariables or ((not virtInsideAPosition[1]) and virtInsideAPosition))
+    if (close <= virtPositionPrice)
+        virtLongMaximumLossPrice := close
+    else
+        virtLongMaximumLossPrice := virtPositionPrice
+else if (virtInsideAPosition)
+    if (close <= virtLongMaximumLossPrice[1])
+        virtLongMaximumLossPrice := close
+virtLongMaximumLossExcursion := math.abs(virtLongMaximumLossPrice - virtPositionPrice)
+
+// Short
+if (resetVirtVariables or ((not virtInsideAPosition[1]) and virtInsideAPosition))
+    if (close >= virtPositionPrice)
+        virtShortMaximumLossPrice := close
+    else
+        virtShortMaximumLossPrice := virtPositionPrice
+else if (virtInsideAPosition)
+    if (close >= virtShortMaximumLossPrice[1])
+        virtShortMaximumLossPrice := close
+virtShortMaximumLossExcursion := math.abs(virtShortMaximumLossPrice - virtPositionPrice)
+
+if resetVirtVariables
+    resetVirtVariables := false
+
+// maximumLossExcursion - END
+
+if (virtInsideAPosition)
+    // Long
+    virtExpectedTakeProfit := traileringAtrLongTakeProfitPrice + ((i_virtTakeProfitMaximumProfitExcursionRatio * virtLongMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * virtLongMaximumLossExcursion))
+    if (virtExpectedTakeProfit >= (virtPositionPrice * (1 + i_breakEvenPerOne)))
+        virtLongTakeProfit := virtExpectedTakeProfit
+    else
+        virtLongTakeProfit := virtLongTakeProfit[1]
+    // Short
+    virtExpectedTakeProfit := traileringAtrShortTakeProfitPrice - ((i_virtTakeProfitMaximumProfitExcursionRatio * virtShortMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * virtShortMaximumLossExcursion))
+    if (virtExpectedTakeProfit <= (virtPositionPrice * (1 - i_breakEvenPerOne)))
+        virtShortTakeProfit := virtExpectedTakeProfit
+    else
+        virtShortTakeProfit := virtShortTakeProfit[1]
+
+// Virtual Trailering Position - END
+
+// Trailering substrategy - BEGIN
+bool traileringLong = false
+bool traileringShort = false
+
+traileringLong := virtInsideAPosition[1] and virtShortTakeProfitIsReached and (close <= virtPositionPrice) and (virtPositionPrice >= (close * (1 + i_breakEvenPerOne)))
+traileringShort := virtInsideAPosition[1] and virtLongTakeProfitIsReached and (close >= virtPositionPrice) and (virtPositionPrice <= (close * (1 - i_breakEvenPerOne)))
+// Trailering substrategy - END
+
+// Volume Bounce substrategy - BEGIN
+
+bool volumeBounceLong = false
+bool volumeBounceShort = false
+
+volumeBounceRatio = volume / volume[1]
+
+volumeBounceLong := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volumeBounceRatio <= i_volumeBounceMaximumRatio)
+volumeBounceShort := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volumeBounceRatio <= i_volumeBounceMaximumRatio)
+
+// Volume Bounce substrategy - END
+
 // ImplementedStrategy substrategies - END
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
@@ -1018,6 +1200,67 @@ if ((not insideABuyOrder[1]) and (insideABuyOrder))
     LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
 if ((not insideASellOrder[1]) and (insideASellOrder))
     ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
+
+var float originalTakeProfitPerOne = na
+if (i_enableTraileringTakeProfit)
+    if (not insideABuyOrder[1] and LONG)
+        originalTakeProfitPerOne := ( virtPositionPrice / positionPrice ) - 1
+        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
+        takeProfit := takeProfitPerOne * 100
+        LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
+        if (i_enableTraileringStopLoss)
+            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
+            orderStopLoss := orderStopLossPerOne * 100
+            LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+    if (not insideASellOrder[1] and SHORT)
+        originalTakeProfitPerOne := ( positionPrice / virtPositionPrice ) - 1
+        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
+        takeProfit := takeProfitPerOne * 100
+        ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
+        if (i_enableTraileringStopLoss)
+            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
+            orderStopLoss := orderStopLossPerOne * 100
+            ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+
+if (i_enableTraileringTakeProfit)
+    if (LONG[1] and (not (insideABuyOrder)))
+        originalTakeProfitPerOne := ( virtPositionPrice / positionPrice[1] ) - 1
+        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
+        takeProfit := takeProfitPerOne * 100
+        LongTakeProfit := positionPrice[1] * (1 + takeProfitPerOne)
+        if (i_enableTraileringStopLoss)
+            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
+            orderStopLoss := orderStopLossPerOne * 100
+            LongStopLoss := positionPrice[1] * (1 - orderStopLossPerOne)
+    if (SHORT[1] and (not (insideASellOrder)))
+        originalTakeProfitPerOne := ( positionPrice[1] / virtPositionPrice ) - 1
+        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
+        takeProfit := takeProfitPerOne * 100
+        ShortTakeProfit := positionPrice[1] * (1 - takeProfitPerOne)
+        if (i_enableTraileringStopLoss)
+            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
+            orderStopLoss := orderStopLossPerOne * 100
+            ShortStopLoss := positionPrice[1] * (1 + orderStopLossPerOne)
+
+if (i_enableTraileringTakeProfit)
+    if ((not insideABuyOrder[1]) and (insideABuyOrder))
+        originalTakeProfitPerOne := ( virtPositionPrice / strategy.position_avg_price ) - 1
+        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
+        takeProfit := takeProfitPerOne * 100
+        LongTakeProfit := strategy.position_avg_price * (1 + takeProfitPerOne)
+        if (i_enableTraileringStopLoss)
+            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
+            orderStopLoss := orderStopLossPerOne * 100
+            LongStopLoss := strategy.position_avg_price * (1 - orderStopLossPerOne)
+    if ((not insideASellOrder[1]) and (insideASellOrder))
+        originalTakeProfitPerOne := ( strategy.position_avg_price / virtPositionPrice ) - 1
+        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
+        takeProfit := takeProfitPerOne * 100
+        ShortTakeProfit := strategy.position_avg_price * (1 - takeProfitPerOne)
+        if (i_enableTraileringStopLoss)
+            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
+            orderStopLoss := orderStopLossPerOne * 100
+            ShortStopLoss := strategy.position_avg_price * (1 + orderStopLossPerOne)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
