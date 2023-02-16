@@ -215,11 +215,11 @@ string i_zignalyExchange = 'Zignaly'
 
 _ZIGEXTYPESPOT_ = 'spot', _ZIGEXFUTURES_ = 'futures'
 i_zignalyExchangeType = input.string(_ZIGEXFUTURES_, title='Exchange Type', options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_], group='Zignaly', inline='ZignalyExchangeType', tooltip='Default: ' + _ZIGEXFUTURES_)
-i_zignalyLeverage = input.int(1, 'Leverage', minval=1, step=1, maxval=125, group='Zignaly', inline='ZignalyLeverage', tooltip='Default: 1x')
+i_zignalyLeverage = input.int(24, 'Leverage', minval=1, step=1, maxval=125, group='Zignaly', inline='ZignalyLeverage', tooltip='Default: 1x')
 var i_zignalyLeverage_str = str.tostring(i_zignalyLeverage)  // It needs to run only once
 
-i_enableZignalyHedgeMode = input.bool(false, title='Hedge Mode', group='Zignaly', inline='ZignalyHedgeMode', tooltip='If HedgeMode is enabled for the Profit Sharing service you probably want this to be enabled so that it allows you open both long and short positions at the same time.\nThis is useful when you run multiple strategies against the same Profit Sharing service.\nDefault: Disabled.')
-i_enableIgnoreOpenContractCheck = input.bool(false, title='Ignore Open Contract Check', group='Zignaly', inline='IgnoreOpenContractCheck', tooltip='It allows you to open several positions for the same pair and same side.\nThis is useful when you run multiple strategies against the same Profit Sharing service.\nDefault: Disabled.')
+i_enableZignalyHedgeMode = input.bool(true, title='Hedge Mode', group='Zignaly', inline='ZignalyHedgeMode', tooltip='If HedgeMode is enabled for the Profit Sharing service you probably want this to be enabled so that it allows you open both long and short positions at the same time.\nThis is useful when you run multiple strategies against the same Profit Sharing service.\nDefault: Enabled.')
+i_enableIgnoreOpenContractCheck = input.bool(true, title='Ignore Open Contract Check', group='Zignaly', inline='IgnoreOpenContractCheck', tooltip='It allows you to open several positions for the same pair and same side.\nThis is useful when you run multiple strategies against the same Profit Sharing service.\nDefault: Enabled.')
 
 i_enableOrderCommentDebug = input.bool(false, title='DEBUG on order comments', group='Zignaly', inline='ZignalyDebug', tooltip='Default: Disabled.')
 
@@ -237,15 +237,15 @@ i_strategyStopTime = input.time(timestamp('31 Dec 2021'), title= 'Ends at:', gro
 
 // SubStrategies - Inputs
 i_subStrategiesLookback = input.int(1, title='Lookback', group='SubStrategies', inline='SubStrategies')
-i_subStrategiesMinimum = input.int(1, title='Minimum', group='SubStrategies', inline='SubStrategies', tooltip='Take a look at the 1 latest candles and then if a minimum of 1 substrategy triggers to open a trade then open the trade.\nDefaults:\nLookback: 1\nMinimum: 1')
+i_subStrategiesMinimum = input.int(2, title='Minimum', group='SubStrategies', inline='SubStrategies', tooltip='Take a look at the 1 latest candles and then if a minimum of 1 substrategy triggers to open a trade then open the trade.\nDefaults:\nLookback: 1\nMinimum: 2')
 
 // Take Profit - Inputs
-i_enableTakeProfit = input.bool(false, title='Take Profit', group='Take Profit', inline='TakeProfitSimple')
-i_takeProfit = input.float(1.10, title='(%)', group='Take Profit', inline='TakeProfitSimple', tooltip='Make sure this is Enabled if you want to be able to Take Profit and any of its forms like, e.g., based on Risk/Reward Ratio.\nDefault: Disabled.\nDefault: 1.10%.')
+i_enableTakeProfit = input.bool(true, title='Take Profit', group='Take Profit', inline='TakeProfitSimple')
+i_takeProfit = input.float(1.10, title='(%)', group='Take Profit', inline='TakeProfitSimple', tooltip='Make sure this is Enabled if you want to be able to Take Profit and any of its forms like, e.g., based on Risk/Reward Ratio.\nDefault: Enabled.\nDefault: 1.10%.')
 i_takeProfitPerOne = i_takeProfit / 100
 
-i_enableRiskRewardRatio = input.bool(false, title='Use this', group='Take Profit', inline='TakeProfitRiskRewardRatio')
-i_positionRatio = input.float(1.50, title='Risk/Reward Ratio', minval=0.01, group='Take Profit', inline='TakeProfitRiskRewardRatio', tooltip='Default: Disabled.\nDefault: 1.50%')
+i_enableRiskRewardRatio = input.bool(true, title='Use this', group='Take Profit', inline='TakeProfitRiskRewardRatio')
+i_positionRatio = input.float(0.50, title='Risk/Reward Ratio', minval=0.01, group='Take Profit', inline='TakeProfitRiskRewardRatio', tooltip='Default: Enabled.\nDefault: 0.50%')
 
 // Trailing Take Profit - Inputs
 i_enableTrailingTakeProfit = input.bool(false, title='', group='Take Profit', inline='TrailingTakeProfit')
@@ -292,7 +292,7 @@ i_riskManagementTypePre = input.string(_SCOMPOUND_, 'Type', options=[_SAFE_, _SC
  'Default: ' + _SCOMPOUND_)
 i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
 
-i_riskManagementMaximumLossPerTrade = input.float(1.0, title='Maximum loss per trade (%)', group='Risk Management', inline='RiskManagementMaximumLossPerTrade', tooltip='How much of your initial or current capital you want to lose as a maximum per trade.\nIt only works in ' + _SAFE_ + ' type and in ' + _SCOMPOUND_ + ' type. ' + '\nDefault: 1.0 %.') * 0.01
+i_riskManagementMaximumLossPerTrade = input.float(0.042, title='Maximum loss per trade (%)', group='Risk Management', inline='RiskManagementMaximumLossPerTrade', tooltip='How much of your initial or current capital you want to lose as a maximum per trade.\nIt only works in ' + _SAFE_ + ' type and in ' + _SCOMPOUND_ + ' type. ' + '\nDefault: 1.0 %.') * 0.01
 
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='... per D/W/M (%)', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
 i_riskManagementMaximumLossPerWeek = input.float(8.0, title='', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
@@ -323,14 +323,14 @@ i_higherTimeframeTrendSlowMaLength = input.int(55, minval = 1,  title = '', grou
 i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa', tooltip='Defaults:\nType: VWMA.\nLength: 55.\nSource: close.')
 
 // Too old order - Inputs
-i_enableTooOldLongOrderClose = input.bool(false, title='(L)', group='Too Old Orders', inline='Too Old Long Orders')
-i_tooOldLongBarsNumber = input.int(6, title='', minval=1, maxval=100, step=1, group='Too Old Orders', inline='Too Old Long Orders')
-i_tooOldLongStopLoss = input.float(1.20, title='', minval=-100.0, step=0.01, group='Too Old Orders', inline='Too Old Long Orders', tooltip='Close when the order is older than the number of bars and less than the specified StopLoss percentage.\n You can use StopLoss negative values in order to have something similar to a BreakEven.\n(L): Long\n(S): Short\nDefaults:\nEnable: False.\nBars Number: 6.\nStop Loss (%): 1.20 %.')
+i_enableTooOldLongOrderClose = input.bool(true, title='(L)', group='Too Old Orders', inline='Too Old Long Orders')
+i_tooOldLongBarsNumber = input.int(24, title='', minval=1, maxval=100, step=1, group='Too Old Orders', inline='Too Old Long Orders')
+i_tooOldLongStopLoss = input.float(-100.0, title='', minval=-100.0, step=0.01, group='Too Old Orders', inline='Too Old Long Orders', tooltip='Close when the order is older than the number of bars and less than the specified StopLoss percentage.\n You can use StopLoss negative values in order to have something similar to a BreakEven.\n(L): Long\n(S): Short\nDefaults:\Enable: True.\nBars Number: 24.\nStop Loss (%): -100.0 %.')
 i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
 
-i_enableTooOldShortOrderClose = input.bool(false, title='(S)', group='Too Old Orders', inline='Too Old Short Orders')
-i_tooOldShortBarsNumber = input.int(6, title='', minval=1, maxval=100, step=1, group='Too Old Orders', inline='Too Old Short Orders')
-i_tooOldShortStopLoss = input.float(0.60, title='', minval=-100.0, step=0.01, group='Too Old Orders', inline='Too Old Short Orders', tooltip='Close when the order is older than the number of bars and less than the specified StopLoss percentage.\nYou can use negative values in order to have something similar to a BreakEven.\n(L): Long\n(S): Short\nDefaults:\nEnable: False.\nBars Number: 6.\nStop Loss (%): 0.60 %.')
+i_enableTooOldShortOrderClose = input.bool(true, title='(S)', group='Too Old Orders', inline='Too Old Short Orders')
+i_tooOldShortBarsNumber = input.int(24, title='', minval=1, maxval=100, step=1, group='Too Old Orders', inline='Too Old Short Orders')
+i_tooOldShortStopLoss = input.float(-100.0, title='', minval=-100.0, step=0.01, group='Too Old Orders', inline='Too Old Short Orders', tooltip='Close when the order is older than the number of bars and less than the specified StopLoss percentage.\nYou can use negative values in order to have something similar to a BreakEven.\n(L): Long\n(S): Short\nDefaults:\nEnable: True.\nBars Number: 24.\nStop Loss (%): -100.0 %.')
 i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
 
 // RSI Protection - Inputs
