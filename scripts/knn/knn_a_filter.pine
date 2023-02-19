@@ -913,17 +913,6 @@ bool knnShortOk = false
 bool longHasWon = false
 bool shortHasWon = false
 
-if (needToLearn)
-    // Did we reach LongTakeProfit ?
-    // Did we NOTreach LongStopLoss?
-
-    // Did we reach ShortTakeProfit ?
-    // Did we NOTreach ShortStopLoss?
-
-if (needToLearn)
-    [knnLongOkTmp, knnShortOkTmp] = knn_doKNN(i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, maCrossingLong, maCrossingShort, true, knnAdx, knnMfi)
-    knnLearnIterations := knnLearnIterations + 1
-
 if (needToTrade)
     [knnLongOkTmp, knnShortOkTmp] = knn_doKNN(i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, true, true, true, knnAdx, knnMfi)
     knnLongOk := knnLongOkTmp
@@ -1278,6 +1267,26 @@ if ((not insideABuyOrder[1]) and (insideABuyOrder))
     LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
 if ((not insideASellOrder[1]) and (insideASellOrder))
     ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
+
+// KNN Filter - Substrategy - Extra code - BEGIN
+
+latestLowest = ta.lowest(low, i_montecarloCheckAfter - 1)
+latestHighest = ta.highest(high, i_montecarloCheckAfter - 1)
+
+virtLongTakeProfitIsReached = (virtLongTakeProfit >= latestLowest) and (virtLongTakeProfit <= latestHighest)
+virtShortTakeProfitIsReached =  (virtShortTakeProfit >= latestLowest) and (virtShortTakeProfit <= latestHighest)
+
+virtLongStopLossIsReached = (virtLongStopLoss >= latestLowest) and (virtLongStopLoss <= latestHighest)
+virtShortStopLossIsReached =  (virtShortStopLoss >= latestLowest) and (virtShortStopLoss <= latestHighest)
+
+virtLongOK = virtLongTakeProfitIsReached and (not virtLongStopLossIsReached)
+virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
+
+if (needToLearn)
+    [knnLongOkTmp, knnShortOkTmp] = knn_doKNN(i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, virtLongOK, virtShortOK, true, knnAdx[i_montecarloCheckAfter], knnMfi[i_montecarloCheckAfter])
+    knnLearnIterations := knnLearnIterations + 1
+
+// KNN Filter - Substrategy - Extra code - END
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
