@@ -1273,6 +1273,11 @@ if ((not insideASellOrder[1]) and (insideASellOrder))
 latestLowest = ta.lowest(low, i_montecarloCheckAfter - 1)
 latestHighest = ta.highest(high, i_montecarloCheckAfter - 1)
 
+virtLongTakeProfit = LongTakeProfit[i_montecarloCheckAfter - 1]
+virtShortTakeProfit = ShortTakeProfit[i_montecarloCheckAfter - 1]
+virtLongStopLoss = LongStopLoss[i_montecarloCheckAfter - 1]
+virtShortStopLoss = ShortStopLoss[i_montecarloCheckAfter - 1]
+
 virtLongTakeProfitIsReached = (virtLongTakeProfit >= latestLowest) and (virtLongTakeProfit <= latestHighest)
 virtShortTakeProfitIsReached =  (virtShortTakeProfit >= latestLowest) and (virtShortTakeProfit <= latestHighest)
 
