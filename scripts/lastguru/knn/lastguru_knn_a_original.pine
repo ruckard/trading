@@ -411,6 +411,22 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 // Template inputs - END
 
 // ImplementedStrategy inputs - BEGIN
+
+i_knnSource = input.source(title='Source', defval=open, group='KNN', tooltip='')
+i_fastMaLength = input.int(title='Fast Length', defval=13, group='KNN', tooltip='')
+i_slowMaLength = input.int(title='Slow Length', defval=19, group='KNN', tooltip='')
+i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='KNN', tooltip='')
+i_adxFilterLength = input.int(title='ADX Filter Length', defval=13, group='KNN', tooltip='')
+i_mfiFilterLength = input.int(title='MFI Filter Length', defval=13, group='KNN', tooltip='')
+i_adxSmoothing = input.int(title='Filter Smoothing', defval=6, group='KNN', tooltip='')
+// When i_knnMinimumDifference is 0, i_knnNearestNeighbors default was 23
+i_knnNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='KNN', tooltip='')
+i_knnMinimumDifference = input.int(title='kNN minimum difference', defval=2, group='KNN', tooltip='')
+i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=0, group='KNN', tooltip='')
+_BOOLEAN_ = 'Boolean', _PERCENT_ = 'Percent'
+i_knnType = input.string(_BOOLEAN_, title='kNN Type', options=[_BOOLEAN_, _PERCENT_], group='kNN', inline='kNNType', tooltip='')
+i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=100, group='KNN', tooltip='')
+
 // ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
@@ -567,6 +583,167 @@ getTooOldOrderShortCloseAdvice () =>
 // Template functions - END
 
 // ImplementedStrategy functions - BEGIN
+
+// @function Store the previous trade; buffer the current one until results are in. Results are binary: up/down
+// @param p_knn knn matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @param p_source current price
+// @param p_maximumSize limit the matrix size to this number of rows (0 of no limit)
+// @returns modified knn matrix
+knnStore(matrix<float> p_knn, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0) =>
+    var _prevFeature1 = 0.0
+    var _prevFeature2 = 0.0
+    var _prevSource = 0.0
+
+    if (p_maximumSize > 0 and matrix.rows(p_knn) > p_maximumSize)
+        matrix.remove_row(p_knn, 0)
+
+    // Add to storage matrix: parameter 1, parameter 2, price, result (up = 1; down = -1)
+    matrix.add_row(p_knn, matrix.rows(p_knn), array.from(_prevFeature1, _prevFeature2, _prevSource, p_source >= _prevSource ? 1 : -1))
+
+    _prevFeature1 := p_feature1
+    _prevFeature2 := p_feature2
+    _prevSource := p_source
+
+    p_knn
+
+// @function Store the previous trade; buffer the current one until results are in. Results are in percents
+// @param p_knn knn matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @param p_source current price
+// @param p_maximumSize limit the matrix size to this number of rows (0 of no limit)
+// @returns modified knn matrix
+knnStorePercent(matrix<float> p_knn, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0) =>
+    var _prevFeature1 = 0.0
+    var _prevFeature2 = 0.0
+    var _prevSource = 0.0
+
+    if (p_maximumSize > 0 and matrix.rows(p_knn) > p_maximumSize)
+        matrix.remove_row(p_knn, 0)
+
+    // Add to storage matrix: parameter 1, parameter 2, price, result percentage
+    matrix.add_row(p_knn, matrix.rows(p_knn), array.from(_prevFeature1, _prevFeature2, _prevSource, 100 * (p_source - _prevSource) / _prevSource))
+
+    _prevFeature1 := p_feature1
+    _prevFeature2 := p_feature2
+    _prevSource := p_source
+
+    p_knn
+
+// @function Get neighbours by getting p_nearestNeighborsNumber results with the smallest distances
+// @param p_distance p_distance array
+// @param p_result p_result array
+// @returns array slice of p_nearestNeighborsNumber results
+knnGet(float[] p_distance, float[] p_result, int p_nearestNeighborsNumber) =>
+    _matrix = matrix.new<float>(0, 0, 0)
+    matrix.add_col(_matrix, 0, p_distance)
+    matrix.add_col(_matrix, 1, p_result)
+    matrix.sort(_matrix, 0)
+
+    _row = matrix.col(_matrix, 1)
+    out = array.slice(_row, 0, math.min(p_nearestNeighborsNumber, array.size(_row)-1))
+
+// @function Create a distance array from the two given parameters
+// @param p_knn knn matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @returns distance array
+knnDistance(matrix<float> p_knn, float p_feature1, float p_feature2) =>
+    _distanceArray = array.new_float(0)
+    _matrixLastindex = matrix.rows(p_knn) - 1
+    for _nIndex = 0 to _matrixLastindex
+        d = math.sqrt( math.pow(p_feature1 - matrix.get(p_knn, _nIndex, 0), 2) + math.pow(p_feature2 - matrix.get(p_knn, _nIndex, 1), 2) )
+        array.push(_distanceArray, d)
+    _distanceArray
+
+// @function Make a prediction, finding k nearest neighbours and summing them up
+// @param p_knn knn matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @param p_knnNearestNeighbors k nearest neighbors
+// @returns sum of k nearest neighbors
+knnSum(matrix<float> p_knn, float p_feature1, float p_feature2, int p_knnNearestNeighbors) =>
+    _slice = (matrix.rows(p_knn) == 0) ? array.from(0.0) : knnGet(knnDistance(p_knn, p_feature1, p_feature2), matrix.col(p_knn, 3), p_knnNearestNeighbors)
+    out = array.sum(_slice)
+
+// @function execute kNN filter
+// @param p_knnType kNN filter type
+// @param p_knnNearestNeighbors k nearest neighbors
+// @param p_knnMinimumDifference kNN minimum difference
+// @param p_maxKnnMatrixMaximumSize kNN matrix size limit
+// @param p_source series
+// @param p_long long condition
+// @param p_short short condition
+// @param p_store store the supplied features (if false, only checks the results without storage)
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @returns [longOK, shortOK] filter output
+knn_doKNN(string p_knnType, int p_knnNearestNeighbors = 5, int p_knnMinimumDifference = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, bool p_store, float p_feature1, float p_feature2) =>
+    var _knnM = matrix.new<float>(0, 0, 0)
+    longOK = true
+    shortOK = true
+
+    switch p_knnType
+        "Boolean" =>
+            if (p_long or p_short)
+                if (p_store)
+                    _knnM := knnStore(_knnM, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
+
+                filter = knnSum(_knnM, p_feature1, p_feature2, p_knnNearestNeighbors)
+                longOK := filter >= p_knnMinimumDifference
+                shortOK := filter <= -p_knnMinimumDifference
+                mySlice = knnDistance(_knnM, p_feature1, p_feature2)
+                mySliceLengthTmp = array.sum(mySlice)
+        "Percent" =>
+            if (p_long or p_short)
+                if (p_store)
+                    _knnM := knnStorePercent(_knnM, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
+
+                filter = knnSum(_knnM, p_feature1, p_feature2, p_knnNearestNeighbors)
+                longOK := filter >= p_knnMinimumDifference
+                shortOK := filter <= -p_knnMinimumDifference
+
+    [longOK, shortOK]
+
+// Wilder's Smoothing (Running Moving Average)
+_rma(p_src, p_length) =>
+    _out = 0.0
+    _out := ((p_length - 1) * nz(_out[1]) + p_src) / p_length
+    _out
+
+// DMI (Directional Movement Index)
+_dmi(p_len, p_smooth) =>
+    _up = ta.change(high)
+    _down = -ta.change(low)
+    _plusDM = na(_up) ? na : _up > _down and _up > 0 ? _up : 0
+    _minusDM = na(_down) ? na : _down > _up and _down > 0 ? _down : 0
+    _trur = _rma(ta.tr, p_len)
+    _plus = fixnan(100 * _rma(_plusDM, p_len) / _trur)
+    _minus = fixnan(100 * _rma(_minusDM, p_len) / _trur)
+    _sum = _plus + _minus
+    _adx = 100 * _rma(math.abs(_plus - _minus) / (_sum == 0 ? 1 : _sum), p_smooth)
+    [_plus, _minus, _adx]
+
+// common RSI function
+_rsi(p_upper, p_lower) =>
+    _returnedRsi = 0.0
+    _extremeCase = false
+    _extremeCaseResult = 0.0
+    if p_lower == 0
+        _extremeCaseResult := 100.0
+        _extremeCase := true
+    if p_upper == 0
+        _extremeCaseResult := 0.0
+        _extremeCase := true
+    if (_extremeCase)
+        _returnedRsi := _extremeCaseResult
+    else
+        _returnedRsi := 100.0 - 100.0 / (1.0 + p_upper / p_lower)
+
+    _returnedRsi
+
 // ImplementedStrategy functions - END
 
 // Strategy Body - BEGIN
@@ -698,6 +875,55 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 // Template substrategies - END
 
 // ImplementedStrategy substrategies - BEGIN
+
+// LastguruKnn substrategy - BEGIN
+
+bool lastguruKnnLong = false
+bool lastguruKnnShort = false
+
+// kNN
+var knnLearnIterations = 0
+
+// MA
+knnFastMA = ta.vwma(i_knnSource, i_fastMaLength)
+knnSlowMA = ta.vwma(i_knnSource, i_slowMaLength)
+
+// DMI
+[knnDiplus, knnDiminus, knnAdx] = _dmi(i_adxFilterLength, i_adxSmoothing)
+
+// MFI
+knnMfiUp = math.sum(volume * (ta.change(ohlc4) <= 0 ? 0 : ohlc4), i_mfiFilterLength)
+knnMfiDown = math.sum(volume * (ta.change(ohlc4) >= 0 ? 0 : ohlc4), i_mfiFilterLength)
+knnMfi = _rsi(knnMfiUp, knnMfiDown)
+
+maCrossingLong = ta.crossover(knnFastMA, knnSlowMA)
+maCrossingShort = ta.crossunder(knnFastMA, knnSlowMA)
+
+var bool knnLongOk = false
+var bool knnShortOk = false
+
+if (maCrossingLong or maCrossingShort)
+    [knnLongOkTmp, knnShortOkTmp] = knn_doKNN(i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, maCrossingLong, maCrossingShort, true, knnAdx, knnMfi)
+    knnLearnIterations := knnLearnIterations + 1
+    knnLongOk := knnLongOkTmp
+    knnShortOk := knnShortOkTmp
+
+knnHasLearntEnough = knnLearnIterations >= i_MaxKnnLearnIterations
+
+// Actions
+if (i_enableKnnFilter)
+    if maCrossingLong and knnLongOk and knnHasLearntEnough
+        lastguruKnnLong := true
+    if maCrossingShort and knnShortOk and knnHasLearntEnough
+        lastguruKnnShort := true
+else
+    if maCrossingLong and knnHasLearntEnough
+        lastguruKnnLong := true
+    if maCrossingShort and knnHasLearntEnough
+        lastguruKnnShort := true
+
+// LastguruKnn substrategy - END
+
 // ImplementedStrategy substrategies - END
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
