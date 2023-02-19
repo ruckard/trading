@@ -425,14 +425,18 @@ i_knnNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, 
 i_knnMinimumDifference = input.int(title='kNN minimum difference', defval=2, group='KNN', tooltip='')
 i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=0, group='KNN', tooltip='')
 _BOOLEAN_ = 'Boolean', _PERCENT_ = 'Percent'
-i_knnType = input.string(_BOOLEAN_, title='kNN Type', options=[_BOOLEAN_, _PERCENT_], group='kNN', inline='kNNType', tooltip='')
+i_knnType = input.string(_BOOLEAN_, title='kNN Type', options=[_BOOLEAN_, _PERCENT_], group='KNN', inline='kNNType', tooltip='')
 i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=100, group='KNN', tooltip='')
+
+i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
+i_montecarloPeriod = input.int(24, minval=2, title='MonteCarlo Period {24}', group='Montecarlo', tooltip='')
+i_montecarloCheckAfter = input.int(6, minval=1, title='MonteCarlo Period {6}', group='Montecarlo', tooltip='')
 
 // ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
 
-var offsetString = ''
+var offsetString = '-' + str.tostring(i_montecarloOffset)
 var longSignalIdString = 'LONG-' + syminfo.ticker + offsetString
 var shortSignalIdString = 'SHORT-' + syminfo.ticker + offsetString
 var reverseSignalIdString = 'REVERSE-' + syminfo.ticker + offsetString
@@ -878,6 +882,12 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 // ImplementedStrategy substrategies - BEGIN
 
 // LastguruKnn substrategy - BEGIN
+
+montecarloAtrIsPossible = bar_index >= i_atrStopLossLength
+
+bool virtMontecarloBoth = false
+virtMontecarloBoth := (bar_index + i_virtMontecarloOffset) % i_virtMontecarloPeriod == 0
+virtMontecarloBoth := virtMontecarloBoth and montecarloAtrIsPossible
 
 bool lastguruKnnLong = false
 bool lastguruKnnShort = false
