@@ -914,7 +914,7 @@ bool longHasWon = false
 bool shortHasWon = false
 
 if (needToTrade)
-    [knnLongOkTmp, knnShortOkTmp] = knn_doKNN(i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, true, true, true, knnAdx, knnMfi)
+    [knnLongOkTmp, knnShortOkTmp] = knn_doKNN(i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, true, true, false, knnAdx, knnMfi)
     knnLongOk := knnLongOkTmp
     knnShortOk := knnShortOkTmp
 
