@@ -690,27 +690,29 @@ knn_doKNN(matrix<float> p_knnMatrix, string p_knnType, int p_knnNearestNeighbors
     longOK = true
     shortOK = true
 
+    updatedKnnMatrix = matrix.copy(p_knnMatrix)
+
     switch p_knnType
         "Boolean" =>
             if (p_long or p_short)
                 if (p_store)
-                    p_knnMatrix := knnStore(p_knnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
+                    updatedKnnMatrix := knnStore(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
 
-                filter = knnSum(p_knnMatrix, p_feature1, p_feature2, p_knnNearestNeighbors)
+                filter = knnSum(updatedKnnMatrix, p_feature1, p_feature2, p_knnNearestNeighbors)
                 longOK := filter >= p_knnMinimumDifference
                 shortOK := filter <= -p_knnMinimumDifference
-                mySlice = knnDistance(p_knnMatrix, p_feature1, p_feature2)
+                mySlice = knnDistance(updatedKnnMatrix, p_feature1, p_feature2)
                 mySliceLengthTmp = array.sum(mySlice)
         "Percent" =>
             if (p_long or p_short)
                 if (p_store)
-                    p_knnMatrix := knnStorePercent(p_knnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
+                    updatedKnnMatrix := knnStorePercent(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
 
-                filter = knnSum(p_knnMatrix, p_feature1, p_feature2, p_knnNearestNeighbors)
+                filter = knnSum(updatedKnnMatrix, p_feature1, p_feature2, p_knnNearestNeighbors)
                 longOK := filter >= p_knnMinimumDifference
                 shortOK := filter <= -p_knnMinimumDifference
 
-    [longOK, shortOK]
+    [updatedKnnMatrix, longOK, shortOK]
 
 // Wilder's Smoothing (Running Moving Average)
 _rma(p_src, p_length) =>
@@ -915,7 +917,7 @@ bool longHasWon = false
 bool shortHasWon = false
 
 if (needToTrade)
-    [knnLongOkTmp, knnShortOkTmp] = knn_doKNN(i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, true, true, false, knnAdx, knnMfi)
+    [tmpKnnMatrix, knnLongOkTmp, knnShortOkTmp] = knn_doKNN(knnMatrix, i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, true, true, false, knnAdx, knnMfi)
     knnLongOk := knnLongOkTmp
     knnShortOk := knnShortOkTmp
 
@@ -1276,8 +1278,9 @@ virtLongOK = virtLongTakeProfitIsReached and (not virtLongStopLossIsReached)
 virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
 
 if (needToLearn)
-    [knnLongOkTmp, knnShortOkTmp] = knn_doKNN(i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, virtLongOK, virtShortOK, true, knnAdx[i_montecarloCheckAfter], knnMfi[i_montecarloCheckAfter])
+    [tmpKnnMatrix2, knnLongOkTmp, knnShortOkTmp] = knn_doKNN(knnMatrix, i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, virtLongOK, virtShortOK, true, knnAdx[i_montecarloCheckAfter], knnMfi[i_montecarloCheckAfter])
     knnLearnIterations := knnLearnIterations + 1
+    knnMatrix := tmpKnnMatrix2
 
 // KNN Filter - Substrategy - Extra code - END
 
