@@ -597,6 +597,23 @@ getTooOldOrderShortCloseAdvice () =>
 // @param p_source current price
 // @param p_maximumSize limit the matrix size to this number of rows (0 of no limit)
 // @returns modified knn matrix
+knnStoreResult(matrix<float> p_knn, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0, float p_result) =>
+
+    if (p_maximumSize > 0 and matrix.rows(p_knn) > p_maximumSize)
+        matrix.remove_row(p_knn, 0)
+
+    // Add to storage matrix: parameter 1, parameter 2, price, result (up = 1; down = -1)
+    matrix.add_row(p_knn, matrix.rows(p_knn), array.from(p_feature1, p_feature2, p_source, p_result))
+
+    p_knn
+
+// @function Store the previous trade; buffer the current one until results are in. Results are binary: up/down
+// @param p_knn knn matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @param p_source current price
+// @param p_maximumSize limit the matrix size to this number of rows (0 of no limit)
+// @returns modified knn matrix
 knnStore(matrix<float> p_knn, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0) =>
     var _prevFeature1 = 0.0
     var _prevFeature2 = 0.0
@@ -1277,10 +1294,15 @@ virtShortStopLossIsReached =  (virtShortStopLoss >= latestLowest) and (virtShort
 virtLongOK = virtLongTakeProfitIsReached and (not virtLongStopLossIsReached)
 virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
 
+float suggestedResult = 0.0
+if (virtLongOK)
+    suggestedResult := suggestedResult + 1.0
+if (virtShortOK)
+    suggestedResult := suggestedResult - 1.0
+
 if (needToLearn)
-    [tmpKnnMatrix2, knnLongOkTmp, knnShortOkTmp] = knn_doKNN(knnMatrix, i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, virtLongOK, virtShortOK, true, knnAdx[i_montecarloCheckAfter], knnMfi[i_montecarloCheckAfter])
+    knnMatrix := knnStoreResult(knnMatrix, knnAdx[i_montecarloCheckAfter], knnMfi[i_montecarloCheckAfter], i_knnSource, i_maxKnnMatrixMaximumSize, suggestedResult)
     knnLearnIterations := knnLearnIterations + 1
-    knnMatrix := tmpKnnMatrix2
 
 // KNN Filter - Substrategy - Extra code - END
 
