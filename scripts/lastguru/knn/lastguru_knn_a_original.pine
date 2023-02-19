@@ -260,8 +260,8 @@ i_trailingTakeProfitPercentageOffset = input.float(25.0, title='(%)', minval=0, 
 i_trailingTakeProfitPercentageOffsetPerOne = i_trailingTakeProfitPercentageOffset * 0.01
 
 // Stop Loss - Inputs
-i_enableStopLoss = input.bool(true, 'Stop Loss', group='Stop Loss', inline='StopLossSimple')
-i_stopLoss = input.float(7.0, title='(%)', minval=0.01, group='Stop Loss', inline='StopLossSimple', tooltip='Make sure this is Enabled if you want to be able to Stop Loss in any of its forms like, e.g., based on ATR.\nDefaults:\nEnable: true.\nStop Loss: 7.0%') * 0.01
+i_enableStopLoss = input.bool(false, 'Stop Loss', group='Stop Loss', inline='StopLossSimple')
+i_stopLoss = input.float(7.0, title='(%)', minval=0.01, group='Stop Loss', inline='StopLossSimple', tooltip='Make sure this is Enabled if you want to be able to Stop Loss in any of its forms like, e.g., based on ATR.\nDefaults:\nEnable: false.\nStop Loss: 7.0%') * 0.01
 
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLATR_, 'Type', options=[_SLConstant_, _SLATR_], group='Stop Loss', inline='StopLossType', tooltip='Default: ' + _SLATR_)
