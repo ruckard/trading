@@ -1295,7 +1295,7 @@ virtLongOK = virtLongTakeProfitIsReached and (not virtLongStopLossIsReached)
 virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
 
 if (maCrossingLong or maCrossingShort)
-    [tmpKnnMatrix2, knnLongOkTmp, knnShortOkTmp] = knn_doKNN(knnMatrix, i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, maCrossingLong, maCrossingShort, true, knnAdx[i_montecarloCheckAfter], knnMfi[i_montecarloCheckAfter])
+    [tmpKnnMatrix2, knnLongOkTmp, knnShortOkTmp] = knn_doKNN(knnMatrix, i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, maCrossingLong, maCrossingShort, true, knnAdx, knnMfi)
     knnLearnIterations := knnLearnIterations + 1
     knnMatrix := tmpKnnMatrix2
 
