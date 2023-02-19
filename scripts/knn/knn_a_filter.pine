@@ -249,12 +249,12 @@ i_subStrategiesLookback = input.int(1, title='Lookback', group='SubStrategies', 
 i_subStrategiesMinimum = input.int(1, title='Minimum', group='SubStrategies', inline='SubStrategies', tooltip='Take a look at the 1 latest candles and then if a minimum of 1 substrategy triggers to open a trade then open the trade.\nDefaults:\nLookback: 1\nMinimum: 1')
 
 // Take Profit - Inputs
-i_enableTakeProfit = input.bool(true, title='Take Profit', group='Take Profit', inline='TakeProfitSimple')
-i_takeProfit = input.float(1.10, title='(%)', group='Take Profit', inline='TakeProfitSimple', tooltip='Make sure this is Enabled if you want to be able to Take Profit and any of its forms like, e.g., based on Risk/Reward Ratio.\nDefault: Enabled.\nDefault: 1.10%.')
+i_enableTakeProfit = input.bool(false, title='Take Profit', group='Take Profit', inline='TakeProfitSimple')
+i_takeProfit = input.float(1.10, title='(%)', group='Take Profit', inline='TakeProfitSimple', tooltip='Make sure this is Enabled if you want to be able to Take Profit and any of its forms like, e.g., based on Risk/Reward Ratio.\nDefault: Disabled.\nDefault: 1.10%.')
 i_takeProfitPerOne = i_takeProfit / 100
 
-i_enableRiskRewardRatio = input.bool(true, title='Use this', group='Take Profit', inline='TakeProfitRiskRewardRatio')
-i_positionRatio = input.float(1.50, title='Risk/Reward Ratio', minval=0.01, group='Take Profit', inline='TakeProfitRiskRewardRatio', tooltip='Default: Enabled.\nDefault: 1.50%')
+i_enableRiskRewardRatio = input.bool(false, title='Use this', group='Take Profit', inline='TakeProfitRiskRewardRatio')
+i_positionRatio = input.float(1.50, title='Risk/Reward Ratio', minval=0.01, group='Take Profit', inline='TakeProfitRiskRewardRatio', tooltip='Default: Disabled.\nDefault: 1.50%')
 
 // Trailing Take Profit - Inputs
 i_enableTrailingTakeProfit = input.bool(false, title='', group='Take Profit', inline='TrailingTakeProfit')
@@ -332,14 +332,14 @@ i_higherTimeframeTrendSlowMaLength = input.int(55, minval = 1,  title = '', grou
 i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa', tooltip='Defaults:\nType: VWMA.\nLength: 55.\nSource: close.')
 
 // Too old order - Inputs
-i_enableTooOldLongOrderClose = input.bool(true, title='(L)', group='Too Old Orders', inline='Too Old Long Orders')
+i_enableTooOldLongOrderClose = input.bool(false, title='(L)', group='Too Old Orders', inline='Too Old Long Orders')
 i_tooOldLongBarsNumber = input.int(6, title='', minval=1, maxval=100, step=1, group='Too Old Orders', inline='Too Old Long Orders')
-i_tooOldLongStopLoss = input.float(-100.0, title='', minval=-100.0, step=0.01, group='Too Old Orders', inline='Too Old Long Orders', tooltip='Close when the order is older than the number of bars and less than the specified StopLoss percentage.\n You can use StopLoss negative values in order to have something similar to a BreakEven.\n(L): Long\n(S): Short\nDefaults:\nEnable: True.\nBars Number: 6.\nStop Loss (%): -100.0 %.')
+i_tooOldLongStopLoss = input.float(-100.0, title='', minval=-100.0, step=0.01, group='Too Old Orders', inline='Too Old Long Orders', tooltip='Close when the order is older than the number of bars and less than the specified StopLoss percentage.\n You can use StopLoss negative values in order to have something similar to a BreakEven.\n(L): Long\n(S): Short\nDefaults:\nEnable: False.\nBars Number: 6.\nStop Loss (%): -100.0 %.')
 i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
 
-i_enableTooOldShortOrderClose = input.bool(true, title='(S)', group='Too Old Orders', inline='Too Old Short Orders')
+i_enableTooOldShortOrderClose = input.bool(false, title='(S)', group='Too Old Orders', inline='Too Old Short Orders')
 i_tooOldShortBarsNumber = input.int(6, title='', minval=1, maxval=100, step=1, group='Too Old Orders', inline='Too Old Short Orders')
-i_tooOldShortStopLoss = input.float(-100.0, title='', minval=-100.0, step=0.01, group='Too Old Orders', inline='Too Old Short Orders', tooltip='Close when the order is older than the number of bars and less than the specified StopLoss percentage.\nYou can use negative values in order to have something similar to a BreakEven.\n(L): Long\n(S): Short\nDefaults:\nEnable: True.\nBars Number: 6.\nStop Loss (%): -100.0 %.')
+i_tooOldShortStopLoss = input.float(-100.0, title='', minval=-100.0, step=0.01, group='Too Old Orders', inline='Too Old Short Orders', tooltip='Close when the order is older than the number of bars and less than the specified StopLoss percentage.\nYou can use negative values in order to have something similar to a BreakEven.\n(L): Long\n(S): Short\nDefaults:\nEnable: False.\nBars Number: 6.\nStop Loss (%): -100.0 %.')
 i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
 
 // RSI Protection - Inputs
@@ -432,6 +432,9 @@ i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=10
 i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
 i_montecarloPeriod = input.int(24, minval=2, title='MonteCarlo Period {24}', group='Montecarlo', tooltip='')
 i_montecarloCheckAfter = input.int(6, minval=1, title='MonteCarlo Period {6}', group='Montecarlo', tooltip='')
+
+i_knnFastMaLength = input.int(title='Fast Length', defval=13, group='KNN', tooltip='')
+i_knnSlowMaLength = input.int(title='Slow Length', defval=19, group='KNN', tooltip='')
 
 // ImplementedStrategy inputs - END
 
@@ -899,6 +902,12 @@ bool lastguruKnnShort = false
 // kNN
 var knnLearnIterations = 0
 
+// MA
+knnFastMA = ta.vwma(i_knnSource, i_knnFastMaLength)
+knnSlowMA = ta.vwma(i_knnSource, i_knnSlowMaLength)
+maCrossingLong = ta.crossover(knnFastMA, knnSlowMA)
+maCrossingShort = ta.crossunder(knnFastMA, knnSlowMA)
+
 // DMI
 [knnDiplus, knnDiminus, knnAdx] = _dmi(i_knnAdxFilterLength, i_knnAdxSmoothing)
 
@@ -916,8 +925,8 @@ bool knnShortOk = false
 bool longHasWon = false
 bool shortHasWon = false
 
-if (needToTrade)
-    [tmpKnnMatrix, knnLongOkTmp, knnShortOkTmp] = knn_doKNN(knnMatrix, i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, true, true, false, knnAdx, knnMfi)
+if (maCrossingLong or maCrossingShort)
+    [tmpKnnMatrix, knnLongOkTmp, knnShortOkTmp] = knn_doKNN(knnMatrix, i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, maCrossingLong, maCrossingShort, false, knnAdx, knnMfi)
     knnLongOk := knnLongOkTmp
     knnShortOk := knnShortOkTmp
 
@@ -1277,8 +1286,8 @@ virtShortStopLossIsReached =  (virtShortStopLoss >= latestLowest) and (virtShort
 virtLongOK = virtLongTakeProfitIsReached and (not virtLongStopLossIsReached)
 virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
 
-if (needToLearn)
-    [tmpKnnMatrix2, knnLongOkTmp, knnShortOkTmp] = knn_doKNN(knnMatrix, i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, virtLongOK, virtShortOK, true, knnAdx[i_montecarloCheckAfter], knnMfi[i_montecarloCheckAfter])
+if (maCrossingLong or maCrossingShort)
+    [tmpKnnMatrix2, knnLongOkTmp, knnShortOkTmp] = knn_doKNN(knnMatrix, i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, maCrossingLong, maCrossingShort, true, knnAdx[i_montecarloCheckAfter], knnMfi[i_montecarloCheckAfter])
     knnLearnIterations := knnLearnIterations + 1
     knnMatrix := tmpKnnMatrix2
 
