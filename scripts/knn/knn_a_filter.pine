@@ -23,6 +23,9 @@
 // Later on we apply our learning to avoid probable non profitable trades and ensure probable profitable trades.
 // We also have an offset so that the strategy can be called several times in a similar fashion to a Montecarlo test.
 //
+// We aim to avoid 1.5 x ATR StopLoss.
+// And we aim to get the TakeProfit as 1.5 x StopLoss.
+//
 // ImplementedStrategy explanation - END
 //
 // In addition the former strategy also includes Risk Management.
