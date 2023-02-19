@@ -1065,6 +1065,14 @@ plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdow
 // Higher Timeframe Trend - Plot - END
 
 // ImplementedStrategy - Plot - BEGIN
+
+// LastguruKnn SubStrategy - Plot - BEGIN
+
+plot(knnFastMA, color=color.new(color.red, 0))
+plot(knnSlowMA, color=color.new(color.green, 0))
+
+// LastguruKnn SubStrategy - Plot - END
+
 // ImplementedStrategy - Plot - END
 
 // Position price calculation - BEGIN
