@@ -423,7 +423,7 @@ i_knnMfiFilterLength = input.int(title='MFI Filter Length', defval=13, group='KN
 i_knnAdxSmoothing = input.int(title='Filter Smoothing', defval=6, group='KNN', tooltip='')
 // When i_knnMinimumDifference is 0, i_knnNearestNeighbors default was 23
 i_knnNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='KNN', tooltip='')
-i_knnMinimumDifference = input.int(title='kNN minimum difference', defval=2, group='KNN', tooltip='')
+i_knnMinimumDifference = input.float(title='kNN minimum difference', defval=2, group='KNN', tooltip='')
 i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=0, group='KNN', tooltip='')
 _BOOLEAN_ = 'Boolean', _PERCENT_ = 'Percent'
 i_knnType = input.string(_BOOLEAN_, title='kNN Type', options=[_BOOLEAN_, _PERCENT_], group='KNN', inline='kNNType', tooltip='')
@@ -703,7 +703,7 @@ knnSum(matrix<float> p_knn, float p_feature1, float p_feature2, int p_knnNearest
 // @param p_feature1 feature 1 value
 // @param p_feature2 feature 2 value
 // @returns [longOK, shortOK] filter output
-knn_doKNN(matrix<float> p_knnMatrix, string p_knnType, int p_knnNearestNeighbors = 5, int p_knnMinimumDifference = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, bool p_store, float p_feature1, float p_feature2) =>
+knn_doKNN(matrix<float> p_knnMatrix, string p_knnType, int p_knnNearestNeighbors = 5, float p_knnMinimumDifference = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, bool p_store, float p_feature1, float p_feature2) =>
     longOK = true
     shortOK = true
 
@@ -1284,6 +1284,7 @@ virtLongTakeProfit = LongTakeProfit[i_montecarloCheckAfter - 1]
 virtShortTakeProfit = ShortTakeProfit[i_montecarloCheckAfter - 1]
 virtLongStopLoss = LongStopLoss[i_montecarloCheckAfter - 1]
 virtShortStopLoss = ShortStopLoss[i_montecarloCheckAfter - 1]
+virtSource = close[i_montecarloCheckAfter]
 
 virtLongTakeProfitIsReached = (virtLongTakeProfit >= latestLowest) and (virtLongTakeProfit <= latestHighest)
 virtShortTakeProfitIsReached =  (virtShortTakeProfit >= latestLowest) and (virtShortTakeProfit <= latestHighest)
@@ -1296,11 +1297,11 @@ virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
 
 float suggestedResult = 0.0
 if (virtLongOK)
-    suggestedResult := suggestedResult + 1.0
+    suggestedResult := suggestedResult + ((virtLongTakeProfit / virtSource) - 1)
 if (virtShortOK)
-    suggestedResult := suggestedResult - 1.0
+    suggestedResult := suggestedResult - ((virtSource / virtShortTakeProfit) - 1)
 
-if (needToLearn)
+if (montecarloAtrIsPossible)
     knnMatrix := knnStoreResult(knnMatrix, knnAdx[i_montecarloCheckAfter], knnMfi[i_montecarloCheckAfter], i_knnSource, i_maxKnnMatrixMaximumSize, suggestedResult)
     knnLearnIterations := knnLearnIterations + 1
 
