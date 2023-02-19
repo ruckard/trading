@@ -414,8 +414,6 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 // ImplementedStrategy inputs - BEGIN
 
 i_knnSource = input.source(title='Source', defval=open, group='KNN', tooltip='')
-i_knnFastMaLength = input.int(title='Fast Length', defval=13, group='KNN', tooltip='')
-i_knnSlowMaLength = input.int(title='Slow Length', defval=19, group='KNN', tooltip='')
 i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='KNN', tooltip='')
 i_knnAdxFilterLength = input.int(title='ADX Filter Length', defval=13, group='KNN', tooltip='')
 i_knnMfiFilterLength = input.int(title='MFI Filter Length', defval=13, group='KNN', tooltip='')
@@ -895,10 +893,6 @@ bool lastguruKnnShort = false
 // kNN
 var knnLearnIterations = 0
 
-// MA
-knnFastMA = ta.vwma(i_knnSource, i_knnFastMaLength)
-knnSlowMA = ta.vwma(i_knnSource, i_knnSlowMaLength)
-
 // DMI
 [knnDiplus, knnDiminus, knnAdx] = _dmi(i_knnAdxFilterLength, i_knnAdxSmoothing)
 
@@ -906,9 +900,6 @@ knnSlowMA = ta.vwma(i_knnSource, i_knnSlowMaLength)
 knnMfiUp = math.sum(volume * (ta.change(ohlc4) <= 0 ? 0 : ohlc4), i_knnMfiFilterLength)
 knnMfiDown = math.sum(volume * (ta.change(ohlc4) >= 0 ? 0 : ohlc4), i_knnMfiFilterLength)
 knnMfi = _rsi(knnMfiUp, knnMfiDown)
-
-maCrossingLong = ta.crossover(knnFastMA, knnSlowMA)
-maCrossingShort = ta.crossunder(knnFastMA, knnSlowMA)
 
 var bool knnLongOk = false
 var bool knnShortOk = false
