@@ -686,9 +686,7 @@ knnSum(matrix<float> p_knn, float p_feature1, float p_feature2, int p_knnNearest
 // @param p_feature1 feature 1 value
 // @param p_feature2 feature 2 value
 // @returns [longOK, shortOK] filter output
-knn_doKNN(string p_knnType, int p_knnNearestNeighbors = 5, int p_knnMinimumDifference = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, bool p_store, float p_feature1, float p_feature2) =>
-    // var _knnM = matrix.new<float>(0, 0, 0)
-    var _knnM = matrix.new<float>(1, 4, 0)
+knn_doKNN(matrix<float> p_knnMatrix, string p_knnType, int p_knnNearestNeighbors = 5, int p_knnMinimumDifference = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, bool p_store, float p_feature1, float p_feature2) =>
     longOK = true
     shortOK = true
 
@@ -696,19 +694,19 @@ knn_doKNN(string p_knnType, int p_knnNearestNeighbors = 5, int p_knnMinimumDiffe
         "Boolean" =>
             if (p_long or p_short)
                 if (p_store)
-                    _knnM := knnStore(_knnM, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
+                    p_knnMatrix := knnStore(p_knnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
 
-                filter = knnSum(_knnM, p_feature1, p_feature2, p_knnNearestNeighbors)
+                filter = knnSum(p_knnMatrix, p_feature1, p_feature2, p_knnNearestNeighbors)
                 longOK := filter >= p_knnMinimumDifference
                 shortOK := filter <= -p_knnMinimumDifference
-                mySlice = knnDistance(_knnM, p_feature1, p_feature2)
+                mySlice = knnDistance(p_knnMatrix, p_feature1, p_feature2)
                 mySliceLengthTmp = array.sum(mySlice)
         "Percent" =>
             if (p_long or p_short)
                 if (p_store)
-                    _knnM := knnStorePercent(_knnM, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
+                    p_knnMatrix := knnStorePercent(p_knnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
 
-                filter = knnSum(_knnM, p_feature1, p_feature2, p_knnNearestNeighbors)
+                filter = knnSum(p_knnMatrix, p_feature1, p_feature2, p_knnNearestNeighbors)
                 longOK := filter >= p_knnMinimumDifference
                 shortOK := filter <= -p_knnMinimumDifference
 
@@ -884,6 +882,8 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 // ImplementedStrategy substrategies - BEGIN
 
 // LastguruKnn substrategy - BEGIN
+
+var knnMatrix = matrix.new<float>(1, 4, 0)
 
 montecarloAtrIsPossible = bar_index >= i_atrStopLossLength
 
