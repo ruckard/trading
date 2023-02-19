@@ -19,8 +19,9 @@
 //
 // ImplementedStrategy explanation - BEGIN
 //
-// Learn from fast Moving Average and slow Moving Average crossings thanks to Machine learning KNN.
-// Later on we apply our learning to avoid probable non profitable trades and ensumre probable profitable trades.
+// Learn from past KNN feature values to know when to go long or short.
+// Later on we apply our learning to avoid probable non profitable trades and ensure probable profitable trades.
+// We also have an offset so that the strategy can be called several times in a similar fashion to a Montecarlo test.
 //
 // ImplementedStrategy explanation - END
 //
