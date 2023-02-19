@@ -901,12 +901,28 @@ knnMfiUp = math.sum(volume * (ta.change(ohlc4) <= 0 ? 0 : ohlc4), i_knnMfiFilter
 knnMfiDown = math.sum(volume * (ta.change(ohlc4) >= 0 ? 0 : ohlc4), i_knnMfiFilterLength)
 knnMfi = _rsi(knnMfiUp, knnMfiDown)
 
-var bool knnLongOk = false
-var bool knnShortOk = false
+bool needToLearn = virtMontecarloBoth[i_montecarloCheckAfter]
+bool needToTrade = virtMontecarloBoth
 
-if (maCrossingLong or maCrossingShort)
+bool knnLongOk = false
+bool knnShortOk = false
+
+bool longHasWon = false
+bool shortHasWon = false
+
+if (needToLearn)
+    // Did we reach LongTakeProfit ?
+    // Did we NOTreach LongStopLoss?
+
+    // Did we reach ShortTakeProfit ?
+    // Did we NOTreach ShortStopLoss?
+
+if (needToLearn)
     [knnLongOkTmp, knnShortOkTmp] = knn_doKNN(i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, maCrossingLong, maCrossingShort, true, knnAdx, knnMfi)
     knnLearnIterations := knnLearnIterations + 1
+
+if (needToTrade)
+    [knnLongOkTmp, knnShortOkTmp] = knn_doKNN(i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, true, true, true, knnAdx, knnMfi)
     knnLongOk := knnLongOkTmp
     knnShortOk := knnShortOkTmp
 
