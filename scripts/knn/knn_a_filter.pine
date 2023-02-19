@@ -887,7 +887,7 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 montecarloAtrIsPossible = bar_index >= i_atrStopLossLength
 
 bool virtMontecarloBoth = false
-virtMontecarloBoth := (bar_index + i_virtMontecarloOffset) % i_virtMontecarloPeriod == 0
+virtMontecarloBoth := (bar_index + i_montecarloOffset) % i_montecarloPeriod == 0
 virtMontecarloBoth := virtMontecarloBoth and montecarloAtrIsPossible
 
 bool lastguruKnnLong = false
@@ -922,14 +922,9 @@ knnHasLearntEnough = knnLearnIterations >= i_MaxKnnLearnIterations
 
 // Actions
 if (i_enableKnnFilter)
-    if maCrossingLong and knnLongOk and knnHasLearntEnough
+    if knnLongOk and knnHasLearntEnough
         lastguruKnnLong := true
-    if maCrossingShort and knnShortOk and knnHasLearntEnough
-        lastguruKnnShort := true
-else
-    if maCrossingLong and knnHasLearntEnough
-        lastguruKnnLong := true
-    if maCrossingShort and knnHasLearntEnough
+    if knnShortOk and knnHasLearntEnough
         lastguruKnnShort := true
 
 // LastguruKnn substrategy - END
@@ -1058,14 +1053,6 @@ plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdow
 // Higher Timeframe Trend - Plot - END
 
 // ImplementedStrategy - Plot - BEGIN
-
-// LastguruKnn SubStrategy - Plot - BEGIN
-
-plot(knnFastMA, color=color.new(color.red, 0))
-plot(knnSlowMA, color=color.new(color.green, 0))
-
-// LastguruKnn SubStrategy - Plot - END
-
 // ImplementedStrategy - Plot - END
 
 // Position price calculation - BEGIN
