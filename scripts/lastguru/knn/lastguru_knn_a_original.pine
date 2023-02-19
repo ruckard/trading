@@ -18,6 +18,10 @@
 // ImplementedStrategy foo - END
 //
 // ImplementedStrategy explanation - BEGIN
+//
+// Learn from fast Moving Average and slow Moving Average crossings thanks to Machine learning KNN.
+// Later on we apply our learning to avoid probable non profitable trades and ensumre probable profitable trades.
+//
 // ImplementedStrategy explanation - END
 //
 // In addition the former strategy also includes Risk Management.
