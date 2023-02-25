@@ -423,7 +423,7 @@ i_knnMfiFilterLength = input.int(title='MFI Filter Length', defval=19, group='KN
 i_knnAdxSmoothing = input.int(title='Filter Smoothing', defval=6, group='KNN', tooltip='')
 // When i_knnMinimumDifference is 0, i_knnNearestNeighbors default was 23
 i_knnNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='KNN', tooltip='')
-i_knnMinimumDifference = input.float(title='kNN minimum difference', defval=0.28, group='KNN', tooltip='')
+i_knnMinimumDifference = input.float(title='kNN minimum difference', defval=0.75, group='KNN', tooltip='')
 i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=100, group='KNN', tooltip='')
 _BOOLEAN_ = 'Boolean', _PERCENT_ = 'Percent'
 i_knnType = input.string(_BOOLEAN_, title='kNN Type', options=[_BOOLEAN_, _PERCENT_], group='KNN', inline='kNNType', tooltip='')
