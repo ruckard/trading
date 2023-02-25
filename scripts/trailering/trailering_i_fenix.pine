@@ -443,11 +443,11 @@ onStartTimeInterval = (not i_strategyStartTimeOn) or (time >= i_strategyStartTim
 offStopTimeInterval = (i_strategyStopTimeOn) and (time > i_strategyStopTime)
 
 // order Stop Loss
-float orderStopLossPerOne = na
-float orderStopLoss = orderStopLossPerOne
+var float orderStopLossPerOne = na
+var float orderStopLoss = orderStopLossPerOne
 
-float customBreakEvenPerOne = na
-float customBreakEven = customBreakEvenPerOne
+var float customBreakEvenPerOne = na
+var float customBreakEven = customBreakEvenPerOne
 
 // ImplementedStrategy init variables - BEGIN
 // ImplementedStrategy init variables - END
