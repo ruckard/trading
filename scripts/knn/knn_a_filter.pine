@@ -431,7 +431,7 @@ i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=10
 
 i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
 i_montecarloPeriod = input.int(24, minval=2, title='MonteCarlo Period {24}', group='Montecarlo', tooltip='')
-i_montecarloCheckAfter = input.int(6, minval=1, title='MonteCarlo Period {6}', group='Montecarlo', tooltip='')
+i_montecarloCheckAfter = input.int(6, minval=1, title='Check after {6} bars', group='Montecarlo', tooltip='')
 
 // ImplementedStrategy inputs - END
 
