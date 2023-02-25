@@ -243,7 +243,7 @@ i_subStrategiesMinimum = input.int(2, title='Minimum', group='SubStrategies', in
 i_enableTakeProfit = input.bool(true, title='Take Profit', group='Take Profit', inline='TakeProfitSimple')
 i_takeProfit = input.float(1.10, title='(%)', group='Take Profit', inline='TakeProfitSimple', tooltip='Make sure this is Enabled if you want to be able to Take Profit and any of its forms like, e.g., based on Risk/Reward Ratio.\nDefault: Enabled.\nDefault: 1.10%.')
 i_takeProfitPerOne = i_takeProfit / 100
-i_enableTakeProfitDefaultLogic = input.bool(true, title='Take Profit Default Logic', group='Take Profit', inline='TakeProfitLogic', tooltip='Turn on TakeProfit default logic.\nOnly useful if you code your own TakeProfit logic.\n Default: true.')
+i_enableTakeProfitDefaultLogic = input.bool(false, title='Take Profit Default Logic', group='Take Profit', inline='TakeProfitLogic', tooltip='Turn on TakeProfit default logic.\nOnly useful if you code your own TakeProfit logic.\n Default: false.')
 
 i_enableRiskRewardRatio = input.bool(true, title='Use this', group='Take Profit', inline='TakeProfitRiskRewardRatio')
 i_positionRatio = input.float(0.50, title='Risk/Reward Ratio', minval=0.01, group='Take Profit', inline='TakeProfitRiskRewardRatio', tooltip='Default: Enabled.\nDefault: 0.50%')
@@ -258,7 +258,7 @@ i_trailingTakeProfitPercentageOffsetPerOne = i_trailingTakeProfitPercentageOffse
 // Stop Loss - Inputs
 i_enableStopLoss = input.bool(true, 'Stop Loss', group='Stop Loss', inline='StopLossSimple')
 i_stopLoss = input.float(7.0, title='(%)', minval=0.01, group='Stop Loss', inline='StopLossSimple', tooltip='Make sure this is Enabled if you want to be able to Stop Loss in any of its forms like, e.g., based on ATR.\nDefaults:\nEnable: true.\nStop Loss: 7.0%') * 0.01
-i_enableStopLossDefaultLogic = input.bool(true, title='Stop Loss Default Logic', group='Stop Loss', inline='StopLossLogic', tooltip='Turn on StopLoss default logic.\nOnly useful if you code your own StopLoss logic.\n Default: true.')
+i_enableStopLossDefaultLogic = input.bool(false, title='Stop Loss Default Logic', group='Stop Loss', inline='StopLossLogic', tooltip='Turn on StopLoss default logic.\nOnly useful if you code your own StopLoss logic.\n Default: false.')
 
 _SLConstant_ = 'Constant', _SLATR_ = 'ATR'
 i_stopLossTypePre = input.string(_SLATR_, 'Type', options=[_SLConstant_, _SLATR_], group='Stop Loss', inline='StopLossType', tooltip='Default: ' + _SLATR_)
