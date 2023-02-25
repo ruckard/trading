@@ -1207,9 +1207,10 @@ if (i_enableTakeProfitDefaultLogic)
         takeProfit := i_takeProfit
         takeProfitPerOne := i_takeProfitPerOne
 
-    var float LongTakeProfit = na
-    var float ShortTakeProfit = na
+var float LongTakeProfit = na
+var float ShortTakeProfit = na
 
+if (i_enableTakeProfitDefaultLogic)
     // Initial TakeProfit value based on last closed candle
     if (not insideABuyOrder)
         LongTakeProfit := close * (1 + takeProfitPerOne)
