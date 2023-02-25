@@ -202,7 +202,7 @@
 
 // Tradingview Public description - END
 
-strategy('Knn Filter A005', shorttitle='A005KNNFilter', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Knn Filter A005', shorttitle='A005KNNFilter', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04, max_lines_count=500)
 
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/Zignaly2Beta/4 as zig
@@ -432,6 +432,8 @@ i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=10
 i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
 i_montecarloPeriod = input.int(24, minval=2, title='MonteCarlo Period {24}', group='Montecarlo', tooltip='')
 i_montecarloCheckAfter = input.int(6, minval=1, title='Check after {6} bars', group='Montecarlo', tooltip='')
+
+i_plotKnnMatrix = input.bool(false, title='Plot KNN Matrix', group='Debug', inline='DebugKnnMatrix', tooltip='Hide the pair and click on auto to see this properly.\nBecause I do not want to modify overlay value.\nDefault: false.')
 
 // ImplementedStrategy inputs - END
 
@@ -1306,6 +1308,36 @@ if ( (montecarloAtrIsPossible) and (virtLongOK or virtShortOK) )
     knnLearnIterations := knnLearnIterations + 1
 
 // KNN Filter - Substrategy - Extra code - END
+
+// ImplementedStrategy - Extra Plot - BEGIN
+
+var knnMatrixLines = array.new_line()
+
+if i_plotKnnMatrix
+    for l in knnMatrixLines
+        line.delete(l)
+    array.clear(knnMatrixLines)
+
+    knnRows = matrix.rows(knnMatrix)
+    for nrow = 0 to (knnRows - 1)
+        tmpFeature1 = matrix.get(knnMatrix, nrow, 0)
+        tmpFeature2 = matrix.get(knnMatrix, nrow, 1)
+
+        tmpX2 = int(time_close - (( 100 - tmpFeature1 ) * (timeframe.in_seconds(timeframe.period)) * 1000.0 ))
+        tmpX1 = int(tmpX2 - (1 * (timeframe.in_seconds(timeframe.period))))
+        tmpY2 = tmpFeature2
+        tmpY1 = tmpFeature2 - 1.0
+
+        array.unshift(knnMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, xloc=xloc.bar_time))
+
+squareBoxX2 = int(time_close)
+squareBoxX1 = int(time_close - ((timeframe.in_seconds(timeframe.period)) * 100 * 1000.0 ))
+
+var box squareBox = na
+box.delete(squareBox)
+squareBox := box.new(squareBoxX1, 100.0, squareBoxX2, 0.0, xloc=xloc.bar_time, bgcolor=na)
+
+// ImplementedStrategy - Extra Plot - END
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
