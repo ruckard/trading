@@ -1335,7 +1335,8 @@ squareBoxX1 = int(time_close - ((timeframe.in_seconds(timeframe.period)) * 100 *
 
 var box squareBox = na
 box.delete(squareBox)
-squareBox := box.new(squareBoxX1, 100.0, squareBoxX2, 0.0, xloc=xloc.bar_time, bgcolor=na)
+if i_plotKnnMatrix
+    squareBox := box.new(squareBoxX1, 100.0, squareBoxX2, 0.0, xloc=xloc.bar_time, bgcolor=na)
 
 // ImplementedStrategy - Extra Plot - END
 
