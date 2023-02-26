@@ -1298,10 +1298,16 @@ virtLongOK = virtLongTakeProfitIsReached and (not virtLongStopLossIsReached)
 virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
 
 float suggestedResult = 0.0
-if (virtLongOK)
-    suggestedResult := suggestedResult + ((virtLongTakeProfit / virtSource) - 1)
-if (virtShortOK)
-    suggestedResult := suggestedResult - ((virtSource / virtShortTakeProfit) - 1)
+if (i_knnType == '_BOOLEAN_')
+    if (virtLongOK)
+        suggestedResult := 1.0
+    if (virtShortOK)
+        suggestedResult := -1.0
+else // '_PERCENT_'
+    if (virtLongOK)
+        suggestedResult := suggestedResult + ((virtLongTakeProfit / virtSource) - 1)
+    if (virtShortOK)
+        suggestedResult := suggestedResult - ((virtSource / virtShortTakeProfit) - 1)
 
 if ( (needToLearn) and (virtLongOK or virtShortOK) )
     knnMatrix := knnStoreResult(knnMatrix, knnAdx[i_montecarloCheckAfter], knnMfi[i_montecarloCheckAfter], i_knnSource, i_maxKnnMatrixMaximumSize, suggestedResult)
