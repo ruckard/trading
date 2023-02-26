@@ -1322,13 +1322,17 @@ if i_plotKnnMatrix
     for nrow = 0 to (knnRows - 1)
         tmpFeature1 = matrix.get(knnMatrix, nrow, 0)
         tmpFeature2 = matrix.get(knnMatrix, nrow, 1)
+        tmpRowResult = matrix.get(knnMatrix, nrow, 3)
 
         tmpX2 = int(time_close - (( 100 - tmpFeature1 ) * (timeframe.in_seconds(timeframe.period)) * 1000.0 ))
         tmpX1 = int(tmpX2 - (1 * (timeframe.in_seconds(timeframe.period))))
         tmpY2 = tmpFeature2
         tmpY1 = tmpFeature2 - 1.0
 
-        array.unshift(knnMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, xloc=xloc.bar_time))
+        if (tmpRowResult >= 0)
+            array.unshift(knnMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, color=color.lime, xloc=xloc.bar_time))
+        else
+            array.unshift(knnMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, color=color.maroon, xloc=xloc.bar_time))
 
 squareBoxX2 = int(time_close)
 squareBoxX1 = int(time_close - ((timeframe.in_seconds(timeframe.period)) * 100 * 1000.0 ))
