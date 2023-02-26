@@ -426,7 +426,7 @@ i_knnNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, 
 i_knnMinimumDifference = input.float(title='kNN minimum difference', defval=0.75, group='KNN', tooltip='')
 i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=100, group='KNN', tooltip='')
 _BOOLEAN_ = 'Boolean', _PERCENT_ = 'Percent'
-i_knnType = input.string(_BOOLEAN_, title='kNN Type', options=[_BOOLEAN_, _PERCENT_], group='KNN', inline='kNNType', tooltip='')
+i_knnType = input.string(_PERCENT_, title='kNN Type', options=[_BOOLEAN_, _PERCENT_], group='KNN', inline='kNNType', tooltip='')
 i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=100, group='KNN', tooltip='')
 
 i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
