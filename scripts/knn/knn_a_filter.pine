@@ -1303,7 +1303,7 @@ if (virtLongOK)
 if (virtShortOK)
     suggestedResult := suggestedResult - ((virtSource / virtShortTakeProfit) - 1)
 
-if ( (montecarloAtrIsPossible) and (virtLongOK or virtShortOK) )
+if ( (needToLearn) and (virtLongOK or virtShortOK) )
     knnMatrix := knnStoreResult(knnMatrix, knnAdx[i_montecarloCheckAfter], knnMfi[i_montecarloCheckAfter], i_knnSource, i_maxKnnMatrixMaximumSize, suggestedResult)
     knnLearnIterations := knnLearnIterations + 1
 
