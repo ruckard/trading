@@ -1046,11 +1046,10 @@ SHORT = PRE_SHORT // Do not wait for confirmation
 // Decide if we are going to SHORT/Go SHORT - END
 
 // Decide if a LONG/LONG entry should be closed - BEGIN
-LONG_CLOSE = true
-if (i_enableLongStrictStrategy)
-    LONG_CLOSE := offStopTimeInterval
-else
-    LONG_CLOSE := offStopTimeInterval or shortCondition
+LONG_CLOSE = false
+
+if (not i_enableLongStrictStrategy)
+    LONG_CLOSE := LONG_CLOSE or shortCondition
 
 if i_enableCurieClosingLines
     LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(i_curieSource, curieHighestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
@@ -1062,16 +1061,18 @@ if i_enableLongRSIClosing
     LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(closingRsi, longRSIClosingLevel) )
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
+if (offStopTimeInterval)
+    LONG_CLOSE := true
+
 if LONG_CLOSE
     LONG := false
 // Decide if a LONG/LONG entry should be closed - END
 
 // Decide if a SHORT/SHORT entry should be closed - BEGIN
-SHORT_CLOSE = true
-if (i_enableShortStrictStrategy)
-    SHORT_CLOSE := offStopTimeInterval
-else
-    SHORT_CLOSE := offStopTimeInterval or longCondition
+SHORT_CLOSE = false
+
+if (not i_enableLongStrictStrategy)
+    SHORT_CLOSE := SHORT_CLOSE or longCondition
 
 if i_enableCurieClosingLines
     SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(i_curieSource, curieLowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
@@ -1083,6 +1084,9 @@ if i_enableShortRSIClosing
     SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(closingRsi, shortRSIClosingLevel) )
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
+if (offStopTimeInterval)
+    SHORT_CLOSE := true
+
 if SHORT_CLOSE
     SHORT := false
 // Decide if a SHORT/SHORT entry should be closed - END
