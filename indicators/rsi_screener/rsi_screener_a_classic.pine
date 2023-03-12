@@ -45,7 +45,7 @@
 
 // Tradingview Public description - END
 
-strategy('IndicatorTemplate A001', shorttitle='A001IndicatorTemplate', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('RSIScreener A001', shorttitle='A001RSIScreener', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 // IMPORTS - BEGIN
 // IMPORTS - END
