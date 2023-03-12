@@ -246,7 +246,7 @@ i_takeProfitPerOne = i_takeProfit / 100
 i_enableTakeProfitDefaultLogic = input.bool(false, title='Take Profit Default Logic', group='Take Profit', inline='TakeProfitLogic', tooltip='Turn on TakeProfit default logic.\nOnly useful if you code your own TakeProfit logic.\n Default: false.')
 
 i_enableRiskRewardRatio = input.bool(true, title='Use this', group='Take Profit', inline='TakeProfitRiskRewardRatio')
-i_positionRatio = input.float(1.00, title='Risk/Reward Ratio', minval=0.01, group='Take Profit', inline='TakeProfitRiskRewardRatio', tooltip='Default: Enabled.\nDefault: 1.00%')
+i_positionRatio = input.float(0.50, title='Risk/Reward Ratio', minval=0.01, group='Take Profit', inline='TakeProfitRiskRewardRatio', tooltip='Default: Enabled.\nDefault: 0.50%')
 
 // Trailing Take Profit - Inputs
 i_enableTrailingTakeProfit = input.bool(false, title='', group='Take Profit', inline='TrailingTakeProfit')
