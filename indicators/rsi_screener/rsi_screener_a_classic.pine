@@ -76,6 +76,12 @@ i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enfo
 // Template inputs - END
 
 // ImplementedIndicator inputs - BEGIN
+
+i_RSILength = input.int(7, minval=1, title='RSI', group='RSI', inline='RSI')
+i_RSISource = input.source(close, title='', group='RSI', inline='RSI')
+i_RSIOverSold = input.int(30, minval=1, title='', group='RSI', inline='RSI')
+i_RSIOverBought = input.int(80, minval=1, title='', group='RSI', inline='RSI', tooltip='Defaults:\nLength: 7.\n Source: close.\n OverSold: 30.\n OverBought: 80.')
+
 // ImplementedIndicator inputs - END
 
 // Strategy - INIT - BEGIN
@@ -104,6 +110,15 @@ getTrend (_fastMaType, _fastMaLength, _fastMaSource, _slowMaType, _slowMaLength,
 // Template functions - END
 
 // ImplementedIndicator functions - BEGIN
+
+screener_func() =>
+    // RSI
+    _rsi = ta.rsi(i_RSISource, i_RSILength)
+    _rsiOverSoldTrigger = ta.crossunder(_rsi, i_RSIOverSold)
+    _rsiOverBoughtTrigger = ta.crossover(_rsi, i_RSIOverBought)
+
+    [_rsiOverSoldTrigger, _rsiOverBoughtTrigger]
+
 // ImplementedIndicator functions - END
 
 // Strategy Body - BEGIN
