@@ -20,6 +20,8 @@
 // ImplementedIndicator foo - END
 //
 // ImplementedIndicator explanation - BEGIN
+// This is an screener for many pairs.
+// It triggers an alert each time one of the RSI levels is reached for every one of the monitored pairs.
 // ImplementedIndicator explanation - END
 //
 // ImplementedIndicator suggested pair and timeframe - BEGIN
