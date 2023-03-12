@@ -82,6 +82,8 @@ i_RSISource = input.source(close, title='', group='RSI', inline='RSI')
 i_RSIOverSold = input.int(30, minval=1, title='', group='RSI', inline='RSI')
 i_RSIOverBought = input.int(80, minval=1, title='', group='RSI', inline='RSI', tooltip='Defaults:\nLength: 7.\n Source: close.\n OverSold: 30.\n OverBought: 80.')
 
+symbol01 = input.symbol('XRPUSDT', group='Symbols', inline='s01', tooltip='Default: XRPUSDT.\n')
+
 // ImplementedIndicator inputs - END
 
 // Strategy - INIT - BEGIN
@@ -140,6 +142,13 @@ if newHigherTimeframeTrendMaBar
 // Template subindicators - END
 
 // ImplementedIndicator subindicators - BEGIN
+
+// RSI Screener subindicator - BEGIN
+
+[rsiOverSoldTrigger, rsiOverBoughtTrigger] = request.security(symbol01, timeframe.period, screener_func())
+
+// RSI Screener subindicator - END
+
 // ImplementedIndicator subindicators - END
 
 // Higher Timeframe Trend - Plot - BEGIN
