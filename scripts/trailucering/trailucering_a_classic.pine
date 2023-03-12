@@ -1,0 +1,1606 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © ruckard
+
+//@version=5
+
+// Current version: v20230312 ( I005 )
+// Tradingview Public description - BEGIN
+// 
+// This is a template for Ruckard strategies that interact with Zignaly.
+// Template sections are not supposed to be modified and are similar to:
+// Template foo - BEGIN
+// (...)
+// Template foo - END
+//
+// Sections meant to be added with your own strategy logic are similar to:
+// ImplementedStrategy foo - BEGIN
+// (...)
+// ImplementedStrategy foo - END
+//
+// ImplementedStrategy explanation - BEGIN
+// This strategy tries to minimize StopLoss and maximize TakeProfit based on the maximum excursion (positive or negative) of price. It is meant to be used as a LongOnly strategy and at the same time as a ShortOnly strategy.
+// ImplementedStrategy explanation - END
+//
+// In addition the former strategy also includes Risk Management.
+//
+// ImplementedStrategy suggested pair and timeframe - BEGIN
+// It was originally tested at BTCUSDT pair and 1H timeframe.
+// ImplementedStrategy suggested pair and timeframe - END
+//
+// Template public description - BEGIN
+// Before using this documentation it's recommended that you:
+// [LIST]
+// [*] Use default TradingView strategy script or another script and setup its associated alert manually. Just make the alert pop-up in the screen.
+// [*] Create a 'Copy-Trader provider' (or Signal Provider) in Zignaly and send signals to it either thanks to your browser or with some basic programming.
+// [/LIST]
+
+// [B]SETTINGS[/B]
+// [B]__ SETTINGS - Capital[/B]
+// [LIST]
+// [*] (CAPITAL) Capital quote invested per order in USDT units {100.0}. This setting is only used when '(ZIG) Provider type' is set to 'Signal Provider'.
+// [*] (CAPITAL) Capital percentage invested per order (%) {25.0}. This setting is only used when '(ZIG) Provider type' is set to 'Copy Trader Provider'.
+// [/LIST]
+// [B]__ SETTINGS - Misc[/B]
+// [LIST]
+// [*] (ZIG) Enable Alert message {True}: Whether to enable alert message or not.
+// [*] (ZIG) Service Secret Key {MYSECRETKEY}: Your service secret key. You can find it in your service Edit tab.
+// [*] (DEBUG) Enable debug on order comments {False}: Whether to show alerts on order comments or not.
+// [*] Number of decimal digits for Prices {2}.
+// [*] (DECIMAL) Maximum number of decimal for contracts {3}.
+// [/LIST]
+// [B]__ SETTINGS - Zignaly[/B]
+// [LIST]
+// [*] (ZIG) Integration type {TradingView only}: [b]Hybrid[/b]: Both TradingView and Zignaly handle take profit, trailing stops and stop losses. Useful if you are scared about TradingView not firing an alert. It might arise problems if TradingView and Zignaly get out of sync. [b]TradingView only[/b]: TradingView sends entry and exit orders to Zignaly so that Zignaly only buys or sells. Zignaly won't handle stop loss or other settings on its own.
+// [*] (ZIG) Zignaly Alert Type {WebHook}: 'Email' or 'WebHook'.
+// [*] (ZIG) Provider type {Profit Sharing Provider}: 'Profit Sharing Provider', 'Copy Trader Provider', or 'Signal Provider'. 'Copy Trader Provider' or 'Profit Sharing Provider' sends a percentage to manage. 'Signal Provider' sends a quote to manage.
+// [*] (ZIG) Exchange {Zignaly}: 'Zignaly', 'Binance' or 'Kucoin'.
+// [*] (ZIG) Exchange Type {Futures}: 'Spot' or 'Futures'.
+// [*] (ZIG) Leverage {1}. Set it to '1' when '(ZIG) Exchange Type' is set to 'Spot'.
+// [/LIST]
+// [B]__ SETTINGS - Strategy[/B]
+// [LIST]
+// [*] (STRAT) Strategy Type: 'Long and Short', 'Long Only' or 'Short Only'.
+// [*] (STRAT) Strategy Start Time {2021-01-01 00:00:00}: When to start the strategy if '(STRAT) Strategy Start Time forced?' setting is set to true.
+// [*] (STRAT) Strategy Stop Time {2021-12-31 00:00:00}: When to stop the strategy if '(STRAT) Strategy Stop Time forced?' setting is set to true.
+// [*] (STRAT) Strategy Start Time forced? {True}: Whether to start the strategy from a given point in time.
+// [*] (STRAT) Strategy Stop Time forced? {False}: Whether to stop the strategy after a given point in time.
+// [*] (STOPTAKE) Take Profit? {false}: Whether to enable Take Profit.
+// [*] (STOPTAKE) Stop Loss? {True}: Whether to enable Stop Loss.
+// [*] (TRAILING) Enable Trailing Take Profit (%) {True}: Whether to enable Trailing Take Profit.
+// [*] (STOPTAKE) Take Profit % {3.0}: Take profit percentage. This setting is only used when '(STOPTAKE) Take Profit?' setting is set to true.
+// [*] (STRAT) Risk/Reward Ratio % {1.5}. Take Profit is StopLoss times Risk/Reward Ratio set here.
+// [*] (STOPTAKE) Stop Loss % {2.0}: Stop loss percentage. This setting is only used when '(STOPTAKE) Stop Loss?' setting is set to true.
+// [*] (TRAILING) Trailing Take Profit Trigger (%) {2.5}: Trailing Stop Trigger Percentage. This setting is only used when '(TRAILING) Enable Trailing Take Profit (%)' setting is set to true.
+// [*] (TRAILING) Trailing Take Profit as a percentage of Trailing Take Profit Trigger (%) {25.0}: Trailing Stop Distance Percentage. This setting is only used when '(TRAILING) Enable Trailing Take Profit (%)' setting is set to true.
+// [*] (RECENT) Number of minutes to wait to open a new order after the previous one has been opened {6}.
+// [/LIST]
+// [B]____ SETTINGS - Risk Management [/B]
+// [list]
+// [*] (RISKM) Risk Management Type: 'Safe', 'Somewhat safe compound' or 'None'. '[b]Safe[/b]': Calculations are always done with the initial capital (1000) in mind. The maximum losses per trade/day/week/month are taken into account. '[b]Somewhat safe compound[/b]': Calculations are done with initial capital (1000) or a higher capital if it increases. The maximum losses per trade/day/week/month are taken into account. '[b]None[/b]': In each order all the current capital is gambled and only the default stop loss per order is taken into account. That means that the maximum losses per trade/day/week/month are not taken into account. [b]Default[/b]: 'Somewhat safe compound'.
+// [*] (RISKM) Maximum loss per trade % {1.0}.
+// [*] (RISKM) Maximum loss per day % {6.0}.
+// [*] (RISKM) Maximum loss per week % {8.0}.
+// [*] (RISKM) Maximum loss per month % {10.0}.
+// [/list]
+
+// [B]DEFAULT SETTINGS[/B]
+
+// By default this strategy has been setup with these beginner settings:
+// [LIST]
+// [*] '(ZIG) Integration type' : TradingView only
+// [*] '(ZIG) Provider type'    : 'Copy Trader Provider'
+// [*] '(ZIG) Exchange'         : 'Binance'
+// [*] '(ZIG) Exchange Type'    : 'Spot'
+// [*] '(STRAT) Strategy Type'  : 'Long Only'
+// [*] '(ZIG) Leverage'         : '1' (Or no leverage)
+// [/LIST]
+// but you can change those settings if needed.
+
+
+// [B]FIRST STEP[/B]
+// [LIST]
+// [*] For both future or spot markets you should make sure to change '(ZIG) Zignaly Alert Type' to match either WebHook or Email. If you have a non paid account in TradingView as in October 2020 you would have to use Email which it's free to use.
+// [/LIST]
+
+// [B]RECOMMENDED SETTINGS[/B]
+// [B]__ RECOMMENDED SETTINGS - Spot markets[/B]
+// [LIST]
+// [*] '(ZIG) Exchange Type'   setting should be set to 'Spot'
+// [*] '(STRAT) Strategy Type' setting should be set to 'Long Only'
+// [*] '(ZIG) Leverage'        setting should be set to '1'
+// [/LIST]
+// [B]__ RECOMMENDED SETTINGS - Future markets[/B]
+// [LIST]
+// [*] '(ZIG) Exchange Type'   setting should be set to 'Futures'
+// [*] '(STRAT) Strategy Type' setting should be set to 'Long and Short'
+// [*] '(ZIG) Leverage'        setting might be changed if desired.
+// [/LIST]
+// [B]__ RECOMMENDED SETTINGS - Signal Providers[/B]
+// [LIST]
+// [*] '(ZIG) Provider type'   setting should be set to 'Signal Provider'
+// [*] '(CAPITAL) Capital quote invested per order in USDT units' setting might be changed if desired.
+// [/LIST]
+// [B]__ RECOMMENDED SETTINGS - Copy Trader Providers[/B]
+// [LIST]
+// [*] '(ZIG) Provider type'   setting should be set to 'Copy Trader Provider'
+// [*] '(CAPITAL) Capital percentage invested per order (%)' setting might be changed if desired.
+// [*] Strategy Properties setting: 'Initial Capital' might be changed if desired.
+// [/LIST]
+
+// [B]INTEGRATION TYPE EXPLANATION[/B]
+// [LIST]
+// [*] 'Hybrid': Both TradingView and Zignaly handle take profit, trailing stops and stop losses. Useful if you are scared about TradingView not firing an alert. It might arise problems if TradingView and Zignaly get out of sync.
+// [*] 'TradingView only': TradingView sends entry and exit orders to Zignaly so that Zignaly only buys or sells. Zignaly won't handle stop loss or other settings on its own.
+// [/LIST]
+
+// [B]HOW TO USE THIS STRATEGY[/B]
+// [LIST]
+// [*] Beginner: Copy and paste the strategy and change it to your needs. Turn off '(DEBUG) Enable debug on order comments' setting.
+// [*] Medium: Reuse functions and inputs from this strategy into your own as if it was a library.
+// [*] Advanced: Check Strategy Tester. List of trades. Copy and paste the different suggested 'alert_message' variable contents to your script and change them to your needs.
+// [*] Expert: You needed a way to pass data from TradingView script to the alert. Now you know it's the 'alert_message' variable. You can find several examples in the source code using the variable. You also have seen 'ALERTS SETUP' explanation below. An additional quick look at 'Strategy Tester', 'List of Trades' and you are ready to go.
+// [/LIST]
+
+
+// [B] ALERTS SETUP[/B]
+// This is the important piece of information that allows you to connect TradingView to Zignaly in a semi-automatic manner.
+// [B] __ ALERTS SETUP - WebHook[/B]
+// [LIST]
+// [*] Webhook URL: https : // zignaly . com / api / signals.php?key=MYSECRETKEY
+// [*] Message: {{strategy.order.alert_message}}
+// [/LIST]
+// [B] __ ALERTS SETUP - Email[/B]
+// [LIST]
+// [*] Setup a new Hotmail account
+// [*] Add it as an 'SMS email' in TradingView Profile settings page.
+// [*] Confirm your own the email address
+// [*] Create a rule in your Hotmail account that 'Redirects' (not forwards) emails to 'signals @ zignaly . email' when (1): 'Subject' includes 'Alert', (2): 'Email body' contains string 'MYZIGNALYREDIRECTTRIGGER' and (3): 'From' contains 'noreply @ tradingview . com'.
+// [*] In 'More Actions' check: Send Email-to-SMS
+// [*] Message: {{strategy.order.alert_message}}
+// MYZIGNALYREDIRECTTRIGGER
+// [/LIST]
+
+
+// '(DEBUG) Enable debug on order comments' is turned on by default so that you can see in the Strategy Tester. List of Trades. The different orders alert_message that would have been sent to your alert. You might want to turn it off it some many letters in the screen is problem.
+
+// [B]STRATEGY ADVICE[/B]
+// [LIST]
+// [*] If you turn on 'Take Profit' then turn off 'Trailing Take Profit'.
+// [/LIST]
+//
+// [B]ZIGNALY SIDE ADVICE[/B]
+// [LIST]
+// [*] If you are a 'Signal Provider' make sure that 'Allow reusing the same signalId if there isn't any open position using it?' setting in the profile tab is set to true.
+// [*] You can find your 'MYSECRETKEY' in your 'Copy Trader/Signal' provider Edit tab at 'Signal URL'.
+// [/LIST]
+//
+// [B]ADDITIONAL ZIGNALY DOCUMENTATION[/B]
+// This beginner's guide is quite basic and meant to be an introduction. Please read additional documentation to learn what you actually can do with Zignaly.
+// [LIST]
+// [*] docs . zignaly . com / signals / how-to -- How to send signals to Zignaly
+// [*] help . zignaly . com / hc/en-us/categories/360002703720-Sending-Signals -- Sending zignals
+// [/LIST]
+//
+// [B]FINAL REMARKS[/B]
+// [LIST]
+// [*] This strategy tries to match the Pine Script Coding Conventions as best as possible.
+// [*] You can check my 'Ruckard TradingLatino' strategy for a more complex strategy that it's also integrated with Zignaly. Unfortunatley it does not use Pine Script Coding Conventions as much.
+// [/LIST]
+// Template public description - END
+
+// ImplementedStrategy public description - BEGIN
+// ImplementedStrategy public description - END
+
+// Tradingview Public description - END
+
+strategy('Trailering I005', shorttitle='I005Trailering', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=24000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+
+import ruckard/RiskManagementBeta/4 as rm
+import ruckard/Zignaly2Beta/4 as zig
+
+// INPUTS - BEGIN
+
+// Template inputs - BEGIN
+
+// Zignaly - Inputs
+i_enableZignalyAlert = input(true, title='Alert Message', group='Zignaly', inline='ZignalyEnable', tooltip='Enable Alert Message for Zignaly.\nDefault: Enabled.')
+i_zignalyServiceSecretKey = input.string('MYSECRETKEY', title='Service Secret Key', group='Zignaly', inline='ZignalySecretKey', tooltip='MYSECRETKEY')
+_ZIGHYBRIDINTEGRATION_ = 'Hybrid', _ZIGTVONLYINTEGRATION_ = 'TradingView only'
+i_zignalyIntegrationTypePre = input.string(_ZIGHYBRIDINTEGRATION_, title='Integration', options=[_ZIGTVONLYINTEGRATION_, _ZIGHYBRIDINTEGRATION_], group='Zignaly', inline='ZignalySecretKey', tooltip='Default: ' + _ZIGHYBRIDINTEGRATION_)
+i_zignalyIntegrationType = (i_zignalyIntegrationTypePre == _ZIGHYBRIDINTEGRATION_) ? 'hybrid' : 'nonhybrid'
+
+string i_zignalyProviderType = 'copytrader'
+string i_zignalyAlertType = 'webhook'
+string i_zignalyExchange = 'Zignaly'
+
+_ZIGEXTYPESPOT_ = 'spot', _ZIGEXFUTURES_ = 'futures'
+i_zignalyExchangeType = input.string(_ZIGEXFUTURES_, title='Exchange Type', options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_], group='Zignaly', inline='ZignalyExchangeType', tooltip='Default: ' + _ZIGEXFUTURES_)
+i_zignalyLeverage = input.int(24, 'Leverage', minval=1, step=1, maxval=125, group='Zignaly', inline='ZignalyLeverage', tooltip='Default: 1x')
+var i_zignalyLeverage_str = str.tostring(i_zignalyLeverage)  // It needs to run only once
+
+i_enableZignalyHedgeMode = input.bool(true, title='Hedge Mode', group='Zignaly', inline='ZignalyHedgeMode', tooltip='If HedgeMode is enabled for the Profit Sharing service you probably want this to be enabled so that it allows you open both long and short positions at the same time.\nThis is useful when you run multiple strategies against the same Profit Sharing service.\nDefault: Enabled.')
+i_enableIgnoreOpenContractCheck = input.bool(true, title='Ignore Open Contract Check', group='Zignaly', inline='IgnoreOpenContractCheck', tooltip='It allows you to open several positions for the same pair and same side.\nThis is useful when you run multiple strategies against the same Profit Sharing service.\nDefault: Enabled.')
+
+i_enableOrderCommentDebug = input.bool(false, title='DEBUG on order comments', group='Zignaly', inline='ZignalyDebug', tooltip='Default: Disabled.')
+
+// Strategy - Inputs
+L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
+i_strategyType = input.string(_REVERSE_, 'Type', options=[L_S, _L_, _S_, _REVERSE_], group='Strategy', inline='StrategyType', tooltip='Default: ' + _REVERSE_)
+
+i_enableLongStrictStrategy = input.bool(false, title='(L) Strict mode', group='Strategy', inline='StrategyStrictMode')
+i_enableShortStrictStrategy = input.bool(false, '(S)', group='Strategy', inline='StrategyStrictMode', tooltip='Ignore other side advice when being in a single side.\nE.g. If type is set to Long Only do not close the trade when Short would have opened a trade.\n(L) = Long.\n(S) = Short.\nDefault for (L): Disabled.\nDefault for (S): Disabled.')
+i_strategyStartTimeOn = input.bool(true, title='', group='Strategy', inline='StrategyStartTime')
+i_strategyStartTime = input.time(timestamp('01 Jan 2021'), title= 'Starts at:', group='Strategy', inline='StrategyStartTime', tooltip='Default: Enabled.\nStarts at 2021-01-01 00:00:00.')
+
+i_strategyStopTimeOn = input.bool(false, title='', group='Strategy', inline='StrategyStopTime')
+i_strategyStopTime = input.time(timestamp('31 Dec 2021'), title= 'Ends at:', group='Strategy', inline='StrategyStopTime', tooltip='Default: Disabled.\n Ends at 2021-12-31 00:00:00.')
+
+// SubStrategies - Inputs
+i_subStrategiesLookback = input.int(1, title='Lookback', group='SubStrategies', inline='SubStrategies')
+i_subStrategiesMinimum = input.int(2, title='Minimum', group='SubStrategies', inline='SubStrategies', tooltip='Take a look at the 1 latest candles and then if a minimum of 1 substrategy triggers to open a trade then open the trade.\nDefaults:\nLookback: 1\nMinimum: 2')
+
+// Take Profit - Inputs
+i_enableTakeProfit = input.bool(true, title='Take Profit', group='Take Profit', inline='TakeProfitSimple')
+i_takeProfit = input.float(1.10, title='(%)', group='Take Profit', inline='TakeProfitSimple', tooltip='Make sure this is Enabled if you want to be able to Take Profit and any of its forms like, e.g., based on Risk/Reward Ratio.\nDefault: Enabled.\nDefault: 1.10%.')
+i_takeProfitPerOne = i_takeProfit / 100
+i_enableTakeProfitDefaultLogic = input.bool(false, title='Take Profit Default Logic', group='Take Profit', inline='TakeProfitLogic', tooltip='Turn on TakeProfit default logic.\nOnly useful if you code your own TakeProfit logic.\n Default: false.')
+
+i_enableRiskRewardRatio = input.bool(true, title='Use this', group='Take Profit', inline='TakeProfitRiskRewardRatio')
+i_positionRatio = input.float(0.50, title='Risk/Reward Ratio', minval=0.01, group='Take Profit', inline='TakeProfitRiskRewardRatio', tooltip='Default: Enabled.\nDefault: 0.50%')
+
+// Trailing Take Profit - Inputs
+i_enableTrailingTakeProfit = input.bool(false, title='', group='Take Profit', inline='TrailingTakeProfit')
+i_trailingTakeProfitPercentageTrigger = input.float(1.2, title='Trailing Take Profit (%)', minval=0, step=0.01, group='Take Profit', inline='TrailingTakeProfit')
+i_trailingTakeProfitPercentageTriggerPerOne = i_trailingTakeProfitPercentageTrigger * 0.01
+i_trailingTakeProfitPercentageOffset = input.float(25.0, title='(%)', minval=0, step=0.01, group='Take Profit', inline='TrailingTakeProfit', tooltip='Start Trailing Stop on 1.2% with a 0.3% distance.\nExplanation: 25% of 1.2 = 0.3.\nDefaults:\nEnable: False.\nTrigger at: 1.2 %.\nPercentage offset: 25.0 % .')
+i_trailingTakeProfitPercentageOffsetPerOne = i_trailingTakeProfitPercentageOffset * 0.01
+
+// Stop Loss - Inputs
+i_enableStopLoss = input.bool(true, 'Stop Loss', group='Stop Loss', inline='StopLossSimple')
+i_stopLoss = input.float(7.0, title='(%)', minval=0.01, group='Stop Loss', inline='StopLossSimple', tooltip='Make sure this is Enabled if you want to be able to Stop Loss in any of its forms like, e.g., based on ATR.\nDefaults:\nEnable: true.\nStop Loss: 7.0%') * 0.01
+i_enableStopLossDefaultLogic = input.bool(false, title='Stop Loss Default Logic', group='Stop Loss', inline='StopLossLogic', tooltip='Turn on StopLoss default logic.\nOnly useful if you code your own StopLoss logic.\n Default: false.')
+
+_SLConstant_ = 'Constant', _SLATR_ = 'ATR'
+i_stopLossTypePre = input.string(_SLATR_, 'Type', options=[_SLConstant_, _SLATR_], group='Stop Loss', inline='StopLossType', tooltip='Default: ' + _SLATR_)
+i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossTypePre == _SLATR_) ? 'atr' : ''
+
+i_atrStopLossLength = input.int(14, minval = 1,  title = 'ATR Stop Loss', group='Stop Loss', inline='StopLossATR')
+i_atrStopLossSource = input.source(close, title = '', group='Stop Loss', inline='StopLossATR')
+i_atrStopLossMultiplier = input.float(1.5, title='', minval=0.01, group='Stop Loss', inline='StopLossATR', tooltip='Default: 1.50 times a 14 length ATR based on close values.')
+
+// Break Even - Inputs
+i_enableBreakEven = input.bool(false, title='Break Even', group='Break Even', inline='BreakEvenSimple')
+i_breakEvenTrigger = input.float(1.0, '(%)', minval=0, step=0.01, group='Break Even', inline='BreakEvenSimple')
+i_breakEvenTriggerPerOne = i_breakEvenTrigger * 0.01
+i_breakEven = input.float(0.20, '(%)', minval=0, step=0.01, group='Break Even', inline='BreakEvenSimple', tooltip='Default: Disabled.\nDefault: When the price reaches 1.0 % set a 0.20% Stop Loss.')
+i_breakEvenPerOne = i_breakEven * 0.01
+
+i_enableRiskBreakevenTriggerRatio = input.bool(false, title='Use this', group='Break Even', inline='BreakEvenTriggerRatio')
+i_breakevenTriggerRatio = input.float(1.0, title='Risk/BreakEvenTrigger Ratio', minval=0.01, group='Break Even', inline='BreakEvenTriggerRatio', tooltip='Default: Disabled.\nDefault: Breakeven Trigger is calculated from a 1.0% Risk/BreakEvenTrigger Ratio.\nThis is similar to how Take Profit might be calculated based on the traditional Risk/Reward ratio.')
+
+i_enableCustomBreakEven = input.bool(false, title='Custom Break Even', group='Break Even', inline='BreakEvenCustom', tooltip='Use a custom coded breakeven instead of the default one.\nDefault: Disabled.')
+
+// Risk Management - Inputs
+i_CapitalQuote = input.float(100.0, title='USDT units per order', group='Risk Management', inline='CapitalQuote', tooltip='Deprecated and ignored. This could be used as a SignalProvider to force a given amount to Zignaly itself. TODO: We need to repurpose it for the Profit Sharing 2.0 new amount option.\nDefault: 100.0.')
+i_CapitalPercentage = input.float(25.0, title='Capital invested per order (%)', minval=0, step=0.01, group='Risk Management', inline='CapitalPercentage', tooltip='Sets each order quantity to this percentage of the initial capital.\nDefault: 25.0 %.') * 0.01
+
+_SAFE_ = 'Safe', _SCOMPOUND_ = 'Somewhat safe compound', _NONE_ = 'None', _CUSTOM_ = 'Custom', _FORCED_ = 'Forced'
+i_riskManagementTypePre = input.string(_SCOMPOUND_, 'Type', options=[_SAFE_, _SCOMPOUND_, _NONE_, _CUSTOM_, _FORCED_], group='Risk Management', inline='RiskManagementType', tooltip=
+ str.upper(_SAFE_) + ': Quantity is automatically choosen. When the StopLoss is hit you are only going to loose the Maximum loss per trade setting applied to your initial capital.\n' +
+ str.upper(_SCOMPOUND_) + ': Quantity is automatically choosen. When the StopLoss is hit you are only going to loose the Maximum loss per trade setting applied to your current capital.\n' +
+ str.upper(_NONE_) + ': Quantity will be your current total capital.\n' +
+ str.upper(_CUSTOM_) + ': Quantity will be set based on Capital invested per order (%).\n' +
+ str.upper(_FORCED_) + ': Quantity will be set based on Capital invested per order (%).\n' +
+ 'Default: ' + _SCOMPOUND_)
+i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
+
+i_riskManagementMaximumLossPerTrade = input.float(0.084, title='Maximum loss per trade (%)', group='Risk Management', inline='RiskManagementMaximumLossPerTrade', tooltip='How much of your initial or current capital you want to lose as a maximum per trade.\nIt only works in ' + _SAFE_ + ' type and in ' + _SCOMPOUND_ + ' type. ' + '\nDefault: 1.0 %.') * 0.01
+
+i_riskManagementMaximumLossPerDay = input.float(6.0, title='... per D/W/M (%)', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
+i_riskManagementMaximumLossPerWeek = input.float(8.0, title='', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
+i_riskManagementMaximumLossPerMonth = input.float(10.0, title='', group='Risk Management', inline='RiskManagementMaximumLossPerDay', tooltip='Try not to lose more than this percentage per choosen period.\nPlease notice that these settings are ignored when using ' + _NONE_ + ' or ' + _FORCED_ + ' types. ' + '\nDefaults: \nDay (D): 6.0 %. \nWeek (W): 8.0 %. \nMonth (M): 10.0 %') * 0.01
+
+// Volatility Protection - Inputs
+i_enableVolatilityProtection = input.bool(false, title='Enable', group='ATR Volatility Protection', inline='ATRVolatilityProtectionEnable')
+i_showAtrVolatilityMultiplier = input.bool(false, title='Show', group='ATR Volatility Protection', inline='ATRVolatilityProtectionEnable', tooltip='Defaults:\nEnable: False.\nShow: False.')
+
+i_atrVolatilityLength = input.int(14, minval = 1,  title='ATR', group='ATR Volatility Protection', inline='ATRVolatilityATR')
+i_atrVolatilitySource = input.source(close, title='', group='ATR Volatility Protection', inline='ATRVolatilityATR', tooltip='Defaults:\nLength: 14.\nSource: close.')
+i_atrVolatilityMinimumMultiplier = input.float(1.10, title='Minimum/Maximum (%)', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax')
+i_atrVolatilityMaximumMultiplier = input.float(2.00, title='', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax', tooltip='Defaults:\nMinimum: 1.10 %.\nMaximum: 2.00 %.')
+
+// Enforce Higher Timeframe Trend - Inputs
+i_higherTimeframeTrendMaEnforce = input.bool(false, title='Enable', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
+i_showHigherTimeframeTrendMa = input.bool(false, title='Show', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow', tooltip='Defaults:\nEnable: False.\nShow: False.')
+
+i_higherTimeframeTrendMaTimeframe = input.timeframe('60', title='Timeframe/Offset', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
+i_higherTimeframeTrendMaOffset = input.int(0, title='', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset', tooltip='Defaults:\nTimeframe: 1 hour.\nOffset: 0 bars.')
+
+i_higherTimeframeTrendFastMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Fast MA', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
+i_higherTimeframeTrendFastMaLength = input.int(10, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
+i_higherTimeframeTrendFastMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa', tooltip='Defaults:\nType: VWMA.\nLength: 10.\nSource: close.')
+
+i_higherTimeframeTrendSlowMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Slow MA', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
+i_higherTimeframeTrendSlowMaLength = input.int(55, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
+i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa', tooltip='Defaults:\nType: VWMA.\nLength: 55.\nSource: close.')
+
+// Too old order - Inputs
+i_enableTooOldLongOrderClose = input.bool(true, title='(L)', group='Too Old Orders', inline='Too Old Long Orders')
+i_tooOldLongBarsNumber = input.int(24, title='', minval=1, maxval=100, step=1, group='Too Old Orders', inline='Too Old Long Orders')
+i_tooOldLongStopLoss = input.float(-100.0, title='', minval=-100.0, step=0.01, group='Too Old Orders', inline='Too Old Long Orders', tooltip='Close when the order is older than the number of bars and less than the specified StopLoss percentage.\n You can use StopLoss negative values in order to have something similar to a BreakEven.\n(L): Long\n(S): Short\nDefaults:\Enable: True.\nBars Number: 24.\nStop Loss (%): -100.0 %.')
+i_tooOldLongStopLossPerOne = i_tooOldLongStopLoss * 0.01
+
+i_enableTooOldShortOrderClose = input.bool(true, title='(S)', group='Too Old Orders', inline='Too Old Short Orders')
+i_tooOldShortBarsNumber = input.int(24, title='', minval=1, maxval=100, step=1, group='Too Old Orders', inline='Too Old Short Orders')
+i_tooOldShortStopLoss = input.float(-100.0, title='', minval=-100.0, step=0.01, group='Too Old Orders', inline='Too Old Short Orders', tooltip='Close when the order is older than the number of bars and less than the specified StopLoss percentage.\nYou can use negative values in order to have something similar to a BreakEven.\n(L): Long\n(S): Short\nDefaults:\nEnable: True.\nBars Number: 24.\nStop Loss (%): -100.0 %.')
+i_tooOldShortStopLossPerOne = i_tooOldShortStopLoss * 0.01
+
+// RSI Protection - Inputs
+i_enableLongRSIProtection = input.bool(false, title='(L)', group='RSI Protection', inline='RSIProtection')
+i_longRSIProtectionLevel = input.float(45.0, title='', group='RSI Protection', inline='RSIProtection', tooltip='Not greater than')
+i_enableShortRSIProtection = input.bool(false, title='(S)', group='RSI Protection', inline='RSIProtection')
+i_shortRSIProtectionLevel = input.float(58.0, title='', group='RSI Protection', inline='RSIProtection', tooltip='Defaults:\n(L): Long. Disabled.\n (L): Not greater than 45.0.\n(S): Short. Disabled.\n(S). Not lower than 58.0.')
+
+i_enableRSIProtectionCustomTimeframe = input.bool(true, title='Custom Timeframe', group='RSI Protection', inline='RSIProtectionTimeframe')
+i_RSIProtectionCustomTimeframe = input.timeframe('180', title='', group='RSI Protection', inline='RSIProtectionTimeframe', tooltip='Default: Enabled.\n Default: 3 hours.')
+
+i_RSIProtectionLength = input.int(14, minval=1, title='RSI', group='RSI Protection', inline='RSIProtectionRSI')
+i_RSIProtectionSource = input.source(close, title='', group='RSI Protection', inline='RSIProtectionRSI', tooltip='Defaults:\nLength: 14.\n Source: close.')
+
+// Curie Closing Lines - Inputs
+i_enableCurieClosingLines = input.bool(false, title='Enable', group='Curie Closing Lines', inline='CurieEnableShow')
+i_showCurieClosingLines = input.bool(false, title='Show', group='Curie Closing Lines', inline='CurieEnableShow', tooltip='Defaults:\nEnable: False.\nShow: False.')
+
+i_curieHighClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'High MA', group='Curie Closing Lines', inline='High Closing Ma')
+i_curieHighClosingMaLength = input.int(20, minval = 1,  title = '', group='Curie Closing Lines', inline='High Closing Ma')
+i_curieHighClosingMaSource = input.source(ohlc4, title = '', group='Curie Closing Lines', inline='High Closing Ma', tooltip='Defaults:\nMA type: SMA.\nMA Length: 20\nMA source: ohlc4.')
+
+i_curieHighestClosingMaLength = input.int(5, minval = 1,  title = 'Highest MA Length', group='Curie Closing Lines', tooltip='Select the highest of the latest 5 High MA values.\nDefault:\nLength: 5.')
+
+i_curieLowClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'Low MA', group='Curie Closing Lines', inline='Low Closing Ma')
+i_curieLowClosingMaLength = input.int(25, minval = 1,  title = '', group='Curie Closing Lines', inline='Low Closing Ma')
+i_curieLowClosingMaSource = input.source(ohlc4, title = '', group='Curie Closing Lines', inline='Low Closing Ma', tooltip='Defaults:\nMA type: SMA.\nMA Length: 25\nMA source: ohlc4.')
+
+i_curieLowestClosingMaLength = input.int(10, minval = 1,  title = 'Lowest MA Length', group='Curie Closing Lines', tooltip='Select the lowest of the latest 10 Low MA values.\nDefault:\nLength: 10.')
+
+i_curieSource = input.source(ohlc4, title = 'Source', group='Curie Closing Lines', tooltip='Price which we compare to the current Curie closing lines.\nDefault: ohlc4.')
+
+// RSI Closing - Inputs
+i_enableLongRSIClosing = input.bool(false, title='(L)', group='RSI Closing', inline='RSIClosing')
+i_longRSIClosingLevel = input.float(55.0, title='', group='RSI Closing', inline='RSIClosing')
+i_enableShortRSIClosing = input.bool(false, title='(S)', group='RSI Closing', inline='RSIClosing')
+i_shortRSIClosingLevel = input.float(45.0, title='', group='RSI Closing', inline='RSIClosing', tooltip='Defaults:\n(L): Long. Disabled.\n (L): Close when crossing under 55.0.\n(S): Short. Disabled.\n(S). Close when crossing over 45.0.')
+
+i_enableRSIClosingCustomTimeframe = input.bool(false, title='Custom Timeframe', group='RSI Closing', inline='RSIClosingTimeframe')
+i_RSIClosingCustomTimeframe = input.timeframe('180', title='', group='RSI Closing', inline='RSIClosingTimeframe', tooltip='Default: Disabled.\nDefault: 3 hours.')
+
+i_RSIClosingLength = input.int(14, minval=1, title='RSI', group='RSI Closing', inline='RSIClosingRSI')
+i_RSIClosingSource = input.source(close, title='', group='RSI Closing', inline='RSIClosingRSI', tooltip='Defaults:\nLength: 14.\n Source: close.')
+
+i_enableLongRSIClosingAutoLevel = input.bool(false, title='(L) Auto Level', group='RSI Closing', inline='longRSIClosingAutoLevel')
+i_longRSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='longRSIClosingAutoLevel')
+i_longRSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='longRSIClosingAutoLevel', tooltip='(L): Long.\nDefaults:\nEnable: false.\nAuto Bars: 55.\nLookback Bars: 42.')
+
+i_enableShortRSIClosingAutoLevel = input.bool(false, title='(S) Auto Level', group='RSI Closing', inline='shortRSIClosingAutoLevel')
+i_shortRSIClosingAutoBarsNumber = input.int(55, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel')
+i_shortRSIClosingLookbackBarsNumber = input.int(42, minval=1, title='', group='RSI Closing', inline='shortRSIClosingAutoLevel', tooltip='(S): Short.\nDefaults:\nEnable: false.\nAuto Bars: 55.\nLookback Bars: 42.')
+
+// ADX Protection - Inputs
+i_enableLongADXProtection = input.bool(false, title='(L)', group='ADX Protection', inline='LongADXProtection')
+i_longADXProtectionMinimum = input.float(20.0, title='', group='ADX Protection', inline='LongADXProtection')
+i_longADXProtectionMaximum = input.float(30.0, title='', group='ADX Protection', inline='LongADXProtection', tooltip='Do not open a new order if ADX is inside this 20.0 - 30.0 range. \n(L): Long.\nDefaults:\nEnable: false.\nMinimum: 20.0.\nMaximum: 30.0.')
+
+i_enableShortADXProtection = input.bool(false, title='(S)', group='ADX Protection', inline='ShortADXProtection')
+i_shortADXProtectionMinimum = input.float(20.0, title='', group='ADX Protection', inline='ShortADXProtection')
+i_shortADXProtectionMaximum = input.float(30.0, title='', group='ADX Protection', inline='ShortADXProtection', tooltip='Do not open a new order if ADX is inside this 20.0 - 30.0 range. \n(S): Short.\nDefaults:\nEnable: false.\nMinimum: 20.0.\nMaximum: 30.0.')
+
+i_enableADXProtectionCustomTimeframe = input.bool(false, title='Custom Timeframe', group='ADX Protection', inline='ADXProtectionTimeframe')
+i_ADXProtectionCustomTimeframe = input.timeframe('180', title='', group='ADX Protection', inline='ADXProtectionTimeframe', tooltip='Default: Disabled.\nDefault: 3 hours.')
+
+i_ADXProtectionDiLength = input.int(14, minval=1, title='ADX', group='ADX Protection', inline='ADXProtectionADX')
+i_ADXProtectionSmoothing = input.int(14, title='', minval=1, maxval=50, group='ADX Protection', inline='ADXProtectionADX', tooltip='Defaults:\nLength: 14.\nSmoothing: 14.')
+
+// Misc - Inputs
+i_priceDecimalDigits = input.int(2, title='Number of decimal digits for Prices', minval=0, maxval=10, step=1, group='Misc', inline='Misc1', tooltip='Default: 2')
+i_contractMaximumDecimalNumber = input.int(3, title='Maximum number of decimal for contracts', minval=0, group='Misc', inline='Misc2', tooltip='Default: 3')
+i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new order after the previous one has been opened', minval=0, step=1, group='Misc', inline='Misc3', tooltip='Default: 0')
+
+// Template inputs - END
+
+// ImplementedStrategy inputs - BEGIN
+
+i_enableTraileringTakeProfit = input.bool(true, title='Enable Trailering TakeProfit {True}', group='Trailering')
+i_enableTraileringStopLoss = input.bool(true, title='Enable Trailering StopLoss {True}', group='Trailering')
+i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
+
+i_virtTakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
+i_virtTakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit Maximum Loss Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
+i_virtTraileringOffset = input.int(0, title='Trailering Offset {0}', group='Trailering')
+i_virtTraileringPeriod = input.int(24, minval=2, title='Trailering Period {24}', group='Trailering')
+
+i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
+i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
+i_traileringAtrTakeProfitMultiplier = input.float(1.25, title='ATR Take Profit Multiplier % {1.25}', minval=0.01, group='Trailering')
+
+i_traileringTakeProfitPercentage = input.float(130.0, minval = 0.001, title='Take Profit Percentage {130.0 %}', group='Trailering')
+i_traileringTakeProfitPerOne = i_traileringTakeProfitPercentage * 0.01
+
+i_volumeBounceMinimumRatio = input.float(2.5, title='Min Ratio % {2.5}', minval=0.01, group='Volume Bounce')
+i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=0.01, group='Volume Bounce')
+
+// ImplementedStrategy inputs - END
+
+// Strategy - INIT - BEGIN
+
+var offsetString = '-' + str.tostring(i_virtTraileringOffset)
+var longSignalIdString = 'LONG-' + syminfo.ticker + offsetString
+var shortSignalIdString = 'SHORT-' + syminfo.ticker + offsetString
+var reverseSignalIdString = 'REVERSE-' + syminfo.ticker + offsetString
+
+string stringNA = na
+
+onStartTimeInterval = (not i_strategyStartTimeOn) or (time >= i_strategyStartTime)
+offStopTimeInterval = (i_strategyStopTimeOn) and (time > i_strategyStopTime)
+
+// order Stop Loss
+var float orderStopLossPerOne = na
+var float orderStopLoss = orderStopLossPerOne
+
+var float customBreakEvenPerOne = na
+var float customBreakEven = customBreakEvenPerOne
+
+// ImplementedStrategy init variables - BEGIN
+// ImplementedStrategy init variables - END
+
+// Dynamic Trailing Take Profit - Variables
+
+var int buyOrderOpenBarIndex = na
+var int sellOrderOpenBarIndex = na
+
+// Breakeven accounting - Variables
+var bool breakEvenTriggered = false
+var bool breakEvenNeedsTrigger = false
+var bool customBreakEvenNeedsTrigger = false
+
+// Handle to avoid two long and short orders being too next to each other
+var bool insideABuyOrder = false
+var bool insideASellOrder = false
+
+var int lastOrderOpenBarTime = na
+
+// Handle recalculate after Stop Loss / Take Profit order
+if (strategy.position_size == 0.0)
+    insideABuyOrder := false
+    insideASellOrder := false
+else
+    lastOrderOpenBarTime := time_close
+
+if (strategy.position_size > 0.0)
+    insideABuyOrder := true
+    insideASellOrder := false
+if (strategy.position_size < 0.0)
+    insideABuyOrder := false
+    insideASellOrder := true
+
+// Zignaly
+exchangeTickerID = syminfo.ticker
+
+var string tmpOrderComment = na
+var string tmpOrderAlertMessage = na
+
+var int i_tooRecentMinutesNumber_ms = i_tooRecentMinutesNumber * 60 * 1000 // Convert minutes into milliseconds only once
+
+// Strategy - INIT - END
+
+// Template functions - BEGIN
+
+// Decimals - Functions
+f_getContractMultiplier(_contractMaximumDecimalNumber) =>
+    _contractMultiplier = 1
+    if (_contractMaximumDecimalNumber == 0)
+        _contractMultiplier // Return 1
+    else
+        for _counter = 1 to _contractMaximumDecimalNumber
+            _contractMultiplier:= _contractMultiplier * 10
+        _contractMultiplier
+
+// Order comment - Functions - BEGIN
+
+f_getOrderComment(_typeOrder, _side, _alertMessage) =>
+    // Dependencies: i_enableOrderCommentDebug (initialized in inputs).
+
+    // TODO: Add descriptive comments
+    // _typeOrder="entry" or _typeOrder="close"
+    // _side: true means long ; false means short ; We can use strategy.long or strategy.short as true and false aliases
+    // _alertMessage
+    var string _orderComment = ""
+    
+    if (i_enableOrderCommentDebug)
+        _orderComment := _alertMessage
+    else
+        // TODO: Use human explanations instead of default order comment value (na)
+        _orderComment := na
+        
+    _orderComment
+
+// Order comment - Functions - END
+
+// Too recent orders functions
+
+f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
+    // Dependencies: i_tooRecentMinutesNumber_ms
+
+    // Condition 1: The order was open
+    // Condition 2: The order was long or short
+    // Condition 3: Time since order was last open is smaller than minimum between orders
+    // Returns boolean
+    bool _isTooRecent =  ((time_close) <= (_lastOrderOpenBarTime + i_tooRecentMinutesNumber_ms))
+
+    bool _tooRecentOrderBuyNotOpenAdvice = na
+    if (na(_lastOrderOpenBarTime))
+        _tooRecentOrderBuyNotOpenAdvice := false
+    else
+        _tooRecentOrderBuyNotOpenAdvice := _isTooRecent
+    _tooRecentOrderBuyNotOpenAdvice
+
+// MA - Functions - BEGIN
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : _maType == "WMA" ? ta.wma(_maSource, _maLength) : _maType == "HMA" ? ta.hma(_maSource, _maLength) : _maSource
+// MA - Functions - END
+
+getTrend (_fastMaType, _fastMaLength, _fastMaSource, _slowMaType, _slowMaLength, _slowMaSource, _offset) =>
+    _fastMa = f_Ma (_fastMaType, _fastMaSource, _fastMaLength)
+    _slowMa = f_Ma (_slowMaType, _slowMaSource, _slowMaLength)
+    _trend = _fastMa >= _slowMa
+
+    _trendOffset = _trend[_offset]
+    _trendOffset
+
+// Too old orders functions
+
+getTooOldOrderLongCloseAdvice () =>
+    // Condition 1: The order is open
+    // Condition 2: The order is long
+    // Condition 3: Order age is bigger than the maximum setting
+    // Returns boolean
+    bool isValidOpenLongOrder = (strategy.position_size > 0)
+    bool isTooOld =  (bar_index >= (buyOrderOpenBarIndex + i_tooOldLongBarsNumber))
+    tooOldStopLoss = strategy.position_avg_price * (1 - i_tooOldLongStopLossPerOne)
+
+    bool isALosingOrder = close < tooOldStopLoss
+    tooOldOrderLongCloseAdvice = isValidOpenLongOrder and isTooOld and isALosingOrder
+    tooOldOrderLongCloseAdvice
+
+getTooOldOrderShortCloseAdvice () =>
+    // Condition 1: The order is open
+    // Condition 2: The order is short
+    // Condition 3: Order age is bigger than the maximum setting
+    // Returns boolean
+    bool is_valid_open_sell_order = (strategy.position_size < 0)
+    bool isTooOld =  (bar_index >= (sellOrderOpenBarIndex + i_tooOldShortBarsNumber))
+    tooOldStopLoss = strategy.position_avg_price * (1 + i_tooOldShortStopLossPerOne)
+
+    bool isALosingOrder = close > tooOldStopLoss
+    tooOldOrderShortCloseAdvice = is_valid_open_sell_order and isTooOld and isALosingOrder
+    tooOldOrderShortCloseAdvice
+
+// Template functions - END
+
+// ImplementedStrategy functions - BEGIN
+// ImplementedStrategy functions - END
+
+// Strategy Body - BEGIN
+// Template substrategies - BEGIN
+// Higher Timeframe Trend substrategy
+
+higherTimeframeTrend = request.security(syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, getTrend (i_higherTimeframeTrendFastMaType, i_higherTimeframeTrendFastMaLength, i_higherTimeframeTrendFastMaSource, i_higherTimeframeTrendSlowMaType, i_higherTimeframeTrendSlowMaLength, i_higherTimeframeTrendSlowMaSource, i_higherTimeframeTrendMaOffset))
+
+int higherTimeframeTrendMaBarIndex = request.security (syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, bar_index)
+bool newHigherTimeframeTrendMaBar = higherTimeframeTrendMaBarIndex[1] != higherTimeframeTrendMaBarIndex[0]
+
+var higherTimeframeTrendMaLong = higherTimeframeTrend
+var higherTimeframeTrendMaShort = (not higherTimeframeTrend)
+
+if newHigherTimeframeTrendMaBar
+    higherTimeframeTrendMaLong := higherTimeframeTrend
+    higherTimeframeTrendMaShort := (not higherTimeframeTrend)
+
+// Volatility substrategy
+
+volatilityLongCondition = true
+volatilityShortCondition = true
+
+atrLongVolatilityMinimumPrice = i_atrVolatilitySource + (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMinimumMultiplier)
+atrLongVolatilityMaximumPrice = i_atrVolatilitySource + (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMaximumMultiplier)
+barIsVolatileLong = (close[0] >= open[0]) and (close[0] >= atrLongVolatilityMinimumPrice[1]) and (close[0] < atrLongVolatilityMaximumPrice[1])
+
+if barIsVolatileLong or barIsVolatileLong[1]
+    volatilityLongCondition := false
+
+atrShortVolatilityMinimumPrice = i_atrVolatilitySource - (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMinimumMultiplier)
+atrShortVolatilityMaximumPrice = i_atrVolatilitySource - (ta.atr(i_atrVolatilityLength) * i_atrVolatilityMaximumMultiplier)
+barIsVolatileShort = (close[0] <= open[0]) and (close[0] <= atrShortVolatilityMinimumPrice[1]) and (close[0] > atrShortVolatilityMaximumPrice[1])
+
+if barIsVolatileShort or barIsVolatileShort[1]
+    volatilityShortCondition := false
+
+// Curie Closing Lines substrategy
+curieHighClosingMa = f_Ma (i_curieHighClosingMaType, i_curieHighClosingMaSource, i_curieHighClosingMaLength)
+curieLowClosingMa = f_Ma (i_curieLowClosingMaType, i_curieLowClosingMaSource, i_curieLowClosingMaLength)
+
+curieHighestClosingMA = ta.highest(curieHighClosingMa, i_curieHighestClosingMaLength)
+curieLowestClosingMA = ta.lowest(curieLowClosingMa, i_curieLowestClosingMaLength)
+
+// Too old logic
+tooOldOrderLongCloseAdvice = getTooOldOrderLongCloseAdvice ()
+tooOldOrderShortCloseAdvice = getTooOldOrderShortCloseAdvice ()
+
+// RSI protection substrategy
+rsiProtectionLongCondition = true
+rsiProtectionShortCondition = true
+
+float currentTimeframeProtectionRsi = ta.rsi(i_RSIProtectionSource, i_RSIProtectionLength)
+float higherTimeframeProtectionRsi = request.security(syminfo.tickerid, i_RSIProtectionCustomTimeframe, ta.rsi(i_RSIProtectionSource, i_RSIProtectionLength))
+
+float protectionRsi = na
+if (i_enableRSIProtectionCustomTimeframe)
+    protectionRsi := higherTimeframeProtectionRsi
+else
+    protectionRsi := currentTimeframeProtectionRsi
+
+float longRSIProtectionLevel = na
+float shortRSIProtectionLevel = na
+
+longRSIProtectionLevel := i_longRSIProtectionLevel
+shortRSIProtectionLevel := i_shortRSIProtectionLevel
+
+if (protectionRsi > longRSIProtectionLevel)
+    rsiProtectionLongCondition := false
+if (protectionRsi < shortRSIProtectionLevel)
+    rsiProtectionShortCondition := false
+
+// RSI Closing substrategy
+float currentTimeframeClosingRsi = ta.rsi(i_RSIClosingSource, i_RSIClosingLength)
+float higherTimeframeClosingRsi = request.security(syminfo.tickerid, i_RSIClosingCustomTimeframe, ta.rsi(i_RSIClosingSource, i_RSIClosingLength))
+
+float closingRsi = na
+if (i_enableRSIClosingCustomTimeframe)
+    closingRsi := higherTimeframeClosingRsi
+else
+    closingRsi := currentTimeframeClosingRsi
+
+float longRSIClosingLevel = na
+float shortRSIClosingLevel = na
+
+float longPreAutoRSIClosingLevel = math.max(closingRsi, i_longRSIClosingAutoBarsNumber)
+float shortPreAutoRSIClosingLevel = math.min(closingRsi, i_shortRSIClosingAutoBarsNumber)
+float longAutoRSIClosingLevel = longPreAutoRSIClosingLevel[i_longRSIClosingLookbackBarsNumber]
+float shortAutoRSIClosingLevel = shortPreAutoRSIClosingLevel[i_shortRSIClosingLookbackBarsNumber]
+
+if (i_enableLongRSIClosingAutoLevel)
+    longRSIClosingLevel := longAutoRSIClosingLevel
+else
+    longRSIClosingLevel := i_longRSIClosingLevel
+
+if (i_enableShortRSIClosingAutoLevel)
+    shortRSIClosingLevel := shortAutoRSIClosingLevel
+else
+    shortRSIClosingLevel := i_shortRSIClosingLevel
+
+// ADX protection substrategy
+adxProtectionLongCondition = true
+adxProtectionShortCondition = true
+
+[currentTimeframeProtectionDiPlus, currentTimeframeProtectionDiMinus, currentTimeframeProtectionAdx] = ta.dmi(i_ADXProtectionDiLength, i_ADXProtectionSmoothing)
+[higherTimeframeProtectionDiPlus, higherTimeframeProtectionDiMinus, higherTimeframeProtectionAdx] = request.security(syminfo.tickerid, i_ADXProtectionCustomTimeframe, ta.dmi(i_ADXProtectionDiLength, i_ADXProtectionSmoothing))
+
+float protectionAdx = na
+if (i_enableADXProtectionCustomTimeframe)
+    protectionAdx := higherTimeframeProtectionAdx
+else
+    protectionAdx := currentTimeframeProtectionAdx
+
+float longADXProtectionMinimumLevel = na
+float longADXProtectionMaximumLevel = na
+float shortADXProtectionMinimumLevel = na
+float shortADXProtectionMaximumLevel = na
+
+longADXProtectionMinimumLevel := i_longADXProtectionMinimum
+longADXProtectionMaximumLevel := i_longADXProtectionMaximum
+
+shortADXProtectionMinimumLevel := i_shortADXProtectionMinimum
+shortADXProtectionMaximumLevel := i_shortADXProtectionMaximum
+
+if ((protectionAdx < longADXProtectionMinimumLevel) or (protectionAdx >= longADXProtectionMaximumLevel))
+    adxProtectionLongCondition := false
+if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortADXProtectionMaximumLevel))
+    adxProtectionShortCondition := false
+// Template substrategies - END
+
+// ImplementedStrategy substrategies - BEGIN
+
+// Virtual Trailering Position - BEGIN
+
+traileringAtrIsPossible = bar_index >= i_traileringAtrTakeProfitLength
+
+bool virtTraileringBoth = false
+virtTraileringBoth := (bar_index + i_virtTraileringOffset) % i_virtTraileringPeriod == 0
+virtTraileringBoth := virtTraileringBoth and traileringAtrIsPossible
+
+float virtLongMaximumProfitExcursion = 0.0
+var float virtLongMaximumProfitPrice = na
+float virtLongMaximumLossExcursion = 0.0
+var float virtLongMaximumLossPrice = na
+
+float virtShortMaximumProfitExcursion = 0.0
+var float virtShortMaximumProfitPrice = na
+float virtShortMaximumLossExcursion = 0.0
+var float virtShortMaximumLossPrice = na
+
+var float traileringAtrLongTakeProfitPrice = na
+var float traileringAtrShortTakeProfitPrice = na
+var float traileringLongTakeProfitPerOne = na
+var float traileringShortTakeProfitPerOne = na
+
+var float virtLongTakeProfit = na
+var float virtShortTakeProfit = na
+var float virtExpectedTakeProfit = na
+
+var bool resetVirtVariables = false
+
+virtLongTakeProfitIsReached = (virtLongTakeProfit >= low) and (virtLongTakeProfit <= high)
+virtShortTakeProfitIsReached =  (virtShortTakeProfit >= low) and (virtShortTakeProfit <= high)
+
+var bool virtInsideAPosition = false
+var float virtPositionPrice = close
+
+if (not (virtLongTakeProfitIsReached[1] or virtShortTakeProfitIsReached[1]))
+    if ((not insideASellOrder) and (not insideABuyOrder))
+        if ((not virtTraileringBoth[1]) and (virtTraileringBoth))
+            if (virtInsideAPosition)
+                resetVirtVariables := true
+            virtInsideAPosition := true
+            virtPositionPrice := close
+
+
+if (virtInsideAPosition[1] and (virtLongTakeProfitIsReached or virtShortTakeProfitIsReached))
+    virtInsideAPosition := false
+
+tmpTraileringAtrLongTakeProfitPrice = i_traileringAtrTakeProfitSource + (ta.atr(i_traileringAtrTakeProfitLength) * i_traileringAtrTakeProfitMultiplier)
+tmpTraileringAtrShortTakeProfitPrice = i_traileringAtrTakeProfitSource - (ta.atr(i_traileringAtrTakeProfitLength) * i_traileringAtrTakeProfitMultiplier)
+
+if (not virtInsideAPosition) or ((not virtInsideAPosition[1]) and virtInsideAPosition) or resetVirtVariables
+    traileringAtrLongTakeProfitPrice := tmpTraileringAtrLongTakeProfitPrice
+    traileringAtrShortTakeProfitPrice := tmpTraileringAtrShortTakeProfitPrice
+    virtLongTakeProfit := traileringAtrLongTakeProfitPrice
+    virtShortTakeProfit := traileringAtrShortTakeProfitPrice
+
+// maximumProfitExcursion - BEGIN
+
+// Long
+if ((not virtInsideAPosition[1]) and virtInsideAPosition)
+    if (close >= virtPositionPrice)
+        virtLongMaximumProfitPrice := close
+    else
+        virtLongMaximumProfitPrice := virtPositionPrice
+else if (virtInsideAPosition)
+    if (close >= virtLongMaximumProfitPrice[1])
+        virtLongMaximumProfitPrice := close
+virtLongMaximumProfitExcursion := math.abs(virtLongMaximumProfitPrice - virtPositionPrice)
+
+// Short
+if ((not virtInsideAPosition[1]) and virtInsideAPosition)
+    if (close <= virtPositionPrice)
+        virtShortMaximumProfitPrice := close
+    else
+        virtShortMaximumProfitPrice := virtPositionPrice
+else if (virtInsideAPosition)
+    if (close <= virtShortMaximumProfitPrice[1])
+        virtShortMaximumProfitPrice := close
+virtShortMaximumProfitExcursion := math.abs(virtShortMaximumProfitPrice - virtPositionPrice)
+
+// maximumProfitExcursion - END
+
+// maximumLossExcursion - BEGIN
+
+// Long
+if (resetVirtVariables or ((not virtInsideAPosition[1]) and virtInsideAPosition))
+    if (close <= virtPositionPrice)
+        virtLongMaximumLossPrice := close
+    else
+        virtLongMaximumLossPrice := virtPositionPrice
+else if (virtInsideAPosition)
+    if (close <= virtLongMaximumLossPrice[1])
+        virtLongMaximumLossPrice := close
+virtLongMaximumLossExcursion := math.abs(virtLongMaximumLossPrice - virtPositionPrice)
+
+// Short
+if (resetVirtVariables or ((not virtInsideAPosition[1]) and virtInsideAPosition))
+    if (close >= virtPositionPrice)
+        virtShortMaximumLossPrice := close
+    else
+        virtShortMaximumLossPrice := virtPositionPrice
+else if (virtInsideAPosition)
+    if (close >= virtShortMaximumLossPrice[1])
+        virtShortMaximumLossPrice := close
+virtShortMaximumLossExcursion := math.abs(virtShortMaximumLossPrice - virtPositionPrice)
+
+if resetVirtVariables
+    resetVirtVariables := false
+
+// maximumLossExcursion - END
+
+if (virtInsideAPosition)
+    // Long
+    virtExpectedTakeProfit := traileringAtrLongTakeProfitPrice + ((i_virtTakeProfitMaximumProfitExcursionRatio * virtLongMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * virtLongMaximumLossExcursion))
+    if (virtExpectedTakeProfit >= (virtPositionPrice * (1 + i_breakEvenPerOne)))
+        virtLongTakeProfit := virtExpectedTakeProfit
+    else
+        virtLongTakeProfit := virtLongTakeProfit[1]
+    // Short
+    virtExpectedTakeProfit := traileringAtrShortTakeProfitPrice - ((i_virtTakeProfitMaximumProfitExcursionRatio * virtShortMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * virtShortMaximumLossExcursion))
+    if (virtExpectedTakeProfit <= (virtPositionPrice * (1 - i_breakEvenPerOne)))
+        virtShortTakeProfit := virtExpectedTakeProfit
+    else
+        virtShortTakeProfit := virtShortTakeProfit[1]
+
+// Virtual Trailering Position - END
+
+// Trailering substrategy - BEGIN
+bool traileringLong = false
+bool traileringShort = false
+
+traileringLong := virtInsideAPosition[1] and virtShortTakeProfitIsReached and (close <= virtPositionPrice) and (virtPositionPrice >= (close * (1 + i_breakEvenPerOne)))
+traileringShort := virtInsideAPosition[1] and virtLongTakeProfitIsReached and (close >= virtPositionPrice) and (virtPositionPrice <= (close * (1 - i_breakEvenPerOne)))
+// Trailering substrategy - END
+
+// Volume Bounce substrategy - BEGIN
+
+bool volumeBounceLong = false
+bool volumeBounceShort = false
+
+volumeBounceRatio = volume / volume[1]
+
+volumeBounceLong := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volumeBounceRatio <= i_volumeBounceMaximumRatio)
+volumeBounceShort := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volumeBounceRatio <= i_volumeBounceMaximumRatio)
+
+// Volume Bounce substrategy - END
+
+// ImplementedStrategy substrategies - END
+
+// Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
+// Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
+bool longCondition1 = traileringLong
+bool longCondition2 = volumeBounceLong
+bool longCondition3 = false
+bool longCondition4 = false
+bool longCondition5 = false
+// Define here your, at most, 5 long conditions. Use false if not used. - END
+
+// Define here your, at most, 5 short conditions. Use false if not used. - BEGIN
+bool shortCondition1 = traileringShort
+bool shortCondition2 = volumeBounceShort
+bool shortCondition3 = false
+bool shortCondition4 = false
+bool shortCondition5 = false
+// Define here your, at most, 5 short conditions. Use false if not used. - END
+
+bool longCondition1Found = false
+bool longCondition2Found = false
+bool longCondition3Found = false
+bool longCondition4Found = false
+bool longCondition5Found = false
+
+bool shortCondition1Found = false
+bool shortCondition2Found = false
+bool shortCondition3Found = false
+bool shortCondition4Found = false
+bool shortCondition5Found = false
+
+
+longConditions = 0
+shortConditions = 0
+for i = (i_subStrategiesLookback - 1) to 0
+    if longCondition1[i]
+        longCondition1Found := true
+    if longCondition2[i]
+        longCondition2Found := true
+    if longCondition3[i]
+        longCondition3Found := true
+    if longCondition4[i]
+        longCondition4Found := true
+    if longCondition5[i]
+        longCondition5Found := true
+    if shortCondition1[i]
+        shortCondition1Found := true
+    if shortCondition2[i]
+        shortCondition2Found := true
+    if shortCondition3[i]
+        shortCondition3Found := true
+    if shortCondition4[i]
+        shortCondition4Found := true
+    if shortCondition5[i]
+        shortCondition5Found := true
+
+if longCondition1Found
+    longConditions := longConditions + 1
+if longCondition2Found
+    longConditions := longConditions + 1
+if longCondition3Found
+    longConditions := longConditions + 1
+if longCondition4Found
+    longConditions := longConditions + 1
+if longCondition5Found
+    longConditions := longConditions + 1
+if shortCondition1Found
+    shortConditions := shortConditions + 1
+if shortCondition2Found
+    shortConditions := shortConditions + 1
+if shortCondition3Found
+    shortConditions := shortConditions + 1
+if shortCondition4Found
+    shortConditions := shortConditions + 1
+if shortCondition5Found
+    shortConditions := shortConditions + 1
+
+bool longCondition = na
+bool shortCondition = na
+
+longCondition := (longConditions >= i_subStrategiesMinimum)
+shortCondition := (shortConditions >= i_subStrategiesMinimum)
+
+if i_enableVolatilityProtection
+    longCondition := longCondition and volatilityLongCondition
+    shortCondition := shortCondition and volatilityShortCondition
+
+if (i_higherTimeframeTrendMaEnforce)
+    longCondition := longCondition and higherTimeframeTrendMaLong
+    shortCondition := shortCondition and higherTimeframeTrendMaShort
+
+if (i_enableLongRSIProtection)
+    longCondition := longCondition and rsiProtectionLongCondition
+if (i_enableShortRSIProtection)
+    shortCondition := shortCondition and rsiProtectionShortCondition
+
+if (i_enableLongADXProtection)
+    longCondition := longCondition and adxProtectionLongCondition
+if (i_enableShortADXProtection)
+    shortCondition := shortCondition and adxProtectionShortCondition
+// Common Logic to go LONG/LONG or go SHORT/SHORT - END
+
+// Volatility - Plot - BEGIN
+atrVolatilityColor = i_showAtrVolatilityMultiplier ? color.maroon : na
+atrLongVolatilityMinimumPricePlot = plot(atrLongVolatilityMinimumPrice, color = atrVolatilityColor, title = "Long Volatility Minimum Price")
+atrShortVolatilityMinimumPricePlot = plot(atrShortVolatilityMinimumPrice, color = atrVolatilityColor, title = "Short Volatility Minimum Price")
+atrLongVolatilityMaximumPricePlot = plot(atrLongVolatilityMaximumPrice, color = atrVolatilityColor, title = "Long Volatility Maximum Price")
+atrShortVolatilityMaximumPricePlot = plot(atrShortVolatilityMaximumPrice, color = atrVolatilityColor, title = "Short Volatility Maximum Price")
+// Volatility - Plot - END
+
+// Curie Closing Lines - Plot - BEGIN
+curieHighestClosingLowestColor = i_showCurieClosingLines ? color.yellow : na
+curieHighestClosingMAPlot = plot(curieHighestClosingMA, color = curieHighestClosingLowestColor, title = 'Upper Curie Closing line')
+curieLowestClosingMAPlot = plot(curieLowestClosingMA, color = curieHighestClosingLowestColor, title = 'Lower Curie Closing Line')
+// Curie Closing Lines - Plot - END
+
+// Higher Timeframe Trend - Plot - BEGIN
+higherTimeframeTrendMaLongColor = i_showHigherTimeframeTrendMa ? color.new(#00c3ff, transp=0) : na
+higherTimeframeTrendMaShortColor = i_showHigherTimeframeTrendMa ? color.new(#ff0062, transp=0) : na
+plotshape(higherTimeframeTrendMaLong, title='SideMA Up', style=shape.arrowup, color=higherTimeframeTrendMaLongColor, location=location.top)
+plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdown, color=higherTimeframeTrendMaShortColor, location=location.top)
+// Higher Timeframe Trend - Plot - END
+
+// ImplementedStrategy - Plot - BEGIN
+
+// Virtual Trailering - Plot - BEGIN
+
+float virtLongTakeProfitPlotPrice = na
+float virtShortTakeProfitPlotPrice = na
+
+virtLongTakeProfitPlotPrice := (virtInsideAPosition and i_enableVirtTraileringDebug) ? virtLongTakeProfit : na
+virtShortTakeProfitPlotPrice := (virtInsideAPosition and i_enableVirtTraileringDebug) ? virtShortTakeProfit : na
+
+longTakeProfitPricePlot = plot(virtLongTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(L) Virtual Take Profit Price")
+shortTakeProfitPricePlot = plot(virtShortTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(S) Virtual Take Profit Price")
+
+// Virtual Trailering - Plot - END
+
+// ImplementedStrategy - Plot - END
+
+// Position price calculation - BEGIN
+float positionPrice = na
+if (insideASellOrder or insideABuyOrder)
+    positionPrice := strategy.position_avg_price
+else
+    positionPrice := close
+    // Make sure to reset breakeven triggered if we are not in an order
+    breakEvenTriggered := false
+    breakEvenNeedsTrigger := false
+    customBreakEvenNeedsTrigger := false
+    
+// Position price calculation - END
+
+tooRecentOrderNotOpenAdvice = f_getTooRecentOrderNotOpenAdvice (lastOrderOpenBarTime)
+
+// Decide if we are going to LONG/Go LONG - BEGIN
+PRE_LONG = false
+if (i_tooRecentMinutesNumber == 0)
+    PRE_LONG := onStartTimeInterval and longCondition
+else
+    PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice)
+
+// LONG = PRE_LONG[1] and PRE_LONG // Wait for confirmation
+LONG = PRE_LONG // Do not wait for confirmation
+
+// Decide if we are going to LONG/Go LONG - END
+
+// Decide if we are going to SHORT/Go SHORT - BEGIN
+PRE_SHORT = false
+if (i_tooRecentMinutesNumber == 0)
+    PRE_SHORT := onStartTimeInterval and shortCondition
+else
+    PRE_SHORT := onStartTimeInterval and shortCondition and (not tooRecentOrderNotOpenAdvice)
+
+// SHORT = PRE_SHORT[1] and PRE_SHORT // Wait for confirmation
+SHORT = PRE_SHORT // Do not wait for confirmation
+
+// Decide if we are going to SHORT/Go SHORT - END
+
+// Decide if a LONG/LONG entry should be closed - BEGIN
+LONG_CLOSE = false
+
+if (not i_enableLongStrictStrategy)
+    LONG_CLOSE := LONG_CLOSE or shortCondition
+
+if i_enableCurieClosingLines
+    LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(i_curieSource, curieHighestClosingMA) and (close >= (positionPrice * (1 + i_breakEvenPerOne))) )
+
+if i_enableTooOldLongOrderClose
+    LONG_CLOSE := LONG_CLOSE or tooOldOrderLongCloseAdvice
+
+if i_enableLongRSIClosing
+    LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(closingRsi, longRSIClosingLevel) )
+
+// Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
+if (offStopTimeInterval)
+    LONG_CLOSE := true
+
+if LONG_CLOSE
+    LONG := false
+// Decide if a LONG/LONG entry should be closed - END
+
+// Decide if a SHORT/SHORT entry should be closed - BEGIN
+SHORT_CLOSE = false
+
+if (not i_enableLongStrictStrategy)
+    SHORT_CLOSE := SHORT_CLOSE or longCondition
+
+if i_enableCurieClosingLines
+    SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(i_curieSource, curieLowestClosingMA) and (close <= (positionPrice * (1 - i_breakEvenPerOne))) )
+
+if i_enableTooOldShortOrderClose
+    SHORT_CLOSE := SHORT_CLOSE or tooOldOrderShortCloseAdvice
+
+if i_enableShortRSIClosing
+    SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(closingRsi, shortRSIClosingLevel) )
+
+// Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
+if (offStopTimeInterval)
+    SHORT_CLOSE := true
+
+if SHORT_CLOSE
+    SHORT := false
+// Decide if a SHORT/SHORT entry should be closed - END
+
+// orderStopLoss is just here just in case
+// we implement i_longStopLoss and i_shortStopLoss
+// in the future
+atrLongStopLossPrice = i_atrStopLossSource - (ta.atr(i_atrStopLossLength) * i_atrStopLossMultiplier)
+atrShortStopLossPrice = i_atrStopLossSource + (ta.atr(i_atrStopLossLength) * i_atrStopLossMultiplier)
+
+if (i_enableStopLossDefaultLogic)
+    if LONG
+        if ( i_stopLossType == 'constant' )
+            orderStopLossPerOne := i_stopLoss
+        else if ( i_stopLossType == 'atr' )
+            orderStopLossPerOne := (close - atrLongStopLossPrice) / close
+
+        orderStopLoss := orderStopLossPerOne * 100
+    else
+        if ( i_stopLossType == 'constant' )
+            orderStopLossPerOne := i_stopLoss
+        else if ( i_stopLossType == 'atr' )
+            orderStopLossPerOne := (atrShortStopLossPrice - close) / atrShortStopLossPrice
+
+        orderStopLoss := orderStopLossPerOne * 100
+
+var float LongBreakEvenTrigger = na
+var float ShortBreakEvenTrigger = na
+
+if (i_enableStopLossDefaultLogic)
+    if (i_enableRiskBreakevenTriggerRatio)
+        i_breakEvenTrigger := orderStopLoss * i_breakevenTriggerRatio
+        i_breakEvenTriggerPerOne := i_breakEvenTrigger * 0.01
+
+    if ((not insideABuyOrder[1]) and insideABuyOrder)
+        LongBreakEvenTrigger := positionPrice * (1 + i_breakEvenTriggerPerOne)
+    if ((not insideASellOrder[1]) and insideASellOrder)
+        ShortBreakEvenTrigger := positionPrice * (1 - i_breakEvenTriggerPerOne)
+
+    if (insideABuyOrder and insideABuyOrder[1])
+        if ( false )
+            customBreakEvenNeedsTrigger := true
+    if (insideASellOrder and insideASellOrder[1])
+        if ( false )
+            customBreakEvenNeedsTrigger := true
+
+    if insideABuyOrder
+        if (high >= LongBreakEvenTrigger)
+            breakEvenNeedsTrigger := true
+    if insideASellOrder
+        if (low <= ShortBreakEvenTrigger)
+            breakEvenNeedsTrigger := true
+
+    if (insideABuyOrder and LONG_CLOSE)
+        breakEvenTriggered := false
+        breakEvenNeedsTrigger := false
+        customBreakEvenNeedsTrigger := false
+    if (insideASellOrder and SHORT_CLOSE)
+        breakEvenTriggered := false
+        breakEvenNeedsTrigger := false
+        customBreakEvenNeedsTrigger := false
+
+// How much to LONG/GO LONG/SHORT/GO SHORT - BEGIN
+
+// Custom take profit and stop loss
+var float LongStopLoss = na
+var float ShortStopLoss = na
+
+if (i_enableStopLossDefaultLogic)
+    // Initial StopLoss value based on last closed candle
+    if (i_enableStopLoss and (not insideABuyOrder))
+        LongStopLoss := close * (1 - orderStopLossPerOne)
+    if (i_enableStopLoss and (not insideASellOrder))
+        ShortStopLoss := close * (1 + orderStopLossPerOne)
+
+    // Final StopLoss value based on actual position price
+    if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
+        LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+    if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
+        ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+
+    // Make sure LongStopLoss and ShortStopLoss are undefined
+    // by default when i_enableStopLoss is set to false
+    if (not i_enableStopLoss)
+        LongStopLoss := na
+        ShortStopLoss := na
+
+    // Override StopLoss with BreakEven if needed
+    if ( i_enableBreakEven and insideABuyOrder and (not breakEvenTriggered) and breakEvenNeedsTrigger )
+        LongStopLoss := positionPrice * (1 + i_breakEvenPerOne)
+    if ( i_enableBreakEven and insideASellOrder and (not breakEvenTriggered) and breakEvenNeedsTrigger )
+        ShortStopLoss := positionPrice * (1 - i_breakEvenPerOne)
+
+    if ( i_enableCustomBreakEven and insideABuyOrder and customBreakEvenNeedsTrigger )
+        LongStopLoss := positionPrice * (1 + i_breakEvenPerOne)
+        customBreakEvenPerOne := (LongStopLoss - close) / close
+        customBreakEven := customBreakEvenPerOne * 100
+    if ( i_enableCustomBreakEven and insideASellOrder and customBreakEvenNeedsTrigger )
+        ShortStopLoss := positionPrice * (1 - i_breakEvenPerOne)
+        customBreakEvenPerOne := (close - ShortStopLoss) / ShortStopLoss
+        customBreakEven := customBreakEvenPerOne * 100
+
+var float takeProfit = na
+var float takeProfitPerOne = na
+
+if (i_enableTakeProfitDefaultLogic)
+    if i_enableRiskRewardRatio
+        takeProfit := orderStopLoss * i_positionRatio
+        takeProfitPerOne := takeProfit / 100
+    else
+        takeProfit := i_takeProfit
+        takeProfitPerOne := i_takeProfitPerOne
+
+var float LongTakeProfit = na
+var float ShortTakeProfit = na
+
+if (i_enableTakeProfitDefaultLogic)
+    // Initial TakeProfit value based on last closed candle
+    if (not insideABuyOrder)
+        LongTakeProfit := close * (1 + takeProfitPerOne)
+    if (not insideASellOrder)
+        ShortTakeProfit := close * (1 - takeProfitPerOne)
+
+    // Final TakeProfit value based on actual position price
+    if ((not insideABuyOrder[1]) and (insideABuyOrder))
+        LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
+    if ((not insideASellOrder[1]) and (insideASellOrder))
+        ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
+
+var float originalTakeProfitPerOne = na
+if (i_enableTraileringTakeProfit)
+    if (not insideABuyOrder[1] and LONG)
+        originalTakeProfitPerOne := ( virtPositionPrice / positionPrice ) - 1
+        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
+        takeProfit := takeProfitPerOne * 100
+        LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
+        if (i_enableTraileringStopLoss)
+            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
+            orderStopLoss := orderStopLossPerOne * 100
+            LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+    if (not insideASellOrder[1] and SHORT)
+        originalTakeProfitPerOne := ( positionPrice / virtPositionPrice ) - 1
+        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
+        takeProfit := takeProfitPerOne * 100
+        ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
+        if (i_enableTraileringStopLoss)
+            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
+            orderStopLoss := orderStopLossPerOne * 100
+            ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+
+if (i_enableTraileringTakeProfit)
+    if (LONG[1] and (not (insideABuyOrder)))
+        originalTakeProfitPerOne := ( virtPositionPrice / positionPrice[1] ) - 1
+        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
+        takeProfit := takeProfitPerOne * 100
+        LongTakeProfit := positionPrice[1] * (1 + takeProfitPerOne)
+        if (i_enableTraileringStopLoss)
+            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
+            orderStopLoss := orderStopLossPerOne * 100
+            LongStopLoss := positionPrice[1] * (1 - orderStopLossPerOne)
+    if (SHORT[1] and (not (insideASellOrder)))
+        originalTakeProfitPerOne := ( positionPrice[1] / virtPositionPrice ) - 1
+        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
+        takeProfit := takeProfitPerOne * 100
+        ShortTakeProfit := positionPrice[1] * (1 - takeProfitPerOne)
+        if (i_enableTraileringStopLoss)
+            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
+            orderStopLoss := orderStopLossPerOne * 100
+            ShortStopLoss := positionPrice[1] * (1 + orderStopLossPerOne)
+
+if (i_enableTraileringTakeProfit)
+    if ((not insideABuyOrder[1]) and (insideABuyOrder))
+        originalTakeProfitPerOne := ( virtPositionPrice / strategy.position_avg_price ) - 1
+        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
+        takeProfit := takeProfitPerOne * 100
+        LongTakeProfit := strategy.position_avg_price * (1 + takeProfitPerOne)
+        if (i_enableTraileringStopLoss)
+            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
+            orderStopLoss := orderStopLossPerOne * 100
+            LongStopLoss := strategy.position_avg_price * (1 - orderStopLossPerOne)
+    if ((not insideASellOrder[1]) and (insideASellOrder))
+        originalTakeProfitPerOne := ( strategy.position_avg_price / virtPositionPrice ) - 1
+        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
+        takeProfit := takeProfitPerOne * 100
+        ShortTakeProfit := strategy.position_avg_price * (1 - takeProfitPerOne)
+        if (i_enableTraileringStopLoss)
+            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
+            orderStopLoss := orderStopLossPerOne * 100
+            ShortStopLoss := strategy.position_avg_price * (1 + orderStopLossPerOne)
+
+float entryQuantity = na
+float currentCapital = strategy.initial_capital + strategy.netprofit
+
+var float customQuantity = na
+
+
+if (i_zignalyProviderType == 'copytrader')
+    entryQuantity := i_CapitalPercentage * currentCapital
+else // _ZIGSIGNALPROVIDER_
+    entryQuantity := i_CapitalQuote
+
+if ( (i_riskManagementType == 'CUSTOM') or (i_riskManagementType == 'FORCED') )
+    customQuantity := entryQuantity
+else
+    customQuantity := na
+
+if (i_zignalyProviderType == 'copytrader') // Risk management is only implemented for CopyTrader Providers
+    var currentDayCapital = 0.0
+    var currentDay = 0
+    var currentWeekCapital = 0.0
+    var currentWeek = 0
+    var currentMonthCapital = 0.0
+    var currentMonth = 0
+
+    currentDay := rm.getCurrentDay ()
+    currentWeek := rm.getCurrentWeek ()
+    currentMonth := rm.getCurrentMonth ()
+
+    [__entryQuantity, __currentDay, __currentDayCapital, __currentWeek, __currentWeekCapital, __currentMonth, __currentMonthCapital] = rm.advisedEntryQuantity (currentCapital, currentDay, currentDayCapital, currentWeek, currentWeekCapital, currentMonth, currentMonthCapital, i_riskManagementMaximumLossPerDay, i_riskManagementMaximumLossPerWeek, i_riskManagementMaximumLossPerMonth, i_riskManagementMaximumLossPerTrade, orderStopLossPerOne, i_riskManagementType, customQuantity)
+
+    entryQuantity := __entryQuantity
+    currentDayCapital := __currentDayCapital
+    currentWeekCapital := __currentWeekCapital
+    currentMonthCapital := __currentMonthCapital
+
+float entryQuantityContractsReducer = 0.99
+
+contractMultiplier = f_getContractMultiplier(i_contractMaximumDecimalNumber)
+
+// We assume the current price is current bar close
+
+entryQuantityContracts = (math.floor(((entryQuantity / close) * entryQuantityContractsReducer) * contractMultiplier) / contractMultiplier)
+entryQuantityContractsUSDT = entryQuantityContracts * (close)
+
+// How much to LONG/GO LONG/SHORT/GO SHORT - END
+
+
+// GO LONG only logic - BEGIN
+
+var float tmpPositionBeforeOpeningOrder = na
+
+if (i_strategyType == _L_)
+    if LONG
+        tmpPositionBeforeOpeningOrder := strategy.position_avg_price
+        if (not insideABuyOrder) // Entry
+            tmpOrderAlertMessage := zig.longEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
+            buyOrderOpenBarIndex := bar_index + 1
+        0 // Workaround for making every if branch to return the same type of value
+    else if LONG_CLOSE
+        tmpOrderAlertMessage := zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+        tmpOrderComment := f_getOrderComment("close", strategy.long, tmpOrderAlertMessage)
+        strategy.close("[L]", alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        0 // Workaround for making every if branch to return the same type of value
+    if ((insideABuyOrder) and (not LONG_CLOSE))
+        if ( i_enableCustomBreakEven and customBreakEvenNeedsTrigger ) // Update Custom Breakeven
+            tmpOrderAlertMessage := zig.updateLongEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableCustomBreakEven, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, breakEvenPercentage = customBreakEven, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+        else if (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered))) // Update Breakeven
+            tmpOrderAlertMessage := zig.updateLongEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableBreakEven, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, breakEvenPercentage = i_breakEvenTrigger, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+            breakEvenTriggered := true
+        else // Update StopLoss
+            tmpOrderAlertMessage := zig.updateLongEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+// GO LONG only logic - END
+
+// GO SHORT only logic - BEGIN
+if (i_strategyType == _S_)
+    if SHORT
+        tmpPositionBeforeOpeningOrder := strategy.position_avg_price
+        if (not insideASellOrder) // Entry
+            tmpOrderAlertMessage := zig.shortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
+            sellOrderOpenBarIndex := bar_index + 1
+        0 // Workaround for making every if branch to return the same type of value
+    else if SHORT_CLOSE
+        tmpOrderAlertMessage := zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=shortSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+        tmpOrderComment := f_getOrderComment("close", strategy.short, tmpOrderAlertMessage)
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        0 // Workaround for making every if branch to return the same type of value
+    if ((insideASellOrder) and (not SHORT_CLOSE))
+        if ( i_enableCustomBreakEven and customBreakEvenNeedsTrigger ) // Update Custom Breakeven
+            tmpOrderAlertMessage := zig.updateShortEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableCustomBreakEven, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=shortSignalIdString, breakEvenPercentage = customBreakEven, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+        else if (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered))) // Update Breakeven
+            tmpOrderAlertMessage := zig.updateShortEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableBreakEven, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=shortSignalIdString, breakEvenPercentage = i_breakEvenTrigger, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+            breakEvenTriggered := true
+        else // Update StopLoss
+            tmpOrderAlertMessage := zig.updateShortEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=shortSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+// GO SHORT only logic - END
+
+// GO LONG and SHORT logic - BEGIN
+if (i_strategyType == L_S)
+// Asumption: Above we have:
+// if LONG_CLOSE
+//    LONG := false
+// if SHORT_CLOSE
+//    SHORT := false
+
+    // LONG and SHORT cannot be true at the same time
+    // Anyways we will take it into account
+    if (LONG == true) and (SHORT == true)
+        LONG := true
+        SHORT := false
+        SHORT_CLOSE := true
+
+    if LONG
+        tmpPositionBeforeOpeningOrder := strategy.position_avg_price
+        if (not insideABuyOrder) // Entry
+            tmpOrderAlertMessage := zig.longEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
+            buyOrderOpenBarIndex := bar_index + 1
+    if LONG_CLOSE
+        tmpOrderAlertMessage := zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+        tmpOrderComment := f_getOrderComment("close", strategy.long, tmpOrderAlertMessage)
+        strategy.close("[L]", alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+    if ((insideABuyOrder) and (not LONG_CLOSE))
+        if ( i_enableCustomBreakEven and customBreakEvenNeedsTrigger ) // Update Custom Breakeven
+            tmpOrderAlertMessage := zig.updateLongEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableCustomBreakEven, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, breakEvenPercentage = customBreakEven, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+        else if (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered))) // Update Breakeven
+            tmpOrderAlertMessage := zig.updateLongEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableBreakEven, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, breakEvenPercentage = i_breakEvenTrigger, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+            breakEvenTriggered := true
+        else // Update StopLoss
+            tmpOrderAlertMessage := zig.updateLongEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+    if SHORT
+        tmpPositionBeforeOpeningOrder := strategy.position_avg_price
+        if (not insideASellOrder) // Entry
+            tmpOrderAlertMessage := zig.shortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=shortSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
+            sellOrderOpenBarIndex := bar_index + 1
+    if SHORT_CLOSE
+        tmpOrderAlertMessage := zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=shortSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+        tmpOrderComment := f_getOrderComment("close", strategy.short, tmpOrderAlertMessage)
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+    if ((insideASellOrder) and (not SHORT_CLOSE))
+        if ( i_enableCustomBreakEven and customBreakEvenNeedsTrigger ) // Update Custom Breakeven
+            tmpOrderAlertMessage := zig.updateShortEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableCustomBreakEven, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=shortSignalIdString, breakEvenPercentage = customBreakEven, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+        else if (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered))) // Update Breakeven
+            tmpOrderAlertMessage := zig.updateShortEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableBreakEven, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=shortSignalIdString, breakEvenPercentage = i_breakEvenTrigger, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+            breakEvenTriggered := true
+        else // Update StopLoss
+            tmpOrderAlertMessage := zig.updateShortEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=shortSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+// GO LONG and SHORT logic - END
+
+// Reverse logic - BEGIN
+if (i_strategyType == _REVERSE_)
+// Asumption: Above we have:
+// if LONG_CLOSE
+//    LONG := false
+// if SHORT_CLOSE
+//    SHORT := false
+
+    // LONG and SHORT cannot be true at the same time
+    // Anyways we will take it into account
+    if (LONG == true) and (SHORT == true)
+        LONG := true
+        SHORT := false
+
+    if (LONG and (not LONG_CLOSE))
+        tmpPositionBeforeOpeningOrder := strategy.position_avg_price
+        if (not insideABuyOrder) // Entry
+            tmpOrderAlertMessage := zig.reverseLongEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=reverseSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
+            buyOrderOpenBarIndex := bar_index + 1
+    if (LONG_CLOSE and (not ((SHORT and (not SHORT_CLOSE)))))
+        tmpOrderAlertMessage := zig.reverseLongExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=reverseSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+        tmpOrderComment := f_getOrderComment("close", strategy.long, tmpOrderAlertMessage)
+        strategy.close("[L]", alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+    if ((insideABuyOrder) and (not LONG_CLOSE))
+        if ( i_enableCustomBreakEven and customBreakEvenNeedsTrigger ) // Update Custom Breakeven
+            tmpOrderAlertMessage := zig.updateReverseLongEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableCustomBreakEven, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=reverseSignalIdString, breakEvenPercentage = customBreakEven, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+        else if (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered))) // Update Breakeven
+            tmpOrderAlertMessage := zig.updateReverseLongEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableBreakEven, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=reverseSignalIdString, breakEvenPercentage = i_breakEvenTrigger, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+            breakEvenTriggered := true
+        else // Update StopLoss
+            tmpOrderAlertMessage := zig.updateReverseLongEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=reverseSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+    if (SHORT and (not SHORT_CLOSE))
+        tmpPositionBeforeOpeningOrder := strategy.position_avg_price
+        if (not insideASellOrder) // Entry
+            tmpOrderAlertMessage := zig.reverseShortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=reverseSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+        if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
+            sellOrderOpenBarIndex := bar_index + 1
+    if (SHORT_CLOSE and (not (LONG and (not LONG_CLOSE))))
+        tmpOrderAlertMessage := zig.reverseShortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=reverseSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+        tmpOrderComment := f_getOrderComment("close", strategy.short, tmpOrderAlertMessage)
+        strategy.close("[S]", alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+    if ((insideASellOrder) and (not SHORT_CLOSE))
+        if ( i_enableCustomBreakEven and customBreakEvenNeedsTrigger ) // Update Custom Breakeven
+            tmpOrderAlertMessage := zig.updateReverseShortEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableCustomBreakEven, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=reverseSignalIdString, breakEvenPercentage = customBreakEven, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+        else if (i_enableBreakEven and breakEvenNeedsTrigger and (not(breakEvenTriggered))) // Update Breakeven
+            tmpOrderAlertMessage := zig.updateReverseShortEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableBreakEven, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=reverseSignalIdString, breakEvenPercentage = i_breakEvenTrigger, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+            breakEvenTriggered := true
+        else // Update StopLoss
+            tmpOrderAlertMessage := zig.updateReverseShortEntry(key=i_zignalyServiceSecretKey, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=reverseSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            // tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
+            alert(message=( i_enableZignalyAlert and (i_zignalyIntegrationType == 'hybrid') ) ? tmpOrderAlertMessage : na)
+// Reverse logic - END
+
+// Handle STOP LOSS (and similar) order exits - BEGIN
+
+// Quick Paste - BEGIN
+float longTrailingTakeProfitPrice = na
+float longTrailingTakeProfitPoints = na
+float longTrailingTakeProfitOffset = na
+float shortTrailingTakeProfitPrice = na
+float shortTrailingTakeProfitPoints = na
+float shortTrailingTakeProfitOffset = na
+
+// Calculate trailing_take_profit_offset based on tick units
+longTmpTtpBaseValue = positionPrice * (1 + i_trailingTakeProfitPercentageTriggerPerOne)
+longTmpTtpTop_value = longTmpTtpBaseValue * (1 + i_trailingTakeProfitPercentageOffsetPerOne)
+longTrailingTakeProfitOffsetFloat = longTmpTtpTop_value - longTmpTtpBaseValue
+float longTrailingTakeProfitOffsetTick = math.floor (longTrailingTakeProfitOffsetFloat / syminfo.mintick)
+
+shortTmpTtpBaseValue = positionPrice * (1 - i_trailingTakeProfitPercentageTriggerPerOne)
+shortTmpTtpBottomValue = shortTmpTtpBaseValue * (1 - i_trailingTakeProfitPercentageOffsetPerOne)
+shortTrailingTakeProfitOffsetFloat = shortTmpTtpBaseValue - shortTmpTtpBottomValue
+float shortTrailingTakeProfitOffsetTick = math.floor (shortTrailingTakeProfitOffsetFloat / syminfo.mintick)
+
+if i_enableTrailingTakeProfit
+    longTrailingTakeProfitPrice := positionPrice * (1 + i_trailingTakeProfitPercentageTriggerPerOne)
+    longTrailingTakeProfitOffset := longTrailingTakeProfitOffsetTick
+    shortTrailingTakeProfitPrice := positionPrice * (1 - i_trailingTakeProfitPercentageTriggerPerOne)
+    shortTrailingTakeProfitOffset := shortTrailingTakeProfitOffsetTick
+else
+    longTrailingTakeProfitPrice := na
+    longTrailingTakeProfitOffset := na
+    shortTrailingTakeProfitPrice := na
+    shortTrailingTakeProfitOffset := na
+// Quick Paste - END
+
+// This might trigger additional close orders than needed in zignaly
+// Better close an existing order twice than regreting zignaly not having closed it.
+
+if (not (i_strategyType == _REVERSE_))
+    tmpOrderAlertMessage := zig.longExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+else // REVERSE
+    tmpOrderAlertMessage := zig.reverseLongExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=reverseSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+tmpOrderComment := f_getOrderComment("close", strategy.long, tmpOrderAlertMessage)
+
+bool i_enableAnyStopLoss = i_enableStopLoss or i_enableBreakEven or i_enableCustomBreakEven
+
+// Exit the signal if
+// * We are not in reverse mode
+// * We are in Long reverse mode and there is not a new Short reverse entry that would have closed it.
+if (
+     (not (i_strategyType == _REVERSE_))
+     or
+     ((i_strategyType == _REVERSE_) and (not (SHORT and (not SHORT_CLOSE))))
+   )
+    strategy.exit("[L]-[SL/TP]", "[L]", stop= i_enableAnyStopLoss ? LongStopLoss : na, limit= i_enableTakeProfit ? LongTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? longTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? longTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+
+if (not (i_strategyType == _REVERSE_))
+    tmpOrderAlertMessage := zig.shortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=shortSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+else // REVERSE
+    tmpOrderAlertMessage := zig.reverseShortExit(key=i_zignalyServiceSecretKey,exchange=i_zignalyExchange,exchangeAccountType=i_zignalyExchangeType,pair=exchangeTickerID,leverage=i_zignalyLeverage,alertType=i_zignalyAlertType, signalId=reverseSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+tmpOrderComment := f_getOrderComment("close", strategy.short, tmpOrderAlertMessage)
+
+// Exit the signal if
+// * We are not in reverse mode
+// * We are in Short reverse mode and there is not a new Long reverse entry that would have closed it.
+if (
+     (not (i_strategyType == _REVERSE_))
+     or
+     ((i_strategyType == _REVERSE_) and (not (LONG and (not LONG_CLOSE))))
+   )
+    strategy.exit("[S]-[SL/TP]", "[S]", stop= i_enableAnyStopLoss ? ShortStopLoss : na, limit= i_enableTakeProfit ? ShortTakeProfit : na, trail_price= i_enableTrailingTakeProfit ? shortTrailingTakeProfitPrice : na, trail_offset = i_enableTrailingTakeProfit ? shortTrailingTakeProfitOffset : na, alert_message= i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+
+// Handle STOP LOSS (and similar) order exits - END
+
+// Strategy Body - END
+
+
+    
