@@ -82,7 +82,8 @@ i_RSISource = input.source(close, title='', group='RSI', inline='RSI')
 i_RSIOverSold = input.int(30, minval=1, title='', group='RSI', inline='RSI')
 i_RSIOverBought = input.int(80, minval=1, title='', group='RSI', inline='RSI', tooltip='Defaults:\nLength: 7.\n Source: close.\n OverSold: 30.\n OverBought: 80.')
 
-symbol01 = input.symbol('XRPUSDT', group='Symbols', inline='s01', tooltip='Default: XRPUSDT.\n')
+symbol01 = input.symbol("XRPUSDT", group='Symbols', inline='s01', tooltip='Default: XRPUSDT.\n')
+symbol02 = input.symbol("BTCUSDT",  group = 'Symbols', inline = 's02', tooltip='Default: BTCUSDT.\n')
 
 // ImplementedIndicator inputs - END
 
@@ -145,7 +146,20 @@ if newHigherTimeframeTrendMaBar
 
 // RSI Screener subindicator - BEGIN
 
-[rsiOverSoldTrigger, rsiOverBoughtTrigger] = request.security(symbol01, timeframe.period, screener_func())
+[rsiOverSoldTrigger01, rsiOverBoughtTrigger01] = request.security(symbol01, timeframe.period, screener_func())
+[rsiOverSoldTrigger02, rsiOverBoughtTrigger02] = request.security(symbol02, timeframe.period, screener_func())
+
+if (rsiOverSoldTrigger01)
+    alert ('Oversold:' + ' ' + symbol01, alert.freq_once_per_bar_close)
+
+if (rsiOverSoldTrigger02)
+    alert ('Oversold:' + ' ' + symbol02, alert.freq_once_per_bar_close)
+
+if (rsiOverBoughtTrigger01)
+    alert ('Overbought:' + ' ' + symbol01, alert.freq_once_per_bar_close)
+
+if (rsiOverBoughtTrigger02)
+    alert ('Overbought:' + ' ' + symbol02, alert.freq_once_per_bar_close)
 
 // RSI Screener subindicator - END
 
