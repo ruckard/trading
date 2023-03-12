@@ -1,0 +1,141 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © ruckard
+
+//@version=5
+
+// Current version: v20230312 ( A001 )
+// Tradingview Public description - BEGIN
+//
+// This is a template for Ruckard strategies that interact with Zignaly.
+// Template sections are not supposed to be modified and are similar to:
+// Template foo - BEGIN
+// (...)
+// Template foo - END
+//
+// This will be a quick-and-dirty repurpose of this strategy template as an indicator template.
+//
+// Sections meant to be added with your own strategy logic are similar to:
+// ImplementedIndicator foo - BEGIN
+// (...)
+// ImplementedIndicator foo - END
+//
+// ImplementedIndicator explanation - BEGIN
+// ImplementedIndicator explanation - END
+//
+// ImplementedIndicator suggested pair and timeframe - BEGIN
+// It was originally tested at BTCUSDT pair and 1H timeframe.
+// ImplementedIndicator suggested pair and timeframe - END
+//
+// Template public description - BEGIN
+//
+// [B]SETTINGS[/B]
+// [B]__ SETTINGS - Category1[/B]
+// [LIST]
+// [*]
+// [*]
+// [/LIST]
+//
+// [B]DEFAULT SETTINGS[/B]
+
+// [B] ALERTS SETUP[/B]
+//
+
+// ImplementedIndicator public description - BEGIN
+// ImplementedIndicator public description - END
+
+// Tradingview Public description - END
+
+strategy('IndicatorTemplate A001', shorttitle='A001IndicatorTemplate', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+
+// IMPORTS - BEGIN
+// IMPORTS - END
+
+// INPUTS - BEGIN
+
+// Template inputs - BEGIN
+
+// HigherTimeframe subindicator Inputs - BEGIN
+i_higherTimeframeTrendMaEnforce = input.bool(false, title='Use {False}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
+i_showHigherTimeframeTrendMa = input.bool(false, title='Show {False}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
+
+i_higherTimeframeTrendMaTimeframe = input.timeframe('60', title='Timeframe/Offset {1 hour/0 bars}', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
+
+i_higherTimeframeTrendMaOffset = input.int(0, title='', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
+
+i_higherTimeframeTrendFastMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Fast MA {EMA/10/close}', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
+i_higherTimeframeTrendFastMaLength = input.int(10, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
+i_higherTimeframeTrendFastMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
+
+i_higherTimeframeTrendSlowMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Slow MA {EMA/55/close}', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
+i_higherTimeframeTrendSlowMaLength = input.int(55, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
+i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
+// HigherTimeframe subindicator Inputs - END
+
+// Template inputs - END
+
+// ImplementedIndicator inputs - BEGIN
+// ImplementedIndicator inputs - END
+
+// Strategy - INIT - BEGIN
+// Strategy - INIT - END
+
+// Template functions - BEGIN
+
+// MTF - functions - BEGIN
+// Taken from `security()` revisited [PineCoders] article.
+f_secureSecurity(_symbol, _res, _src) => security(_symbol, _res, _src[1], lookahead = barmerge.lookahead_on)
+// MTF - functions - END
+
+// MA - Functions - BEGIN
+f_Ma (_maType, _maSource, _maLength) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : _maType == "WMA" ? ta.wma(_maSource, _maLength) : _maType == "HMA" ? ta.hma(_maSource, _maLength) : _maSource
+// MA - Functions - END
+
+getTrend (_fastMaType, _fastMaLength, _fastMaSource, _slowMaType, _slowMaLength, _slowMaSource, _offset) =>
+    _fastMa = f_Ma (_fastMaType, _fastMaSource, _fastMaLength)
+    _slowMa = f_Ma (_slowMaType, _slowMaSource, _slowMaLength)
+    _trend = _fastMa >= _slowMa
+
+    _trendOffset = _trend[_offset]
+    _trendOffset
+
+// Template functions - END
+
+// ImplementedIndicator functions - BEGIN
+// ImplementedIndicator functions - END
+
+// Strategy Body - BEGIN
+// Template subindicators - BEGIN
+// Higher Timeframe Trend subindicator
+
+higherTimeframeTrend = request.security(syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, getTrend (i_higherTimeframeTrendFastMaType, i_higherTimeframeTrendFastMaLength, i_higherTimeframeTrendFastMaSource, i_higherTimeframeTrendSlowMaType, i_higherTimeframeTrendSlowMaLength, i_higherTimeframeTrendSlowMaSource, i_higherTimeframeTrendMaOffset))
+
+int higherTimeframeTrendMaBarIndex = request.security (syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, bar_index)
+bool newHigherTimeframeTrendMaBar = higherTimeframeTrendMaBarIndex[1] != higherTimeframeTrendMaBarIndex[0]
+
+var higherTimeframeTrendMaLong = higherTimeframeTrend
+var higherTimeframeTrendMaShort = (not higherTimeframeTrend)
+
+if newHigherTimeframeTrendMaBar
+    higherTimeframeTrendMaLong := higherTimeframeTrend
+    higherTimeframeTrendMaShort := (not higherTimeframeTrend)
+
+// Template subindicators - END
+
+// ImplementedIndicator subindicators - BEGIN
+// ImplementedIndicator subindicators - END
+
+// Higher Timeframe Trend - Plot - BEGIN
+higherTimeframeTrendMaLongColor = i_showHigherTimeframeTrendMa ? color.new(#00c3ff, transp=0) : na
+higherTimeframeTrendMaShortColor = i_showHigherTimeframeTrendMa ? color.new(#ff0062, transp=0) : na
+plotshape(higherTimeframeTrendMaLong, title='SideMA Up', style=shape.arrowup, color=higherTimeframeTrendMaLongColor, location=location.top)
+plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdown, color=higherTimeframeTrendMaShortColor, location=location.top)
+// Higher Timeframe Trend - Plot - END
+
+// ImplementedIndicator - Plot - BEGIN
+
+// ImplementedIndicator - Plot - END
+
+// Alerts - BEGIN
+// WARN: This might be usually empty because I prefer to write strategies for handling alerts.
+// Alerts - END
