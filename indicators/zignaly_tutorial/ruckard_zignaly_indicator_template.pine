@@ -3,7 +3,7 @@
 
 //@version=5
 
-// Current version: v20230312 ( A001 )
+// Current version: v20230312 ( A002 )
 // Tradingview Public description - BEGIN
 //
 // This is a template for Ruckard strategies that interact with Zignaly.
@@ -45,7 +45,7 @@
 
 // Tradingview Public description - END
 
-indicator('IndicatorTemplate A001', overlay=true, max_bars_back=5000, max_lines_count=500)
+indicator('IndicatorTemplate A002', overlay=true, max_bars_back=5000, max_lines_count=500)
 
 // IMPORTS - BEGIN
 // IMPORTS - END
