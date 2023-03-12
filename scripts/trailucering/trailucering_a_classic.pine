@@ -1239,7 +1239,7 @@ if (i_enableTraileringTakeProfit)
 
 if (i_enableTraileringTakeProfit)
     if (LONG[1] and (not (insideABuyOrder)))
-        originalTakeProfitPerOne := ( close[1] / positionPrice[1] ) - 1
+        originalTakeProfitPerOne := ( close[2] / positionPrice[1] ) - 1
         takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         LongTakeProfit := positionPrice[1] * (1 + takeProfitPerOne)
@@ -1248,7 +1248,7 @@ if (i_enableTraileringTakeProfit)
             orderStopLoss := orderStopLossPerOne * 100
             LongStopLoss := positionPrice[1] * (1 - orderStopLossPerOne)
     if (SHORT[1] and (not (insideASellOrder)))
-        originalTakeProfitPerOne := ( positionPrice[1] / close[1] ) - 1
+        originalTakeProfitPerOne := ( positionPrice[1] / close[2] ) - 1
         takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         ShortTakeProfit := positionPrice[1] * (1 - takeProfitPerOne)
