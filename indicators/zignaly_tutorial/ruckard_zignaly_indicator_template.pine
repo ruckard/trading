@@ -83,7 +83,7 @@ i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enfo
 
 // MTF - functions - BEGIN
 // Taken from `security()` revisited [PineCoders] article.
-f_secureSecurity(_symbol, _res, _src) => security(_symbol, _res, _src[1], lookahead = barmerge.lookahead_on)
+f_secureSecurity(_symbol, _res, _src) => request.security(_symbol, _res, _src[1], lookahead = barmerge.lookahead_on)
 // MTF - functions - END
 
 // MA - Functions - BEGIN
