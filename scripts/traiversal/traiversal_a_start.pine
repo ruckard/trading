@@ -18,7 +18,7 @@
 // ImplementedStrategy foo - END
 //
 // ImplementedStrategy explanation - BEGIN
-// This strategy tries to minimize StopLoss and maximize TakeProfit based on the maximum excursion (positive or negative) of price. It is meant to be used as a LongOnly strategy and at the same time as a ShortOnly strategy.
+// This strategy tries to find reversal points 3 candles after a breakout happens. Another breakout in the opposite direction will signal the end of the trend we just rided. The strategy is supposed to run 24 times for the different ways of finding breakouts.
 // ImplementedStrategy explanation - END
 //
 // In addition the former strategy also includes Risk Management.
