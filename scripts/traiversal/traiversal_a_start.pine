@@ -409,7 +409,6 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 // ImplementedStrategy inputs - BEGIN
 
-i_enableTraileringTakeProfit = input.bool(true, title='Enable Trailering TakeProfit {True}', group='Trailering')
 i_enableTraileringStopLoss = input.bool(true, title='Enable Trailering StopLoss {True}', group='Trailering')
 i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 
@@ -1215,67 +1214,6 @@ if (i_enableTakeProfitDefaultLogic)
         LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
     if ((not insideASellOrder[1]) and (insideASellOrder))
         ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
-
-var float originalTakeProfitPerOne = na
-if (i_enableTraileringTakeProfit)
-    if (not insideABuyOrder[1] and LONG)
-        originalTakeProfitPerOne := ( virtPositionPrice / positionPrice ) - 1
-        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
-        takeProfit := takeProfitPerOne * 100
-        LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
-        if (i_enableTraileringStopLoss)
-            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
-            orderStopLoss := orderStopLossPerOne * 100
-            LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
-    if (not insideASellOrder[1] and SHORT)
-        originalTakeProfitPerOne := ( positionPrice / virtPositionPrice ) - 1
-        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
-        takeProfit := takeProfitPerOne * 100
-        ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
-        if (i_enableTraileringStopLoss)
-            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
-            orderStopLoss := orderStopLossPerOne * 100
-            ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
-
-if (i_enableTraileringTakeProfit)
-    if (LONG[1] and (not (insideABuyOrder)))
-        originalTakeProfitPerOne := ( virtPositionPrice / positionPrice[1] ) - 1
-        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
-        takeProfit := takeProfitPerOne * 100
-        LongTakeProfit := positionPrice[1] * (1 + takeProfitPerOne)
-        if (i_enableTraileringStopLoss)
-            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
-            orderStopLoss := orderStopLossPerOne * 100
-            LongStopLoss := positionPrice[1] * (1 - orderStopLossPerOne)
-    if (SHORT[1] and (not (insideASellOrder)))
-        originalTakeProfitPerOne := ( positionPrice[1] / virtPositionPrice ) - 1
-        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
-        takeProfit := takeProfitPerOne * 100
-        ShortTakeProfit := positionPrice[1] * (1 - takeProfitPerOne)
-        if (i_enableTraileringStopLoss)
-            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
-            orderStopLoss := orderStopLossPerOne * 100
-            ShortStopLoss := positionPrice[1] * (1 + orderStopLossPerOne)
-
-if (i_enableTraileringTakeProfit)
-    if ((not insideABuyOrder[1]) and (insideABuyOrder))
-        originalTakeProfitPerOne := ( virtPositionPrice / strategy.position_avg_price ) - 1
-        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
-        takeProfit := takeProfitPerOne * 100
-        LongTakeProfit := strategy.position_avg_price * (1 + takeProfitPerOne)
-        if (i_enableTraileringStopLoss)
-            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
-            orderStopLoss := orderStopLossPerOne * 100
-            LongStopLoss := strategy.position_avg_price * (1 - orderStopLossPerOne)
-    if ((not insideASellOrder[1]) and (insideASellOrder))
-        originalTakeProfitPerOne := ( strategy.position_avg_price / virtPositionPrice ) - 1
-        takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
-        takeProfit := takeProfitPerOne * 100
-        ShortTakeProfit := strategy.position_avg_price * (1 - takeProfitPerOne)
-        if (i_enableTraileringStopLoss)
-            orderStopLossPerOne := takeProfitPerOne / i_positionRatio
-            orderStopLoss := orderStopLossPerOne * 100
-            ShortStopLoss := strategy.position_avg_price * (1 + orderStopLossPerOne)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
