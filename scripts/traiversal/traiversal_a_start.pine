@@ -409,7 +409,7 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 // ImplementedStrategy inputs - BEGIN
 
-i_enableTraileringStopLoss = input.bool(true, title='Enable Trailering StopLoss {True}', group='Trailering')
+i_enableTraiversalStopLoss = input.bool(true, title='Enable Traiversal StopLoss {True}', group='Trailering')
 i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 
 i_virtTakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
@@ -1112,10 +1112,54 @@ if (i_enableStopLossDefaultLogic)
 
         orderStopLoss := orderStopLossPerOne * 100
 
+longTraiversalStopLoss = ta.lowest (low, 3)
+shortTraiversalStopLoss = ta.highest (high, 3)
+
+if (i_enableTraiversalStopLoss)
+    if LONG
+        orderStopLossPerOne := (close - longTraiversalStopLoss) / close
+        orderStopLoss := orderStopLossPerOne * 100
+    else
+        orderStopLossPerOne := (shortTraiversalStopLoss - close) / shortTraiversalStopLoss
+        orderStopLoss := orderStopLossPerOne * 100
+
 var float LongBreakEvenTrigger = na
 var float ShortBreakEvenTrigger = na
 
 if (i_enableStopLossDefaultLogic)
+    if (i_enableRiskBreakevenTriggerRatio)
+        i_breakEvenTrigger := orderStopLoss * i_breakevenTriggerRatio
+        i_breakEvenTriggerPerOne := i_breakEvenTrigger * 0.01
+
+    if ((not insideABuyOrder[1]) and insideABuyOrder)
+        LongBreakEvenTrigger := positionPrice * (1 + i_breakEvenTriggerPerOne)
+    if ((not insideASellOrder[1]) and insideASellOrder)
+        ShortBreakEvenTrigger := positionPrice * (1 - i_breakEvenTriggerPerOne)
+
+    if (insideABuyOrder and insideABuyOrder[1])
+        if ( false )
+            customBreakEvenNeedsTrigger := true
+    if (insideASellOrder and insideASellOrder[1])
+        if ( false )
+            customBreakEvenNeedsTrigger := true
+
+    if insideABuyOrder
+        if (high >= LongBreakEvenTrigger)
+            breakEvenNeedsTrigger := true
+    if insideASellOrder
+        if (low <= ShortBreakEvenTrigger)
+            breakEvenNeedsTrigger := true
+
+    if (insideABuyOrder and LONG_CLOSE)
+        breakEvenTriggered := false
+        breakEvenNeedsTrigger := false
+        customBreakEvenNeedsTrigger := false
+    if (insideASellOrder and SHORT_CLOSE)
+        breakEvenTriggered := false
+        breakEvenNeedsTrigger := false
+        customBreakEvenNeedsTrigger := false
+
+if (i_enableTraiversalStopLoss)
     if (i_enableRiskBreakevenTriggerRatio)
         i_breakEvenTrigger := orderStopLoss * i_breakevenTriggerRatio
         i_breakEvenTriggerPerOne := i_breakEvenTrigger * 0.01
@@ -1155,6 +1199,40 @@ var float LongStopLoss = na
 var float ShortStopLoss = na
 
 if (i_enableStopLossDefaultLogic)
+    // Initial StopLoss value based on last closed candle
+    if (i_enableStopLoss and (not insideABuyOrder))
+        LongStopLoss := close * (1 - orderStopLossPerOne)
+    if (i_enableStopLoss and (not insideASellOrder))
+        ShortStopLoss := close * (1 + orderStopLossPerOne)
+
+    // Final StopLoss value based on actual position price
+    if (i_enableStopLoss and ((not insideABuyOrder[1]) and (insideABuyOrder)))
+        LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
+    if (i_enableStopLoss and ((not insideASellOrder[1]) and (insideASellOrder)))
+        ShortStopLoss := positionPrice * (1 + orderStopLossPerOne)
+
+    // Make sure LongStopLoss and ShortStopLoss are undefined
+    // by default when i_enableStopLoss is set to false
+    if (not i_enableStopLoss)
+        LongStopLoss := na
+        ShortStopLoss := na
+
+    // Override StopLoss with BreakEven if needed
+    if ( i_enableBreakEven and insideABuyOrder and (not breakEvenTriggered) and breakEvenNeedsTrigger )
+        LongStopLoss := positionPrice * (1 + i_breakEvenPerOne)
+    if ( i_enableBreakEven and insideASellOrder and (not breakEvenTriggered) and breakEvenNeedsTrigger )
+        ShortStopLoss := positionPrice * (1 - i_breakEvenPerOne)
+
+    if ( i_enableCustomBreakEven and insideABuyOrder and customBreakEvenNeedsTrigger )
+        LongStopLoss := positionPrice * (1 + i_breakEvenPerOne)
+        customBreakEvenPerOne := (LongStopLoss - close) / close
+        customBreakEven := customBreakEvenPerOne * 100
+    if ( i_enableCustomBreakEven and insideASellOrder and customBreakEvenNeedsTrigger )
+        ShortStopLoss := positionPrice * (1 - i_breakEvenPerOne)
+        customBreakEvenPerOne := (close - ShortStopLoss) / ShortStopLoss
+        customBreakEven := customBreakEvenPerOne * 100
+
+if (i_enableTraiversalStopLoss)
     // Initial StopLoss value based on last closed candle
     if (i_enableStopLoss and (not insideABuyOrder))
         LongStopLoss := close * (1 - orderStopLossPerOne)
