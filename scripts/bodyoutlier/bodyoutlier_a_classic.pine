@@ -409,6 +409,16 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 // Template inputs - END
 
 // ImplementedStrategy inputs - BEGIN
+
+i_bodyRangeAlmaLength = input.int(500, title='BodyRange Alma', group='BodyRange Alma', inline='BodyRangeAlmaSettings')
+i_bodyRangeAlmaOff  = input.float(0.85, title='', group='BodyRange Alma', inline='BodyRangeAlmaSettings')
+i_bodyRangeAlmaSig  = input.int(16, title='', group='BodyRange Alma', inline='BodyRangeAlmaSettings', tooltip='Defaults:\nLength: 500.\n Off: 0.85\n Sig: 16.')
+
+i_bodyRangeFilter = input.float(0.5, title='BodyRange Filter %', group='BodyRange Alma', inline='BodyRangeAlmaFilter', tooltip='Default: 0.5.')
+
+i_bodyRangeExtendUntilFilled = input.bool(true, title='Extend Until Fill', group='BodyRange Conditions', inline='BodyRangeExtension1', tooltip='Default: True.')
+i_bodyRangeHideFilled = input.bool(false, title='Hide Filled', group='BodyRange Conditions', inline='BodyRangeExtension2', tooltip='Default: False.')
+
 // ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
