@@ -578,6 +578,14 @@ getTooOldOrderShortCloseAdvice () =>
 // Template functions - END
 
 // ImplementedStrategy functions - BEGIN
+
+// bodyOutlier functions - BEGIN
+
+bodyRange() =>
+    change =  (close - open) / open * 100
+
+// bodyOutlier functions - END
+
 // ImplementedStrategy functions - END
 
 // Strategy Body - BEGIN
