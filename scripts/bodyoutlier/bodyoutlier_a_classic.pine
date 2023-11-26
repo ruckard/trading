@@ -717,6 +717,17 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 // Template substrategies - END
 
 // ImplementedStrategy substrategies - BEGIN
+
+// bodyOutlier substrategy - BEGIN
+
+absoluteBodyRange =  math.abs(bodyRange())
+averageBodyRange = ta.alma(absoluteBodyRange, i_bodyRangeAlmaLength ,i_bodyRangeAlmaOff ,i_bodyRangeAlmaSig)
+
+bodyRangeLong = bodyRange()  >= averageBodyRange and (bodyRange() >= i_bodyRangeFilter)
+bodyRangeShort = bodyRange()  <= -averageBodyRange and(bodyRange() <= -i_bodyRangeFilter)
+
+// bodyOutlier substrategy - END
+
 // ImplementedStrategy substrategies - END
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
