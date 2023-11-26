@@ -18,6 +18,9 @@
 // ImplementedStrategy foo - END
 //
 // ImplementedStrategy explanation - BEGIN
+// Place limit orders when there is an outlier candle (based on its body).
+// E.g. Big green candle, place a long entry on its low.
+// E.g. Big red candle, place a short entry on its high.
 // ImplementedStrategy explanation - END
 //
 // In addition the former strategy also includes Risk Management.
