@@ -434,10 +434,9 @@ i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=
 
 // Strategy - INIT - BEGIN
 
-var offsetString = '-' + str.tostring(i_virtTraileringOffset)
-var longSignalIdString = 'LONG-' + syminfo.ticker + offsetString
-var shortSignalIdString = 'SHORT-' + syminfo.ticker + offsetString
-var reverseSignalIdString = 'REVERSE-' + syminfo.ticker + offsetString
+var longSignalIdString = 'LONG-' + syminfo.ticker
+var shortSignalIdString = 'SHORT-' + syminfo.ticker
+var reverseSignalIdString = 'REVERSE-' + syminfo.ticker
 
 string stringNA = na
 
