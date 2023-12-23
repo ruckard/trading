@@ -752,8 +752,6 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     float _traileringAtrLongTakeProfitPrice = p_traileringAtrLongTakeProfitPrice
     float _traileringAtrShortTakeProfitPrice = p_traileringAtrShortTakeProfitPrice
-    var float traileringLongTakeProfitPerOne = na
-    var float traileringShortTakeProfitPerOne = na
 
     var float virtLongTakeProfit = na
     var float virtShortTakeProfit = na
