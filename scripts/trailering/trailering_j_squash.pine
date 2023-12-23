@@ -417,7 +417,6 @@ i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {
 
 i_virtTakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
 i_virtTakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit Maximum Loss Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
-i_virtTraileringOffset = input.int(0, title='Trailering Offset {0}', group='Trailering')
 i_virtTraileringPeriod = input.int(24, minval=2, title='Trailering Period {24}', group='Trailering')
 
 i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
@@ -730,7 +729,7 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 traileringAtrIsPossible = bar_index >= i_traileringAtrTakeProfitLength
 
 bool virtTraileringBoth = false
-virtTraileringBoth := (bar_index + i_virtTraileringOffset) % i_virtTraileringPeriod == 0
+virtTraileringBoth := (bar_index + p_virtTraileringOffset) % i_virtTraileringPeriod == 0
 virtTraileringBoth := virtTraileringBoth and traileringAtrIsPossible
 
 float virtLongMaximumProfitExcursion = 0.0
