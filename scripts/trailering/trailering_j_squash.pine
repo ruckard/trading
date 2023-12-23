@@ -434,7 +434,6 @@ i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=
 // Strategy - INIT - BEGIN
 
 type traileringStatusType
-    bool virtInsideAPosition = false
     float virtLongMaximumProfitPrice = na
     float virtLongMaximumLossPrice = na
     float virtShortMaximumProfitPrice = na
