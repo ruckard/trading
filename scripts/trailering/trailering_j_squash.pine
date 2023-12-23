@@ -418,6 +418,7 @@ i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {
 i_virtTakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
 i_virtTakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit Maximum Loss Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
 i_virtTraileringPeriod = input.int(24, minval=2, title='Trailering Period {24}', group='Trailering')
+i_virtTraileringPlotOffset = input.int(0, title='Trailering Plot Offset {0}', group='Trailering')
 
 i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
 i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
@@ -1061,8 +1062,8 @@ plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdow
 float virtLongTakeProfitPlotPrice = na
 float virtShortTakeProfitPlotPrice = na
 
-virtLongTakeProfitPlotPrice := (virtInsideAPosition and i_enableVirtTraileringDebug) ? virtLongTakeProfit : na
-virtShortTakeProfitPlotPrice := (virtInsideAPosition and i_enableVirtTraileringDebug) ? virtShortTakeProfit : na
+virtLongTakeProfitPlotPrice := ((array.get(traileringStatus, i_virtTraileringPlotOffset).virtInsideAPosition) and i_enableVirtTraileringDebug) ? (array.get(traileringStatus, i_virtTraileringPlotOffset).virtLongTakeProfit) : na
+virtShortTakeProfitPlotPrice := ((array.get(traileringStatus, i_virtTraileringPlotOffset).virtInsideAPosition) and i_enableVirtTraileringDebug) ? (array.get(traileringStatus, i_virtTraileringPlotOffset).virtShortTakeProfit) : na
 
 longTakeProfitPricePlot = plot(virtLongTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(L) Virtual Take Profit Price")
 shortTakeProfitPricePlot = plot(virtShortTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(S) Virtual Take Profit Price")
