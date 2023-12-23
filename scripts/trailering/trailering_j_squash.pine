@@ -726,6 +726,8 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 
 // Virtual Trailering Position - BEGIN
 
+f_getTraileringData(p_virtTraileringOffset)=>
+
 traileringAtrIsPossible = bar_index >= i_traileringAtrTakeProfitLength
 
 bool virtTraileringBoth = false
@@ -852,12 +854,31 @@ if (virtInsideAPosition)
 // Virtual Trailering Position - END
 
 // Trailering substrategy - BEGIN
+bool traileringLongTmp = false
+bool traileringShortTmp = false
+
+for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
+    // Read from traileringStatus - BEGIN
+    // Read from traileringStatus - END
+
+    [tmpVirtInsideAPosition,tmpVirtShortTakeProfitIsReached,tmpVirtLongTakeProfitIsReached,tmpVirtPositionPrice] = f_getTraileringData(virtTraileringOffset)
+
+    // Save into traileringStatus - BEGIN
+    // Save into traileringStatus - END
+
+    traileringLongTmp := virtInsideAPosition[1] and virtShortTakeProfitIsReached and (close <= virtPositionPrice) and (virtPositionPrice >= (close * (1 + i_breakEvenPerOne)))
+    traileringShortTmp := virtInsideAPosition[1] and virtLongTakeProfitIsReached and (close >= virtPositionPrice) and (virtPositionPrice <= (close * (1 - i_breakEvenPerOne)))
+
+    // Save into traileringStatus (traileringLongTmp, traileringShortTmp) - BEGIN
+    // Save into traileringStatus (traileringLongTmp, traileringShortTmp) - END
+
+// Trailering substrategy - END
+
 bool traileringLong = false
 bool traileringShort = false
 
-traileringLong := virtInsideAPosition[1] and virtShortTakeProfitIsReached and (close <= virtPositionPrice) and (virtPositionPrice >= (close * (1 + i_breakEvenPerOne)))
-traileringShort := virtInsideAPosition[1] and virtLongTakeProfitIsReached and (close >= virtPositionPrice) and (virtPositionPrice <= (close * (1 - i_breakEvenPerOne)))
-// Trailering substrategy - END
+traileringLong := false // TODO: Count (Reading from traileringStatus)
+traileringShort := false // TODO: Count (Reading from traileringStatus)
 
 // Volume Bounce substrategy - BEGIN
 
