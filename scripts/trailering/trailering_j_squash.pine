@@ -434,6 +434,11 @@ i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=
 
 // Strategy - INIT - BEGIN
 
+type traileringStatusType
+    bool virtInsideAPosition = false
+
+var traileringStatus = array.new<traileringStatusType>(i_virtTraileringPeriod)
+
 var longSignalIdString = 'LONG-' + syminfo.ticker
 var shortSignalIdString = 'SHORT-' + syminfo.ticker
 var reverseSignalIdString = 'REVERSE-' + syminfo.ticker
