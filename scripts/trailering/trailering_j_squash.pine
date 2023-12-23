@@ -865,8 +865,8 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 // Virtual Trailering Position - END
 
 // Trailering substrategy - BEGIN
-bool traileringLongTmp = false
-bool traileringShortTmp = false
+bool traileringLongBet = false
+bool traileringShortBet = false
 
 for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
     // Read from traileringStatus - BEGIN
@@ -906,11 +906,11 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
     array.set(traileringStatus, virtTraileringOffset, updatedCurrentTraileringStatus)
     // Save into traileringStatus - END
 
-    traileringLongTmp := (array.get(traileringStatus, virtTraileringOffset).virtInsideAPosition)[1] and tmpVirtShortTakeProfitIsReached and (close <= (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice)) and ((array.get(traileringStatus, virtTraileringOffset).virtPositionPrice) >= (close * (1 + i_breakEvenPerOne)))
-    traileringShortTmp := (array.get(traileringStatus, virtTraileringOffset).virtInsideAPosition)[1] and tmpVirtLongTakeProfitIsReached and (close >= (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice)) and ((array.get(traileringStatus, virtTraileringOffset).virtPositionPrice) <= (close * (1 - i_breakEvenPerOne)))
+    traileringLongBet := (array.get(traileringStatus, virtTraileringOffset).virtInsideAPosition)[1] and tmpVirtShortTakeProfitIsReached and (close <= (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice)) and ((array.get(traileringStatus, virtTraileringOffset).virtPositionPrice) >= (close * (1 + i_breakEvenPerOne)))
+    traileringShortBet := (array.get(traileringStatus, virtTraileringOffset).virtInsideAPosition)[1] and tmpVirtLongTakeProfitIsReached and (close >= (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice)) and ((array.get(traileringStatus, virtTraileringOffset).virtPositionPrice) <= (close * (1 - i_breakEvenPerOne)))
 
-    // Save into traileringStatus (traileringLongTmp, traileringShortTmp) - BEGIN
-    // Save into traileringStatus (traileringLongTmp, traileringShortTmp) - END
+    // Save into traileringStatus (traileringLongBet, traileringShortBet) - BEGIN
+    // Save into traileringStatus (traileringLongBet, traileringShortBet) - END
 
 // Trailering substrategy - END
 
