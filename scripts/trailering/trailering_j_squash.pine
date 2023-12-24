@@ -885,7 +885,7 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
     float virtExpectedTakeProfit = array.get(traileringStatus, virtTraileringOffset).virtExpectedTakeProfit
     bool resetVirtVariables = array.get(traileringStatus, virtTraileringOffset).resetVirtVariables
     bool virtInsideAPosition = array.get(traileringStatus, virtTraileringOffset).virtInsideAPosition
-    bool virtPositionPrice = array.get(traileringStatus, virtTraileringOffset).virtPositionPrice
+    float virtPositionPrice = array.get(traileringStatus, virtTraileringOffset).virtPositionPrice
     // Read from traileringStatus - END
 
     [tmpVirtLongMaximumProfitPrice, tmpVirtLongMaximumLossPrice, tmpVirtShortMaximumProfitPrice, tmpVirtShortMaximumLossPrice, tmpTraileringAtrLongTakeProfitPrice, tmpTraileringAtrShortTakeProfitPrice, tmpVirtLongTakeProfit, tmpVirtShortTakeProfit, tmpVirtExpectedTakeProfit, tmpResetVirtVariables, tmpVirtInsideAPosition, tmpVirtPositionPrice, tmpVirtLongTakeProfitIsReached, tmpVirtShortTakeProfitIsReached] = f_getTraileringData(virtTraileringOffset, virtLongMaximumProfitPrice, virtLongMaximumLossPrice, virtShortMaximumProfitPrice, virtShortMaximumLossPrice, traileringAtrLongTakeProfitPrice, traileringAtrShortTakeProfitPrice, virtLongTakeProfit, virtShortTakeProfit, virtExpectedTakeProfit, resetVirtVariables, virtInsideAPosition, virtPositionPrice)
