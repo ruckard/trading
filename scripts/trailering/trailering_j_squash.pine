@@ -1119,6 +1119,9 @@ virtShortTakeProfitPlotPrice := ((array.get(traileringStatus, i_virtTraileringPl
 longTakeProfitPricePlot = plot(virtLongTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(L) Virtual Take Profit Price")
 shortTakeProfitPricePlot = plot(virtShortTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(S) Virtual Take Profit Price")
 
+plotchar(virtTraileringLongConsensus, "virtTraileringLongConsensus", "", location = location.top)
+plotchar(virtTraileringShortConsensus, "virtTraileringShortConsensus", "", location = location.top)
+
 // Virtual Trailering - Plot - END
 
 // ImplementedStrategy - Plot - END
