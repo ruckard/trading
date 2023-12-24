@@ -935,7 +935,7 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
     updatedCurrentTraileringStatus.traileringLongBet := traileringLongBet
     updatedCurrentTraileringStatus.traileringShortBet := traileringShortBet
 
-    array.set(traileringStatus, virtTraileringOffset, updatedCurrentTraileringStatus)
+    array.set(traileringStatus, virtTraileringOffset, traileringStatusType.copy(updatedCurrentTraileringStatus))
     // Save into traileringStatus (2/2) - END
 
 // Trailering substrategy - END
