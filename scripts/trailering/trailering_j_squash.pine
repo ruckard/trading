@@ -452,7 +452,7 @@ type traileringStatusType
     bool traileringLongBet = false
     bool traileringShortBet = false
 
-var traileringStatus = array.new<traileringStatusType>(i_virtTraileringPeriod)
+var traileringStatus = array.new<traileringStatusType>(i_virtTraileringPeriod, traileringStatusType.new())
 
 var longSignalIdString = 'LONG-' + syminfo.ticker
 var shortSignalIdString = 'SHORT-' + syminfo.ticker
