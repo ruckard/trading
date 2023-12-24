@@ -419,6 +419,8 @@ i_virtTakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit
 i_virtTakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit Maximum Loss Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
 i_virtTraileringPeriod = input.int(24, minval=2, title='Trailering Period {24}', group='Trailering')
 i_virtTraileringPlotOffset = input.int(0, title='Trailering Plot Offset {0}', group='Trailering')
+i_virtTraileringLongMinimumConsensus = input.int(5, minval=1, title='Trailering Long Minimum Consensus {5}', group='Trailering')
+i_virtTraileringShortMinimumConsensus = input.int(5, minval=1, title='Trailering Short Minimum Consensus {5}', group='Trailering')
 
 i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
 i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
@@ -922,8 +924,18 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
 bool traileringLong = false
 bool traileringShort = false
 
-traileringLong := false // TODO: Count (Reading from traileringStatus)
-traileringShort := false // TODO: Count (Reading from traileringStatus)
+int virtTraileringLongConsensus = 0
+int virtTraileringShortConsensus = 0
+for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
+    if (array.get(traileringStatus, virtTraileringOffset).traileringLongBet)
+        virtTraileringLongConsensus := virtTraileringLongConsensus + 1
+    if (array.get(traileringStatus, virtTraileringOffset).traileringShortBet)
+        virtTraileringShortConsensus := virtTraileringShortConsensus + 1
+
+if (virtTraileringLongConsensus >= i_virtTraileringLongMinimumConsensus)
+    traileringLong := true
+if (virtTraileringShortConsensus >= i_virtTraileringShortMinimumConsensus)
+    traileringShort := true
 
 // Volume Bounce substrategy - BEGIN
 
