@@ -790,12 +790,12 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     if (p_virtInsideAPosition_1 and (_virtLongTakeProfitIsReached or _virtShortTakeProfitIsReached))
         _virtInsideAPosition := false
 
-    tmpTraileringAtrLongTakeProfitPrice = i_traileringAtrTakeProfitSource + (ta.atr(i_traileringAtrTakeProfitLength) * i_traileringAtrTakeProfitMultiplier)
-    tmpTraileringAtrShortTakeProfitPrice = i_traileringAtrTakeProfitSource - (ta.atr(i_traileringAtrTakeProfitLength) * i_traileringAtrTakeProfitMultiplier)
+    currentTraileringAtrLongTakeProfitPrice = i_traileringAtrTakeProfitSource + (ta.atr(i_traileringAtrTakeProfitLength) * i_traileringAtrTakeProfitMultiplier)
+    currentTraileringAtrShortTakeProfitPrice = i_traileringAtrTakeProfitSource - (ta.atr(i_traileringAtrTakeProfitLength) * i_traileringAtrTakeProfitMultiplier)
 
     if (not _virtInsideAPosition) or ((not p_virtInsideAPosition_1) and _virtInsideAPosition) or _resetVirtVariables
-        _traileringAtrLongTakeProfitPrice := tmpTraileringAtrLongTakeProfitPrice
-        _traileringAtrShortTakeProfitPrice := tmpTraileringAtrShortTakeProfitPrice
+        _traileringAtrLongTakeProfitPrice := currentTraileringAtrLongTakeProfitPrice
+        _traileringAtrShortTakeProfitPrice := currentTraileringAtrShortTakeProfitPrice
         _virtLongTakeProfit := _traileringAtrLongTakeProfitPrice
         _virtShortTakeProfit := _traileringAtrShortTakeProfitPrice
 
