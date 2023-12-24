@@ -429,7 +429,7 @@ i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take P
 i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
 i_traileringAtrTakeProfitMultiplier = input.float(1.25, title='ATR Take Profit Multiplier % {1.25}', minval=0.01, group='Trailering')
 
-i_traileringTakeProfitPercentage = input.float(130.0, minval = 0.001, title='Take Profit Percentage {130.0 %}', group='Trailering')
+i_traileringTakeProfitPercentage = input.float(100.0, minval = 0.001, title='Take Profit Percentage {100.0 %}', group='Trailering')
 i_traileringTakeProfitPerOne = i_traileringTakeProfitPercentage * 0.01
 
 i_volumeBounceMinimumRatio = input.float(2.5, title='Min Ratio % {2.5}', minval=0.01, group='Volume Bounce')
