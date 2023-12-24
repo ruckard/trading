@@ -937,6 +937,21 @@ if (virtTraileringLongConsensus >= i_virtTraileringLongMinimumConsensus)
 if (virtTraileringShortConsensus >= i_virtTraileringShortMinimumConsensus)
     traileringShort := true
 
+// virtPositionPriceMedian calculus - BEGIN
+
+bool newVirtPositionPriceMedian = false
+virtPositionPriceArray = array.new_float()
+for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
+    if (array.get(traileringStatus, virtTraileringOffset).traileringLongBet)
+        array.push(virtPositionPriceArray, (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice))
+        newVirtPositionPriceMedian := true
+
+var float virtPositionPriceMedian = close
+if (newVirtPositionPriceMedian)
+    virtPositionPriceMedian := array.median(virtPositionPriceArray)
+
+// virtPositionPriceMedian calculus - END
+
 // Volume Bounce substrategy - BEGIN
 
 bool volumeBounceLong = false
@@ -1302,7 +1317,7 @@ if (i_enableTakeProfitDefaultLogic)
 var float originalTakeProfitPerOne = na
 if (i_enableTraileringTakeProfit)
     if (not insideABuyOrder[1] and LONG)
-        originalTakeProfitPerOne := ( virtPositionPrice / positionPrice ) - 1
+        originalTakeProfitPerOne := ( virtPositionPriceMedian / positionPrice ) - 1
         takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
@@ -1311,7 +1326,7 @@ if (i_enableTraileringTakeProfit)
             orderStopLoss := orderStopLossPerOne * 100
             LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
     if (not insideASellOrder[1] and SHORT)
-        originalTakeProfitPerOne := ( positionPrice / virtPositionPrice ) - 1
+        originalTakeProfitPerOne := ( positionPrice / virtPositionPriceMedian ) - 1
         takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
@@ -1322,7 +1337,7 @@ if (i_enableTraileringTakeProfit)
 
 if (i_enableTraileringTakeProfit)
     if (LONG[1] and (not (insideABuyOrder)))
-        originalTakeProfitPerOne := ( virtPositionPrice / positionPrice[1] ) - 1
+        originalTakeProfitPerOne := ( virtPositionPriceMedian / positionPrice[1] ) - 1
         takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         LongTakeProfit := positionPrice[1] * (1 + takeProfitPerOne)
@@ -1331,7 +1346,7 @@ if (i_enableTraileringTakeProfit)
             orderStopLoss := orderStopLossPerOne * 100
             LongStopLoss := positionPrice[1] * (1 - orderStopLossPerOne)
     if (SHORT[1] and (not (insideASellOrder)))
-        originalTakeProfitPerOne := ( positionPrice[1] / virtPositionPrice ) - 1
+        originalTakeProfitPerOne := ( positionPrice[1] / virtPositionPriceMedian ) - 1
         takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         ShortTakeProfit := positionPrice[1] * (1 - takeProfitPerOne)
@@ -1342,7 +1357,7 @@ if (i_enableTraileringTakeProfit)
 
 if (i_enableTraileringTakeProfit)
     if ((not insideABuyOrder[1]) and (insideABuyOrder))
-        originalTakeProfitPerOne := ( virtPositionPrice / strategy.position_avg_price ) - 1
+        originalTakeProfitPerOne := ( virtPositionPriceMedian / strategy.position_avg_price ) - 1
         takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         LongTakeProfit := strategy.position_avg_price * (1 + takeProfitPerOne)
@@ -1351,7 +1366,7 @@ if (i_enableTraileringTakeProfit)
             orderStopLoss := orderStopLossPerOne * 100
             LongStopLoss := strategy.position_avg_price * (1 - orderStopLossPerOne)
     if ((not insideASellOrder[1]) and (insideASellOrder))
-        originalTakeProfitPerOne := ( strategy.position_avg_price / virtPositionPrice ) - 1
+        originalTakeProfitPerOne := ( strategy.position_avg_price / virtPositionPriceMedian ) - 1
         takeProfitPerOne := i_traileringTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         ShortTakeProfit := strategy.position_avg_price * (1 - takeProfitPerOne)
