@@ -444,11 +444,11 @@ i_traileringTakeProfitPerOne = i_traileringTakeProfitPercentage * 0.01
 i_volumeBounceMinimumRatio = input.float(2.5, title='Min Ratio % {2.5}', minval=0.01, group='Volume Bounce')
 i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=0.01, group='Volume Bounce')
 
-i_bodyRangeAlmaLength = input.int(500, title='BodyRange Alma', group='BodyRange Alma', inline='BodyRangeAlmaSettings')
+i_bodyRangeAlmaLength = input.int(42, title='BodyRange Alma', group='BodyRange Alma', inline='BodyRangeAlmaSettings')
 i_bodyRangeAlmaOff  = input.float(0.85, title='', group='BodyRange Alma', inline='BodyRangeAlmaSettings')
-i_bodyRangeAlmaSig  = input.int(16, title='', group='BodyRange Alma', inline='BodyRangeAlmaSettings', tooltip='Defaults:\nLength: 500.\n Off: 0.85\n Sig: 16.')
+i_bodyRangeAlmaSig  = input.int(16, title='', group='BodyRange Alma', inline='BodyRangeAlmaSettings', tooltip='Defaults:\nLength: 42.\n Off: 0.85\n Sig: 16.')
 
-i_bodyRangeFilter = input.float(2.0, title='BodyRange Filter %', group='BodyRange Alma', inline='BodyRangeAlmaFilter', tooltip='Default: 2.0.')
+i_bodyRangeFilter = input.float(0.25, title='BodyRange Filter %', group='BodyRange Alma', inline='BodyRangeAlmaFilter', tooltip='Default: 0.25.')
 
 // ImplementedStrategy inputs - END
 
