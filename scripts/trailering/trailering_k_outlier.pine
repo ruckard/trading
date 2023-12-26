@@ -195,7 +195,7 @@
 
 // Tradingview Public description - END
 
-strategy('Trailering K003', shorttitle='K003Trailering', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=24000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Trailering K003', shorttitle='K003Trailering', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1100, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/Zignaly2Beta/4 as zig
@@ -217,7 +217,7 @@ string i_zignalyExchange = 'Zignaly'
 
 _ZIGEXTYPESPOT_ = 'spot', _ZIGEXFUTURES_ = 'futures'
 i_zignalyExchangeType = input.string(_ZIGEXFUTURES_, title='Exchange Type', options=[_ZIGEXFUTURES_, _ZIGEXTYPESPOT_], group='Zignaly', inline='ZignalyExchangeType', tooltip='Default: ' + _ZIGEXFUTURES_)
-i_zignalyLeverage = input.int(24, 'Leverage', minval=1, step=1, maxval=125, group='Zignaly', inline='ZignalyLeverage', tooltip='Default: 1x')
+i_zignalyLeverage = input.int(11, 'Leverage', minval=1, step=1, maxval=125, group='Zignaly', inline='ZignalyLeverage', tooltip='Default: 11x')
 var i_zignalyLeverage_str = str.tostring(i_zignalyLeverage)  // It needs to run only once
 
 i_enableZignalyHedgeMode = input.bool(true, title='Hedge Mode', group='Zignaly', inline='ZignalyHedgeMode', tooltip='If HedgeMode is enabled for the Profit Sharing service you probably want this to be enabled so that it allows you open both long and short positions at the same time.\nThis is useful when you run multiple strategies against the same Profit Sharing service.\nDefault: Enabled.')
@@ -296,7 +296,7 @@ i_riskManagementTypePre = input.string(_SCOMPOUND_, 'Type', options=[_SAFE_, _SC
  'Default: ' + _SCOMPOUND_)
 i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
 
-i_riskManagementMaximumLossPerTrade = input.float(0.084, title='Maximum loss per trade (%)', group='Risk Management', inline='RiskManagementMaximumLossPerTrade', tooltip='How much of your initial or current capital you want to lose as a maximum per trade.\nIt only works in ' + _SAFE_ + ' type and in ' + _SCOMPOUND_ + ' type. ' + '\nDefault: 1.0 %.') * 0.01
+i_riskManagementMaximumLossPerTrade = input.float(1.0, title='Maximum loss per trade (%)', group='Risk Management', inline='RiskManagementMaximumLossPerTrade', tooltip='How much of your initial or current capital you want to lose as a maximum per trade.\nIt only works in ' + _SAFE_ + ' type and in ' + _SCOMPOUND_ + ' type. ' + '\nDefault: 1.0 %.') * 0.01
 
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='... per D/W/M (%)', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
 i_riskManagementMaximumLossPerWeek = input.float(8.0, title='', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
