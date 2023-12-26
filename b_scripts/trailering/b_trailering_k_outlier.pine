@@ -1169,6 +1169,17 @@ plotchar(virtTraileringShortConsensus, "virtTraileringShortConsensus", "", locat
 
 // Virtual Trailering - Plot - END
 
+// BodyRange - Plot - BEGIN
+
+plot(bodyRange(), color=color.white, style=plot.style_columns)
+plot(averageBodyRange, color=color.orange)
+plot(-averageBodyRange, color=color.orange)
+
+plot(i_bodyRangeFilter)
+plot(-i_bodyRangeFilter)
+
+// BodyRange - Plot - END
+
 // ImplementedStrategy - Plot - END
 
 // Position price calculation - BEGIN
