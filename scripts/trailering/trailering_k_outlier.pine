@@ -1023,8 +1023,8 @@ volumeBounceShort := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volu
 absoluteBodyRange =  math.abs(bodyRange())
 averageBodyRange = ta.alma(absoluteBodyRange, i_bodyRangeAlmaLength ,i_bodyRangeAlmaOff ,i_bodyRangeAlmaSig)
 
-bodyRangeLong = bodyRange()  >= averageBodyRange and (bodyRange() >= i_bodyRangeFilter)
-bodyRangeShort = bodyRange()  <= -averageBodyRange and(bodyRange() <= -i_bodyRangeFilter)
+bodyRangeLong = bodyRange()  <= -averageBodyRange and(bodyRange() <= -i_bodyRangeFilter)
+bodyRangeShort = bodyRange()  >= averageBodyRange and (bodyRange() >= i_bodyRangeFilter)
 
 // bodyOutlier substrategy - END
 
