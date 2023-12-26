@@ -444,6 +444,12 @@ i_traileringTakeProfitPerOne = i_traileringTakeProfitPercentage * 0.01
 i_volumeBounceMinimumRatio = input.float(2.5, title='Min Ratio % {2.5}', minval=0.01, group='Volume Bounce')
 i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=0.01, group='Volume Bounce')
 
+i_bodyRangeAlmaLength = input.int(500, title='BodyRange Alma', group='BodyRange Alma', inline='BodyRangeAlmaSettings')
+i_bodyRangeAlmaOff  = input.float(0.85, title='', group='BodyRange Alma', inline='BodyRangeAlmaSettings')
+i_bodyRangeAlmaSig  = input.int(16, title='', group='BodyRange Alma', inline='BodyRangeAlmaSettings', tooltip='Defaults:\nLength: 500.\n Off: 0.85\n Sig: 16.')
+
+i_bodyRangeFilter = input.float(2.0, title='BodyRange Filter %', group='BodyRange Alma', inline='BodyRangeAlmaFilter', tooltip='Default: 2.0.')
+
 // ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
@@ -623,6 +629,14 @@ getTooOldOrderShortCloseAdvice () =>
 // Template functions - END
 
 // ImplementedStrategy functions - BEGIN
+
+// bodyOutlier functions - BEGIN
+
+bodyRange() =>
+    change =  (close - open) / open * 100
+
+// bodyOutlier functions - END
+
 // ImplementedStrategy functions - END
 
 // Strategy Body - BEGIN
@@ -1003,6 +1017,16 @@ volumeBounceLong := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volum
 volumeBounceShort := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volumeBounceRatio <= i_volumeBounceMaximumRatio)
 
 // Volume Bounce substrategy - END
+
+// bodyOutlier substrategy - BEGIN
+
+absoluteBodyRange =  math.abs(bodyRange())
+averageBodyRange = ta.alma(absoluteBodyRange, i_bodyRangeAlmaLength ,i_bodyRangeAlmaOff ,i_bodyRangeAlmaSig)
+
+bodyRangeLong = bodyRange()  >= averageBodyRange and (bodyRange() >= i_bodyRangeFilter)
+bodyRangeShort = bodyRange()  <= -averageBodyRange and(bodyRange() <= -i_bodyRangeFilter)
+
+// bodyOutlier substrategy - END
 
 // ImplementedStrategy substrategies - END
 
