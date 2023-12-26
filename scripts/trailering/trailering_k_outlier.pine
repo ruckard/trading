@@ -1033,7 +1033,7 @@ bodyRangeShort = bodyRange()  >= averageBodyRange and (bodyRange() >= i_bodyRang
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
 bool longCondition1 = traileringLong
-bool longCondition2 = volumeBounceLong
+bool longCondition2 = false
 bool longCondition3 = false
 bool longCondition4 = false
 bool longCondition5 = false
@@ -1041,7 +1041,7 @@ bool longCondition5 = false
 
 // Define here your, at most, 5 short conditions. Use false if not used. - BEGIN
 bool shortCondition1 = traileringShort
-bool shortCondition2 = volumeBounceShort
+bool shortCondition2 = false
 bool shortCondition3 = false
 bool shortCondition4 = false
 bool shortCondition5 = false
