@@ -482,6 +482,7 @@ type traileringStatusType
     bool virtTraileringBoth = na
 
 var traileringStatus = array.new<traileringStatusType>(i_virtTraileringPeriod, traileringStatusType.new())
+var traileringStatus_1 = array.new<traileringStatusType>(i_virtTraileringPeriod, traileringStatusType.new())
 
 var longSignalIdString = 'LONG-' + syminfo.ticker
 var shortSignalIdString = 'SHORT-' + syminfo.ticker
@@ -971,6 +972,11 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
 
     array.set(traileringStatus, virtTraileringOffset, traileringStatusType.copy(updatedCurrentTraileringStatus))
     // Save into traileringStatus (2/2) - END
+
+for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
+    traileringStatusType copyCurrentTraileringStatus = traileringStatusType.new()
+    copyCurrentTraileringStatus := array.get(traileringStatus, virtTraileringOffset)
+    array.set(traileringStatus_1, virtTraileringOffset, traileringStatusType.copy(copyCurrentTraileringStatus))
 
 // Trailering substrategy - END
 
