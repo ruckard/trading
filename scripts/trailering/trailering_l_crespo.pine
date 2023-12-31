@@ -925,16 +925,16 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
     bool virtInsideAPosition = array.get(traileringStatus, virtTraileringOffset).virtInsideAPosition
     float virtPositionPrice = array.get(traileringStatus, virtTraileringOffset).virtPositionPrice
 
-    bool virtLongTakeProfitIsReached_1 = (array.get(traileringStatus, virtTraileringOffset).virtLongTakeProfitIsReached)[1]
-    bool virtShortTakeProfitIsReached_1 = (array.get(traileringStatus, virtTraileringOffset).virtShortTakeProfitIsReached)[1]
-    bool virtTraileringBoth_1 = (array.get(traileringStatus, virtTraileringOffset).virtTraileringBoth)[1]
-    bool virtInsideAPosition_1 = (array.get(traileringStatus, virtTraileringOffset).virtInsideAPosition)[1]
-    float virtLongMaximumProfitPrice_1 = (array.get(traileringStatus, virtTraileringOffset).virtLongMaximumProfitPrice)[1]
-    float virtShortMaximumProfitPrice_1 = (array.get(traileringStatus, virtTraileringOffset).virtShortMaximumProfitPrice)[1]
-    float virtLongMaximumLossPrice_1 = (array.get(traileringStatus, virtTraileringOffset).virtLongMaximumLossPrice)[1]
-    float virtShortMaximumLossPrice_1 = (array.get(traileringStatus, virtTraileringOffset).virtShortMaximumLossPrice)[1]
-    float virtLongTakeProfit_1 = (array.get(traileringStatus, virtTraileringOffset).virtLongTakeProfit)[1]
-    float virtShortTakeProfit_1 = (array.get(traileringStatus, virtTraileringOffset).virtShortTakeProfit)[1]
+    bool virtLongTakeProfitIsReached_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtLongTakeProfitIsReached)
+    bool virtShortTakeProfitIsReached_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtShortTakeProfitIsReached)
+    bool virtTraileringBoth_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtTraileringBoth)
+    bool virtInsideAPosition_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtInsideAPosition)
+    float virtLongMaximumProfitPrice_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtLongMaximumProfitPrice)
+    float virtShortMaximumProfitPrice_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtShortMaximumProfitPrice)
+    float virtLongMaximumLossPrice_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtLongMaximumLossPrice)
+    float virtShortMaximumLossPrice_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtShortMaximumLossPrice)
+    float virtLongTakeProfit_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtLongTakeProfit)
+    float virtShortTakeProfit_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtShortTakeProfit)
 
     // Read from traileringStatus - END
 
