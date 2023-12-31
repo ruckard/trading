@@ -1025,16 +1025,25 @@ if (i_enableTraileringShortProtection)
 
 // virtPositionPriceMedian calculus - BEGIN
 
-bool newVirtPositionPriceMedian = false
-virtPositionPriceArray = array.new_float()
+bool newVirtLongPositionPriceMedian = false
+virtLongPositionPriceArray = array.new_float()
 for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
     if (array.get(traileringStatus, virtTraileringOffset).traileringLongBet)
-        array.push(virtPositionPriceArray, (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice))
-        newVirtPositionPriceMedian := true
+        array.push(virtLongPositionPriceArray, (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice))
+        newVirtLongPositionPriceMedian := true
+
+bool newVirtShortPositionPriceMedian = false
+virtShortPositionPriceArray = array.new_float()
+for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
+    if (array.get(traileringStatus, virtTraileringOffset).traileringShortBet)
+        array.push(virtShortPositionPriceArray, (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice))
+        newVirtShortPositionPriceMedian := true
 
 var float virtPositionPriceMedian = close
-if (newVirtPositionPriceMedian)
-    virtPositionPriceMedian := array.median(virtPositionPriceArray)
+if (newVirtShortPositionPriceMedian)
+    virtPositionPriceMedian := array.median(virtShortPositionPriceArray)
+if (newVirtLongPositionPriceMedian)
+    virtPositionPriceMedian := array.median(virtLongPositionPriceArray)
 
 // virtPositionPriceMedian calculus - END
 
