@@ -430,7 +430,7 @@ i_enableTraileringTakeProfit = input.bool(true, title='Enable Trailering TakePro
 i_enableTraileringStopLoss = input.bool(true, title='Enable Trailering StopLoss {True}', group='Trailering')
 i_enableTraileringExtremeTakeProfit = input.bool(false, title='Enable Trailering Extreme TakeProfit {False}', group='Trailering')
 i_enableTraileringSafeMedianTakeProfit = input.bool(false, title='Enable Trailering Safe Median TakeProfit {False}', group='Trailering', tooltip='Do not trade when extreme prices difference is not bigger than the Minimum (L) TakeProfit.')
-i_enableTraileringFiboTakeProfit = input.bool(true, title='Enable Trailering Fibo TakeProfit {True}', group='Trailering')
+i_enableTraileringFiboTakeProfit = input.bool(false, title='Enable Trailering Fibo TakeProfit {False}', group='Trailering')
 i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 i_lowestTakeProfitLength = input.int(24, title='TakeProfit Lowest Length (L) {24}', group='Trailering')
 i_highestTakeProfitLength = input.int(24, title='TakeProfit Highest Length (S) {24}', group='Trailering')
