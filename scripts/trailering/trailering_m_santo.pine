@@ -430,11 +430,15 @@ i_enableTraileringTakeProfit = input.bool(true, title='Enable Trailering TakePro
 i_enableTraileringStopLoss = input.bool(true, title='Enable Trailering StopLoss {True}', group='Trailering')
 i_enableTraileringExtremeTakeProfit = input.bool(false, title='Enable Trailering Extreme TakeProfit {False}', group='Trailering')
 i_enableTraileringSafeMedianTakeProfit = input.bool(true, title='Enable Trailering Safe Median TakeProfit {True}', group='Trailering', tooltip='Do not trade when extreme prices difference is not bigger than the Minimum (L) TakeProfit.')
+i_enableTraileringFiboTakeProfit = input.bool(false, title='Enable Trailering Fibo TakeProfit {False}', group='Trailering')
 i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 i_lowestTakeProfitLength = input.int(24, title='TakeProfit Lowest Length (L) {24}', group='Trailering')
 i_highestTakeProfitLength = input.int(24, title='TakeProfit Highest Length (S) {24}', group='Trailering')
 i_minimumLongTakeProfit = input.float(0.12, title='Minimum (L) TakeProfit % {0.12}', minval=0.01, group='Trailering', tooltip='This option is only taken into account if Enable Trailering Extreme TakeProfit is on.')
 i_minimumShortTakeProfit = input.float(0.12, title='Minimum (S) TakeProfit % {0.12}', minval=0.01, group='Trailering', tooltip='This option is only taken into account if Enable Trailering Extreme TakeProfit is on.')
+
+i_fiboTraileringLongTakeProfit = input.float(61.80, title='Fibo (L) TakeProfit % {61.80}', minval=0.01, group='Trailering')
+i_fiboTraileringShortTakeProfit = input.float(61.80, title='Fibo (S) TakeProfit % {61.80}', minval=0.01, group='Trailering')
 
 i_virtTakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
 i_virtTakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit Maximum Loss Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
@@ -1110,6 +1114,7 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
 
 var float virtPositionPriceMedian = close
 var float virtPositionExtremeMedian = close
+var float virtPositionPriceFibo = close
 
 // Extreme Median Calculus
 if (newVirtShortExtremePriceMedian)
@@ -1129,6 +1134,15 @@ if (i_enableTraileringExtremeTakeProfit or i_enableTraileringSafeMedianTakeProfi
 
 if (i_enableTraileringExtremeTakeProfit)
     virtPositionPriceMedian := virtPositionExtremeMedian
+
+if (i_enableTraileringFiboTakeProfit)
+    if (newVirtShortPositionPriceMedian)
+        virtPositionPriceFibo := virtPositionPriceMedian + ( i_fiboTraileringLongTakeProfit * 0.01 * (virtPositionExtremeMedian - virtPositionPriceMedian) )
+    if (newVirtLongPositionPriceMedian)
+        virtPositionPriceFibo := virtPositionExtremeMedian + ( i_fiboTraileringLongTakeProfit * 0.01 * (virtPositionPriceMedian - virtPositionExtremeMedian) )
+
+if (i_enableTraileringFiboTakeProfit)
+    virtPositionPriceMedian := virtPositionPriceFibo
 
 // virtPositionPriceMedian calculus - END
 
