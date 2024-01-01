@@ -305,7 +305,7 @@ i_riskManagementTypePre = input.string(_SCOMPOUND_, 'Type', options=[_SAFE_, _SC
  'Default: ' + _SCOMPOUND_)
 i_riskManagementType = (i_riskManagementTypePre == _SAFE_) ? 'SAFE' : (i_riskManagementTypePre == _SCOMPOUND_) ? 'SCOMPOUND' : (i_riskManagementTypePre == _NONE_) ? 'NONE' : (i_riskManagementTypePre == _CUSTOM_) ? 'CUSTOM' : 'FORCED'
 
-i_riskManagementMaximumLossPerTrade = input.float(1.0, title='Maximum loss per trade (%)', group='Risk Management', inline='RiskManagementMaximumLossPerTrade', tooltip='How much of your initial or current capital you want to lose as a maximum per trade.\nIt only works in ' + _SAFE_ + ' type and in ' + _SCOMPOUND_ + ' type. ' + '\nDefault: 1.0 %.') * 0.01
+i_riskManagementMaximumLossPerTrade = input.float(2.0, title='Maximum loss per trade (%)', group='Risk Management', inline='RiskManagementMaximumLossPerTrade', tooltip='How much of your initial or current capital you want to lose as a maximum per trade.\nIt only works in ' + _SAFE_ + ' type and in ' + _SCOMPOUND_ + ' type. ' + '\nDefault: 2.0 %.') * 0.01
 
 i_riskManagementMaximumLossPerDay = input.float(6.0, title='... per D/W/M (%)', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
 i_riskManagementMaximumLossPerWeek = input.float(8.0, title='', group='Risk Management', inline='RiskManagementMaximumLossPerDay') * 0.01
@@ -321,22 +321,22 @@ i_atrVolatilityMinimumMultiplier = input.float(1.10, title='Minimum/Maximum (%)'
 i_atrVolatilityMaximumMultiplier = input.float(2.00, title='', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax', tooltip='Defaults:\nMinimum: 1.10 %.\nMaximum: 2.00 %.')
 
 // Enforce Higher Timeframe Trend - Inputs
-i_higherTimeframeTrendMaEnforce = input.bool(false, title='Enable', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
-i_showHigherTimeframeTrendMa = input.bool(false, title='Show', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow', tooltip='Defaults:\nEnable: False.\nShow: False.')
+i_higherTimeframeTrendMaEnforce = input.bool(true, title='Enable', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
+i_showHigherTimeframeTrendMa = input.bool(false, title='Show', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow', tooltip='Defaults:\nEnable: True.\nShow: False.')
 
-i_higherTimeframeTrendMaTimeframe = input.timeframe('60', title='Timeframe/Offset', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
-i_higherTimeframeTrendMaOffset = input.int(0, title='', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset', tooltip='Defaults:\nTimeframe: 1 hour.\nOffset: 0 bars.')
+i_higherTimeframeTrendMaTimeframe = input.timeframe('240', title='Timeframe/Offset', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
+i_higherTimeframeTrendMaOffset = input.int(0, title='', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset', tooltip='Defaults:\nTimeframe: 4 hours.\nOffset: 0 bars.')
 
-i_higherTimeframeTrendFastMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA', 'ALMA'], title = 'Fast MA', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
-i_higherTimeframeTrendFastMaLength = input.int(10, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
-i_higherTimeframeTrendFastMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa', tooltip='Defaults:\nType: VWMA.\nLength: 10.\nSource: close.')
+i_higherTimeframeTrendFastMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA', 'ALMA'], title = 'Fast MA', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
+i_higherTimeframeTrendFastMaLength = input.int(200, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
+i_higherTimeframeTrendFastMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa', tooltip='Defaults:\nType: SMA.\nLength: 200.\nSource: close.')
 
 i_higherTimeframeTrendFastMaOffset = input.float(0.89, minval = 0,  title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa2')
 i_higherTimeframeTrendFastMaSigma = input.float(16.0, minval = 0,  title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa2', tooltip='Defaults:\nOffset: 0.89.\nSigma: 16.0.\nPlease note that this is only used when selecting ALMA type.')
 
-i_higherTimeframeTrendSlowMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA', 'ALMA'], title = 'Slow MA', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
-i_higherTimeframeTrendSlowMaLength = input.int(55, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
-i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa', tooltip='Defaults:\nType: VWMA.\nLength: 55.\nSource: close.')
+i_higherTimeframeTrendSlowMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA', 'ALMA'], title = 'Slow MA', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
+i_higherTimeframeTrendSlowMaLength = input.int(50, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
+i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa', tooltip='Defaults:\nType: SMA.\nLength: 50.\nSource: close.')
 
 i_higherTimeframeTrendSlowMaOffset = input.float(0.89, minval = 0,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa2')
 i_higherTimeframeTrendSlowMaSigma = input.float(16.0, minval = 0,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa2', tooltip='Defaults:\nOffset: 0.89.\nSigma: 16.0.\nPlease note that this is only used when selecting ALMA type.')
@@ -428,7 +428,7 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 i_enableTraileringTakeProfit = input.bool(true, title='Enable Trailering TakeProfit {True}', group='Trailering')
 i_enableTraileringStopLoss = input.bool(true, title='Enable Trailering StopLoss {True}', group='Trailering')
-i_enableTraileringExtremeTakeProfit = input.bool(true, title='Enable Trailering Extreme TakeProfit {True}', group='Trailering')
+i_enableTraileringExtremeTakeProfit = input.bool(false, title='Enable Trailering Extreme TakeProfit {False}', group='Trailering')
 i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 i_lowestTakeProfitLength = input.int(24, title='TakeProfit Lowest Length (L) {24}', group='Trailering')
 i_highestTakeProfitLength = input.int(24, title='TakeProfit Highest Length (S) {24}', group='Trailering')
