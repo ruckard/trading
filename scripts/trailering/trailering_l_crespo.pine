@@ -225,6 +225,15 @@ i_enableIgnoreOpenContractCheck = input.bool(true, title='Ignore Open Contract C
 
 i_enableOrderCommentDebug = input.bool(false, title='DEBUG on order comments', group='Zignaly', inline='ZignalyDebug', tooltip='Default: Disabled.')
 
+// Days of week - Filter - Inputs
+i_enableMonday = input.bool(true, title='M', group='Day Of Week Filter', inline='DayOfWeekFilter1')
+i_enableTuesday = input.bool(true, title='T', group='Day Of Week Filter', inline='DayOfWeekFilter1')
+i_enableWednesday = input.bool(true, title='W', group='Day Of Week Filter', inline='DayOfWeekFilter1')
+i_enableThursday = input.bool(true, title='T', group='Day Of Week Filter', inline='DayOfWeekFilter1')
+i_enableFriday = input.bool(true, title='F', group='Day Of Week Filter', inline='DayOfWeekFilter1')
+i_enableSaturday = input.bool(true, title='S', group='Day Of Week Filter', inline='DayOfWeekFilter2')
+i_enableSunday = input.bool(true, title='S', group='Day Of Week Filter', inline='DayOfWeekFilter2')
+
 // Strategy - Inputs
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
 i_strategyType = input.string(_L_, 'Type', options=[L_S, _L_, _S_, _REVERSE_], group='Strategy', inline='StrategyType', tooltip='Default: ' + _L_)
@@ -499,6 +508,27 @@ string stringNA = na
 
 onStartTimeInterval = (not i_strategyStartTimeOn) or (time >= i_strategyStartTime)
 offStopTimeInterval = (i_strategyStopTimeOn) and (time > i_strategyStopTime)
+
+// Days of week - Filter - BEGIN
+bool dayOfWeekAllowed = false
+
+gmtDayOfWeek = dayofweek(time, 'GMT')
+
+if ((gmtDayOfWeek == dayofweek.monday) and i_enableMonday)
+    dayOfWeekAllowed := true
+if ((gmtDayOfWeek == dayofweek.tuesday) and i_enableTuesday)
+    dayOfWeekAllowed := true
+if ((gmtDayOfWeek == dayofweek.wednesday) and i_enableWednesday)
+    dayOfWeekAllowed := true
+if ((gmtDayOfWeek == dayofweek.thursday) and i_enableThursday)
+    dayOfWeekAllowed := true
+if ((gmtDayOfWeek == dayofweek.friday) and i_enableFriday)
+    dayOfWeekAllowed := true
+if ((gmtDayOfWeek == dayofweek.saturday) and i_enableSaturday)
+    dayOfWeekAllowed := true
+if ((gmtDayOfWeek == dayofweek.sunday) and i_enableSunday)
+    dayOfWeekAllowed := true
+// Days of week - Filter - END
 
 // order Stop Loss
 var float orderStopLossPerOne = na
@@ -1273,9 +1303,9 @@ tooRecentOrderNotOpenAdvice = f_getTooRecentOrderNotOpenAdvice (lastOrderOpenBar
 // Decide if we are going to LONG/Go LONG - BEGIN
 PRE_LONG = false
 if (i_tooRecentMinutesNumber == 0)
-    PRE_LONG := onStartTimeInterval and longCondition
+    PRE_LONG := onStartTimeInterval and dayOfWeekAllowed and longCondition
 else
-    PRE_LONG := onStartTimeInterval and longCondition and (not tooRecentOrderNotOpenAdvice)
+    PRE_LONG := onStartTimeInterval and dayOfWeekAllowed and longCondition and (not tooRecentOrderNotOpenAdvice)
 
 // LONG = PRE_LONG[1] and PRE_LONG // Wait for confirmation
 LONG = PRE_LONG // Do not wait for confirmation
@@ -1285,9 +1315,9 @@ LONG = PRE_LONG // Do not wait for confirmation
 // Decide if we are going to SHORT/Go SHORT - BEGIN
 PRE_SHORT = false
 if (i_tooRecentMinutesNumber == 0)
-    PRE_SHORT := onStartTimeInterval and shortCondition
+    PRE_SHORT := onStartTimeInterval and dayOfWeekAllowed and shortCondition
 else
-    PRE_SHORT := onStartTimeInterval and shortCondition and (not tooRecentOrderNotOpenAdvice)
+    PRE_SHORT := onStartTimeInterval and dayOfWeekAllowed and shortCondition and (not tooRecentOrderNotOpenAdvice)
 
 // SHORT = PRE_SHORT[1] and PRE_SHORT // Wait for confirmation
 SHORT = PRE_SHORT // Do not wait for confirmation
