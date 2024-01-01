@@ -1108,21 +1108,26 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
         newVirtShortExtremePriceMedian := true
 
 var float virtPositionPriceMedian = close
+var float virtPositionExtremeMedian = close
+
+// Extreme Median Calculus
+if (newVirtShortExtremePriceMedian)
+    virtPositionExtremeMedian := array.max(virtShortExtremePriceArray)
+if (newVirtLongExtremePriceMedian)
+    virtPositionExtremeMedian := array.min(virtLongExtremePriceArray)
+
+// Classic Median Calculus
+if (newVirtShortPositionPriceMedian)
+    virtPositionPriceMedian := array.median(virtShortPositionPriceArray)
+if (newVirtLongPositionPriceMedian)
+    virtPositionPriceMedian := array.median(virtLongPositionPriceArray)
+
+if (i_enableTraileringExtremeTakeProfit or true) // TODO: NEW SETTING
+    traileringLong := traileringLong and (virtPositionExtremeMedian >= (close + (i_minimumLongTakeProfit * 0.01 * close)))
+    traileringShort := traileringShort and (virtPositionExtremeMedian <= (close - (i_minimumShortTakeProfit * 0.01 * close)))
 
 if (i_enableTraileringExtremeTakeProfit)
-    if (newVirtShortExtremePriceMedian)
-        virtPositionPriceMedian := array.max(virtShortExtremePriceArray)
-    if (newVirtLongExtremePriceMedian)
-        virtPositionPriceMedian := array.min(virtLongExtremePriceArray)
-else // Classic Median Calculus
-    if (newVirtShortPositionPriceMedian)
-        virtPositionPriceMedian := array.median(virtShortPositionPriceArray)
-    if (newVirtLongPositionPriceMedian)
-        virtPositionPriceMedian := array.median(virtLongPositionPriceArray)
-
-if (i_enableTraileringExtremeTakeProfit)
-    traileringLong := traileringLong and (virtPositionPriceMedian >= (close + (i_minimumLongTakeProfit * 0.01 * close)))
-    traileringShort := traileringShort and (virtPositionPriceMedian <= (close - (i_minimumShortTakeProfit * 0.01 * close)))
+    virtPositionPriceMedian := virtPositionExtremeMedian
 
 // virtPositionPriceMedian calculus - END
 
