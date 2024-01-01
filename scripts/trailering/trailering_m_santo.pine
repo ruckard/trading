@@ -429,7 +429,7 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 i_enableTraileringTakeProfit = input.bool(true, title='Enable Trailering TakeProfit {True}', group='Trailering')
 i_enableTraileringStopLoss = input.bool(true, title='Enable Trailering StopLoss {True}', group='Trailering')
 i_enableTraileringExtremeTakeProfit = input.bool(false, title='Enable Trailering Extreme TakeProfit {False}', group='Trailering')
-i_enableTraileringSafeMedianTakeProfit = input.bool(true, title='Enable Trailering Safe Median TakeProfit {True}', group='Trailering', tooltip='Do not trade when extreme prices difference is not bigger than the Minimum (L) TakeProfit.')
+i_enableTraileringSafeMedianTakeProfit = input.bool(false, title='Enable Trailering Safe Median TakeProfit {False}', group='Trailering', tooltip='Do not trade when extreme prices difference is not bigger than the Minimum (L) TakeProfit.')
 i_enableTraileringFiboTakeProfit = input.bool(false, title='Enable Trailering Fibo TakeProfit {False}', group='Trailering')
 i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 i_lowestTakeProfitLength = input.int(24, title='TakeProfit Lowest Length (L) {24}', group='Trailering')
