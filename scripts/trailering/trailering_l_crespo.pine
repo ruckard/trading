@@ -327,13 +327,19 @@ i_showHigherTimeframeTrendMa = input.bool(false, title='Show', group='Enforce Hi
 i_higherTimeframeTrendMaTimeframe = input.timeframe('60', title='Timeframe/Offset', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
 i_higherTimeframeTrendMaOffset = input.int(0, title='', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset', tooltip='Defaults:\nTimeframe: 1 hour.\nOffset: 0 bars.')
 
-i_higherTimeframeTrendFastMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Fast MA', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
+i_higherTimeframeTrendFastMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA', 'ALMA'], title = 'Fast MA', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
 i_higherTimeframeTrendFastMaLength = input.int(10, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa')
 i_higherTimeframeTrendFastMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa', tooltip='Defaults:\nType: VWMA.\nLength: 10.\nSource: close.')
 
-i_higherTimeframeTrendSlowMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA'], title = 'Slow MA', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
+i_higherTimeframeTrendFastMaOffset = input.float(0.89, minval = 0,  title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa2')
+i_higherTimeframeTrendFastMaSigma = input.float(16.0, minval = 0,  title = '', group='Enforce Higher Timeframe Trend', inline='HTFastMa2', tooltip='Defaults:\nOffset: 0.89.\nSigma: 16.0.\nPlease note that this is only used when selecting ALMA type.')
+
+i_higherTimeframeTrendSlowMaType = input.string(defval = 'VWMA', options = ['SMA', 'EMA', 'VWMA', 'RMA', 'WMA', 'ALMA'], title = 'Slow MA', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
 i_higherTimeframeTrendSlowMaLength = input.int(55, minval = 1,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa')
 i_higherTimeframeTrendSlowMaSource = input.source(close, title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa', tooltip='Defaults:\nType: VWMA.\nLength: 55.\nSource: close.')
+
+i_higherTimeframeTrendSlowMaOffset = input.float(0.89, minval = 0,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa2')
+i_higherTimeframeTrendSlowMaSigma = input.float(16.0, minval = 0,  title = '', group='Enforce Higher Timeframe Trend', inline='HTSlowMa2', tooltip='Defaults:\nOffset: 0.89.\nSigma: 16.0.\nPlease note that this is only used when selecting ALMA type.')
 
 // Too old order - Inputs
 i_enableTooOldLongOrderClose = input.bool(true, title='(L)', group='Too Old Orders', inline='Too Old Long Orders')
@@ -632,13 +638,13 @@ f_getTooRecentOrderNotOpenAdvice (_lastOrderOpenBarTime) =>
     _tooRecentOrderBuyNotOpenAdvice
 
 // MA - Functions - BEGIN
-f_Ma (_maType, _maSource, _maLength) =>
-    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : _maType == "WMA" ? ta.wma(_maSource, _maLength) : _maType == "HMA" ? ta.hma(_maSource, _maLength) : _maSource
+f_Ma (_maType, _maSource, _maLength, _maOffset, _maSigma) =>
+    _maType == "SMA" ? ta.sma(_maSource, _maLength) : _maType == "EMA" ? ta.ema(_maSource, _maLength) : _maType == "VWMA" ? ta.vwma(_maSource, _maLength) : _maType == "RMA" ? ta.rma(_maSource, _maLength) : _maType == "WMA" ? ta.wma(_maSource, _maLength) : _maType == "HMA" ? ta.hma(_maSource, _maLength) : _maType == "ALMA" ? ta.alma(_maSource, _maLength, _maOffset, _maSigma) : _maSource
 // MA - Functions - END
 
-getTrend (_fastMaType, _fastMaLength, _fastMaSource, _slowMaType, _slowMaLength, _slowMaSource, _offset) =>
-    _fastMa = f_Ma (_fastMaType, _fastMaSource, _fastMaLength)
-    _slowMa = f_Ma (_slowMaType, _slowMaSource, _slowMaLength)
+getTrend (_fastMaType, _fastMaLength, _fastMaSource, _fastMaOffset, _fastMaSigma, _slowMaType, _slowMaLength, _slowMaSource, _offset, _slowMaOffset, _slowMaSigma) =>
+    _fastMa = f_Ma (_fastMaType, _fastMaSource, _fastMaLength, _fastMaOffset, _fastMaSigma)
+    _slowMa = f_Ma (_slowMaType, _slowMaSource, _slowMaLength, _slowMaOffset, _slowMaSigma)
     _trend = _fastMa >= _slowMa
 
     _trendOffset = _trend[_offset]
@@ -689,7 +695,7 @@ bodyRange() =>
 // Template substrategies - BEGIN
 // Higher Timeframe Trend substrategy
 
-higherTimeframeTrend = request.security(syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, getTrend (i_higherTimeframeTrendFastMaType, i_higherTimeframeTrendFastMaLength, i_higherTimeframeTrendFastMaSource, i_higherTimeframeTrendSlowMaType, i_higherTimeframeTrendSlowMaLength, i_higherTimeframeTrendSlowMaSource, i_higherTimeframeTrendMaOffset))
+higherTimeframeTrend = request.security(syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, getTrend (i_higherTimeframeTrendFastMaType, i_higherTimeframeTrendFastMaLength, i_higherTimeframeTrendFastMaSource, i_higherTimeframeTrendFastMaOffset, i_higherTimeframeTrendFastMaSigma, i_higherTimeframeTrendSlowMaType, i_higherTimeframeTrendSlowMaLength, i_higherTimeframeTrendSlowMaSource, i_higherTimeframeTrendMaOffset, i_higherTimeframeTrendSlowMaOffset, i_higherTimeframeTrendSlowMaSigma))
 
 int higherTimeframeTrendMaBarIndex = request.security (syminfo.tickerid, i_higherTimeframeTrendMaTimeframe, bar_index)
 bool newHigherTimeframeTrendMaBar = higherTimeframeTrendMaBarIndex[1] != higherTimeframeTrendMaBarIndex[0]
@@ -721,8 +727,8 @@ if barIsVolatileShort or barIsVolatileShort[1]
     volatilityShortCondition := false
 
 // Curie Closing Lines substrategy
-curieHighClosingMa = f_Ma (i_curieHighClosingMaType, i_curieHighClosingMaSource, i_curieHighClosingMaLength)
-curieLowClosingMa = f_Ma (i_curieLowClosingMaType, i_curieLowClosingMaSource, i_curieLowClosingMaLength)
+curieHighClosingMa = f_Ma (i_curieHighClosingMaType, i_curieHighClosingMaSource, i_curieHighClosingMaLength, 0, 0)
+curieLowClosingMa = f_Ma (i_curieLowClosingMaType, i_curieLowClosingMaSource, i_curieLowClosingMaLength, 0, 0)
 
 curieHighestClosingMA = ta.highest(curieHighClosingMa, i_curieHighestClosingMaLength)
 curieLowestClosingMA = ta.lowest(curieLowClosingMa, i_curieLowestClosingMaLength)
