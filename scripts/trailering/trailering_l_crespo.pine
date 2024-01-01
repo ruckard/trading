@@ -417,6 +417,8 @@ i_enableTraileringExtremeTakeProfit = input.bool(true, title='Enable Trailering 
 i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 i_lowestTakeProfitLength = input.int(24, title='TakeProfit Lowest Length (L) {24}', group='Trailering')
 i_highestTakeProfitLength = input.int(24, title='TakeProfit Highest Length (S) {24}', group='Trailering')
+i_minimumLongTakeProfit = input.float(0.12, title='Minimum (L) TakeProfit % {0.12}', minval=0.01, group='Trailering', tooltip='This option is only taken into account if Enable Trailering Extreme TakeProfit is on.')
+i_minimumShortTakeProfit = input.float(0.12, title='Minimum (S) TakeProfit % {0.12}', minval=0.01, group='Trailering', tooltip='This option is only taken into account if Enable Trailering Extreme TakeProfit is on.')
 
 i_virtTakeProfitMaximumProfitExcursionRatio = input.float(1.0, title='TakeProfit Maximum Profit Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
 i_virtTakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit Maximum Loss Excursion Ratio % {1.0}', minval=0.01, group='Trailering')
@@ -1081,6 +1083,10 @@ else // Classic Median Calculus
         virtPositionPriceMedian := array.median(virtShortPositionPriceArray)
     if (newVirtLongPositionPriceMedian)
         virtPositionPriceMedian := array.median(virtLongPositionPriceArray)
+
+if (i_enableTraileringExtremeTakeProfit)
+    traileringLong := traileringLong and (virtPositionPriceMedian >= (close + (i_minimumLongTakeProfit * 0.01 * close)))
+    traileringShort := traileringShort and (virtPositionPriceMedian <= (close - (i_minimumShortTakeProfit * 0.01 * close)))
 
 // virtPositionPriceMedian calculus - END
 
