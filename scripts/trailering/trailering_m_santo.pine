@@ -432,6 +432,10 @@ i_enableTraileringStopLoss = input.bool(false, title='Enable Trailering StopLoss
 i_enableTraileringExtremeTakeProfit = input.bool(false, title='Enable Trailering Extreme TakeProfit {False}', group='Trailering')
 i_enableTraileringSafeMedianTakeProfit = input.bool(false, title='Enable Trailering Safe Median TakeProfit {False}', group='Trailering', tooltip='Do not trade when extreme prices difference is not bigger than the Minimum (L) TakeProfit.')
 i_enableTraileringFiboTakeProfit = input.bool(false, title='Enable Trailering Fibo TakeProfit {False}', group='Trailering')
+
+i_enableTraileringLongFollowTheBumpClose = input.bool(true, title='Follow the Bump Close (L)', group='Trailering', inline='enableFollowTheBump')
+i_enableTraileringShortFollowTheBumpClose = input.bool(true, title='(S)', group='Trailering', inline='enableFollowTheBump', tooltip='Defaults:\n(L): True\n(S): True')
+
 i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 i_lowestTakeProfitLength = input.int(24, title='TakeProfit Lowest Length (L) {24}', group='Trailering')
 i_highestTakeProfitLength = input.int(24, title='TakeProfit Highest Length (S) {24}', group='Trailering')
@@ -483,6 +487,9 @@ i_bodyRangeAlmaOff  = input.float(0.85, title='', group='BodyRange Alma', inline
 i_bodyRangeAlmaSig  = input.int(16, title='', group='BodyRange Alma', inline='BodyRangeAlmaSettings', tooltip='Defaults:\nLength: 42.\n Off: 0.85\n Sig: 16.')
 
 i_bodyRangeFilter = input.float(0.25, title='BodyRange Filter %', group='BodyRange Alma', inline='BodyRangeAlmaFilter', tooltip='Default: 0.25.')
+
+i_traileringLongFollowTheBumpCloseConsensusMinimum = input.int(1, minval = 1,  title = 'Follow the Bump (L)', group='Trailering', inline='traileringFollowTheBump', tooltip='Defaults:\n(L) Enable: true,\nLookback: 4\nConsensus Minimum: 1')
+i_traileringShortFollowTheBumpCloseConsensusMinimum = input.int(1, minval = 1,  title = '(S)', group='Trailering', inline='traileringFollowTheBump', tooltip='Defaults:\n(L) Enable: true,\n(S) Enable: true')
 
 // ImplementedStrategy inputs - END
 
@@ -1083,6 +1090,12 @@ if (i_enableTraileringShortProtection)
 
 // Trailering Protection - END
 
+// Follow the Bump Close Advice - BEGIN
+traileringLongFollowTheBumpCloseAdvice = (virtTraileringShortConsensus >= i_traileringLongFollowTheBumpCloseConsensusMinimum)
+traileringShortFollowTheBumpCloseAdvice = (virtTraileringLongConsensus >= i_traileringShortFollowTheBumpCloseConsensusMinimum)
+
+// Follow the Bump Close Advice - END
+
 // virtPositionPriceMedian calculus - BEGIN
 
 bool newVirtLongPositionPriceMedian = false
@@ -1366,6 +1379,9 @@ if i_enableTooOldLongOrderClose
 if i_enableLongRSIClosing
     LONG_CLOSE := LONG_CLOSE or ( ta.crossunder(closingRsi, longRSIClosingLevel) )
 
+if i_enableTraileringLongFollowTheBumpClose
+    LONG_CLOSE := LONG_CLOSE or traileringLongFollowTheBumpCloseAdvice
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if (offStopTimeInterval)
     LONG_CLOSE := true
@@ -1388,6 +1404,9 @@ if i_enableTooOldShortOrderClose
 
 if i_enableShortRSIClosing
     SHORT_CLOSE := SHORT_CLOSE or ( ta.crossover(closingRsi, shortRSIClosingLevel) )
+
+if i_enableTraileringShortFollowTheBumpClose
+    SHORT_CLOSE := SHORT_CLOSE or traileringShortFollowTheBumpCloseAdvice
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if (offStopTimeInterval)
