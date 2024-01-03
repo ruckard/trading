@@ -874,8 +874,20 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     float _virtExtremeLowestPrice = p_virtExtremeLowestPrice
     float _virtExtremeHighestPrice = p_virtExtremeHighestPrice
 
-    if (not (p_virtLongTakeProfitIsReached_1 or p_virtShortTakeProfitIsReached_1))
-        if ((not insideASellOrder) and (not insideABuyOrder))
+    // Long
+    if (not p_virtShortTakeProfitIsReached_1)
+        if (not insideABuyOrder)
+            if ((not p_virtTraileringBoth_1) and (_virtTraileringBoth))
+                if (_virtInsideAPosition)
+                    _resetVirtVariables := true
+                _virtInsideAPosition := true
+                _virtPositionPrice := close
+                _virtExtremeLowestPrice := p_traileringCurrentLowest
+                _virtExtremeHighestPrice := p_traileringCurrentHighest
+
+    // Short
+    if (not p_virtLongTakeProfitIsReached_1)
+        if (not insideASellOrder)
             if ((not p_virtTraileringBoth_1) and (_virtTraileringBoth))
                 if (_virtInsideAPosition)
                     _resetVirtVariables := true
