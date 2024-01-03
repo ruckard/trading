@@ -944,17 +944,6 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     // Long
     if (_resetVirtVariables or ((not p_virtInsideAPosition_1) and _virtInsideAPosition))
-        if (close <= _virtPositionPrice)
-            _virtLongMaximumLossPrice := close
-        else
-            _virtLongMaximumLossPrice := _virtPositionPrice
-    else if (_virtInsideAPosition)
-        if (close <= p_virtLongMaximumLossPrice_1)
-            _virtLongMaximumLossPrice := close
-    _virtLongMaximumLossExcursion := math.abs(_virtLongMaximumLossPrice - _virtPositionPrice)
-
-    // Short
-    if (_resetVirtVariables or ((not p_virtInsideAPosition_1) and _virtInsideAPosition))
         if (close >= _virtPositionPrice)
             _virtShortMaximumLossPrice := close
         else
@@ -963,6 +952,17 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
         if (close >= p_virtShortMaximumLossPrice_1)
             _virtShortMaximumLossPrice := close
     _virtShortMaximumLossExcursion := math.abs(_virtShortMaximumLossPrice - _virtPositionPrice)
+
+    // Short
+    if (_resetVirtVariables or ((not p_virtInsideAPosition_1) and _virtInsideAPosition))
+        if (close <= _virtPositionPrice)
+            _virtLongMaximumLossPrice := close
+        else
+            _virtLongMaximumLossPrice := _virtPositionPrice
+    else if (_virtInsideAPosition)
+        if (close <= p_virtLongMaximumLossPrice_1)
+            _virtLongMaximumLossPrice := close
+    _virtLongMaximumLossExcursion := math.abs(_virtLongMaximumLossPrice - _virtPositionPrice)
 
     if _resetVirtVariables
         _resetVirtVariables := false
