@@ -507,6 +507,8 @@ type traileringStatusType
     float virtExpectedTakeProfit = na
     bool resetVirtVariables = false
     bool virtInsideAPosition = false
+    bool longVirtInsideAPosition = false
+    bool shortVirtInsideAPosition = false
     float virtPositionPrice = close
     bool traileringLongBet = false
     bool traileringShortBet = false
@@ -836,7 +838,7 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 
 // Virtual Trailering Position - BEGIN
 
-f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virtLongMaximumLossPrice, p_virtShortMaximumProfitPrice, p_virtShortMaximumLossPrice, p_traileringAtrLongTakeProfitPrice, p_traileringAtrShortTakeProfitPrice, p_virtLongTakeProfit, p_virtShortTakeProfit, p_virtExpectedTakeProfit, p_resetVirtVariables, p_virtInsideAPosition, p_virtPositionPrice, p_virtLongTakeProfitIsReached_1, p_virtShortTakeProfitIsReached_1, p_virtTraileringBoth_1, p_virtInsideAPosition_1, p_virtLongMaximumProfitPrice_1, p_virtShortMaximumProfitPrice_1, p_virtLongMaximumLossPrice_1, p_virtShortMaximumLossPrice_1, p_virtLongTakeProfit_1, p_virtShortTakeProfit_1, p_currentTraileringAtrLongTakeProfitPrice, p_currentTraileringAtrShortTakeProfitPrice, p_traileringCurrentLowest, p_traileringCurrentHighest, p_virtExtremeLowestPrice, p_virtExtremeHighestPrice)=>
+f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virtLongMaximumLossPrice, p_virtShortMaximumProfitPrice, p_virtShortMaximumLossPrice, p_traileringAtrLongTakeProfitPrice, p_traileringAtrShortTakeProfitPrice, p_virtLongTakeProfit, p_virtShortTakeProfit, p_virtExpectedTakeProfit, p_resetVirtVariables, p_virtInsideAPosition, p_longVirtInsideAPosition, p_shortVirtInsideAPosition, p_virtPositionPrice, p_virtLongTakeProfitIsReached_1, p_virtShortTakeProfitIsReached_1, p_virtTraileringBoth_1, p_virtInsideAPosition_1, p_longVirtInsideAPosition_1, p_shortVirtInsideAPosition_1, p_virtLongMaximumProfitPrice_1, p_virtShortMaximumProfitPrice_1, p_virtLongMaximumLossPrice_1, p_virtShortMaximumLossPrice_1, p_virtLongTakeProfit_1, p_virtShortTakeProfit_1, p_currentTraileringAtrLongTakeProfitPrice, p_currentTraileringAtrShortTakeProfitPrice, p_traileringCurrentLowest, p_traileringCurrentHighest, p_virtExtremeLowestPrice, p_virtExtremeHighestPrice)=>
 
     _traileringAtrIsPossible = bar_index >= i_traileringAtrTakeProfitLength
 
@@ -870,6 +872,8 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     _virtLongTakeProfitIsReached = (_virtLongTakeProfit >= low) and (_virtLongTakeProfit <= high)
 
     bool _virtInsideAPosition = p_virtInsideAPosition
+    bool _longVirtInsideAPosition = p_longVirtInsideAPosition
+    bool _shortVirtInsideAPosition = p_shortVirtInsideAPosition
     float _virtPositionPrice = p_virtPositionPrice
     float _virtExtremeLowestPrice = p_virtExtremeLowestPrice
     float _virtExtremeHighestPrice = p_virtExtremeHighestPrice
@@ -878,9 +882,9 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     if (not p_virtShortTakeProfitIsReached_1)
         if (not insideABuyOrder)
             if ((not p_virtTraileringBoth_1) and (_virtTraileringBoth))
-                if (_virtInsideAPosition)
+                if (_longVirtInsideAPosition)
                     _resetVirtVariables := true
-                _virtInsideAPosition := true
+                _longVirtInsideAPosition := true
                 _virtPositionPrice := close
                 _virtExtremeLowestPrice := p_traileringCurrentLowest
                 _virtExtremeHighestPrice := p_traileringCurrentHighest
@@ -889,51 +893,51 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     if (not p_virtLongTakeProfitIsReached_1)
         if (not insideASellOrder)
             if ((not p_virtTraileringBoth_1) and (_virtTraileringBoth))
-                if (_virtInsideAPosition)
+                if (_shortVirtInsideAPosition)
                     _resetVirtVariables := true
-                _virtInsideAPosition := true
+                _shortVirtInsideAPosition := true
                 _virtPositionPrice := close
                 _virtExtremeLowestPrice := p_traileringCurrentLowest
                 _virtExtremeHighestPrice := p_traileringCurrentHighest
 
     // Long
-    if (p_virtInsideAPosition_1 and _virtShortTakeProfitIsReached)
-        _virtInsideAPosition := false
+    if (p_longVirtInsideAPosition_1 and _virtShortTakeProfitIsReached)
+        _longVirtInsideAPosition := false
 
     // Short
-    if (p_virtInsideAPosition_1 and _virtLongTakeProfitIsReached)
-        _virtInsideAPosition := false
+    if (p_shortVirtInsideAPosition_1 and _virtLongTakeProfitIsReached)
+        _shortVirtInsideAPosition := false
 
     // Long
-    if (not _virtInsideAPosition) or ((not p_virtInsideAPosition_1) and _virtInsideAPosition) or _resetVirtVariables
+    if (not _longVirtInsideAPosition) or ((not p_longVirtInsideAPosition_1) and _longVirtInsideAPosition) or _resetVirtVariables
         _traileringAtrShortTakeProfitPrice := p_currentTraileringAtrShortTakeProfitPrice
         _virtShortTakeProfit := _traileringAtrShortTakeProfitPrice
 
     // Short
-    if (not _virtInsideAPosition) or ((not p_virtInsideAPosition_1) and _virtInsideAPosition) or _resetVirtVariables
+    if (not _shortVirtInsideAPosition) or ((not p_shortVirtInsideAPosition_1) and _shortVirtInsideAPosition) or _resetVirtVariables
         _traileringAtrLongTakeProfitPrice := p_currentTraileringAtrLongTakeProfitPrice
         _virtLongTakeProfit := _traileringAtrLongTakeProfitPrice
 
     // maximumProfitExcursion - BEGIN
 
     // Long
-    if ((not p_virtInsideAPosition_1) and _virtInsideAPosition)
+    if ((not p_longVirtInsideAPosition_1) and _longVirtInsideAPosition)
         if (close <= _virtPositionPrice)
             _virtShortMaximumProfitPrice := close
         else
             _virtShortMaximumProfitPrice := _virtPositionPrice
-    else if (_virtInsideAPosition)
+    else if (_longVirtInsideAPosition)
         if (close <= p_virtShortMaximumProfitPrice_1)
             _virtShortMaximumProfitPrice := close
     _virtShortMaximumProfitExcursion := math.abs(_virtShortMaximumProfitPrice - _virtPositionPrice)
 
     // Short
-    if ((not p_virtInsideAPosition_1) and _virtInsideAPosition)
+    if ((not p_shortVirtInsideAPosition_1) and _shortVirtInsideAPosition)
         if (close >= _virtPositionPrice)
             _virtLongMaximumProfitPrice := close
         else
             _virtLongMaximumProfitPrice := _virtPositionPrice
-    else if (_virtInsideAPosition)
+    else if (_shortVirtInsideAPosition)
         if (close >= p_virtLongMaximumProfitPrice_1)
             _virtLongMaximumProfitPrice := close
     _virtLongMaximumProfitExcursion := math.abs(_virtLongMaximumProfitPrice - _virtPositionPrice)
@@ -943,23 +947,23 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     // maximumLossExcursion - BEGIN
 
     // Long
-    if (_resetVirtVariables or ((not p_virtInsideAPosition_1) and _virtInsideAPosition))
+    if (_resetVirtVariables or ((not p_longVirtInsideAPosition_1) and _longVirtInsideAPosition))
         if (close >= _virtPositionPrice)
             _virtShortMaximumLossPrice := close
         else
             _virtShortMaximumLossPrice := _virtPositionPrice
-    else if (_virtInsideAPosition)
+    else if (_longVirtInsideAPosition)
         if (close >= p_virtShortMaximumLossPrice_1)
             _virtShortMaximumLossPrice := close
     _virtShortMaximumLossExcursion := math.abs(_virtShortMaximumLossPrice - _virtPositionPrice)
 
     // Short
-    if (_resetVirtVariables or ((not p_virtInsideAPosition_1) and _virtInsideAPosition))
+    if (_resetVirtVariables or ((not p_shortVirtInsideAPosition_1) and _shortVirtInsideAPosition))
         if (close <= _virtPositionPrice)
             _virtLongMaximumLossPrice := close
         else
             _virtLongMaximumLossPrice := _virtPositionPrice
-    else if (_virtInsideAPosition)
+    else if (_shortVirtInsideAPosition)
         if (close <= p_virtLongMaximumLossPrice_1)
             _virtLongMaximumLossPrice := close
     _virtLongMaximumLossExcursion := math.abs(_virtLongMaximumLossPrice - _virtPositionPrice)
@@ -970,7 +974,7 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     // maximumLossExcursion - END
 
     // Long
-    if (_virtInsideAPosition)
+    if (_longVirtInsideAPosition)
         _virtExpectedTakeProfit := _traileringAtrShortTakeProfitPrice - ((i_virtTakeProfitMaximumProfitExcursionRatio * _virtShortMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * _virtShortMaximumLossExcursion))
         if (_virtExpectedTakeProfit <= (_virtPositionPrice * (1 - i_breakEvenPerOne)))
             _virtShortTakeProfit := _virtExpectedTakeProfit
@@ -978,14 +982,14 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
             _virtShortTakeProfit := p_virtShortTakeProfit_1
 
     // Short
-    if (_virtInsideAPosition)
+    if (_shortVirtInsideAPosition)
         _virtExpectedTakeProfit := _traileringAtrLongTakeProfitPrice + ((i_virtTakeProfitMaximumProfitExcursionRatio * _virtLongMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * _virtLongMaximumLossExcursion))
         if (_virtExpectedTakeProfit >= (_virtPositionPrice * (1 + i_breakEvenPerOne)))
             _virtLongTakeProfit := _virtExpectedTakeProfit
         else
             _virtLongTakeProfit := p_virtLongTakeProfit_1
 
-    [_virtLongMaximumProfitPrice, _virtLongMaximumLossPrice, _virtShortMaximumProfitPrice, _virtShortMaximumLossPrice, _traileringAtrLongTakeProfitPrice, _traileringAtrShortTakeProfitPrice, _virtLongTakeProfit, _virtShortTakeProfit, _virtExpectedTakeProfit, _resetVirtVariables, _virtInsideAPosition, _virtPositionPrice, _virtLongTakeProfitIsReached, _virtShortTakeProfitIsReached, _virtTraileringBoth, _virtExtremeLowestPrice, _virtExtremeHighestPrice]
+    [_virtLongMaximumProfitPrice, _virtLongMaximumLossPrice, _virtShortMaximumProfitPrice, _virtShortMaximumLossPrice, _traileringAtrLongTakeProfitPrice, _traileringAtrShortTakeProfitPrice, _virtLongTakeProfit, _virtShortTakeProfit, _virtExpectedTakeProfit, _resetVirtVariables, _virtInsideAPosition, _longVirtInsideAPosition, _shortVirtInsideAPosition, _virtPositionPrice, _virtLongTakeProfitIsReached, _virtShortTakeProfitIsReached, _virtTraileringBoth, _virtExtremeLowestPrice, _virtExtremeHighestPrice]
 
 // Virtual Trailering Position - END
 
@@ -1013,6 +1017,8 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
     float virtExpectedTakeProfit = array.get(traileringStatus, virtTraileringOffset).virtExpectedTakeProfit
     bool resetVirtVariables = array.get(traileringStatus, virtTraileringOffset).resetVirtVariables
     bool virtInsideAPosition = array.get(traileringStatus, virtTraileringOffset).virtInsideAPosition
+    bool longVirtInsideAPosition = array.get(traileringStatus, virtTraileringOffset).longVirtInsideAPosition
+    bool shortVirtInsideAPosition = array.get(traileringStatus, virtTraileringOffset).shortVirtInsideAPosition
     float virtPositionPrice = array.get(traileringStatus, virtTraileringOffset).virtPositionPrice
     float virtExtremeLowestPrice = array.get(traileringStatus, virtTraileringOffset).virtExtremeLowestPrice
     float virtExtremeHighestPrice = array.get(traileringStatus, virtTraileringOffset).virtExtremeHighestPrice
@@ -1021,6 +1027,8 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
     bool virtShortTakeProfitIsReached_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtShortTakeProfitIsReached)
     bool virtTraileringBoth_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtTraileringBoth)
     bool virtInsideAPosition_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtInsideAPosition)
+    bool longVirtInsideAPosition_1 = (array.get(traileringStatus_1, virtTraileringOffset).longVirtInsideAPosition)
+    bool shortVirtInsideAPosition_1 = (array.get(traileringStatus_1, virtTraileringOffset).shortVirtInsideAPosition)
     float virtLongMaximumProfitPrice_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtLongMaximumProfitPrice)
     float virtShortMaximumProfitPrice_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtShortMaximumProfitPrice)
     float virtLongMaximumLossPrice_1 = (array.get(traileringStatus_1, virtTraileringOffset).virtLongMaximumLossPrice)
@@ -1030,7 +1038,7 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
 
     // Read from traileringStatus - END
 
-    [tmpVirtLongMaximumProfitPrice, tmpVirtLongMaximumLossPrice, tmpVirtShortMaximumProfitPrice, tmpVirtShortMaximumLossPrice, tmpTraileringAtrLongTakeProfitPrice, tmpTraileringAtrShortTakeProfitPrice, tmpVirtLongTakeProfit, tmpVirtShortTakeProfit, tmpVirtExpectedTakeProfit, tmpResetVirtVariables, tmpVirtInsideAPosition, tmpVirtPositionPrice, tmpVirtLongTakeProfitIsReached, tmpVirtShortTakeProfitIsReached, tmpVirtTraileringBoth, tmpVirtExtremeLowestPrice, tmpVirtExtremeHighestPrice] = f_getTraileringData(virtTraileringOffset, virtLongMaximumProfitPrice, virtLongMaximumLossPrice, virtShortMaximumProfitPrice, virtShortMaximumLossPrice, traileringAtrLongTakeProfitPrice, traileringAtrShortTakeProfitPrice, virtLongTakeProfit, virtShortTakeProfit, virtExpectedTakeProfit, resetVirtVariables, virtInsideAPosition, virtPositionPrice, virtLongTakeProfitIsReached_1, virtShortTakeProfitIsReached_1, virtTraileringBoth_1, virtInsideAPosition_1, virtLongMaximumProfitPrice_1, virtShortMaximumProfitPrice_1, virtLongMaximumLossPrice_1, virtShortMaximumLossPrice_1, virtLongTakeProfit_1, virtShortTakeProfit_1, currentTraileringAtrLongTakeProfitPrice, currentTraileringAtrShortTakeProfitPrice, traileringCurrentLowest, traileringCurrentHighest, virtExtremeLowestPrice, virtExtremeHighestPrice)
+    [tmpVirtLongMaximumProfitPrice, tmpVirtLongMaximumLossPrice, tmpVirtShortMaximumProfitPrice, tmpVirtShortMaximumLossPrice, tmpTraileringAtrLongTakeProfitPrice, tmpTraileringAtrShortTakeProfitPrice, tmpVirtLongTakeProfit, tmpVirtShortTakeProfit, tmpVirtExpectedTakeProfit, tmpResetVirtVariables, tmpVirtInsideAPosition, tmpLongVirtInsideAPosition, tmpShortVirtInsideAPosition, tmpVirtPositionPrice, tmpVirtLongTakeProfitIsReached, tmpVirtShortTakeProfitIsReached, tmpVirtTraileringBoth, tmpVirtExtremeLowestPrice, tmpVirtExtremeHighestPrice] = f_getTraileringData(virtTraileringOffset, virtLongMaximumProfitPrice, virtLongMaximumLossPrice, virtShortMaximumProfitPrice, virtShortMaximumLossPrice, traileringAtrLongTakeProfitPrice, traileringAtrShortTakeProfitPrice, virtLongTakeProfit, virtShortTakeProfit, virtExpectedTakeProfit, resetVirtVariables, virtInsideAPosition, longVirtInsideAPosition, shortVirtInsideAPosition, virtPositionPrice, virtLongTakeProfitIsReached_1, virtShortTakeProfitIsReached_1, virtTraileringBoth_1, virtInsideAPosition_1, longVirtInsideAPosition_1, shortVirtInsideAPosition_1, virtLongMaximumProfitPrice_1, virtShortMaximumProfitPrice_1, virtLongMaximumLossPrice_1, virtShortMaximumLossPrice_1, virtLongTakeProfit_1, virtShortTakeProfit_1, currentTraileringAtrLongTakeProfitPrice, currentTraileringAtrShortTakeProfitPrice, traileringCurrentLowest, traileringCurrentHighest, virtExtremeLowestPrice, virtExtremeHighestPrice)
 
     // Save into traileringStatus (1/2) - BEGIN
     traileringStatusType updatedCurrentTraileringStatus = traileringStatusType.new()
@@ -1047,6 +1055,8 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
     updatedCurrentTraileringStatus.virtExpectedTakeProfit := tmpVirtExpectedTakeProfit
     updatedCurrentTraileringStatus.resetVirtVariables := tmpResetVirtVariables
     updatedCurrentTraileringStatus.virtInsideAPosition := tmpVirtInsideAPosition
+    updatedCurrentTraileringStatus.longVirtInsideAPosition := tmpLongVirtInsideAPosition
+    updatedCurrentTraileringStatus.shortVirtInsideAPosition := tmpShortVirtInsideAPosition
     updatedCurrentTraileringStatus.virtPositionPrice := tmpVirtPositionPrice
     updatedCurrentTraileringStatus.virtExtremeLowestPrice := tmpVirtExtremeLowestPrice
     updatedCurrentTraileringStatus.virtExtremeHighestPrice := tmpVirtExtremeHighestPrice
@@ -1057,8 +1067,8 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
 
     // Save into traileringStatus (1/2) - END
 
-    traileringLongBet := (array.get(traileringStatus, virtTraileringOffset).virtInsideAPosition)[1] and tmpVirtShortTakeProfitIsReached and (close <= (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice)) and ((array.get(traileringStatus, virtTraileringOffset).virtPositionPrice) >= (close * (1 + i_breakEvenPerOne)))
-    traileringShortBet := (array.get(traileringStatus, virtTraileringOffset).virtInsideAPosition)[1] and tmpVirtLongTakeProfitIsReached and (close >= (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice)) and ((array.get(traileringStatus, virtTraileringOffset).virtPositionPrice) <= (close * (1 - i_breakEvenPerOne)))
+    traileringLongBet := (array.get(traileringStatus, virtTraileringOffset).longVirtInsideAPosition)[1] and tmpVirtShortTakeProfitIsReached and (close <= (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice)) and ((array.get(traileringStatus, virtTraileringOffset).virtPositionPrice) >= (close * (1 + i_breakEvenPerOne)))
+    traileringShortBet := (array.get(traileringStatus, virtTraileringOffset).shortVirtInsideAPosition)[1] and tmpVirtLongTakeProfitIsReached and (close >= (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice)) and ((array.get(traileringStatus, virtTraileringOffset).virtPositionPrice) <= (close * (1 - i_breakEvenPerOne)))
 
     // Save into traileringStatus (2/2) - BEGIN
     updatedCurrentTraileringStatus.traileringLongBet := traileringLongBet
@@ -1339,8 +1349,8 @@ plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdow
 float virtLongTakeProfitPlotPrice = na
 float virtShortTakeProfitPlotPrice = na
 
-virtLongTakeProfitPlotPrice := ((array.get(traileringStatus, i_virtTraileringPlotOffset).virtInsideAPosition) and i_enableVirtTraileringDebug) ? (array.get(traileringStatus, i_virtTraileringPlotOffset).virtLongTakeProfit) : na
-virtShortTakeProfitPlotPrice := ((array.get(traileringStatus, i_virtTraileringPlotOffset).virtInsideAPosition) and i_enableVirtTraileringDebug) ? (array.get(traileringStatus, i_virtTraileringPlotOffset).virtShortTakeProfit) : na
+virtLongTakeProfitPlotPrice := ((array.get(traileringStatus, i_virtTraileringPlotOffset).longVirtInsideAPosition) and i_enableVirtTraileringDebug) ? (array.get(traileringStatus, i_virtTraileringPlotOffset).virtLongTakeProfit) : na
+virtShortTakeProfitPlotPrice := ((array.get(traileringStatus, i_virtTraileringPlotOffset).shortVirtInsideAPosition) and i_enableVirtTraileringDebug) ? (array.get(traileringStatus, i_virtTraileringPlotOffset).virtShortTakeProfit) : na
 
 longTakeProfitPricePlot = plot(virtLongTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(L) Virtual Take Profit Price")
 shortTakeProfitPricePlot = plot(virtShortTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(S) Virtual Take Profit Price")
