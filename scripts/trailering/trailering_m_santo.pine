@@ -918,17 +918,6 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     // Long
     if ((not p_virtInsideAPosition_1) and _virtInsideAPosition)
-        if (close >= _virtPositionPrice)
-            _virtLongMaximumProfitPrice := close
-        else
-            _virtLongMaximumProfitPrice := _virtPositionPrice
-    else if (_virtInsideAPosition)
-        if (close >= p_virtLongMaximumProfitPrice_1)
-            _virtLongMaximumProfitPrice := close
-    _virtLongMaximumProfitExcursion := math.abs(_virtLongMaximumProfitPrice - _virtPositionPrice)
-
-    // Short
-    if ((not p_virtInsideAPosition_1) and _virtInsideAPosition)
         if (close <= _virtPositionPrice)
             _virtShortMaximumProfitPrice := close
         else
@@ -937,6 +926,17 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
         if (close <= p_virtShortMaximumProfitPrice_1)
             _virtShortMaximumProfitPrice := close
     _virtShortMaximumProfitExcursion := math.abs(_virtShortMaximumProfitPrice - _virtPositionPrice)
+
+    // Short
+    if ((not p_virtInsideAPosition_1) and _virtInsideAPosition)
+        if (close >= _virtPositionPrice)
+            _virtLongMaximumProfitPrice := close
+        else
+            _virtLongMaximumProfitPrice := _virtPositionPrice
+    else if (_virtInsideAPosition)
+        if (close >= p_virtLongMaximumProfitPrice_1)
+            _virtLongMaximumProfitPrice := close
+    _virtLongMaximumProfitExcursion := math.abs(_virtLongMaximumProfitPrice - _virtPositionPrice)
 
     // maximumProfitExcursion - END
 
