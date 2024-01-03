@@ -969,19 +969,22 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     // maximumLossExcursion - END
 
+    // Long
     if (_virtInsideAPosition)
-        // Long
-        _virtExpectedTakeProfit := _traileringAtrLongTakeProfitPrice + ((i_virtTakeProfitMaximumProfitExcursionRatio * _virtLongMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * _virtLongMaximumLossExcursion))
-        if (_virtExpectedTakeProfit >= (_virtPositionPrice * (1 + i_breakEvenPerOne)))
-            _virtLongTakeProfit := _virtExpectedTakeProfit
-        else
-            _virtLongTakeProfit := p_virtLongTakeProfit_1
-        // Short
         _virtExpectedTakeProfit := _traileringAtrShortTakeProfitPrice - ((i_virtTakeProfitMaximumProfitExcursionRatio * _virtShortMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * _virtShortMaximumLossExcursion))
         if (_virtExpectedTakeProfit <= (_virtPositionPrice * (1 - i_breakEvenPerOne)))
             _virtShortTakeProfit := _virtExpectedTakeProfit
         else
             _virtShortTakeProfit := p_virtShortTakeProfit_1
+
+    // Short
+    if (_virtInsideAPosition)
+        _virtExpectedTakeProfit := _traileringAtrLongTakeProfitPrice + ((i_virtTakeProfitMaximumProfitExcursionRatio * _virtLongMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * _virtLongMaximumLossExcursion))
+        if (_virtExpectedTakeProfit >= (_virtPositionPrice * (1 + i_breakEvenPerOne)))
+            _virtLongTakeProfit := _virtExpectedTakeProfit
+        else
+            _virtLongTakeProfit := p_virtLongTakeProfit_1
+
     [_virtLongMaximumProfitPrice, _virtLongMaximumLossPrice, _virtShortMaximumProfitPrice, _virtShortMaximumLossPrice, _traileringAtrLongTakeProfitPrice, _traileringAtrShortTakeProfitPrice, _virtLongTakeProfit, _virtShortTakeProfit, _virtExpectedTakeProfit, _resetVirtVariables, _virtInsideAPosition, _virtPositionPrice, _virtLongTakeProfitIsReached, _virtShortTakeProfitIsReached, _virtTraileringBoth, _virtExtremeLowestPrice, _virtExtremeHighestPrice]
 
 // Virtual Trailering Position - END
