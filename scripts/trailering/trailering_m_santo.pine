@@ -863,8 +863,11 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     bool _resetVirtVariables = p_resetVirtVariables
 
-    _virtLongTakeProfitIsReached = (_virtLongTakeProfit >= low) and (_virtLongTakeProfit <= high)
+    // Long
     _virtShortTakeProfitIsReached =  (_virtShortTakeProfit >= low) and (_virtShortTakeProfit <= high)
+
+    // Short
+    _virtLongTakeProfitIsReached = (_virtLongTakeProfit >= low) and (_virtLongTakeProfit <= high)
 
     bool _virtInsideAPosition = p_virtInsideAPosition
     float _virtPositionPrice = p_virtPositionPrice
