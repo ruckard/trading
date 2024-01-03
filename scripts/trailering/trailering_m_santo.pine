@@ -904,11 +904,15 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     if (p_virtInsideAPosition_1 and _virtLongTakeProfitIsReached)
         _virtInsideAPosition := false
 
+    // Long
+    if (not _virtInsideAPosition) or ((not p_virtInsideAPosition_1) and _virtInsideAPosition) or _resetVirtVariables
+        _traileringAtrShortTakeProfitPrice := p_currentTraileringAtrShortTakeProfitPrice
+        _virtShortTakeProfit := _traileringAtrShortTakeProfitPrice
+
+    // Short
     if (not _virtInsideAPosition) or ((not p_virtInsideAPosition_1) and _virtInsideAPosition) or _resetVirtVariables
         _traileringAtrLongTakeProfitPrice := p_currentTraileringAtrLongTakeProfitPrice
-        _traileringAtrShortTakeProfitPrice := p_currentTraileringAtrShortTakeProfitPrice
         _virtLongTakeProfit := _traileringAtrLongTakeProfitPrice
-        _virtShortTakeProfit := _traileringAtrShortTakeProfitPrice
 
     // maximumProfitExcursion - BEGIN
 
