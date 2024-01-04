@@ -889,7 +889,6 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
                 _longVirtInsideAPosition := true
                 _longVirtPositionPrice := close
                 _virtExtremeLowestPrice := p_traileringCurrentLowest
-                _virtExtremeHighestPrice := p_traileringCurrentHighest
 
     // Short
     if (not p_virtLongTakeProfitIsReached_1)
@@ -899,7 +898,6 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
                     _shortResetVirtVariables := true
                 _shortVirtInsideAPosition := true
                 _shortVirtPositionPrice := close
-                _virtExtremeLowestPrice := p_traileringCurrentLowest
                 _virtExtremeHighestPrice := p_traileringCurrentHighest
 
     // Long
