@@ -966,6 +966,11 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
             _virtLongMaximumLossPrice := close
     _virtLongMaximumLossExcursion := math.abs(_virtLongMaximumLossPrice - _virtPositionPrice)
 
+    // Long
+    if _resetVirtVariables
+        _resetVirtVariables := false
+
+    // Short
     if _resetVirtVariables
         _resetVirtVariables := false
 
