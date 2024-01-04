@@ -1062,8 +1062,8 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
 
     // Save into traileringStatus (1/2) - END
 
-    traileringLongBet := (array.get(traileringStatus, virtTraileringOffset).longVirtInsideAPosition)[1] and tmpVirtShortTakeProfitIsReached and (close <= (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice)) and ((array.get(traileringStatus, virtTraileringOffset).virtPositionPrice) >= (close * (1 + i_breakEvenPerOne)))
-    traileringShortBet := (array.get(traileringStatus, virtTraileringOffset).shortVirtInsideAPosition)[1] and tmpVirtLongTakeProfitIsReached and (close >= (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice)) and ((array.get(traileringStatus, virtTraileringOffset).virtPositionPrice) <= (close * (1 - i_breakEvenPerOne)))
+    traileringLongBet := (array.get(traileringStatus_1, virtTraileringOffset).longVirtInsideAPosition) and tmpVirtShortTakeProfitIsReached and (close <= (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice)) and ((array.get(traileringStatus, virtTraileringOffset).virtPositionPrice) >= (close * (1 + i_breakEvenPerOne)))
+    traileringShortBet := (array.get(traileringStatus_1, virtTraileringOffset).shortVirtInsideAPosition) and tmpVirtLongTakeProfitIsReached and (close >= (array.get(traileringStatus, virtTraileringOffset).virtPositionPrice)) and ((array.get(traileringStatus, virtTraileringOffset).virtPositionPrice) <= (close * (1 - i_breakEvenPerOne)))
 
     // Save into traileringStatus (2/2) - BEGIN
     updatedCurrentTraileringStatus.traileringLongBet := traileringLongBet
