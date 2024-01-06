@@ -888,7 +888,7 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     // maximumProfitExcursion (Long) - BEGIN
 
-    if ((not p_longVirtInsideAPosition_1) and _longVirtInsideAPosition)
+    if (_longResetVirtVariables or ((not p_longVirtInsideAPosition_1) and _longVirtInsideAPosition))
         if (close <= _longVirtPositionPrice)
             _virtShortMaximumProfitPrice := close
         else
@@ -959,7 +959,7 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     // maximumProfitExcursion (Short) - BEGIN
 
-    if ((not p_shortVirtInsideAPosition_1) and _shortVirtInsideAPosition)
+    if (_shortResetVirtVariables or ((not p_shortVirtInsideAPosition_1) and _shortVirtInsideAPosition))
         if (close >= _shortVirtPositionPrice)
             _virtLongMaximumProfitPrice := close
         else
