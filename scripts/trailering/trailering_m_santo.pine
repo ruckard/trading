@@ -937,9 +937,8 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
         _virtLongTakeProfit := _traileringAtrLongTakeProfitPrice
         _virtLongTakeProfitIsReset := true
 
-    // maximumProfitExcursion - BEGIN
+    // Long - maximumProfitExcursion - BEGIN
 
-    // Long
     if ((not p_longVirtInsideAPosition_1) and _longVirtInsideAPosition)
         if (close <= _longVirtPositionPrice)
             _virtShortMaximumProfitPrice := close
@@ -950,7 +949,10 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
             _virtShortMaximumProfitPrice := close
     _virtShortMaximumProfitExcursion := math.abs(_virtShortMaximumProfitPrice - _longVirtPositionPrice)
 
-    // Short
+    // Long - maximumProfitExcursion - END
+
+    // Short - maximumProfitExcursion - BEGIN
+
     if ((not p_shortVirtInsideAPosition_1) and _shortVirtInsideAPosition)
         if (close >= _shortVirtPositionPrice)
             _virtLongMaximumProfitPrice := close
@@ -961,7 +963,7 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
             _virtLongMaximumProfitPrice := close
     _virtLongMaximumProfitExcursion := math.abs(_virtLongMaximumProfitPrice - _shortVirtPositionPrice)
 
-    // maximumProfitExcursion - END
+    // Short - maximumProfitExcursion - END
 
     // maximumLossExcursion - BEGIN
 
