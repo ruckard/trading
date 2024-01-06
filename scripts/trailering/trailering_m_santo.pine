@@ -849,26 +849,14 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     float _virtExpectedTakeProfit = na
 
-    // Short
-    float _virtLongMaximumProfitExcursion = 0.0
-    float _virtLongMaximumProfitPrice = p_virtLongMaximumProfitPrice
-    float _virtLongMaximumLossExcursion = 0.0
-    float _virtLongMaximumLossPrice = p_virtLongMaximumLossPrice
-
     // Long
     float _virtShortMaximumProfitExcursion = 0.0
     float _virtShortMaximumProfitPrice = p_virtShortMaximumProfitPrice
     float _virtShortMaximumLossExcursion = 0.0
     float _virtShortMaximumLossPrice = p_virtShortMaximumLossPrice
 
-    // Short
-    float _traileringAtrLongTakeProfitPrice = p_traileringAtrLongTakeProfitPrice
-
     // Long
     float _traileringAtrShortTakeProfitPrice = p_traileringAtrShortTakeProfitPrice
-
-    // Short
-    float _virtLongTakeProfit = p_virtLongTakeProfit
 
     // Long
     float _virtShortTakeProfit = p_virtShortTakeProfit
@@ -876,11 +864,23 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     // Long
     bool _longResetVirtVariables = p_longResetVirtVariables
 
-    // Short
-    bool _shortResetVirtVariables = p_shortResetVirtVariables
-
     // Long
     _virtShortTakeProfitIsReached =  (_virtShortTakeProfit >= low) and (_virtShortTakeProfit <= high)
+
+    // Short
+    float _virtLongMaximumProfitExcursion = 0.0
+    float _virtLongMaximumProfitPrice = p_virtLongMaximumProfitPrice
+    float _virtLongMaximumLossExcursion = 0.0
+    float _virtLongMaximumLossPrice = p_virtLongMaximumLossPrice
+
+    // Short
+    float _traileringAtrLongTakeProfitPrice = p_traileringAtrLongTakeProfitPrice
+
+    // Short
+    float _virtLongTakeProfit = p_virtLongTakeProfit
+
+    // Short
+    bool _shortResetVirtVariables = p_shortResetVirtVariables
 
     // Short
     _virtLongTakeProfitIsReached = (_virtLongTakeProfit >= low) and (_virtLongTakeProfit <= high)
