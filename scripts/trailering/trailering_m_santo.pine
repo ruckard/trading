@@ -893,6 +893,46 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
         _virtShortTakeProfit := _traileringAtrShortTakeProfitPrice
         _virtShortTakeProfitIsReset := true
 
+    // Long - maximumProfitExcursion - BEGIN
+
+    if ((not p_longVirtInsideAPosition_1) and _longVirtInsideAPosition)
+        if (close <= _longVirtPositionPrice)
+            _virtShortMaximumProfitPrice := close
+        else
+            _virtShortMaximumProfitPrice := _longVirtPositionPrice
+    else if (_longVirtInsideAPosition)
+        if (close <= p_virtShortMaximumProfitPrice_1)
+            _virtShortMaximumProfitPrice := close
+    _virtShortMaximumProfitExcursion := math.abs(_virtShortMaximumProfitPrice - _longVirtPositionPrice)
+
+    // Long - maximumProfitExcursion - END
+
+    // Long - maximumLossExcursion - BEGIN
+
+    if (_longResetVirtVariables or ((not p_longVirtInsideAPosition_1) and _longVirtInsideAPosition))
+        if (close >= _longVirtPositionPrice)
+            _virtShortMaximumLossPrice := close
+        else
+            _virtShortMaximumLossPrice := _longVirtPositionPrice
+    else if (_longVirtInsideAPosition)
+        if (close >= p_virtShortMaximumLossPrice_1)
+            _virtShortMaximumLossPrice := close
+    _virtShortMaximumLossExcursion := math.abs(_virtShortMaximumLossPrice - _longVirtPositionPrice)
+
+    // Long - maximumLossExcursion - END
+
+    // Long
+    if _longResetVirtVariables
+        _longResetVirtVariables := false
+
+    // Long
+    if ((_longVirtInsideAPosition) and (not _virtShortTakeProfitIsReset))
+        _virtExpectedTakeProfit := _traileringAtrShortTakeProfitPrice - ((i_virtTakeProfitMaximumProfitExcursionRatio * _virtShortMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * _virtShortMaximumLossExcursion))
+        if (_virtExpectedTakeProfit <= (_longVirtPositionPrice * (1 - i_breakEvenPerOne)))
+            _virtShortTakeProfit := _virtExpectedTakeProfit
+        else
+            _virtShortTakeProfit := p_virtShortTakeProfit_1
+
     // Short
     float _virtLongMaximumProfitExcursion = 0.0
     float _virtLongMaximumProfitPrice = p_virtLongMaximumProfitPrice
@@ -937,20 +977,6 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
         _virtLongTakeProfit := _traileringAtrLongTakeProfitPrice
         _virtLongTakeProfitIsReset := true
 
-    // Long - maximumProfitExcursion - BEGIN
-
-    if ((not p_longVirtInsideAPosition_1) and _longVirtInsideAPosition)
-        if (close <= _longVirtPositionPrice)
-            _virtShortMaximumProfitPrice := close
-        else
-            _virtShortMaximumProfitPrice := _longVirtPositionPrice
-    else if (_longVirtInsideAPosition)
-        if (close <= p_virtShortMaximumProfitPrice_1)
-            _virtShortMaximumProfitPrice := close
-    _virtShortMaximumProfitExcursion := math.abs(_virtShortMaximumProfitPrice - _longVirtPositionPrice)
-
-    // Long - maximumProfitExcursion - END
-
     // Short - maximumProfitExcursion - BEGIN
 
     if ((not p_shortVirtInsideAPosition_1) and _shortVirtInsideAPosition)
@@ -964,20 +990,6 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     _virtLongMaximumProfitExcursion := math.abs(_virtLongMaximumProfitPrice - _shortVirtPositionPrice)
 
     // Short - maximumProfitExcursion - END
-
-    // Long - maximumLossExcursion - BEGIN
-
-    if (_longResetVirtVariables or ((not p_longVirtInsideAPosition_1) and _longVirtInsideAPosition))
-        if (close >= _longVirtPositionPrice)
-            _virtShortMaximumLossPrice := close
-        else
-            _virtShortMaximumLossPrice := _longVirtPositionPrice
-    else if (_longVirtInsideAPosition)
-        if (close >= p_virtShortMaximumLossPrice_1)
-            _virtShortMaximumLossPrice := close
-    _virtShortMaximumLossExcursion := math.abs(_virtShortMaximumLossPrice - _longVirtPositionPrice)
-
-    // Long - maximumLossExcursion - END
 
     // Short - maximumLossExcursion - BEGIN
 
@@ -993,21 +1005,9 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     // Short - maximumLossExcursion - END
 
-    // Long
-    if _longResetVirtVariables
-        _longResetVirtVariables := false
-
     // Short
     if _shortResetVirtVariables
         _shortResetVirtVariables := false
-
-    // Long
-    if ((_longVirtInsideAPosition) and (not _virtShortTakeProfitIsReset))
-        _virtExpectedTakeProfit := _traileringAtrShortTakeProfitPrice - ((i_virtTakeProfitMaximumProfitExcursionRatio * _virtShortMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * _virtShortMaximumLossExcursion))
-        if (_virtExpectedTakeProfit <= (_longVirtPositionPrice * (1 - i_breakEvenPerOne)))
-            _virtShortTakeProfit := _virtExpectedTakeProfit
-        else
-            _virtShortTakeProfit := p_virtShortTakeProfit_1
 
     // Short
     if ((_shortVirtInsideAPosition) and (not _virtLongTakeProfitIsReset))
