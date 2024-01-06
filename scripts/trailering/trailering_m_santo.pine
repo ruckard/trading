@@ -841,30 +841,43 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 
 f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virtLongMaximumLossPrice, p_virtShortMaximumProfitPrice, p_virtShortMaximumLossPrice, p_traileringAtrLongTakeProfitPrice, p_traileringAtrShortTakeProfitPrice, p_virtLongTakeProfit, p_virtShortTakeProfit, p_virtExpectedTakeProfit, p_longResetVirtVariables, p_shortResetVirtVariables, p_longVirtInsideAPosition, p_shortVirtInsideAPosition, p_longVirtPositionPrice, p_shortVirtPositionPrice, p_virtLongTakeProfitIsReached_1, p_virtShortTakeProfitIsReached_1, p_virtTraileringBoth_1, p_longVirtInsideAPosition_1, p_shortVirtInsideAPosition_1, p_virtLongMaximumProfitPrice_1, p_virtShortMaximumProfitPrice_1, p_virtLongMaximumLossPrice_1, p_virtShortMaximumLossPrice_1, p_virtLongTakeProfit_1, p_virtShortTakeProfit_1, p_currentTraileringAtrLongTakeProfitPrice, p_currentTraileringAtrShortTakeProfitPrice, p_traileringCurrentLowest, p_traileringCurrentHighest, p_virtExtremeLowestPrice, p_virtExtremeHighestPrice)=>
 
+    // Both
     _traileringAtrIsPossible = bar_index >= i_traileringAtrTakeProfitLength
 
     bool _virtTraileringBoth = false
     _virtTraileringBoth := (bar_index + p_virtTraileringOffset) % i_virtTraileringPeriod == 0
     _virtTraileringBoth := _virtTraileringBoth and _traileringAtrIsPossible
 
+    // Short
     float _virtLongMaximumProfitExcursion = 0.0
     float _virtLongMaximumProfitPrice = p_virtLongMaximumProfitPrice
     float _virtLongMaximumLossExcursion = 0.0
     float _virtLongMaximumLossPrice = p_virtLongMaximumLossPrice
 
+    // Long
     float _virtShortMaximumProfitExcursion = 0.0
     float _virtShortMaximumProfitPrice = p_virtShortMaximumProfitPrice
     float _virtShortMaximumLossExcursion = 0.0
     float _virtShortMaximumLossPrice = p_virtShortMaximumLossPrice
 
+    // Short
     float _traileringAtrLongTakeProfitPrice = p_traileringAtrLongTakeProfitPrice
+
+    // Long
     float _traileringAtrShortTakeProfitPrice = p_traileringAtrShortTakeProfitPrice
 
+    // Short
     float _virtLongTakeProfit = p_virtLongTakeProfit
+
+    // Long
     float _virtShortTakeProfit = p_virtShortTakeProfit
+
     float _virtExpectedTakeProfit = p_virtExpectedTakeProfit
 
+    // Long
     bool _longResetVirtVariables = p_longResetVirtVariables
+
+    // Short
     bool _shortResetVirtVariables = p_shortResetVirtVariables
 
     // Long
