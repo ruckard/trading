@@ -909,14 +909,18 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
         _shortVirtInsideAPosition := false
 
     // Long
+    bool _virtShortTakeProfitIsReset = false
     if (not _longVirtInsideAPosition) or ((not p_longVirtInsideAPosition_1) and _longVirtInsideAPosition) or _longResetVirtVariables
         _traileringAtrShortTakeProfitPrice := p_currentTraileringAtrShortTakeProfitPrice
         _virtShortTakeProfit := _traileringAtrShortTakeProfitPrice
+        _virtShortTakeProfitIsReset := true
 
     // Short
+    bool _virtLongTakeProfitIsReset = false
     if (not _shortVirtInsideAPosition) or ((not p_shortVirtInsideAPosition_1) and _shortVirtInsideAPosition) or _shortResetVirtVariables
         _traileringAtrLongTakeProfitPrice := p_currentTraileringAtrLongTakeProfitPrice
         _virtLongTakeProfit := _traileringAtrLongTakeProfitPrice
+        _virtLongTakeProfitIsReset := true
 
     // maximumProfitExcursion - BEGIN
 
@@ -979,7 +983,7 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     // maximumLossExcursion - END
 
     // Long
-    if (_longVirtInsideAPosition)
+    if ((_longVirtInsideAPosition) and (not _virtShortTakeProfitIsReset))
         _virtExpectedTakeProfit := _traileringAtrShortTakeProfitPrice - ((i_virtTakeProfitMaximumProfitExcursionRatio * _virtShortMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * _virtShortMaximumLossExcursion))
         if (_virtExpectedTakeProfit <= (_longVirtPositionPrice * (1 - i_breakEvenPerOne)))
             _virtShortTakeProfit := _virtExpectedTakeProfit
@@ -987,7 +991,7 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
             _virtShortTakeProfit := p_virtShortTakeProfit_1
 
     // Short
-    if (_shortVirtInsideAPosition)
+    if ((_shortVirtInsideAPosition) and (not _virtLongTakeProfitIsReset))
         _virtExpectedTakeProfit := _traileringAtrLongTakeProfitPrice + ((i_virtTakeProfitMaximumProfitExcursionRatio * _virtLongMaximumProfitExcursion) - (i_virtTakeProfitMaximumLossExcursionRatio * _virtLongMaximumLossExcursion))
         if (_virtExpectedTakeProfit >= (_shortVirtPositionPrice * (1 + i_breakEvenPerOne)))
             _virtLongTakeProfit := _virtExpectedTakeProfit
