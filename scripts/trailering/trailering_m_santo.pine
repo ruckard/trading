@@ -885,11 +885,14 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     // Short
     _virtLongTakeProfitIsReached = (_virtLongTakeProfit >= low) and (_virtLongTakeProfit <= high)
 
+    // Long
     bool _longVirtInsideAPosition = p_longVirtInsideAPosition
-    bool _shortVirtInsideAPosition = p_shortVirtInsideAPosition
     float _longVirtPositionPrice = p_longVirtPositionPrice
-    float _shortVirtPositionPrice = p_shortVirtPositionPrice
     float _virtExtremeLowestPrice = p_virtExtremeLowestPrice
+
+    // Short
+    bool _shortVirtInsideAPosition = p_shortVirtInsideAPosition
+    float _shortVirtPositionPrice = p_shortVirtPositionPrice
     float _virtExtremeHighestPrice = p_virtExtremeHighestPrice
 
     // Long
