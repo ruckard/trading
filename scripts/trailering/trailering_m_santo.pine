@@ -847,6 +847,8 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     _virtTraileringBoth := (bar_index + p_virtTraileringOffset) % i_virtTraileringPeriod == 0
     _virtTraileringBoth := _virtTraileringBoth and _traileringAtrIsPossible
 
+    float _virtExpectedTakeProfit = na
+
     // Short
     float _virtLongMaximumProfitExcursion = 0.0
     float _virtLongMaximumProfitPrice = p_virtLongMaximumProfitPrice
@@ -870,8 +872,6 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     // Long
     float _virtShortTakeProfit = p_virtShortTakeProfit
-
-    float _virtExpectedTakeProfit = na
 
     // Long
     bool _longResetVirtVariables = p_longResetVirtVariables
