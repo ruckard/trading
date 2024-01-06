@@ -848,6 +848,8 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
     float _virtExpectedTakeProfit = na
     bool _longResetVirtVariables = false
 
+    bool _newPeriod = ((not p_virtTraileringBoth_1) and (_virtTraileringBoth))
+
     // Long
     float _virtShortMaximumProfitExcursion = 0.0
     float _virtShortMaximumLossExcursion = 0.0
@@ -868,7 +870,7 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     if (not p_virtShortTakeProfitIsReached_1)
         if (not insideABuyOrder)
-            if ((not p_virtTraileringBoth_1) and (_virtTraileringBoth))
+            if (_newPeriod)
                 if (_longVirtInsideAPosition)
                     _longResetVirtVariables := true
                 _longVirtInsideAPosition := true
@@ -939,7 +941,7 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     if (not p_virtLongTakeProfitIsReached_1)
         if (not insideASellOrder)
-            if ((not p_virtTraileringBoth_1) and (_virtTraileringBoth))
+            if (_newPeriod)
                 if (_shortVirtInsideAPosition)
                     _shortResetVirtVariables := true
                 _shortVirtInsideAPosition := true
