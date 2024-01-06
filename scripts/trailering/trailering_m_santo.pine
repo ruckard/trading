@@ -851,21 +851,22 @@ f_getTraileringData(p_virtTraileringOffset, p_virtLongMaximumProfitPrice, p_virt
 
     // Long
     float _virtShortMaximumProfitExcursion = 0.0
-    float _virtShortMaximumProfitPrice = p_virtShortMaximumProfitPrice
     float _virtShortMaximumLossExcursion = 0.0
+
+    // Long (var)
+    float _virtShortMaximumProfitPrice = p_virtShortMaximumProfitPrice
     float _virtShortMaximumLossPrice = p_virtShortMaximumLossPrice
 
     float _traileringAtrShortTakeProfitPrice = p_traileringAtrShortTakeProfitPrice
-
     float _virtShortTakeProfit = p_virtShortTakeProfit
-
     bool _longResetVirtVariables = p_longResetVirtVariables
-
-    _virtShortTakeProfitIsReached =  (_virtShortTakeProfit >= low) and (_virtShortTakeProfit <= high)
 
     bool _longVirtInsideAPosition = p_longVirtInsideAPosition
     float _longVirtPositionPrice = p_longVirtPositionPrice
     float _virtExtremeLowestPrice = p_virtExtremeLowestPrice
+
+    // Long - Check if virtual TakeProfit has been reached
+    _virtShortTakeProfitIsReached =  (_virtShortTakeProfit >= low) and (_virtShortTakeProfit <= high)
 
     if (not p_virtShortTakeProfitIsReached_1)
         if (not insideABuyOrder)
