@@ -436,6 +436,9 @@ i_enableTraileringFiboTakeProfit = input.bool(false, title='Enable Trailering Fi
 i_enableTraileringLongFollowTheBumpClose = input.bool(false, title='Follow the Bump Close (L)', group='Trailering', inline='enableFollowTheBump')
 i_enableTraileringShortFollowTheBumpClose = input.bool(false, title='(S)', group='Trailering', inline='enableFollowTheBump', tooltip='Defaults:\n(L): False\n(S): False')
 
+i_enableTraileringLongCummulativeBumpClose = input.bool(true, title='Follow the Cummulative Bump Close (L)', group='Trailering', inline='enableFollowTheBump')
+i_enableTraileringShortCummulativeBumpClose = input.bool(true, title='(S)', group='Trailering', inline='enableFollowTheBump', tooltip='Defaults:\n(L): True\n(S): True')
+
 i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 i_lowestTakeProfitLength = input.int(24, title='TakeProfit Lowest Length (L) {24}', group='Trailering')
 i_highestTakeProfitLength = input.int(24, title='TakeProfit Highest Length (S) {24}', group='Trailering')
@@ -1131,6 +1134,46 @@ traileringShortFollowTheBumpCloseAdvice = (virtTraileringLongConsensus >= i_trai
 
 // Follow the Bump Close Advice - END
 
+// Follow Cummulative Close Advice (L) - BEGIN
+
+var int virtTraileringShortConsensusAccumulated = -1
+var int virtTraileringShortConsensusTarget = 0
+
+if (not insideABuyOrder)
+    virtTraileringShortConsensusAccumulated := -1
+    virtTraileringShortConsensusTarget := 0
+
+if ((not insideABuyOrder[1]) and (insideABuyOrder))
+    virtTraileringShortConsensusAccumulated := 0
+    virtTraileringShortConsensusTarget := virtTraileringLongConsensus[1]
+
+if (insideABuyOrder)
+    virtTraileringShortConsensusAccumulated := virtTraileringShortConsensusAccumulated + virtTraileringShortConsensus
+
+traileringLongCummulativeBumpCloseAdvice = (virtTraileringShortConsensusAccumulated >= virtTraileringShortConsensusTarget)
+
+// Follow Cummulative Close Advice (L) - END
+
+// Follow Cummulative Close Advice (S) - BEGIN
+
+var int virtTraileringLongConsensusAccumulated = -1
+var int virtTraileringLongConsensusTarget = 0
+
+if (not insideASellOrder)
+    virtTraileringLongConsensusAccumulated := -1
+    virtTraileringLongConsensusTarget := 0
+
+if ((not insideASellOrder[1]) and (insideASellOrder))
+    virtTraileringLongConsensusAccumulated := 0
+    virtTraileringLongConsensusTarget := virtTraileringShortConsensus[1]
+
+if (insideASellOrder)
+    virtTraileringLongConsensusAccumulated := virtTraileringLongConsensusAccumulated + virtTraileringLongConsensus
+
+traileringShortCummulativeBumpCloseAdvice = (virtTraileringLongConsensusAccumulated >= virtTraileringLongConsensusTarget)
+
+// Follow Cummulative Close Advice (S) - END
+
 // virtPositionPriceMedian calculus - BEGIN
 
 bool newVirtLongPositionPriceMedian = false
@@ -1417,6 +1460,9 @@ if i_enableLongRSIClosing
 if i_enableTraileringLongFollowTheBumpClose
     LONG_CLOSE := LONG_CLOSE or traileringLongFollowTheBumpCloseAdvice
 
+if i_enableTraileringLongCummulativeBumpClose
+    LONG_CLOSE := LONG_CLOSE or traileringLongCummulativeBumpCloseAdvice
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if (offStopTimeInterval)
     LONG_CLOSE := true
@@ -1442,6 +1488,9 @@ if i_enableShortRSIClosing
 
 if i_enableTraileringShortFollowTheBumpClose
     SHORT_CLOSE := SHORT_CLOSE or traileringShortFollowTheBumpCloseAdvice
+
+if i_enableTraileringShortCummulativeBumpClose
+    SHORT_CLOSE := SHORT_CLOSE or traileringShortCummulativeBumpCloseAdvice
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if (offStopTimeInterval)
