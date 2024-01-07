@@ -1464,7 +1464,7 @@ if i_enableTraileringLongFollowTheBumpClose
     LONG_CLOSE := LONG_CLOSE or traileringLongFollowTheBumpCloseAdvice
 
 if i_enableTraileringLongCumulativeBumpClose
-    LONG_CLOSE := LONG_CLOSE or traileringLongCumulativeBumpCloseAdvice
+    LONG_CLOSE := LONG_CLOSE or (traileringLongCumulativeBumpCloseAdvice and (close >= (positionPrice * (1 + i_breakEvenPerOne))))
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if (offStopTimeInterval)
@@ -1493,7 +1493,7 @@ if i_enableTraileringShortFollowTheBumpClose
     SHORT_CLOSE := SHORT_CLOSE or traileringShortFollowTheBumpCloseAdvice
 
 if i_enableTraileringShortCumulativeBumpClose
-    SHORT_CLOSE := SHORT_CLOSE or traileringShortCumulativeBumpCloseAdvice
+    SHORT_CLOSE := SHORT_CLOSE or (traileringShortCumulativeBumpCloseAdvice and (close <= (positionPrice * (1 - i_breakEvenPerOne))))
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if (offStopTimeInterval)
