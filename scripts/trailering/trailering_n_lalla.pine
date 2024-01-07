@@ -436,8 +436,8 @@ i_enableTraileringFiboTakeProfit = input.bool(false, title='Enable Trailering Fi
 i_enableTraileringLongFollowTheBumpClose = input.bool(false, title='Follow the Bump Close (L)', group='Trailering', inline='enableFollowTheBump')
 i_enableTraileringShortFollowTheBumpClose = input.bool(false, title='(S)', group='Trailering', inline='enableFollowTheBump', tooltip='Defaults:\n(L): False\n(S): False')
 
-i_enableTraileringLongCumulativeBumpClose = input.bool(true, title='Follow the Cumulative Bump Close (L)', group='Trailering', inline='enableFollowTheBump')
-i_enableTraileringShortCumulativeBumpClose = input.bool(true, title='(S)', group='Trailering', inline='enableFollowTheBump', tooltip='Defaults:\n(L): True\n(S): True')
+i_enableTraileringLongCumulativeBumpClose = input.bool(true, title='Follow the Cumulative Bump Close (L)', group='Trailering', inline='enableCumulativeBump')
+i_enableTraileringShortCumulativeBumpClose = input.bool(true, title='(S)', group='Trailering', inline='enableCumulativeBump', tooltip='Defaults:\n(L): True\n(S): True')
 
 i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 i_lowestTakeProfitLength = input.int(24, title='TakeProfit Lowest Length (L) {24}', group='Trailering')
