@@ -474,13 +474,13 @@ i_traileringAtrTakeProfitMultiplier = input.float(1.25, title='ATR Take Profit M
 i_traileringTakeProfitPercentage = input.float(100.0, minval = 0.001, title='Take Profit Percentage {100.0 %}', group='Trailering')
 i_traileringTakeProfitPerOne = i_traileringTakeProfitPercentage * 0.01
 
-i_enableTraileringLongProtection = input.bool(true, title='Trailering (L) Protection', group='Trailering', inline='longTraileringProtection')
+i_enableTraileringLongProtection = input.bool(false, title='Trailering (L) Protection', group='Trailering', inline='longTraileringProtection')
 i_traileringLongProtectionLookback = input.int(4, minval = 1,  title = '', group='Trailering', inline='longTraileringProtection')
-i_traileringLongProtectionConsensusMinimum = input.int(1, minval = 1,  title = '', group='Trailering', inline='longTraileringProtection', tooltip='Defaults:\n(L) Enable: true,\nLookback: 4\nConsensus Minimum: 1')
+i_traileringLongProtectionConsensusMinimum = input.int(1, minval = 1,  title = '', group='Trailering', inline='longTraileringProtection', tooltip='Defaults:\n(L) Enable: false,\nLookback: 4\nConsensus Minimum: 1')
 
-i_enableTraileringShortProtection = input.bool(true, title='Trailering (S) Protection', group='Trailering', inline='shortTraileringProtection')
+i_enableTraileringShortProtection = input.bool(false, title='Trailering (S) Protection', group='Trailering', inline='shortTraileringProtection')
 i_traileringShortProtectionLookback = input.int(4, minval = 1,  title = '', group='Trailering', inline='shortTraileringProtection')
-i_traileringShortProtectionConsensusMinimum = input.int(1, minval = 1,  title = '', group='Trailering', inline='shortTraileringProtection', tooltip='Defaults:\n(S) Enable: true,\nLookback: 4\nConsensus Minimum: 1')
+i_traileringShortProtectionConsensusMinimum = input.int(1, minval = 1,  title = '', group='Trailering', inline='shortTraileringProtection', tooltip='Defaults:\n(S) Enable: false,\nLookback: 4\nConsensus Minimum: 1')
 
 i_volumeBounceMinimumRatio = input.float(2.5, title='Min Ratio % {2.5}', minval=0.01, group='Volume Bounce')
 i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=0.01, group='Volume Bounce')
