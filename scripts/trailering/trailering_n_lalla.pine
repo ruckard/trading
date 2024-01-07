@@ -1778,9 +1778,15 @@ if (entryQuantity < 0.0)
 // We assume the current price is current bar close
 
 longEntryQuantityContracts = (math.floor(((entryQuantity / close) * entryQuantityContractsReducer) * contractMultiplier) / contractMultiplier)
+
+longEntryQuantityContracts := (math.floor(((entryQuantity / close) * entryQuantityContractsReducer * longTraileringSizingMultiplier ) * contractMultiplier) / contractMultiplier)
+
 longEntryQuantityContractsUSDT = longEntryQuantityContracts * (close)
 
 shortEntryQuantityContracts = (math.floor(((entryQuantity / close) * entryQuantityContractsReducer) * contractMultiplier) / contractMultiplier)
+
+shortEntryQuantityContracts := (math.floor(((entryQuantity / close) * entryQuantityContractsReducer * shortTraileringSizingMultiplier ) * contractMultiplier) / contractMultiplier)
+
 shortEntryQuantityContractsUSDT = shortEntryQuantityContracts * (close)
 
 // How much to LONG/GO LONG/SHORT/GO SHORT - END
