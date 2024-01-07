@@ -490,6 +490,7 @@ i_bodyRangeAlmaOff  = input.float(0.85, title='', group='BodyRange Alma', inline
 i_bodyRangeAlmaSig  = input.int(16, title='', group='BodyRange Alma', inline='BodyRangeAlmaSettings', tooltip='Defaults:\nLength: 42.\n Off: 0.85\n Sig: 16.')
 
 i_bodyRangeFilter = input.float(0.25, title='BodyRange Filter %', group='BodyRange Alma', inline='BodyRangeAlmaFilter', tooltip='Default: 0.25.')
+i_bodyRangeLift = input.float(220.0,minval = 0.0, title='BodyRange Lift %', group='BodyRange Alma', tooltip = "UpLifting  the avg Body outlier for filtering the the body Range higher in term of percent.\nDefault: 220.0") * 0.01
 
 i_traileringLongFollowTheBumpCloseConsensusMinimum = input.int(1, minval = 1,  title = 'Follow the Bump (L)', group='Trailering', inline='traileringFollowTheBump')
 i_traileringShortFollowTheBumpCloseConsensusMinimum = input.int(1, minval = 1,  title = '(S)', group='Trailering', inline='traileringFollowTheBump', tooltip='Defaults:\n(L) : 1\n(S) : 1')
@@ -1295,9 +1296,10 @@ volumeBounceShort := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volu
 
 absoluteBodyRange =  math.abs(bodyRange())
 averageBodyRange = ta.alma(absoluteBodyRange, i_bodyRangeAlmaLength ,i_bodyRangeAlmaOff ,i_bodyRangeAlmaSig)
+liftAverageBodyRange = (1 + i_bodyRangeLift) * averageBodyRange
 
-bodyRangeLong = bodyRange()  <= -averageBodyRange and(bodyRange() <= -i_bodyRangeFilter)
-bodyRangeShort = bodyRange()  >= averageBodyRange and (bodyRange() >= i_bodyRangeFilter)
+bodyRangeLong = bodyRange()  <= -liftAverageBodyRange and(bodyRange() <= -i_bodyRangeFilter)
+bodyRangeShort = bodyRange()  >= liftAverageBodyRange and (bodyRange() >= i_bodyRangeFilter)
 
 // bodyOutlier substrategy - END
 
