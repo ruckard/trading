@@ -453,20 +453,20 @@ i_virtTakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit M
 i_virtTraileringPeriod = input.int(24, minval=2, title='Trailering Period {24}', group='Trailering')
 i_virtTraileringPlotOffset = input.int(0, title='Trailering Plot Offset {0}', group='Trailering')
 
-i_virtTraileringLongMinimumConsensus1 = input.int(10, minval=1, title='(-1). (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus1')
-i_virtTraileringLongMaximumConsensus1 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus1', tooltip='Defaults:\n(L) Minimum: 10.\n(L) Maximum: 24.')
-i_virtTraileringLongMinimumConsensus2 = input.int(10, minval=1, title='1. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus2')
-i_virtTraileringLongMaximumConsensus2 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus2', tooltip='Defaults:\n(L) Minimum: 10.\n(L) Maximum: 24.')
+i_virtTraileringLongMinimumConsensus1 = input.int(3, minval=1, title='(-1). (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus1')
+i_virtTraileringLongMaximumConsensus1 = input.int(11, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus1', tooltip='Defaults:\n(L) Minimum: 3.\n(L) Maximum: 11.')
+i_virtTraileringLongMinimumConsensus2 = input.int(1, minval=1, title='1. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus2')
+i_virtTraileringLongMaximumConsensus2 = input.int(1, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus2', tooltip='Defaults:\n(L) Minimum: 1.\n(L) Maximum: 1.')
 
 // i_virtTraileringLongMinimumConsensus3 = input.int(10, minval=1, title='2. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus3')
 // i_virtTraileringLongMaximumConsensus3 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus3', tooltip='Defaults:\n(L) Minimum: 10.\n(L) Maximum: 24.')
 i_virtTraileringLongMinimumConsensus3 = i_virtTraileringLongMinimumConsensus2
 i_virtTraileringLongMaximumConsensus3 = i_virtTraileringLongMaximumConsensus2
 
-i_virtTraileringShortMinimumConsensus1 = input.int(10, minval=1, title='(-1). (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus1')
-i_virtTraileringShortMaximumConsensus1 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus1', tooltip='Defaults:\n(S) Minimum: 10.\n(S) Maximum: 24.')
-i_virtTraileringShortMinimumConsensus2 = input.int(10, minval=1, title='1. (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus2')
-i_virtTraileringShortMaximumConsensus2 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus2', tooltip='Defaults:\n(S) Minimum: 10.\n(S) Maximum: 24.')
+i_virtTraileringShortMinimumConsensus1 = input.int(3, minval=1, title='(-1). (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus1')
+i_virtTraileringShortMaximumConsensus1 = input.int(11, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus1', tooltip='Defaults:\n(S) Minimum: 3.\n(S) Maximum: 11.')
+i_virtTraileringShortMinimumConsensus2 = input.int(1, minval=1, title='1. (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus2')
+i_virtTraileringShortMaximumConsensus2 = input.int(1, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus2', tooltip='Defaults:\n(S) Minimum: 1.\n(S) Maximum: 1.')
 
 // i_virtTraileringShortMinimumConsensus3 = input.int(10, minval=1, title='2. (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus3')
 // i_virtTraileringShortMaximumConsensus3 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus3', tooltip='Defaults:\n(S) Minimum: 10.\n(S) Maximum: 24.')
