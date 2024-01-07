@@ -453,19 +453,25 @@ i_virtTakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit M
 i_virtTraileringPeriod = input.int(24, minval=2, title='Trailering Period {24}', group='Trailering')
 i_virtTraileringPlotOffset = input.int(0, title='Trailering Plot Offset {0}', group='Trailering')
 
-i_virtTraileringLongMinimumConsensus1 = input.int(10, minval=1, title='1. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus1')
+i_virtTraileringLongMinimumConsensus1 = input.int(10, minval=1, title='(-1). (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus1')
 i_virtTraileringLongMaximumConsensus1 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus1', tooltip='Defaults:\n(L) Minimum: 10.\n(L) Maximum: 24.')
-i_virtTraileringLongMinimumConsensus2 = input.int(10, minval=1, title='2. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus2')
+i_virtTraileringLongMinimumConsensus2 = input.int(10, minval=1, title='1. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus2')
 i_virtTraileringLongMaximumConsensus2 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus2', tooltip='Defaults:\n(L) Minimum: 10.\n(L) Maximum: 24.')
-i_virtTraileringLongMinimumConsensus3 = input.int(10, minval=1, title='3. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus3')
-i_virtTraileringLongMaximumConsensus3 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus3', tooltip='Defaults:\n(L) Minimum: 10.\n(L) Maximum: 24.')
 
-i_virtTraileringShortMinimumConsensus1 = input.int(10, minval=1, title='1. (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus1')
+// i_virtTraileringLongMinimumConsensus3 = input.int(10, minval=1, title='2. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus3')
+// i_virtTraileringLongMaximumConsensus3 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus3', tooltip='Defaults:\n(L) Minimum: 10.\n(L) Maximum: 24.')
+i_virtTraileringLongMinimumConsensus3 = i_virtTraileringLongMinimumConsensus2
+i_virtTraileringLongMaximumConsensus3 = i_virtTraileringLongMaximumConsensus2
+
+i_virtTraileringShortMinimumConsensus1 = input.int(10, minval=1, title='(-1). (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus1')
 i_virtTraileringShortMaximumConsensus1 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus1', tooltip='Defaults:\n(S) Minimum: 10.\n(S) Maximum: 24.')
-i_virtTraileringShortMinimumConsensus2 = input.int(10, minval=1, title='2. (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus2')
+i_virtTraileringShortMinimumConsensus2 = input.int(10, minval=1, title='1. (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus2')
 i_virtTraileringShortMaximumConsensus2 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus2', tooltip='Defaults:\n(S) Minimum: 10.\n(S) Maximum: 24.')
-i_virtTraileringShortMinimumConsensus3 = input.int(10, minval=1, title='3. (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus3')
-i_virtTraileringShortMaximumConsensus3 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus3', tooltip='Defaults:\n(S) Minimum: 10.\n(S) Maximum: 24.')
+
+// i_virtTraileringShortMinimumConsensus3 = input.int(10, minval=1, title='2. (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus3')
+// i_virtTraileringShortMaximumConsensus3 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus3', tooltip='Defaults:\n(S) Minimum: 10.\n(S) Maximum: 24.')
+i_virtTraileringShortMinimumConsensus3 = i_virtTraileringShortMinimumConsensus2
+i_virtTraileringShortMaximumConsensus3 = i_virtTraileringShortMaximumConsensus2
 
 i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
 i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
@@ -1100,18 +1106,14 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
     if (array.get(traileringStatus, virtTraileringOffset).traileringShortBet)
         virtTraileringShortConsensus := virtTraileringShortConsensus + 1
 
-if ((virtTraileringLongConsensus >= i_virtTraileringLongMinimumConsensus1) and (virtTraileringLongConsensus <= i_virtTraileringLongMaximumConsensus1))
-     or
-     ((virtTraileringLongConsensus >= i_virtTraileringLongMinimumConsensus2) and (virtTraileringLongConsensus <= i_virtTraileringLongMaximumConsensus2))
-     or
-     ((virtTraileringLongConsensus >= i_virtTraileringLongMinimumConsensus3) and (virtTraileringLongConsensus <= i_virtTraileringLongMaximumConsensus3))
+if ((virtTraileringLongConsensus[1] >= i_virtTraileringLongMinimumConsensus1) and (virtTraileringLongConsensus[1] <= i_virtTraileringLongMaximumConsensus1))
+     and
+     ((virtTraileringShortConsensus >= i_virtTraileringLongMinimumConsensus2) and (virtTraileringShortConsensus <= i_virtTraileringLongMaximumConsensus2))
     traileringLong := true
 
-if ((virtTraileringShortConsensus >= i_virtTraileringShortMinimumConsensus1) and (virtTraileringShortConsensus <= i_virtTraileringShortMaximumConsensus1))
-     or
-     ((virtTraileringShortConsensus >= i_virtTraileringShortMinimumConsensus2) and (virtTraileringShortConsensus <= i_virtTraileringShortMaximumConsensus2))
-     or
-     ((virtTraileringShortConsensus >= i_virtTraileringShortMinimumConsensus3) and (virtTraileringShortConsensus <= i_virtTraileringShortMaximumConsensus3))
+if ((virtTraileringShortConsensus[1] >= i_virtTraileringShortMinimumConsensus1) and (virtTraileringShortConsensus[1] <= i_virtTraileringShortMaximumConsensus1))
+     and
+     ((virtTraileringLongConsensus >= i_virtTraileringShortMinimumConsensus2) and (virtTraileringLongConsensus <= i_virtTraileringShortMaximumConsensus2))
     traileringShort := true
 
 // Trailering Protection - BEGIN
