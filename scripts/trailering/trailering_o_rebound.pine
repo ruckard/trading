@@ -248,7 +248,7 @@ i_strategyStopTime = input.time(timestamp('31 Dec 2021'), title= 'Ends at:', gro
 
 // SubStrategies - Inputs
 i_subStrategiesLookback = input.int(1, title='Lookback', group='SubStrategies', inline='SubStrategies')
-i_subStrategiesMinimum = input.int(2, title='Minimum', group='SubStrategies', inline='SubStrategies', tooltip='Take a look at the 1 latest candles and then if a minimum of 1 substrategy triggers to open a trade then open the trade.\nDefaults:\nLookback: 1\nMinimum: 2')
+i_subStrategiesMinimum = input.int(1, title='Minimum', group='SubStrategies', inline='SubStrategies', tooltip='Take a look at the 1 latest candles and then if a minimum of 1 substrategy triggers to open a trade then open the trade.\nDefaults:\nLookback: 1\nMinimum: 1')
 
 // Take Profit - Inputs
 i_enableTakeProfit = input.bool(true, title='Take Profit', group='Take Profit', inline='TakeProfitSimple')
