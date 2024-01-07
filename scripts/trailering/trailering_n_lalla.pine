@@ -433,8 +433,8 @@ i_enableTraileringExtremeTakeProfit = input.bool(false, title='Enable Trailering
 i_enableTraileringSafeMedianTakeProfit = input.bool(false, title='Enable Trailering Safe Median TakeProfit {False}', group='Trailering', tooltip='Do not trade when extreme prices difference is not bigger than the Minimum (L) TakeProfit.')
 i_enableTraileringFiboTakeProfit = input.bool(false, title='Enable Trailering Fibo TakeProfit {False}', group='Trailering')
 
-i_enableTraileringLongFollowTheBumpClose = input.bool(true, title='Follow the Bump Close (L)', group='Trailering', inline='enableFollowTheBump')
-i_enableTraileringShortFollowTheBumpClose = input.bool(true, title='(S)', group='Trailering', inline='enableFollowTheBump', tooltip='Defaults:\n(L): True\n(S): True')
+i_enableTraileringLongFollowTheBumpClose = input.bool(false, title='Follow the Bump Close (L)', group='Trailering', inline='enableFollowTheBump')
+i_enableTraileringShortFollowTheBumpClose = input.bool(false, title='(S)', group='Trailering', inline='enableFollowTheBump', tooltip='Defaults:\n(L): False\n(S): False')
 
 i_enableVirtTraileringDebug = input.bool(false, title='Enable Trailering Debug {False}', group='Trailering')
 i_lowestTakeProfitLength = input.int(24, title='TakeProfit Lowest Length (L) {24}', group='Trailering')
