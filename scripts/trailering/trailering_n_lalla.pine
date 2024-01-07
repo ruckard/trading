@@ -494,6 +494,9 @@ i_bodyRangeFilter = input.float(0.25, title='BodyRange Filter %', group='BodyRan
 i_traileringLongFollowTheBumpCloseConsensusMinimum = input.int(1, minval = 1,  title = 'Follow the Bump (L)', group='Trailering', inline='traileringFollowTheBump')
 i_traileringShortFollowTheBumpCloseConsensusMinimum = input.int(1, minval = 1,  title = '(S)', group='Trailering', inline='traileringFollowTheBump', tooltip='Defaults:\n(L) : 1\n(S) : 1')
 
+i_traileringLongCumulativeBumpMultiplier = input.float(61.80, minval = 0.01,  title = 'Cumulative Bump Multiplier (%) (L)', group='Trailering', inline='traileringFollowTheBump')
+i_traileringShortCumulativeBumpMultiplier = input.float(61.80, minval = 0.01,  title = '(S)', group='Trailering', inline='traileringFollowTheBump', tooltip='Defaults:\n(L) : 61.8 %\n(S) : 61.8 %')
+
 // ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
@@ -1145,7 +1148,7 @@ if (not insideABuyOrder)
 
 if ((not insideABuyOrder[1]) and (insideABuyOrder))
     virtTraileringShortConsensusAccumulated := 0
-    virtTraileringShortConsensusTarget := virtTraileringLongConsensus[1]
+    virtTraileringShortConsensusTarget := virtTraileringLongConsensus[1] * i_traileringLongCumulativeBumpMultiplier * 0.01
 
 if (insideABuyOrder)
     virtTraileringShortConsensusAccumulated := virtTraileringShortConsensusAccumulated + virtTraileringShortConsensus
@@ -1165,7 +1168,7 @@ if (not insideASellOrder)
 
 if ((not insideASellOrder[1]) and (insideASellOrder))
     virtTraileringLongConsensusAccumulated := 0
-    virtTraileringLongConsensusTarget := virtTraileringShortConsensus[1]
+    virtTraileringLongConsensusTarget := virtTraileringShortConsensus[1] * i_traileringShortCumulativeBumpMultiplier * 0.01
 
 if (insideASellOrder)
     virtTraileringLongConsensusAccumulated := virtTraileringLongConsensusAccumulated + virtTraileringLongConsensus
