@@ -488,8 +488,8 @@ i_bodyRangeAlmaSig  = input.int(16, title='', group='BodyRange Alma', inline='Bo
 
 i_bodyRangeFilter = input.float(0.25, title='BodyRange Filter %', group='BodyRange Alma', inline='BodyRangeAlmaFilter', tooltip='Default: 0.25.')
 
-i_traileringLongFollowTheBumpCloseConsensusMinimum = input.int(1, minval = 1,  title = 'Follow the Bump (L)', group='Trailering', inline='traileringFollowTheBump', tooltip='Defaults:\n(L) Enable: true,\nLookback: 4\nConsensus Minimum: 1')
-i_traileringShortFollowTheBumpCloseConsensusMinimum = input.int(1, minval = 1,  title = '(S)', group='Trailering', inline='traileringFollowTheBump', tooltip='Defaults:\n(L) Enable: true,\n(S) Enable: true')
+i_traileringLongFollowTheBumpCloseConsensusMinimum = input.int(1, minval = 1,  title = 'Follow the Bump (L)', group='Trailering', inline='traileringFollowTheBump')
+i_traileringShortFollowTheBumpCloseConsensusMinimum = input.int(1, minval = 1,  title = '(S)', group='Trailering', inline='traileringFollowTheBump', tooltip='Defaults:\n(L) : 1\n(S) : 1')
 
 // ImplementedStrategy inputs - END
 
