@@ -1202,9 +1202,7 @@ smallestOfThree (p_one, p_two, p_three) =>
 var longConsensusMinimum = smallestOfThree(i_virtTraileringLongMinimumConsensus1, i_virtTraileringLongMinimumConsensus2, i_virtTraileringLongMinimumConsensus3)
 // var longConsensusMaximum = biggestOfThree(i_virtTraileringLongMaximumConsensus1, i_virtTraileringLongMaximumConsensus2, i_virtTraileringLongMaximumConsensus3)
 
-float longTraileringSizingMultiplier = 0.0
-if ((not insideABuyOrder[1]) and (insideABuyOrder))
-    longTraileringSizingMultiplier := (longConsensusMinimum / (virtTraileringLongConsensus[1]))
+float longTraileringSizingMultiplier = (longConsensusMinimum / (virtTraileringLongConsensus[1]))
 
 // Consensus sizing (L) - END
 
@@ -1213,9 +1211,7 @@ if ((not insideABuyOrder[1]) and (insideABuyOrder))
 var shortConsensusMinimum = smallestOfThree(i_virtTraileringShortMinimumConsensus1, i_virtTraileringShortMinimumConsensus2, i_virtTraileringShortMinimumConsensus3)
 // var shortConsensusMaximum = biggestOfThree(i_virtTraileringShortMaximumConsensus1, i_virtTraileringShortMaximumConsensus2, i_virtTraileringShortMaximumConsensus3)
 
-float shortTraileringSizingMultiplier = 0.0
-if ((not insideASellOrder[1]) and (insideASellOrder))
-    shortTraileringSizingMultiplier := (shortConsensusMinimum / (virtTraileringShortConsensus[1]))
+float shortTraileringSizingMultiplier = (shortConsensusMinimum / (virtTraileringShortConsensus[1]))
 
 // Consensus sizing (S) - END
 
