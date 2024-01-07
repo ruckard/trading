@@ -1137,11 +1137,11 @@ traileringShortFollowTheBumpCloseAdvice = (virtTraileringLongConsensus >= i_trai
 // Follow Cumulative Close Advice (L) - BEGIN
 
 var int virtTraileringShortConsensusAccumulated = -1
-var int virtTraileringShortConsensusTarget = 0
+var float virtTraileringShortConsensusTarget = 0.0
 
 if (not insideABuyOrder)
     virtTraileringShortConsensusAccumulated := -1
-    virtTraileringShortConsensusTarget := 0
+    virtTraileringShortConsensusTarget := 0.0
 
 if ((not insideABuyOrder[1]) and (insideABuyOrder))
     virtTraileringShortConsensusAccumulated := 0
@@ -1157,11 +1157,11 @@ traileringLongCumulativeBumpCloseAdvice = (virtTraileringShortConsensusAccumulat
 // Follow Cumulative Close Advice (S) - BEGIN
 
 var int virtTraileringLongConsensusAccumulated = -1
-var int virtTraileringLongConsensusTarget = 0
+var float virtTraileringLongConsensusTarget = 0.0
 
 if (not insideASellOrder)
     virtTraileringLongConsensusAccumulated := -1
-    virtTraileringLongConsensusTarget := 0
+    virtTraileringLongConsensusTarget := 0.0
 
 if ((not insideASellOrder[1]) and (insideASellOrder))
     virtTraileringLongConsensusAccumulated := 0
