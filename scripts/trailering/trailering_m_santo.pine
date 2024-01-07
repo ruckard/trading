@@ -322,8 +322,8 @@ i_atrVolatilityMinimumMultiplier = input.float(1.10, title='Minimum/Maximum (%)'
 i_atrVolatilityMaximumMultiplier = input.float(2.00, title='', minval=0.01, group='ATR Volatility Protection', inline='ATRVolatilityMinMax', tooltip='Defaults:\nMinimum: 1.10 %.\nMaximum: 2.00 %.')
 
 // Enforce Higher Timeframe Trend - Inputs
-i_higherTimeframeTrendMaEnforce = input.bool(true, title='Enable', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
-i_showHigherTimeframeTrendMa = input.bool(false, title='Show', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow', tooltip='Defaults:\nEnable: True.\nShow: False.')
+i_higherTimeframeTrendMaEnforce = input.bool(false, title='Enable', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow')
+i_showHigherTimeframeTrendMa = input.bool(false, title='Show', group='Enforce Higher Timeframe Trend', inline='HTTimeframeUseShow', tooltip='Defaults:\nEnable: False.\nShow: False.')
 
 i_higherTimeframeTrendMaTimeframe = input.timeframe('240', title='Timeframe/Offset', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset')
 i_higherTimeframeTrendMaOffset = input.int(0, title='', group='Enforce Higher Timeframe Trend', inline='HTTimeframeOffset', tooltip='Defaults:\nTimeframe: 4 hours.\nOffset: 0 bars.')
