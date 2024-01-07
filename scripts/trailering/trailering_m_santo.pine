@@ -1347,8 +1347,8 @@ plotshape(higherTimeframeTrendMaShort, title='SideMA Down', style=shape.arrowdow
 float virtLongTakeProfitPlotPrice = na
 float virtShortTakeProfitPlotPrice = na
 
-virtLongTakeProfitPlotPrice := ((array.get(traileringStatus, i_virtTraileringPlotOffset).longVirtInsideAPosition) and i_enableVirtTraileringDebug) ? (array.get(traileringStatus, i_virtTraileringPlotOffset).virtLongTakeProfit) : na
-virtShortTakeProfitPlotPrice := ((array.get(traileringStatus, i_virtTraileringPlotOffset).shortVirtInsideAPosition) and i_enableVirtTraileringDebug) ? (array.get(traileringStatus, i_virtTraileringPlotOffset).virtShortTakeProfit) : na
+virtLongTakeProfitPlotPrice := ((array.get(traileringStatus, i_virtTraileringPlotOffset).shortVirtInsideAPosition) and i_enableVirtTraileringDebug) ? (array.get(traileringStatus, i_virtTraileringPlotOffset).virtLongTakeProfit) : na
+virtShortTakeProfitPlotPrice := ((array.get(traileringStatus, i_virtTraileringPlotOffset).longVirtInsideAPosition) and i_enableVirtTraileringDebug) ? (array.get(traileringStatus, i_virtTraileringPlotOffset).virtShortTakeProfit) : na
 
 longTakeProfitPricePlot = plot(virtLongTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(L) Virtual Take Profit Price")
 shortTakeProfitPricePlot = plot(virtShortTakeProfitPlotPrice, color=color.yellow, style=plot.style_linebr, title="(S) Virtual Take Profit Price")
