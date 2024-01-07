@@ -1149,7 +1149,7 @@ if (not insideABuyOrder)
 
 if ((not insideABuyOrder[1]) and (insideABuyOrder))
     virtTraileringShortConsensusAccumulated := 0
-    virtTraileringShortConsensusTarget := virtTraileringLongConsensus[1] * i_traileringLongCumulativeBumpMultiplier * 0.01
+    virtTraileringShortConsensusTarget := virtTraileringLongConsensus[2] * i_traileringLongCumulativeBumpMultiplier * 0.01
 
 if (insideABuyOrder)
     virtTraileringShortConsensusAccumulated := virtTraileringShortConsensusAccumulated + virtTraileringShortConsensus
@@ -1169,7 +1169,7 @@ if (not insideASellOrder)
 
 if ((not insideASellOrder[1]) and (insideASellOrder))
     virtTraileringLongConsensusAccumulated := 0
-    virtTraileringLongConsensusTarget := virtTraileringShortConsensus[1] * i_traileringShortCumulativeBumpMultiplier * 0.01
+    virtTraileringLongConsensusTarget := virtTraileringShortConsensus[2] * i_traileringShortCumulativeBumpMultiplier * 0.01
 
 if (insideASellOrder)
     virtTraileringLongConsensusAccumulated := virtTraileringLongConsensusAccumulated + virtTraileringLongConsensus
