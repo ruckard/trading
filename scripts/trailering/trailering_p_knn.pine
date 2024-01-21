@@ -236,7 +236,7 @@ i_enableSunday = input.bool(true, title='S', group='Day Of Week Filter', inline=
 
 // Strategy - Inputs
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
-i_strategyType = input.string(_L_, 'Type', options=[L_S, _L_, _S_, _REVERSE_], group='Strategy', inline='StrategyType', tooltip='Default: ' + _L_)
+i_strategyType = input.string(_REVERSE_, 'Type', options=[L_S, _L_, _S_, _REVERSE_], group='Strategy', inline='StrategyType', tooltip='Default: ' + _REVERSE_)
 
 i_enableLongStrictStrategy = input.bool(false, title='(L) Strict mode', group='Strategy', inline='StrategyStrictMode')
 i_enableShortStrictStrategy = input.bool(false, '(S)', group='Strategy', inline='StrategyStrictMode', tooltip='Ignore other side advice when being in a single side.\nE.g. If type is set to Long Only do not close the trade when Short would have opened a trade.\n(L) = Long.\n(S) = Short.\nDefault for (L): Disabled.\nDefault for (S): Disabled.')
