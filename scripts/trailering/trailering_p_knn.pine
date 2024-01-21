@@ -1263,11 +1263,14 @@ if (i_enableTraileringFiboTakeProfit)
 // 1st candle: Different than zero
 // 2nd candle: Different than zero
 
+bool swingLong = virtTraileringLongConsensus >= 1
+bool swingShort = virtTraileringShortConsensus >= 1
+
 bool swingDetected = false
-swingDetected := not (traileringLong[1] and traileringShort[1])
-swingDetected := swingDetected and (not (traileringLong[0] and traileringShort[0]))
-swingDetected := swingDetected and ((virtTraileringLongConsensus[1] != 0) or (virtTraileringShortConsensus[1] != 0))
-swingDetected := swingDetected and ((virtTraileringLongConsensus[0] != 0) or (virtTraileringShortConsensus[0] != 0))
+swingDetected := not (swingLong[1] and swingShort[1])
+swingDetected := swingDetected and (not (swingLong[0] and swingShort[0]))
+swingDetected := swingDetected and ((virtTraileringLongConsensus[1] >= 1) or (virtTraileringShortConsensus[1] >= 1))
+swingDetected := swingDetected and ((virtTraileringLongConsensus[0] >= 1) or (virtTraileringShortConsensus[0] >= 1))
 
 // swing substrategy - END
 
