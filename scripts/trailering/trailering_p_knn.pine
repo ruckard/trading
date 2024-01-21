@@ -1272,6 +1272,11 @@ swingDetected := swingDetected and (not (swingLong[0] and swingShort[0]))
 swingDetected := swingDetected and ((virtTraileringLongConsensus[1] >= 1) or (virtTraileringShortConsensus[1] >= 1))
 swingDetected := swingDetected and ((virtTraileringLongConsensus[0] >= 1) or (virtTraileringShortConsensus[0] >= 1))
 
+float swingFeature = virtTraileringLongConsensus - virtTraileringShortConsensus
+
+float swingFeature1 = swingFeature[1]
+float swingFeature2 = swingFeature[0]
+
 // swing substrategy - END
 
 
