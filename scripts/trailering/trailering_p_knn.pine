@@ -238,8 +238,8 @@ i_enableSunday = input.bool(true, title='S', group='Day Of Week Filter', inline=
 L_S = 'Long and Short', _L_ = 'Long Only', _S_ = 'Short Only', _REVERSE_ = 'Reverse'
 i_strategyType = input.string(_L_, 'Type', options=[L_S, _L_, _S_, _REVERSE_], group='Strategy', inline='StrategyType', tooltip='Default: ' + _L_)
 
-i_enableLongStrictStrategy = input.bool(true, title='(L) Strict mode', group='Strategy', inline='StrategyStrictMode')
-i_enableShortStrictStrategy = input.bool(false, '(S)', group='Strategy', inline='StrategyStrictMode', tooltip='Ignore other side advice when being in a single side.\nE.g. If type is set to Long Only do not close the trade when Short would have opened a trade.\n(L) = Long.\n(S) = Short.\nDefault for (L): Enabled.\nDefault for (S): Disabled.')
+i_enableLongStrictStrategy = input.bool(false, title='(L) Strict mode', group='Strategy', inline='StrategyStrictMode')
+i_enableShortStrictStrategy = input.bool(false, '(S)', group='Strategy', inline='StrategyStrictMode', tooltip='Ignore other side advice when being in a single side.\nE.g. If type is set to Long Only do not close the trade when Short would have opened a trade.\n(L) = Long.\n(S) = Short.\nDefault for (L): Disabled.\nDefault for (S): Disabled.')
 i_strategyStartTimeOn = input.bool(true, title='', group='Strategy', inline='StrategyStartTime')
 i_strategyStartTime = input.time(timestamp('01 Jan 2021'), title= 'Starts at:', group='Strategy', inline='StrategyStartTime', tooltip='Default: Enabled.\nStarts at 2021-01-01 00:00:00.')
 
