@@ -1180,41 +1180,15 @@ traileringShortCumulativeBumpCloseAdvice = (virtTraileringLongConsensusAccumulat
 
 // Follow Cumulative Close Advice (S) - END
 
-// Consensus sizing - Functions - BEGIN
-
-// biggestOfThree (p_one, p_two, p_three) =>
-//     int biggestOfThree = p_one
-//     if (p_two > biggestOfThree)
-//         biggestOfThree := p_two
-//     if (p_three > biggestOfThree)
-//         biggestOfThree := p_three
-//     biggestOfThree
-
-smallestOfThree (p_one, p_two, p_three) =>
-    int smallestOfThree = p_one
-    if (p_two < smallestOfThree)
-        smallestOfThree := p_two
-    if (p_three < smallestOfThree)
-        smallestOfThree := p_three
-    smallestOfThree
-
-// Consensus sizing - Functions - END
-
 // Consensus sizing (L) - BEGIN
 
-var longConsensusMinimum = smallestOfThree(i_virtTraileringLongMinimumConsensus1, i_virtTraileringLongMinimumConsensus2, i_virtTraileringLongMinimumConsensus3)
-// var longConsensusMaximum = biggestOfThree(i_virtTraileringLongMaximumConsensus1, i_virtTraileringLongMaximumConsensus2, i_virtTraileringLongMaximumConsensus3)
-
-float longTraileringSizingMultiplier = (longConsensusMinimum / virtTraileringLongConsensus[1])
+float longTraileringSizingMultiplier = 1.0
 
 // Consensus sizing (L) - END
 
 // Consensus sizing (S) - BEGIN
 
-var shortConsensusMinimum = smallestOfThree(i_virtTraileringShortMinimumConsensus1, i_virtTraileringShortMinimumConsensus2, i_virtTraileringShortMinimumConsensus3)
-// var shortConsensusMaximum = biggestOfThree(i_virtTraileringShortMaximumConsensus1, i_virtTraileringShortMaximumConsensus2, i_virtTraileringShortMaximumConsensus3)
-
-float shortTraileringSizingMultiplier = (shortConsensusMinimum / virtTraileringShortConsensus[1])
+float shortTraileringSizingMultiplier = 1.0
 
 // Consensus sizing (S) - END
 
