@@ -278,7 +278,7 @@ i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossT
 i_atrStopLossOffset = input.int(0, minval = 0,  title = 'ATR Stop Loss Offset', group='Stop Loss', inline='StopLossATR')
 i_atrStopLossLength = input.int(14, minval = 1,  title = 'ATR Stop Loss', group='Stop Loss', inline='StopLossATR')
 i_atrStopLossSource = input.source(close, title = '', group='Stop Loss', inline='StopLossATR')
-i_atrStopLossMultiplier = input.float(3.0, title='', minval=0.01, group='Stop Loss', inline='StopLossATR', tooltip='Default: 3.00 times a 14 length ATR based on close values.')
+i_atrStopLossMultiplier = input.float(1.5, title='', minval=0.01, group='Stop Loss', inline='StopLossATR', tooltip='Default: 1.50 times a 14 length ATR based on close values.')
 
 // Break Even - Inputs
 i_enableBreakEven = input.bool(false, title='Break Even', group='Break Even', inline='BreakEvenSimple')
