@@ -1180,6 +1180,44 @@ traileringShortCumulativeBumpCloseAdvice = (virtTraileringLongConsensusAccumulat
 
 // Follow Cumulative Close Advice (S) - END
 
+// Consensus sizing - Functions - BEGIN
+
+// biggestOfThree (p_one, p_two, p_three) =>
+//     int biggestOfThree = p_one
+//     if (p_two > biggestOfThree)
+//         biggestOfThree := p_two
+//     if (p_three > biggestOfThree)
+//         biggestOfThree := p_three
+//     biggestOfThree
+
+smallestOfThree (p_one, p_two, p_three) =>
+    int smallestOfThree = p_one
+    if (p_two < smallestOfThree)
+        smallestOfThree := p_two
+    if (p_three < smallestOfThree)
+        smallestOfThree := p_three
+    smallestOfThree
+
+// Consensus sizing - Functions - END
+
+// Consensus sizing (L) - BEGIN
+
+var longConsensusMinimum = smallestOfThree(i_virtTraileringLongMinimumConsensus1, i_virtTraileringLongMinimumConsensus2, i_virtTraileringLongMinimumConsensus3)
+// var longConsensusMaximum = biggestOfThree(i_virtTraileringLongMaximumConsensus1, i_virtTraileringLongMaximumConsensus2, i_virtTraileringLongMaximumConsensus3)
+
+float longTraileringSizingMultiplier = (longConsensusMinimum / virtTraileringLongConsensus[1])
+
+// Consensus sizing (L) - END
+
+// Consensus sizing (S) - BEGIN
+
+var shortConsensusMinimum = smallestOfThree(i_virtTraileringShortMinimumConsensus1, i_virtTraileringShortMinimumConsensus2, i_virtTraileringShortMinimumConsensus3)
+// var shortConsensusMaximum = biggestOfThree(i_virtTraileringShortMaximumConsensus1, i_virtTraileringShortMaximumConsensus2, i_virtTraileringShortMaximumConsensus3)
+
+float shortTraileringSizingMultiplier = (shortConsensusMinimum / virtTraileringShortConsensus[1])
+
+// Consensus sizing (S) - END
+
 // virtPositionPriceMedian calculus - BEGIN
 
 bool newVirtLongPositionPriceMedian = false
@@ -1743,8 +1781,17 @@ if (entryQuantity < 0.0)
 
 // We assume the current price is current bar close
 
-entryQuantityContracts = (math.floor(((entryQuantity / close) * entryQuantityContractsReducer) * contractMultiplier) / contractMultiplier)
-entryQuantityContractsUSDT = entryQuantityContracts * (close)
+longEntryQuantityContracts = (math.floor(((entryQuantity / close) * entryQuantityContractsReducer) * contractMultiplier) / contractMultiplier)
+
+longEntryQuantityContracts := (math.floor(((entryQuantity / close) * entryQuantityContractsReducer * longTraileringSizingMultiplier ) * contractMultiplier) / contractMultiplier)
+
+longEntryQuantityContractsUSDT = longEntryQuantityContracts * (close)
+
+shortEntryQuantityContracts = (math.floor(((entryQuantity / close) * entryQuantityContractsReducer) * contractMultiplier) / contractMultiplier)
+
+shortEntryQuantityContracts := (math.floor(((entryQuantity / close) * entryQuantityContractsReducer * shortTraileringSizingMultiplier ) * contractMultiplier) / contractMultiplier)
+
+shortEntryQuantityContractsUSDT = shortEntryQuantityContracts * (close)
 
 // How much to LONG/GO LONG/SHORT/GO SHORT - END
 
@@ -1757,9 +1804,9 @@ if (i_strategyType == _L_)
     if LONG
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
         if (not insideABuyOrder) // Entry
-            tmpOrderAlertMessage := zig.longEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            tmpOrderAlertMessage := zig.longEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=longEntryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
             tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
-            strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+            strategy.entry("[L]", strategy.long, qty=longEntryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
         0 // Workaround for making every if branch to return the same type of value
@@ -1789,9 +1836,9 @@ if (i_strategyType == _S_)
     if SHORT
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
         if (not insideASellOrder) // Entry
-            tmpOrderAlertMessage := zig.shortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            tmpOrderAlertMessage := zig.shortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=shortEntryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
             tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
-            strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+            strategy.entry("[S]", strategy.short, qty=shortEntryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             sellOrderOpenBarIndex := bar_index + 1
         0 // Workaround for making every if branch to return the same type of value
@@ -1834,9 +1881,9 @@ if (i_strategyType == L_S)
     if LONG
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
         if (not insideABuyOrder) // Entry
-            tmpOrderAlertMessage := zig.longEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            tmpOrderAlertMessage := zig.longEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=longEntryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=longSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
             tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
-            strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+            strategy.entry("[L]", strategy.long, qty=longEntryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
     if LONG_CLOSE
@@ -1860,9 +1907,9 @@ if (i_strategyType == L_S)
     if SHORT
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
         if (not insideASellOrder) // Entry
-            tmpOrderAlertMessage := zig.shortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=shortSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            tmpOrderAlertMessage := zig.shortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=shortEntryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=shortSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
             tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
-            strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+            strategy.entry("[S]", strategy.short, qty=shortEntryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             sellOrderOpenBarIndex := bar_index + 1
     if SHORT_CLOSE
@@ -1902,9 +1949,9 @@ if (i_strategyType == _REVERSE_)
     if (LONG and (not LONG_CLOSE))
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
         if (not insideABuyOrder) // Entry
-            tmpOrderAlertMessage := zig.reverseLongEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=reverseSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            tmpOrderAlertMessage := zig.reverseLongEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=longEntryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=reverseSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
             tmpOrderComment := f_getOrderComment("entry", strategy.long, tmpOrderAlertMessage)
-            strategy.entry("[L]", strategy.long, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+            strategy.entry("[L]", strategy.long, qty=longEntryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             buyOrderOpenBarIndex := bar_index + 1
     if (LONG_CLOSE and (not ((SHORT and (not SHORT_CLOSE)))))
@@ -1928,9 +1975,9 @@ if (i_strategyType == _REVERSE_)
     if (SHORT and (not SHORT_CLOSE))
         tmpPositionBeforeOpeningOrder := strategy.position_avg_price
         if (not insideASellOrder) // Entry
-            tmpOrderAlertMessage := zig.reverseShortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=entryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=reverseSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
+            tmpOrderAlertMessage := zig.reverseShortEntry(key=i_zignalyServiceSecretKey,positionSizeQuote=shortEntryQuantityContractsUSDT, currentCapital=currentCapital, alertType=i_zignalyAlertType, stopLoss=i_enableStopLoss, takeProfit=i_enableTakeProfit, takeProfitPercentage1=takeProfit, trailingStopLoss=i_enableTrailingTakeProfit, trailingStopTriggerPercentage=i_trailingTakeProfitPercentageTrigger, trailingStopDistancePercentage=i_trailingTakeProfitPercentageOffset, integration=i_zignalyIntegrationType, priceDecimalDigits=i_priceDecimalDigits, exchange=i_zignalyExchange, exchangeAccountType=i_zignalyExchangeType, pair=exchangeTickerID, leverage=i_zignalyLeverage, providerType=i_zignalyProviderType, stopLossPercentage=orderStopLoss, signalId=reverseSignalIdString, hedgeMode=i_enableZignalyHedgeMode, ignoreOpenContractCheck=i_enableIgnoreOpenContractCheck, partial=false)
             tmpOrderComment := f_getOrderComment("entry", strategy.short, tmpOrderAlertMessage)
-            strategy.entry("[S]", strategy.short, qty=entryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
+            strategy.entry("[S]", strategy.short, qty=shortEntryQuantityContracts, alert_message=i_enableZignalyAlert ? tmpOrderAlertMessage : na, comment=tmpOrderComment)
         if (na(tmpPositionBeforeOpeningOrder)) // bar_index should only be saved when there is no order opened
             sellOrderOpenBarIndex := bar_index + 1
     if (SHORT_CLOSE and (not (LONG and (not LONG_CLOSE))))
