@@ -1442,6 +1442,8 @@ shortTakeProfitPricePlot = plot(virtShortTakeProfitPlotPrice, color=color.yellow
 plotchar(virtTraileringLongConsensus, "virtTraileringLongConsensus", "", location = location.top)
 plotchar(virtTraileringShortConsensus, "virtTraileringShortConsensus", "", location = location.top)
 
+plotchar(swingDetected, "swingDetected", "", location = location.top)
+
 // Virtual Trailering - Plot - END
 
 // ImplementedStrategy - Plot - END
