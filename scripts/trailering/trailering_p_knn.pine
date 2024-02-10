@@ -1493,6 +1493,9 @@ if knnShortOk and knnHasLearntEnough
 
 // knn and traileringLong integration - BEGIN
 
+bool preKnnTraileringLong = traileringLong
+bool preKnnTraileringShort = traileringShort
+
 if (i_enableKnnFilter)
     traileringLong := traileringLong and knnLong
     traileringShort := traileringShort and knnShort
@@ -1996,8 +1999,9 @@ if (not i_enableKnnSwingMode)
         knnLearnIterations := knnLearnIterations + 1
 
 if (i_enableKnnSwingMode)
-    knnMatrix := knnStore(knnMatrix, swingFeature1, swingFeature2, i_knnSource, i_maxKnnMatrixMaximumSize)
-    knnLearnIterations := knnLearnIterations + 1
+    if ( (montecarloAtrIsPossible) and (preKnnTraileringLong or preKnnTraileringShort) )
+        knnMatrix := knnStore(knnMatrix, swingFeature1, swingFeature2, i_knnSource, i_maxKnnMatrixMaximumSize)
+        knnLearnIterations := knnLearnIterations + 1
 
 // KNN Filter - Substrategy - Extra code - END
 
