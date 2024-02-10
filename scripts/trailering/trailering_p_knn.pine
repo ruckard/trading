@@ -735,6 +735,151 @@ getTooOldOrderShortCloseAdvice () =>
 
 // ImplementedStrategy functions - BEGIN
 
+// knn functions - BEGIN
+
+// @function Store the previous trade; buffer the current one until results are in. Results are binary: up/down
+// @param p_knn knn matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @param p_source current price
+// @param p_maximumSize limit the matrix size to this number of rows (0 of no limit)
+// @returns modified knn matrix
+knnStoreResult(matrix<float> p_knn, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0, float p_result) =>
+
+    if (p_maximumSize > 0 and matrix.rows(p_knn) > p_maximumSize)
+        matrix.remove_row(p_knn, 0)
+
+    // Add to storage matrix: parameter 1, parameter 2, price, result (up = 1; down = -1)
+    matrix.add_row(p_knn, matrix.rows(p_knn), array.from(p_feature1, p_feature2, p_source, p_result))
+
+    p_knn
+
+// @function Store the previous trade; buffer the current one until results are in. Results are binary: up/down
+// @param p_knn knn matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @param p_source current price
+// @param p_maximumSize limit the matrix size to this number of rows (0 of no limit)
+// @returns modified knn matrix
+knnStore(matrix<float> p_knn, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0) =>
+    var _prevFeature1 = 0.0
+    var _prevFeature2 = 0.0
+    var _prevSource = 0.0
+
+    if (p_maximumSize > 0 and matrix.rows(p_knn) > p_maximumSize)
+        matrix.remove_row(p_knn, 0)
+
+    // Add to storage matrix: parameter 1, parameter 2, price, result (up = 1; down = -1)
+    matrix.add_row(p_knn, matrix.rows(p_knn), array.from(_prevFeature1, _prevFeature2, _prevSource, p_source >= _prevSource ? 1 : -1))
+
+    _prevFeature1 := p_feature1
+    _prevFeature2 := p_feature2
+    _prevSource := p_source
+
+    p_knn
+
+// @function Store the previous trade; buffer the current one until results are in. Results are in percents
+// @param p_knn knn matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @param p_source current price
+// @param p_maximumSize limit the matrix size to this number of rows (0 of no limit)
+// @returns modified knn matrix
+knnStorePercent(matrix<float> p_knn, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0) =>
+    var _prevFeature1 = 0.0
+    var _prevFeature2 = 0.0
+    var _prevSource = 0.0
+
+    if (p_maximumSize > 0 and matrix.rows(p_knn) > p_maximumSize)
+        matrix.remove_row(p_knn, 0)
+
+    // Add to storage matrix: parameter 1, parameter 2, price, result percentage
+    matrix.add_row(p_knn, matrix.rows(p_knn), array.from(_prevFeature1, _prevFeature2, _prevSource, 100 * (p_source - _prevSource) / _prevSource))
+
+    _prevFeature1 := p_feature1
+    _prevFeature2 := p_feature2
+    _prevSource := p_source
+
+    p_knn
+
+// @function Get neighbours by getting p_nearestNeighborsNumber results with the smallest distances
+// @param p_distance p_distance array
+// @param p_result p_result array
+// @returns array slice of p_nearestNeighborsNumber results
+knnGet(float[] p_distance, float[] p_result, int p_nearestNeighborsNumber) =>
+    _matrix = matrix.new<float>(0, 0, 0)
+    matrix.add_col(_matrix, 0, p_distance)
+    matrix.add_col(_matrix, 1, p_result)
+    matrix.sort(_matrix, 0)
+
+    _row = matrix.col(_matrix, 1)
+    out = array.slice(_row, 0, math.min(p_nearestNeighborsNumber, array.size(_row)-1))
+
+// @function Create a distance array from the two given parameters
+// @param p_knn knn matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @returns distance array
+knnDistance(matrix<float> p_knn, float p_feature1, float p_feature2) =>
+    _distanceArray = array.new_float(0)
+    _matrixLastindex = matrix.rows(p_knn) - 1
+    for _nIndex = 0 to _matrixLastindex
+        d = math.sqrt( math.pow(p_feature1 - matrix.get(p_knn, _nIndex, 0), 2) + math.pow(p_feature2 - matrix.get(p_knn, _nIndex, 1), 2) )
+        array.push(_distanceArray, d)
+    _distanceArray
+
+// @function Make a prediction, finding k nearest neighbours and summing them up
+// @param p_knn knn matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @param p_knnNearestNeighbors k nearest neighbors
+// @returns sum of k nearest neighbors
+knnSum(matrix<float> p_knn, float p_feature1, float p_feature2, int p_knnNearestNeighbors) =>
+    _slice = (matrix.rows(p_knn) == 0) ? array.from(0.0) : knnGet(knnDistance(p_knn, p_feature1, p_feature2), matrix.col(p_knn, 3), p_knnNearestNeighbors)
+    out = array.sum(_slice)
+
+// @function execute kNN filter
+// @param p_knnType kNN filter type
+// @param p_knnNearestNeighbors k nearest neighbors
+// @param p_knnMinimumDifference kNN minimum difference
+// @param p_maxKnnMatrixMaximumSize kNN matrix size limit
+// @param p_source series
+// @param p_long long condition
+// @param p_short short condition
+// @param p_store store the supplied features (if false, only checks the results without storage)
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @returns [longOK, shortOK] filter output
+knn_doKNN(matrix<float> p_knnMatrix, string p_knnType, int p_knnNearestNeighbors = 5, float p_knnMinimumDifference = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, bool p_store, float p_feature1, float p_feature2) =>
+    longOK = true
+    shortOK = true
+
+    updatedKnnMatrix = matrix.copy(p_knnMatrix)
+
+    switch p_knnType
+        "Boolean" =>
+            if (p_long or p_short)
+                if (p_store)
+                    updatedKnnMatrix := knnStore(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
+
+                filter = knnSum(updatedKnnMatrix, p_feature1, p_feature2, p_knnNearestNeighbors)
+                longOK := filter >= p_knnMinimumDifference
+                shortOK := filter <= -p_knnMinimumDifference
+                mySlice = knnDistance(updatedKnnMatrix, p_feature1, p_feature2)
+                mySliceLengthTmp = array.sum(mySlice)
+        "Percent" =>
+            if (p_long or p_short)
+                if (p_store)
+                    updatedKnnMatrix := knnStorePercent(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
+
+                filter = knnSum(updatedKnnMatrix, p_feature1, p_feature2, p_knnNearestNeighbors)
+                longOK := filter >= p_knnMinimumDifference
+                shortOK := filter <= -p_knnMinimumDifference
+
+    [updatedKnnMatrix, longOK, shortOK]
+
+// knn functions - END
+
 // bodyOutlier functions - BEGIN
 
 bodyRange() =>
