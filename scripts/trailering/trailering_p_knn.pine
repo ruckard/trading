@@ -432,6 +432,7 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 // knn inputs
 
 i_knnSource = input.source(title='Source', defval=open, group='KNN', tooltip='')
+i_enableKnnSwingMode = input.bool(title='Enable kNN Swing Mode', defval=true, group='KNN', tooltip='Swing mode learns from last trade previous values. Non swing mode learns depending on Montecarlos Check after {N} bars which it is useful when you TakeProfit.')
 i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='KNN', tooltip='')
 // When i_knnMinimumDifference is 0, i_knnNearestNeighbors default was 23
 i_knnNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='KNN', tooltip='')
@@ -1989,8 +1990,13 @@ if (i_enableKnnResultFilter)
     virtLongOK := virtLongOK and (math.abs(suggestedResult) >= (i_longKnnResultMinimum * 0.01))
     virtShortOK := virtShortOK and (math.abs(suggestedResult) >= (i_shortKnnResultMinimum * 0.01))
 
-if ( (montecarloAtrIsPossible) and (virtLongOK or virtShortOK) )
-    knnMatrix := knnStoreResult(knnMatrix, swingFeature1[i_montecarloCheckAfter], swingFeature2[i_montecarloCheckAfter], i_knnSource, i_maxKnnMatrixMaximumSize, suggestedResult)
+if (not i_enableKnnSwingMode)
+    if ( (montecarloAtrIsPossible) and (virtLongOK or virtShortOK) )
+        knnMatrix := knnStoreResult(knnMatrix, swingFeature1[i_montecarloCheckAfter], swingFeature2[i_montecarloCheckAfter], i_knnSource, i_maxKnnMatrixMaximumSize, suggestedResult)
+        knnLearnIterations := knnLearnIterations + 1
+
+if (i_enableKnnSwingMode)
+    knnMatrix := knnStore(knnMatrix, swingFeature1, swingFeature2, i_knnSource, i_maxKnnMatrixMaximumSize)
     knnLearnIterations := knnLearnIterations + 1
 
 // KNN Filter - Substrategy - Extra code - END
