@@ -1483,13 +1483,20 @@ if (needToTrade)
 knnHasLearntEnough = knnLearnIterations >= i_MaxKnnLearnIterations
 
 // Actions
-if (i_enableKnnFilter)
-    if knnLongOk and knnHasLearntEnough
-        knnLong := true
-    if knnShortOk and knnHasLearntEnough
-        knnShort := true
+if knnLongOk and knnHasLearntEnough
+    knnLong := true
+if knnShortOk and knnHasLearntEnough
+    knnShort := true
 
 // knn substrategy - END
+
+// knn and traileringLong integration - BEGIN
+
+if (i_enableKnnFilter)
+    traileringLong := traileringLong and knnLong
+    traileringShort := traileringShort and knnShort
+
+// knn and traileringLong integration - END
 
 // Volume Bounce substrategy - BEGIN
 
