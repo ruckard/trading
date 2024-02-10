@@ -1907,6 +1907,48 @@ if (i_enableTraileringTakeProfit)
             orderStopLoss := orderStopLossPerOne * 100
             ShortStopLoss := strategy.position_avg_price * (1 + orderStopLossPerOne)
 
+// KNN Filter - Substrategy - Extra code - BEGIN
+
+latestLowest = ta.lowest(low, i_montecarloCheckAfter - 1)
+latestHighest = ta.highest(high, i_montecarloCheckAfter - 1)
+
+virtLongTakeProfit = LongTakeProfit[i_montecarloCheckAfter - 1]
+virtShortTakeProfit = ShortTakeProfit[i_montecarloCheckAfter - 1]
+virtLongStopLoss = LongStopLoss[i_montecarloCheckAfter - 1]
+virtShortStopLoss = ShortStopLoss[i_montecarloCheckAfter - 1]
+virtSource = close[i_montecarloCheckAfter]
+
+virtLongTakeProfitIsReached = (virtLongTakeProfit >= latestLowest) and (virtLongTakeProfit <= latestHighest)
+virtShortTakeProfitIsReached =  (virtShortTakeProfit >= latestLowest) and (virtShortTakeProfit <= latestHighest)
+
+virtLongStopLossIsReached = (virtLongStopLoss >= latestLowest) and (virtLongStopLoss <= latestHighest)
+virtShortStopLossIsReached =  (virtShortStopLoss >= latestLowest) and (virtShortStopLoss <= latestHighest)
+
+virtLongOK = virtLongTakeProfitIsReached and (not virtLongStopLossIsReached)
+virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
+
+float suggestedResult = 0.0
+if (i_knnType == '_BOOLEAN_')
+    if (virtLongOK)
+        suggestedResult := 1.0
+    if (virtShortOK)
+        suggestedResult := -1.0
+else // '_PERCENT_'
+    if (virtLongOK)
+        suggestedResult := suggestedResult + ((virtLongTakeProfit / virtSource) - 1)
+    if (virtShortOK)
+        suggestedResult := suggestedResult - ((virtSource / virtShortTakeProfit) - 1)
+
+if (i_enableKnnResultFilter)
+    virtLongOK := virtLongOK and (math.abs(suggestedResult) >= (i_longKnnResultMinimum * 0.01))
+    virtShortOK := virtShortOK and (math.abs(suggestedResult) >= (i_shortKnnResultMinimum * 0.01))
+
+if ( (montecarloAtrIsPossible) and (virtLongOK or virtShortOK) )
+    knnMatrix := knnStoreResult(knnMatrix, knnAdx[i_montecarloCheckAfter], knnMfi[i_montecarloCheckAfter], i_knnSource, i_maxKnnMatrixMaximumSize, suggestedResult)
+    knnLearnIterations := knnLearnIterations + 1
+
+// KNN Filter - Substrategy - Extra code - END
+
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
 
