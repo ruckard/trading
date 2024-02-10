@@ -1949,6 +1949,41 @@ if ( (montecarloAtrIsPossible) and (virtLongOK or virtShortOK) )
 
 // KNN Filter - Substrategy - Extra code - END
 
+// ImplementedStrategy - Extra Plot - BEGIN
+
+var knnMatrixLines = array.new_line()
+
+if i_plotKnnMatrix
+    for l in knnMatrixLines
+        line.delete(l)
+    array.clear(knnMatrixLines)
+
+    knnRows = matrix.rows(knnMatrix)
+    for nrow = 0 to (knnRows - 1)
+        tmpFeature1 = matrix.get(knnMatrix, nrow, 0)
+        tmpFeature2 = matrix.get(knnMatrix, nrow, 1)
+        tmpRowResult = matrix.get(knnMatrix, nrow, 3)
+
+        tmpX2 = int(time_close - (( 100 - tmpFeature1 ) * (timeframe.in_seconds(timeframe.period)) * 1000.0 ))
+        tmpX1 = int(tmpX2 - (1 * (timeframe.in_seconds(timeframe.period))))
+        tmpY2 = tmpFeature2
+        tmpY1 = tmpFeature2 - 1.0
+
+        if (tmpRowResult >= 0)
+            array.unshift(knnMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, color=color.lime, xloc=xloc.bar_time))
+        else
+            array.unshift(knnMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, color=color.maroon, xloc=xloc.bar_time))
+
+squareBoxX2 = int(time_close)
+squareBoxX1 = int(time_close - ((timeframe.in_seconds(timeframe.period)) * 100 * 1000.0 ))
+
+var box squareBox = na
+box.delete(squareBox)
+if i_plotKnnMatrix
+    squareBox := box.new(squareBoxX1, 100.0, squareBoxX2, 0.0, xloc=xloc.bar_time, bgcolor=na)
+
+// ImplementedStrategy - Extra Plot - END
+
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
 
