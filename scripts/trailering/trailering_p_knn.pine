@@ -1439,8 +1439,8 @@ if (i_enableTraileringFiboTakeProfit)
 // 1st candle: Different than zero
 // 2nd candle: Different than zero
 
-bool swingLong = virtTraileringLongConsensus >= 1
-bool swingShort = virtTraileringShortConsensus >= 1
+bool swingLong = virtTraileringShortConsensus >= 1
+bool swingShort =  virtTraileringLongConsensus >= 1
 
 bool swingDetected = false
 swingDetected := not (swingLong[1] and swingShort[1])
