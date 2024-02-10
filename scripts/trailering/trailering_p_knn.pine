@@ -1463,15 +1463,11 @@ var knnMatrix = matrix.new<float>(1, 4, 0)
 
 montecarloAtrIsPossible = bar_index >= i_atrStopLossLength
 
-bool virtMontecarloBoth = false
-virtMontecarloBoth := (bar_index + i_montecarloOffset) % i_montecarloPeriod == 0
-virtMontecarloBoth := virtMontecarloBoth and montecarloAtrIsPossible
-
 bool knnLong = false
 bool knnShort = false
 
-bool needToLearn = virtMontecarloBoth[i_montecarloCheckAfter]
-bool needToTrade = virtMontecarloBoth
+bool needToLearn = montecarloAtrIsPossible[i_montecarloCheckAfter]
+bool needToTrade = montecarloAtrIsPossible
 
 bool knnLongOk = false
 bool knnShortOk = false
