@@ -1269,6 +1269,8 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
 
 // Trailering substrategy - END
 
+// TraileringConsensus - substrategy - BEGIN
+
 bool traileringLong = false
 bool traileringShort = false
 
@@ -1307,6 +1309,8 @@ if (i_enableTraileringShortProtection)
     traileringShort := traileringShort and (not (longLookBackConsensus >= i_traileringShortProtectionConsensusMinimum))
 
 // Trailering Protection - END
+
+// TraileringConsensus - substrategy - END
 
 // Follow the Bump Close Advice - BEGIN
 traileringLongFollowTheBumpCloseAdvice = (virtTraileringShortConsensus >= i_traileringLongFollowTheBumpCloseConsensusMinimum)
