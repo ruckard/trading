@@ -427,6 +427,31 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 // ImplementedStrategy inputs - BEGIN
 
+// knn inputs
+
+i_knnSource = input.source(title='Source', defval=open, group='KNN', tooltip='')
+i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='KNN', tooltip='')
+i_knnAdxFilterLength = input.int(title='ADX Filter Length', defval=19, group='KNN', tooltip='')
+i_knnMfiFilterLength = input.int(title='MFI Filter Length', defval=19, group='KNN', tooltip='')
+i_knnAdxSmoothing = input.int(title='Filter Smoothing', defval=6, group='KNN', tooltip='')
+// When i_knnMinimumDifference is 0, i_knnNearestNeighbors default was 23
+i_knnNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='KNN', tooltip='')
+i_knnMinimumDifference = input.float(title='kNN minimum difference', defval=0.75, group='KNN', tooltip='')
+i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=100, group='KNN', tooltip='')
+_BOOLEAN_ = 'Boolean', _PERCENT_ = 'Percent'
+i_knnType = input.string(_PERCENT_, title='kNN Type', options=[_BOOLEAN_, _PERCENT_], group='KNN', inline='kNNType', tooltip='')
+i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=100, group='KNN', tooltip='')
+
+i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
+i_montecarloPeriod = input.int(24, minval=2, title='MonteCarlo Period {24}', group='Montecarlo', tooltip='')
+i_montecarloCheckAfter = input.int(6, minval=1, title='Check after {6} bars', group='Montecarlo', tooltip='')
+
+i_plotKnnMatrix = input.bool(false, title='Plot KNN Matrix', group='Debug', inline='DebugKnnMatrix', tooltip='Hide the pair and click on auto to see this properly.\nBecause I do not want to modify overlay value.\nDefault: false.')
+
+i_enableKnnResultFilter = input.bool(title='Enable Result filter', defval=true, group='KNN Result Filter', tooltip='')
+i_longKnnResultMinimum = input.float(title='(L) kNN Result minimum (%)', defval=0.50, group='KNN', tooltip='')
+i_shortKnnResultMinimum = input.float(title='(S) kNN Result minimum (%)', defval=0.50, group='KNN', tooltip='')
+
 // Trailering inputs
 
 i_enableTraileringTakeProfit = input.bool(false, title='Enable Trailering TakeProfit {False}', group='Trailering')
