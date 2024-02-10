@@ -1491,16 +1491,16 @@ if knnShortOk and knnHasLearntEnough
 
 // knn substrategy - END
 
-// knn and traileringLong integration - BEGIN
+// knn and swingLong integration - BEGIN
 
-bool preKnnTraileringLong = traileringLong
-bool preKnnTraileringShort = traileringShort
+bool preKnnSwingLong = swingLong
+bool preKnnSwingShort = swingShort
 
 if (i_enableKnnFilter)
-    traileringLong := traileringLong and knnLong
-    traileringShort := traileringShort and knnShort
+    swingLong := swingLong and knnLong
+    swingShort := swingShort and knnShort
 
-// knn and traileringLong integration - END
+// knn and swingLong integration - END
 
 // Volume Bounce substrategy - BEGIN
 
@@ -1529,7 +1529,7 @@ bodyRangeShort = bodyRange()  >= liftAverageBodyRange and (bodyRange() >= i_body
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
-bool longCondition1 = traileringLong
+bool longCondition1 = swingLong
 bool longCondition2 = false
 bool longCondition3 = false
 bool longCondition4 = false
@@ -1537,7 +1537,7 @@ bool longCondition5 = false
 // Define here your, at most, 5 long conditions. Use false if not used. - END
 
 // Define here your, at most, 5 short conditions. Use false if not used. - BEGIN
-bool shortCondition1 = traileringShort
+bool shortCondition1 = swingShort
 bool shortCondition2 = false
 bool shortCondition3 = false
 bool shortCondition4 = false
@@ -1999,7 +1999,7 @@ if (not i_enableKnnSwingMode)
         knnLearnIterations := knnLearnIterations + 1
 
 if (i_enableKnnSwingMode)
-    if ( (montecarloAtrIsPossible) and (preKnnTraileringLong or preKnnTraileringShort) )
+    if ( (montecarloAtrIsPossible) and (swingLong or swingShort) )
         knnMatrix := knnStore(knnMatrix, swingFeature1, swingFeature2, i_knnSource, i_maxKnnMatrixMaximumSize)
         knnLearnIterations := knnLearnIterations + 1
 
