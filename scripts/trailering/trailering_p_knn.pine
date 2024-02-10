@@ -1466,6 +1466,9 @@ montecarloAtrIsPossible = bar_index >= i_atrStopLossLength
 bool knnLong = false
 bool knnShort = false
 
+// kNN
+var knnLearnIterations = 0
+
 bool needToLearn = montecarloAtrIsPossible[i_montecarloCheckAfter]
 bool needToTrade = montecarloAtrIsPossible
 
