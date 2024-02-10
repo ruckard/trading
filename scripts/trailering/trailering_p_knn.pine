@@ -446,7 +446,7 @@ i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=10
 
 i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
 i_montecarloPeriod = input.int(24, minval=2, title='MonteCarlo Period {24}', group='Montecarlo', tooltip='')
-i_montecarloCheckAfter = input.int(6, minval=1, title='Check after {6} bars', group='Montecarlo', tooltip='')
+i_montecarloCheckAfter = input.int(24, minval=1, title='Check after {24} bars', group='Montecarlo', tooltip='')
 
 i_plotKnnMatrix = input.bool(false, title='Plot KNN Matrix', group='Debug', inline='DebugKnnMatrix', tooltip='Hide the pair and click on auto to see this properly.\nBecause I do not want to modify overlay value.\nDefault: false.')
 
