@@ -253,8 +253,8 @@ i_subStrategiesLookback = input.int(1, title='Lookback', group='SubStrategies', 
 i_subStrategiesMinimum = input.int(1, title='Minimum', group='SubStrategies', inline='SubStrategies', tooltip='Take a look at the 1 latest candles and then if a minimum of 1 substrategy triggers to open a trade then open the trade.\nDefaults:\nLookback: 1\nMinimum: 1')
 
 // Take Profit - Inputs
-i_enableTakeProfit = input.bool(false, title='Take Profit', group='Take Profit', inline='TakeProfitSimple')
-i_takeProfit = input.float(1.10, title='(%)', group='Take Profit', inline='TakeProfitSimple', tooltip='Make sure this is Enabled if you want to be able to Take Profit and any of its forms like, e.g., based on Risk/Reward Ratio.\nDefault: False.\nDefault: 1.10%.')
+i_enableTakeProfit = input.bool(true, title='Take Profit', group='Take Profit', inline='TakeProfitSimple')
+i_takeProfit = input.float(1.10, title='(%)', group='Take Profit', inline='TakeProfitSimple', tooltip='Make sure this is Enabled if you want to be able to Take Profit and any of its forms like, e.g., based on Risk/Reward Ratio.\nDefault: Enabled.\nDefault: 1.10%.')
 i_takeProfitPerOne = i_takeProfit / 100
 i_enableTakeProfitDefaultLogic = input.bool(true, title='Take Profit Default Logic', group='Take Profit', inline='TakeProfitLogic', tooltip='Turn on TakeProfit default logic.\nOnly useful if you code your own TakeProfit logic.\n Default: true.')
 
