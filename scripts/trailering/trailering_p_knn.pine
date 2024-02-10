@@ -433,9 +433,6 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 i_knnSource = input.source(title='Source', defval=open, group='KNN', tooltip='')
 i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='KNN', tooltip='')
-i_knnAdxFilterLength = input.int(title='ADX Filter Length', defval=19, group='KNN', tooltip='')
-i_knnMfiFilterLength = input.int(title='MFI Filter Length', defval=19, group='KNN', tooltip='')
-i_knnAdxSmoothing = input.int(title='Filter Smoothing', defval=6, group='KNN', tooltip='')
 // When i_knnMinimumDifference is 0, i_knnNearestNeighbors default was 23
 i_knnNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='KNN', tooltip='')
 i_knnMinimumDifference = input.float(title='kNN minimum difference', defval=0.75, group='KNN', tooltip='')
