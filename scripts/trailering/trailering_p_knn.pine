@@ -427,6 +427,8 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 // ImplementedStrategy inputs - BEGIN
 
+// Trailering inputs
+
 i_enableTraileringTakeProfit = input.bool(false, title='Enable Trailering TakeProfit {False}', group='Trailering')
 i_enableTraileringStopLoss = input.bool(false, title='Enable Trailering StopLoss {False}', group='Trailering')
 i_enableTraileringExtremeTakeProfit = input.bool(false, title='Enable Trailering Extreme TakeProfit {False}', group='Trailering')
