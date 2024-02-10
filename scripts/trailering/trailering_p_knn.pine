@@ -1457,6 +1457,43 @@ float swingFeature2 = swingFeature[0]
 
 // swing substrategy - END
 
+// knn substrategy - BEGIN
+
+var knnMatrix = matrix.new<float>(1, 4, 0)
+
+montecarloAtrIsPossible = bar_index >= i_atrStopLossLength
+
+bool virtMontecarloBoth = false
+virtMontecarloBoth := (bar_index + i_montecarloOffset) % i_montecarloPeriod == 0
+virtMontecarloBoth := virtMontecarloBoth and montecarloAtrIsPossible
+
+bool knnLong = false
+bool knnShort = false
+
+bool needToLearn = virtMontecarloBoth[i_montecarloCheckAfter]
+bool needToTrade = virtMontecarloBoth
+
+bool knnLongOk = false
+bool knnShortOk = false
+
+bool longHasWon = false
+bool shortHasWon = false
+
+if (needToTrade)
+    [tmpKnnMatrix, knnLongOkTmp, knnShortOkTmp] = knn_doKNN(knnMatrix, i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, true, true, false, swingFeature1, swingFeature2)
+    knnLongOk := knnLongOkTmp
+    knnShortOk := knnShortOkTmp
+
+knnHasLearntEnough = knnLearnIterations >= i_MaxKnnLearnIterations
+
+// Actions
+if (i_enableKnnFilter)
+    if knnLongOk and knnHasLearntEnough
+        knnLong := true
+    if knnShortOk and knnHasLearntEnough
+        knnShort := true
+
+// knn substrategy - END
 
 // Volume Bounce substrategy - BEGIN
 
