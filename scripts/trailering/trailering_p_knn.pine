@@ -2022,8 +2022,8 @@ if i_plotKnnMatrix
 
         tmpX2 = int(time_close - (( 100 - tmpFeature1 ) * (timeframe.in_seconds(timeframe.period)) * 1000.0 ))
         tmpX1 = int(tmpX2 - (1 * (timeframe.in_seconds(timeframe.period))))
-        tmpY2 = tmpFeature2
-        tmpY1 = tmpFeature2 - 1.0
+        tmpY2 = (tmpFeature2 >= 0) ? (tmpFeature2      ) : (tmpFeature2 - 1.0)
+        tmpY1 = (tmpFeature2 >= 0) ? (tmpFeature2 - 1.0) : (tmpFeature2      )
 
         if (tmpRowResult >= 0)
             array.unshift(knnMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, color=color.lime, xloc=xloc.bar_time))
