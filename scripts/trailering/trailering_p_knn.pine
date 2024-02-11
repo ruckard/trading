@@ -259,7 +259,7 @@ i_takeProfitPerOne = i_takeProfit / 100
 i_enableTakeProfitDefaultLogic = input.bool(true, title='Take Profit Default Logic', group='Take Profit', inline='TakeProfitLogic', tooltip='Turn on TakeProfit default logic.\nOnly useful if you code your own TakeProfit logic.\n Default: true.')
 
 i_enableRiskRewardRatio = input.bool(true, title='Use this', group='Take Profit', inline='TakeProfitRiskRewardRatio')
-i_positionRatio = input.float(2.25, title='Risk/Reward Ratio', minval=0.01, group='Take Profit', inline='TakeProfitRiskRewardRatio', tooltip='Default: Enabled.\nDefault: 2.25')
+i_positionRatio = input.float(1.25, title='Risk/Reward Ratio', minval=0.01, group='Take Profit', inline='TakeProfitRiskRewardRatio', tooltip='Default: Enabled.\nDefault: 1.25')
 
 // Trailing Take Profit - Inputs
 i_enableTrailingTakeProfit = input.bool(false, title='', group='Take Profit', inline='TrailingTakeProfit')
@@ -280,7 +280,7 @@ i_stopLossType = (i_stopLossTypePre == _SLConstant_) ? 'constant' : (i_stopLossT
 i_atrStopLossOffset = input.int(0, minval = 0,  title = 'ATR Stop Loss Offset', group='Stop Loss', inline='StopLossATR')
 i_atrStopLossLength = input.int(14, minval = 1,  title = 'ATR Stop Loss', group='Stop Loss', inline='StopLossATR')
 i_atrStopLossSource = input.source(close, title = '', group='Stop Loss', inline='StopLossATR')
-i_atrStopLossMultiplier = input.float(1.5, title='', minval=0.01, group='Stop Loss', inline='StopLossATR', tooltip='Default: 1.50 times a 14 length ATR based on close values.')
+i_atrStopLossMultiplier = input.float(1.75, title='', minval=0.01, group='Stop Loss', inline='StopLossATR', tooltip='Default: 1.75 times a 14 length ATR based on close values.')
 
 // Break Even - Inputs
 i_enableBreakEven = input.bool(false, title='Break Even', group='Break Even', inline='BreakEvenSimple')
@@ -436,11 +436,11 @@ i_enableKnnSwingMode = input.bool(title='Enable kNN Swing Mode', defval=false, g
 i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='KNN', tooltip='')
 // When i_knnMinimumDifference is 0, i_knnNearestNeighbors default was 23
 i_knnNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='KNN', tooltip='')
-i_knnMinimumDifference = input.float(title='kNN minimum difference', defval=0.75, group='KNN', tooltip='')
-i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=100, group='KNN', tooltip='')
+i_knnMinimumDifference = input.float(title='kNN minimum difference', defval=1.00, group='KNN', tooltip='')
+i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=200, group='KNN', tooltip='')
 _BOOLEAN_ = 'Boolean', _PERCENT_ = 'Percent'
 i_knnType = input.string(_PERCENT_, title='kNN Type', options=[_BOOLEAN_, _PERCENT_], group='KNN', inline='kNNType', tooltip='')
-i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=100, group='KNN', tooltip='')
+i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=200, group='KNN', tooltip='')
 
 i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
 i_montecarloPeriod = input.int(24, minval=2, title='MonteCarlo Period {24}', group='Montecarlo', tooltip='')
@@ -449,8 +449,8 @@ i_montecarloCheckAfter = input.int(24, minval=1, title='Check after {24} bars', 
 i_plotKnnMatrix = input.bool(false, title='Plot KNN Matrix', group='Debug', inline='DebugKnnMatrix', tooltip='Hide the pair and click on auto to see this properly.\nBecause I do not want to modify overlay value.\nDefault: false.')
 
 i_enableKnnResultFilter = input.bool(title='Enable Result filter', defval=true, group='KNN Result Filter', tooltip='')
-i_longKnnResultMinimum = input.float(title='(L) kNN Result minimum (%)', defval=0.50, group='KNN', tooltip='')
-i_shortKnnResultMinimum = input.float(title='(S) kNN Result minimum (%)', defval=0.50, group='KNN', tooltip='')
+i_longKnnResultMinimum = input.float(title='(L) kNN Result minimum (%)', defval=2.00, group='KNN', tooltip='')
+i_shortKnnResultMinimum = input.float(title='(S) kNN Result minimum (%)', defval=2.00, group='KNN', tooltip='')
 
 // Trailering inputs
 
@@ -502,7 +502,7 @@ i_virtTraileringShortMaximumConsensus3 = i_virtTraileringShortMaximumConsensus2
 
 i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
 i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
-i_traileringAtrTakeProfitMultiplier = input.float(1.25, title='ATR Take Profit Multiplier % {1.25}', minval=0.01, group='Trailering')
+i_traileringAtrTakeProfitMultiplier = input.float(1.50, title='ATR Take Profit Multiplier % {1.50}', minval=0.01, group='Trailering')
 
 i_traileringTakeProfitPercentage = input.float(100.0, minval = 0.001, title='Take Profit Percentage {100.0 %}', group='Trailering')
 i_traileringTakeProfitPerOne = i_traileringTakeProfitPercentage * 0.01
