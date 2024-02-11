@@ -1450,8 +1450,10 @@ swingDetected := swingDetected and ((virtTraileringLongConsensus[0] >= 1) or (vi
 
 float swingFeature = virtTraileringLongConsensus - virtTraileringShortConsensus
 
-float swingFeature1 = virtTraileringLongConsensus
-float swingFeature2 = virtTraileringShortConsensus
+volumeBounceRatioForKNN = (close >= open) ? (volume[0] / volume[1]) : ((volume[1] / volume[0]) * (-1.00))
+
+float swingFeature1 = swingFeature
+float swingFeature2 = volumeBounceRatioForKNN
 
 // swing substrategy - END
 
