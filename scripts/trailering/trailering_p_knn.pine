@@ -431,7 +431,7 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 // knn inputs
 
-i_knnSource = input.source(title='Source', defval=open, group='KNN', tooltip='')
+i_knnSource = input.source(title='Source', defval=close, group='KNN', tooltip='')
 i_enableKnnSwingMode = input.bool(title='Enable kNN Swing Mode', defval=false, group='KNN', tooltip='Swing mode learns from last trade previous values. Non swing mode learns depending on Montecarlos Check after {N} bars which it is useful when you TakeProfit.')
 i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='KNN', tooltip='')
 // When i_knnMinimumDifference is 0, i_knnNearestNeighbors default was 23
