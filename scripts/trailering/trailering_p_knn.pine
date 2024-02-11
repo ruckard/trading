@@ -1995,7 +1995,7 @@ if (i_enableKnnResultFilter)
 
 if (not i_enableKnnSwingMode)
     if ( (montecarloAtrIsPossible) and (virtLongOK or virtShortOK) )
-        knnMatrix := knnStoreResult(knnMatrix, swingFeature1[i_montecarloCheckAfter], swingFeature2[i_montecarloCheckAfter], i_knnSource, i_maxKnnMatrixMaximumSize, suggestedResult)
+        knnMatrix := knnStoreResult(knnMatrix, swingFeature1[i_montecarloCheckAfter], swingFeature2[i_montecarloCheckAfter], i_knnSource[i_montecarloCheckAfter], i_maxKnnMatrixMaximumSize, suggestedResult)
         knnLearnIterations := knnLearnIterations + 1
 
 if (i_enableKnnSwingMode)
