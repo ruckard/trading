@@ -434,12 +434,9 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 i_hsaSource = input.source(title='Source', defval=close, group='HSA', tooltip='')
 i_enableKnnSwingMode = input.bool(title='Enable kNN Swing Mode', defval=false, group='HSA', tooltip='Swing mode learns from last trade previous values. Non swing mode learns depending on Montecarlos Check after {N} bars which it is useful when you TakeProfit.')
 i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='HSA', tooltip='')
-// When i_hsaMinimumDifference is 0, i_hsaNearestNeighbors default was 23
 i_hsaNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='HSA', tooltip='')
-i_hsaMinimumDifference = input.float(title='kNN minimum difference', defval=1.00, group='HSA', tooltip='')
+i_hsaMinimumMedianExpectedResult = input.float(title='HSA minimum minimum median expected result', defval=1.00, group='HSA', tooltip='')
 i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=200, group='HSA', tooltip='')
-_BOOLEAN_ = 'Boolean', _PERCENT_ = 'Percent'
-i_hsaType = input.string(_PERCENT_, title='kNN Type', options=[_BOOLEAN_, _PERCENT_], group='HSA', inline='kNNType', tooltip='')
 i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=200, group='HSA', tooltip='')
 
 i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
@@ -867,9 +864,8 @@ hsaSum(matrix<float> p_hsa, float p_feature1, float p_feature2, int p_hsaNearest
     out = array.sum(_slice)
 
 // @function execute kNN filter
-// @param p_hsaType kNN filter type
 // @param p_hsaNearestNeighbors k nearest neighbors
-// @param p_hsaMinimumDifference kNN minimum difference
+// @param p_hsaMinimumMedianExpectedResult HSA median expected result
 // @param p_maxKnnMatrixMaximumSize kNN matrix size limit
 // @param p_source series
 // @param p_long long condition
@@ -878,31 +874,24 @@ hsaSum(matrix<float> p_hsa, float p_feature1, float p_feature2, int p_hsaNearest
 // @param p_feature1 feature 1 value
 // @param p_feature2 feature 2 value
 // @returns [longOK, shortOK] filter output
-hsa_doHSA(matrix<float> p_hsaMatrix, string p_hsaType, int p_hsaNearestNeighbors = 5, float p_hsaMinimumDifference = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, bool p_store, float p_feature1, float p_feature2) =>
+hsa_doHSA(matrix<float> p_hsaMatrix, int p_hsaNearestNeighbors = 5, float p_hsaMinimumMedianExpectedResult = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, bool p_store, float p_feature1, float p_feature2) =>
     longOK = true
     shortOK = true
 
     updatedKnnMatrix = matrix.copy(p_hsaMatrix)
 
-    switch p_hsaType
-        "Boolean" =>
-            if (p_long or p_short)
-                if (p_store)
-                    updatedKnnMatrix := hsaStore(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
+    if (p_long or p_short)
+        if (p_store)
+            updatedKnnMatrix := hsaStorePercent(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
 
-                filter = hsaSum(updatedKnnMatrix, p_feature1, p_feature2, p_hsaNearestNeighbors)
-                longOK := filter >= p_hsaMinimumDifference
-                shortOK := filter <= -p_hsaMinimumDifference
-                mySlice = hsaDistance(updatedKnnMatrix, p_feature1, p_feature2)
-                mySliceLengthTmp = array.sum(mySlice)
-        "Percent" =>
-            if (p_long or p_short)
-                if (p_store)
-                    updatedKnnMatrix := hsaStorePercent(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
-
-                filter = hsaSum(updatedKnnMatrix, p_feature1, p_feature2, p_hsaNearestNeighbors)
-                longOK := filter >= p_hsaMinimumDifference
-                shortOK := filter <= -p_hsaMinimumDifference
+        hsaFeaturePairNumber = hsaFeaturePairCount (updatedKnnMatrix, p_feature1, p_feature2)
+        if (hsaFeaturePairNumber >= 3)
+            medianExpectedResult = hsaMedianExpectedResult (updatedKnnMatrix, p_feature1, p_feature2)
+            longOK := filter >= p_hsaMinimumMedianExpectedResult
+            shortOK := filter <= -p_hsaMinimumMedianExpectedResult
+        else
+            longOK := false
+            shortOK := false
 
     [updatedKnnMatrix, longOK, shortOK]
 
@@ -1505,7 +1494,7 @@ bool longHasWon = false
 bool shortHasWon = false
 
 if (needToTrade)
-    [tmpKnnMatrix, hsaLongOkTmp, hsaShortOkTmp] = hsa_doHSA(hsaMatrix, i_hsaType, i_hsaNearestNeighbors, i_hsaMinimumDifference, i_maxKnnMatrixMaximumSize, i_hsaSource, true, true, false, swingFeature1, swingFeature2)
+    [tmpKnnMatrix, hsaLongOkTmp, hsaShortOkTmp] = hsa_doHSA(hsaMatrix, i_hsaNearestNeighbors, i_hsaMinimumMedianExpectedResult, i_maxKnnMatrixMaximumSize, i_hsaSource, true, true, false, swingFeature1, swingFeature2)
     hsaLongOk := hsaLongOkTmp
     hsaShortOk := hsaShortOkTmp
 
