@@ -437,7 +437,7 @@ i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='HS
 i_hsaNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='HSA', tooltip='')
 i_hsaMinimumMedianExpectedResult = input.float(title='HSA minimum minimum median expected result', defval=1.00, group='HSA', tooltip='')
 i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=200, group='HSA', tooltip='')
-i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=200, group='HSA', tooltip='')
+i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=2880, group='HSA', tooltip='')
 
 i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
 i_montecarloPeriod = input.int(24, minval=2, title='MonteCarlo Period {24}', group='Montecarlo', tooltip='')
