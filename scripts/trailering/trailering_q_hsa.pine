@@ -22,7 +22,7 @@
 // It is a Longonly strategy.
 // Depending on the number of trigger conditions more capital is used on the trade.
 //
-// Also learn from the past thanks to HSA and use that to know when to go long or short.
+// Also learn from the past thanks to HSA (Historical Statistic Advice) and use that to know when to go long or short.
 // ImplementedStrategy explanation - END
 //
 // In addition the former strategy also includes Risk Management.
