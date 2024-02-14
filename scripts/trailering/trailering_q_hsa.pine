@@ -737,6 +737,34 @@ getTooOldOrderShortCloseAdvice () =>
 
 // hsa functions - BEGIN
 
+// @function Count data matching the two given features
+// @param p_hsa hsa matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @returns number of matches
+hsaFeaturePairCount(matrix<float> p_hsa, float p_feature1, float p_feature2) =>
+    int _featurePairCount = 0
+    _matrixLastindex = matrix.rows(p_hsa) - 1
+    for _nIndex = 0 to _matrixLastindex
+        if ((p_feature1 == matrix.get(p_hsa, _nIndex, 0)) and (p_feature2 == matrix.get(p_hsa, _nIndex, 1)))
+            _featurePairCount := _featurePairCount + 1
+    _featurePairCount
+
+// @function Median expected value based on matching features
+// @param p_hsa hsa matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @returns median expected value
+hsaMedianExpectedResult(matrix<float> p_hsa, float p_feature1, float p_feature2) =>
+    _medianArray = array.new_float(0, 0.0)
+    _matrixLastindex = matrix.rows(p_hsa) - 1
+    for _nIndex = 0 to _matrixLastindex
+        if ((p_feature1 == matrix.get(p_hsa, _nIndex, 0)) and (p_feature2 == matrix.get(p_hsa, _nIndex, 1)))
+            array.push(_medianArray,matrix.get(p_hsa, _nIndex, 3))
+
+    _medianArray := array.median(_medianArray)
+    _medianArray
+
 // @function Store the previous trade; buffer the current one until results are in. Results are binary: up/down
 // @param p_hsa hsa matrix
 // @param p_feature1 feature 1 value
