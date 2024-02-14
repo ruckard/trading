@@ -775,14 +775,15 @@ hsaFeaturePairCount(matrix<float> p_hsa, float p_feature1, float p_feature2) =>
 // @param p_feature2 feature 2 value
 // @returns median expected value
 hsaMedianExpectedResult(matrix<float> p_hsa, float p_feature1, float p_feature2) =>
+    float _medianExpectedValue = 0.0
     _medianArray = array.new_float(0, 0.0)
     _matrixLastindex = matrix.rows(p_hsa) - 1
     for _nIndex = 0 to _matrixLastindex
         if ((p_feature1 == matrix.get(p_hsa, _nIndex, 0)) and (p_feature2 == matrix.get(p_hsa, _nIndex, 1)))
             array.push(_medianArray,matrix.get(p_hsa, _nIndex, 3))
 
-    _medianArray := array.median(_medianArray)
-    _medianArray
+    _medianExpectedValue := array.median(_medianArray)
+    _medianExpectedValue
 
 // @function Store the previous trade; buffer the current one until results are in. Results are binary: up/down
 // @param p_hsa hsa matrix
@@ -825,8 +826,8 @@ hsa_doHSA(matrix<float> p_hsaMatrix, int p_hsaNearestNeighbors = 5, float p_hsaM
         hsaFeaturePairNumber = hsaFeaturePairCount (updatedKnnMatrix, p_feature1, p_feature2)
         if (hsaFeaturePairNumber >= i_hsaMinimumFeaturePairNumber)
             medianExpectedResult = hsaMedianExpectedResult (updatedKnnMatrix, p_feature1, p_feature2)
-            longOK := filter >= p_hsaMinimumMedianExpectedResult
-            shortOK := filter <= -p_hsaMinimumMedianExpectedResult
+            longOK := medianExpectedResult >= p_hsaMinimumMedianExpectedResult
+            shortOK := medianExpectedResult <= -p_hsaMinimumMedianExpectedResult
         else
             longOK := false
             shortOK := false
@@ -1933,16 +1934,10 @@ virtLongOK = virtLongTakeProfitIsReached and (not virtLongStopLossIsReached)
 virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
 
 float suggestedResult = 0.0
-if (i_hsaType == '_BOOLEAN_')
-    if (virtShortStopLossIsReached)
-        suggestedResult := 1.0
-    if (virtLongStopLossIsReached)
-        suggestedResult := -1.0
-else // '_PERCENT_'
-    if (virtLongStopLossIsReached)
-        suggestedResult := suggestedResult - ((virtSource / virtLongStopLoss) - 1)
-    if (virtShortStopLossIsReached)
-        suggestedResult := suggestedResult + ((virtShortStopLoss / virtSource) - 1)
+if (virtLongStopLossIsReached)
+    suggestedResult := suggestedResult - ((virtSource / virtLongStopLoss) - 1)
+if (virtShortStopLossIsReached)
+    suggestedResult := suggestedResult + ((virtShortStopLoss / virtSource) - 1)
 
 if (i_enableKnnResultFilter)
     virtShortStopLossIsReached := virtShortStopLossIsReached and (math.abs(suggestedResult) >= (i_longKnnResultMinimum * 0.01))
