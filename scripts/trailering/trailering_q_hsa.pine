@@ -734,6 +734,28 @@ getTooOldOrderShortCloseAdvice () =>
 
 // hsa functions - BEGIN
 
+// @function Remove oldest row matching the two given features
+// @param p_hsa hsa matrix
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @returns number of matches
+hsaRemoveOldestRow(matrix<float> p_hsa, float p_feature1, float p_feature2) =>
+    bool _featurePairFound = false
+    int _matrixOldestIndex = 0
+    int _matrixLastindex = matrix.rows(p_hsa) - 1
+    for _nIndex = 0 to _matrixLastindex
+        if ((p_feature1 == matrix.get(p_hsa, _nIndex, 0)) and (p_feature2 == matrix.get(p_hsa, _nIndex, 1)))
+            if (not _featurePairFound)
+                _matrixOldestIndex := _nIndex
+            else
+                if ((matrix.get(p_hsa, _nIndex, 2)) < (matrix.get(p_hsa, _matrixOldestIndex, 2)))
+                    _matrixOldestIndex := _nIndex
+
+            _featurePairFound := true
+
+    if (_featurePairFound)
+        matrix.remove_row(p_hsa, _matrixOldestIndex)
+
 // @function Count data matching the two given features
 // @param p_hsa hsa matrix
 // @param p_feature1 feature 1 value
