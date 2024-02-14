@@ -803,30 +803,6 @@ hsaStore(matrix<float> p_hsa, float p_feature1, float p_feature2, float p_source
 
     p_hsa
 
-// @function Store the previous trade; buffer the current one until results are in. Results are in percents
-// @param p_hsa hsa matrix
-// @param p_feature1 feature 1 value
-// @param p_feature2 feature 2 value
-// @param p_source current price
-// @param p_maximumSize limit the matrix size to this number of rows (0 of no limit)
-// @returns modified hsa matrix
-hsaStorePercent(matrix<float> p_hsa, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0) =>
-    var _prevFeature1 = 0.0
-    var _prevFeature2 = 0.0
-    var _prevSource = 0.0
-
-    if (p_maximumSize > 0 and matrix.rows(p_hsa) > p_maximumSize)
-        matrix.remove_row(p_hsa, 0)
-
-    // Add to storage matrix: parameter 1, parameter 2, price, result percentage
-    matrix.add_row(p_hsa, matrix.rows(p_hsa), array.from(_prevFeature1, _prevFeature2, _prevSource, 100 * (p_source - _prevSource) / _prevSource))
-
-    _prevFeature1 := p_feature1
-    _prevFeature2 := p_feature2
-    _prevSource := p_source
-
-    p_hsa
-
 // @function Get neighbours by getting p_nearestNeighborsNumber results with the smallest distances
 // @param p_distance p_distance array
 // @param p_result p_result array
@@ -870,19 +846,16 @@ hsaSum(matrix<float> p_hsa, float p_feature1, float p_feature2, int p_hsaNearest
 // @param p_source series
 // @param p_long long condition
 // @param p_short short condition
-// @param p_store store the supplied features (if false, only checks the results without storage)
 // @param p_feature1 feature 1 value
 // @param p_feature2 feature 2 value
 // @returns [longOK, shortOK] filter output
-hsa_doHSA(matrix<float> p_hsaMatrix, int p_hsaNearestNeighbors = 5, float p_hsaMinimumMedianExpectedResult = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, bool p_store, float p_feature1, float p_feature2) =>
+hsa_doHSA(matrix<float> p_hsaMatrix, int p_hsaNearestNeighbors = 5, float p_hsaMinimumMedianExpectedResult = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, float p_feature1, float p_feature2) =>
     longOK = true
     shortOK = true
 
     updatedKnnMatrix = matrix.copy(p_hsaMatrix)
 
     if (p_long or p_short)
-        if (p_store)
-            updatedKnnMatrix := hsaStorePercent(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
 
         hsaFeaturePairNumber = hsaFeaturePairCount (updatedKnnMatrix, p_feature1, p_feature2)
         if (hsaFeaturePairNumber >= i_hsaMinimumFeaturePairNumber)
@@ -1494,7 +1467,7 @@ bool longHasWon = false
 bool shortHasWon = false
 
 if (needToTrade)
-    [tmpKnnMatrix, hsaLongOkTmp, hsaShortOkTmp] = hsa_doHSA(hsaMatrix, i_hsaNearestNeighbors, i_hsaMinimumMedianExpectedResult, i_maxKnnMatrixMaximumSize, i_hsaSource, true, true, false, swingFeature1, swingFeature2)
+    [tmpKnnMatrix, hsaLongOkTmp, hsaShortOkTmp] = hsa_doHSA(hsaMatrix, i_hsaNearestNeighbors, i_hsaMinimumMedianExpectedResult, i_maxKnnMatrixMaximumSize, i_hsaSource, true, true, swingFeature1, swingFeature2)
     hsaLongOk := hsaLongOkTmp
     hsaShortOk := hsaShortOkTmp
 
