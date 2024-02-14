@@ -432,7 +432,6 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 // hsa inputs
 
 i_hsaSource = input.source(title='Source', defval=close, group='HSA', tooltip='')
-i_enableKnnSwingMode = input.bool(title='Enable kNN Swing Mode', defval=false, group='HSA', tooltip='Swing mode learns from last trade previous values. Non swing mode learns depending on Montecarlos Check after {N} bars which it is useful when you TakeProfit.')
 i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='HSA', tooltip='')
 i_hsaMinimumFeaturePairNumber = input.int(title='HSA minimum feature pairs', defval=3, group='HSA', tooltip='HSA - Minimum number of feature pairs to be found {3}')
 i_hsaNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='HSA', tooltip='')
@@ -2011,15 +2010,9 @@ if (i_enableKnnResultFilter)
     virtShortStopLossIsReached := virtShortStopLossIsReached and (math.abs(suggestedResult) >= (i_longKnnResultMinimum * 0.01))
     virtLongStopLossIsReached := virtLongStopLossIsReached and (math.abs(suggestedResult) >= (i_shortKnnResultMinimum * 0.01))
 
-if (not i_enableKnnSwingMode)
-    if ( (montecarloAtrIsPossible) and (virtLongStopLossIsReached or virtShortStopLossIsReached) )
-        hsaMatrix := hsaStoreResult(hsaMatrix, swingFeature1[i_montecarloCheckAfter], swingFeature2[i_montecarloCheckAfter], i_hsaSource[i_montecarloCheckAfter], i_maxKnnMatrixMaximumSize, suggestedResult)
-        hsaLearnIterations := hsaLearnIterations + 1
-
-if (i_enableKnnSwingMode)
-    if ( (montecarloAtrIsPossible) and (swingLong or swingShort) )
-        hsaMatrix := hsaStore(hsaMatrix, swingFeature1, swingFeature2, i_hsaSource, i_maxKnnMatrixMaximumSize)
-        hsaLearnIterations := hsaLearnIterations + 1
+if ( (montecarloAtrIsPossible) and (virtLongStopLossIsReached or virtShortStopLossIsReached) )
+    hsaMatrix := hsaStoreResult(hsaMatrix, swingFeature1[i_montecarloCheckAfter], swingFeature2[i_montecarloCheckAfter], i_hsaSource[i_montecarloCheckAfter], i_maxKnnMatrixMaximumSize, suggestedResult)
+    hsaLearnIterations := hsaLearnIterations + 1
 
 // HSA Filter - Substrategy - Extra code - END
 
