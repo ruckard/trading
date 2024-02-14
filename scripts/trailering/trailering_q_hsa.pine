@@ -434,6 +434,7 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 i_hsaSource = input.source(title='Source', defval=close, group='HSA', tooltip='')
 i_enableKnnSwingMode = input.bool(title='Enable kNN Swing Mode', defval=false, group='HSA', tooltip='Swing mode learns from last trade previous values. Non swing mode learns depending on Montecarlos Check after {N} bars which it is useful when you TakeProfit.')
 i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='HSA', tooltip='')
+i_hsaMinimumFeaturePairNumber = input.int(title='HSA minimum feature pairs', defval=3, group='HSA', tooltip='HSA - Minimum number of feature pairs to be found {3}')
 i_hsaNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='HSA', tooltip='')
 i_hsaMinimumMedianExpectedResult = input.float(title='HSA minimum minimum median expected result', defval=1.00, group='HSA', tooltip='')
 i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=200, group='HSA', tooltip='')
@@ -885,7 +886,7 @@ hsa_doHSA(matrix<float> p_hsaMatrix, int p_hsaNearestNeighbors = 5, float p_hsaM
             updatedKnnMatrix := hsaStorePercent(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
 
         hsaFeaturePairNumber = hsaFeaturePairCount (updatedKnnMatrix, p_feature1, p_feature2)
-        if (hsaFeaturePairNumber >= 3)
+        if (hsaFeaturePairNumber >= i_hsaMinimumFeaturePairNumber)
             medianExpectedResult = hsaMedianExpectedResult (updatedKnnMatrix, p_feature1, p_feature2)
             longOK := filter >= p_hsaMinimumMedianExpectedResult
             shortOK := filter <= -p_hsaMinimumMedianExpectedResult
