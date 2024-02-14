@@ -429,17 +429,17 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 // ImplementedStrategy inputs - BEGIN
 
-// knn inputs
+// hsa inputs
 
-i_knnSource = input.source(title='Source', defval=close, group='KNN', tooltip='')
+i_hsaSource = input.source(title='Source', defval=close, group='KNN', tooltip='')
 i_enableKnnSwingMode = input.bool(title='Enable kNN Swing Mode', defval=false, group='KNN', tooltip='Swing mode learns from last trade previous values. Non swing mode learns depending on Montecarlos Check after {N} bars which it is useful when you TakeProfit.')
 i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='KNN', tooltip='')
-// When i_knnMinimumDifference is 0, i_knnNearestNeighbors default was 23
-i_knnNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='KNN', tooltip='')
-i_knnMinimumDifference = input.float(title='kNN minimum difference', defval=1.00, group='KNN', tooltip='')
+// When i_hsaMinimumDifference is 0, i_hsaNearestNeighbors default was 23
+i_hsaNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='KNN', tooltip='')
+i_hsaMinimumDifference = input.float(title='kNN minimum difference', defval=1.00, group='KNN', tooltip='')
 i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=200, group='KNN', tooltip='')
 _BOOLEAN_ = 'Boolean', _PERCENT_ = 'Percent'
-i_knnType = input.string(_PERCENT_, title='kNN Type', options=[_BOOLEAN_, _PERCENT_], group='KNN', inline='kNNType', tooltip='')
+i_hsaType = input.string(_PERCENT_, title='kNN Type', options=[_BOOLEAN_, _PERCENT_], group='KNN', inline='kNNType', tooltip='')
 i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=200, group='KNN', tooltip='')
 
 i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
@@ -735,78 +735,78 @@ getTooOldOrderShortCloseAdvice () =>
 
 // ImplementedStrategy functions - BEGIN
 
-// knn functions - BEGIN
+// hsa functions - BEGIN
 
 // @function Store the previous trade; buffer the current one until results are in. Results are binary: up/down
-// @param p_knn knn matrix
+// @param p_hsa hsa matrix
 // @param p_feature1 feature 1 value
 // @param p_feature2 feature 2 value
 // @param p_source current price
 // @param p_maximumSize limit the matrix size to this number of rows (0 of no limit)
-// @returns modified knn matrix
-knnStoreResult(matrix<float> p_knn, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0, float p_result) =>
+// @returns modified hsa matrix
+hsaStoreResult(matrix<float> p_hsa, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0, float p_result) =>
 
-    if (p_maximumSize > 0 and matrix.rows(p_knn) > p_maximumSize)
-        matrix.remove_row(p_knn, 0)
+    if (p_maximumSize > 0 and matrix.rows(p_hsa) > p_maximumSize)
+        matrix.remove_row(p_hsa, 0)
 
     // Add to storage matrix: parameter 1, parameter 2, price, result (up = 1; down = -1)
-    matrix.add_row(p_knn, matrix.rows(p_knn), array.from(p_feature1, p_feature2, p_source, p_result))
+    matrix.add_row(p_hsa, matrix.rows(p_hsa), array.from(p_feature1, p_feature2, p_source, p_result))
 
-    p_knn
+    p_hsa
 
 // @function Store the previous trade; buffer the current one until results are in. Results are binary: up/down
-// @param p_knn knn matrix
+// @param p_hsa hsa matrix
 // @param p_feature1 feature 1 value
 // @param p_feature2 feature 2 value
 // @param p_source current price
 // @param p_maximumSize limit the matrix size to this number of rows (0 of no limit)
-// @returns modified knn matrix
-knnStore(matrix<float> p_knn, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0) =>
+// @returns modified hsa matrix
+hsaStore(matrix<float> p_hsa, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0) =>
     var _prevFeature1 = 0.0
     var _prevFeature2 = 0.0
     var _prevSource = 0.0
 
-    if (p_maximumSize > 0 and matrix.rows(p_knn) > p_maximumSize)
-        matrix.remove_row(p_knn, 0)
+    if (p_maximumSize > 0 and matrix.rows(p_hsa) > p_maximumSize)
+        matrix.remove_row(p_hsa, 0)
 
     // Add to storage matrix: parameter 1, parameter 2, price, result (up = 1; down = -1)
-    matrix.add_row(p_knn, matrix.rows(p_knn), array.from(_prevFeature1, _prevFeature2, _prevSource, p_source >= _prevSource ? 1 : -1))
+    matrix.add_row(p_hsa, matrix.rows(p_hsa), array.from(_prevFeature1, _prevFeature2, _prevSource, p_source >= _prevSource ? 1 : -1))
 
     _prevFeature1 := p_feature1
     _prevFeature2 := p_feature2
     _prevSource := p_source
 
-    p_knn
+    p_hsa
 
 // @function Store the previous trade; buffer the current one until results are in. Results are in percents
-// @param p_knn knn matrix
+// @param p_hsa hsa matrix
 // @param p_feature1 feature 1 value
 // @param p_feature2 feature 2 value
 // @param p_source current price
 // @param p_maximumSize limit the matrix size to this number of rows (0 of no limit)
-// @returns modified knn matrix
-knnStorePercent(matrix<float> p_knn, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0) =>
+// @returns modified hsa matrix
+hsaStorePercent(matrix<float> p_hsa, float p_feature1, float p_feature2, float p_source, int p_maximumSize = 0) =>
     var _prevFeature1 = 0.0
     var _prevFeature2 = 0.0
     var _prevSource = 0.0
 
-    if (p_maximumSize > 0 and matrix.rows(p_knn) > p_maximumSize)
-        matrix.remove_row(p_knn, 0)
+    if (p_maximumSize > 0 and matrix.rows(p_hsa) > p_maximumSize)
+        matrix.remove_row(p_hsa, 0)
 
     // Add to storage matrix: parameter 1, parameter 2, price, result percentage
-    matrix.add_row(p_knn, matrix.rows(p_knn), array.from(_prevFeature1, _prevFeature2, _prevSource, 100 * (p_source - _prevSource) / _prevSource))
+    matrix.add_row(p_hsa, matrix.rows(p_hsa), array.from(_prevFeature1, _prevFeature2, _prevSource, 100 * (p_source - _prevSource) / _prevSource))
 
     _prevFeature1 := p_feature1
     _prevFeature2 := p_feature2
     _prevSource := p_source
 
-    p_knn
+    p_hsa
 
 // @function Get neighbours by getting p_nearestNeighborsNumber results with the smallest distances
 // @param p_distance p_distance array
 // @param p_result p_result array
 // @returns array slice of p_nearestNeighborsNumber results
-knnGet(float[] p_distance, float[] p_result, int p_nearestNeighborsNumber) =>
+hsaGet(float[] p_distance, float[] p_result, int p_nearestNeighborsNumber) =>
     _matrix = matrix.new<float>(0, 0, 0)
     matrix.add_col(_matrix, 0, p_distance)
     matrix.add_col(_matrix, 1, p_result)
@@ -816,32 +816,32 @@ knnGet(float[] p_distance, float[] p_result, int p_nearestNeighborsNumber) =>
     out = array.slice(_row, 0, math.min(p_nearestNeighborsNumber, array.size(_row)-1))
 
 // @function Create a distance array from the two given parameters
-// @param p_knn knn matrix
+// @param p_hsa hsa matrix
 // @param p_feature1 feature 1 value
 // @param p_feature2 feature 2 value
 // @returns distance array
-knnDistance(matrix<float> p_knn, float p_feature1, float p_feature2) =>
+hsaDistance(matrix<float> p_hsa, float p_feature1, float p_feature2) =>
     _distanceArray = array.new_float(0)
-    _matrixLastindex = matrix.rows(p_knn) - 1
+    _matrixLastindex = matrix.rows(p_hsa) - 1
     for _nIndex = 0 to _matrixLastindex
-        d = math.sqrt( math.pow(p_feature1 - matrix.get(p_knn, _nIndex, 0), 2) + math.pow(p_feature2 - matrix.get(p_knn, _nIndex, 1), 2) )
+        d = math.sqrt( math.pow(p_feature1 - matrix.get(p_hsa, _nIndex, 0), 2) + math.pow(p_feature2 - matrix.get(p_hsa, _nIndex, 1), 2) )
         array.push(_distanceArray, d)
     _distanceArray
 
 // @function Make a prediction, finding k nearest neighbours and summing them up
-// @param p_knn knn matrix
+// @param p_hsa hsa matrix
 // @param p_feature1 feature 1 value
 // @param p_feature2 feature 2 value
-// @param p_knnNearestNeighbors k nearest neighbors
+// @param p_hsaNearestNeighbors k nearest neighbors
 // @returns sum of k nearest neighbors
-knnSum(matrix<float> p_knn, float p_feature1, float p_feature2, int p_knnNearestNeighbors) =>
-    _slice = (matrix.rows(p_knn) == 0) ? array.from(0.0) : knnGet(knnDistance(p_knn, p_feature1, p_feature2), matrix.col(p_knn, 3), p_knnNearestNeighbors)
+hsaSum(matrix<float> p_hsa, float p_feature1, float p_feature2, int p_hsaNearestNeighbors) =>
+    _slice = (matrix.rows(p_hsa) == 0) ? array.from(0.0) : hsaGet(hsaDistance(p_hsa, p_feature1, p_feature2), matrix.col(p_hsa, 3), p_hsaNearestNeighbors)
     out = array.sum(_slice)
 
 // @function execute kNN filter
-// @param p_knnType kNN filter type
-// @param p_knnNearestNeighbors k nearest neighbors
-// @param p_knnMinimumDifference kNN minimum difference
+// @param p_hsaType kNN filter type
+// @param p_hsaNearestNeighbors k nearest neighbors
+// @param p_hsaMinimumDifference kNN minimum difference
 // @param p_maxKnnMatrixMaximumSize kNN matrix size limit
 // @param p_source series
 // @param p_long long condition
@@ -850,35 +850,35 @@ knnSum(matrix<float> p_knn, float p_feature1, float p_feature2, int p_knnNearest
 // @param p_feature1 feature 1 value
 // @param p_feature2 feature 2 value
 // @returns [longOK, shortOK] filter output
-knn_doKNN(matrix<float> p_knnMatrix, string p_knnType, int p_knnNearestNeighbors = 5, float p_knnMinimumDifference = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, bool p_store, float p_feature1, float p_feature2) =>
+hsa_doKNN(matrix<float> p_hsaMatrix, string p_hsaType, int p_hsaNearestNeighbors = 5, float p_hsaMinimumDifference = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, bool p_store, float p_feature1, float p_feature2) =>
     longOK = true
     shortOK = true
 
-    updatedKnnMatrix = matrix.copy(p_knnMatrix)
+    updatedKnnMatrix = matrix.copy(p_hsaMatrix)
 
-    switch p_knnType
+    switch p_hsaType
         "Boolean" =>
             if (p_long or p_short)
                 if (p_store)
-                    updatedKnnMatrix := knnStore(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
+                    updatedKnnMatrix := hsaStore(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
 
-                filter = knnSum(updatedKnnMatrix, p_feature1, p_feature2, p_knnNearestNeighbors)
-                longOK := filter >= p_knnMinimumDifference
-                shortOK := filter <= -p_knnMinimumDifference
-                mySlice = knnDistance(updatedKnnMatrix, p_feature1, p_feature2)
+                filter = hsaSum(updatedKnnMatrix, p_feature1, p_feature2, p_hsaNearestNeighbors)
+                longOK := filter >= p_hsaMinimumDifference
+                shortOK := filter <= -p_hsaMinimumDifference
+                mySlice = hsaDistance(updatedKnnMatrix, p_feature1, p_feature2)
                 mySliceLengthTmp = array.sum(mySlice)
         "Percent" =>
             if (p_long or p_short)
                 if (p_store)
-                    updatedKnnMatrix := knnStorePercent(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
+                    updatedKnnMatrix := hsaStorePercent(updatedKnnMatrix, p_feature1, p_feature2, p_source, p_maxKnnMatrixMaximumSize)
 
-                filter = knnSum(updatedKnnMatrix, p_feature1, p_feature2, p_knnNearestNeighbors)
-                longOK := filter >= p_knnMinimumDifference
-                shortOK := filter <= -p_knnMinimumDifference
+                filter = hsaSum(updatedKnnMatrix, p_feature1, p_feature2, p_hsaNearestNeighbors)
+                longOK := filter >= p_hsaMinimumDifference
+                shortOK := filter <= -p_hsaMinimumDifference
 
     [updatedKnnMatrix, longOK, shortOK]
 
-// knn functions - END
+// hsa functions - END
 
 // bodyOutlier functions - BEGIN
 
@@ -1455,52 +1455,52 @@ float swingFeature2 = virtTraileringShortConsensus
 
 // swing substrategy - END
 
-// knn substrategy - BEGIN
+// hsa substrategy - BEGIN
 
-var knnMatrix = matrix.new<float>(1, 4, 0)
+var hsaMatrix = matrix.new<float>(1, 4, 0)
 
 montecarloAtrIsPossible = bar_index >= i_atrStopLossLength
 
-bool knnLong = false
-bool knnShort = false
+bool hsaLong = false
+bool hsaShort = false
 
 // kNN
-var knnLearnIterations = 0
+var hsaLearnIterations = 0
 
 bool needToLearn = montecarloAtrIsPossible[i_montecarloCheckAfter]
 bool needToTrade = montecarloAtrIsPossible
 
-bool knnLongOk = false
-bool knnShortOk = false
+bool hsaLongOk = false
+bool hsaShortOk = false
 
 bool longHasWon = false
 bool shortHasWon = false
 
 if (needToTrade)
-    [tmpKnnMatrix, knnLongOkTmp, knnShortOkTmp] = knn_doKNN(knnMatrix, i_knnType, i_knnNearestNeighbors, i_knnMinimumDifference, i_maxKnnMatrixMaximumSize, i_knnSource, true, true, false, swingFeature1, swingFeature2)
-    knnLongOk := knnLongOkTmp
-    knnShortOk := knnShortOkTmp
+    [tmpKnnMatrix, hsaLongOkTmp, hsaShortOkTmp] = hsa_doKNN(hsaMatrix, i_hsaType, i_hsaNearestNeighbors, i_hsaMinimumDifference, i_maxKnnMatrixMaximumSize, i_hsaSource, true, true, false, swingFeature1, swingFeature2)
+    hsaLongOk := hsaLongOkTmp
+    hsaShortOk := hsaShortOkTmp
 
-knnHasLearntEnough = knnLearnIterations >= i_MaxKnnLearnIterations
+hsaHasLearntEnough = hsaLearnIterations >= i_MaxKnnLearnIterations
 
 // Actions
-if knnLongOk and knnHasLearntEnough
-    knnLong := true
-if knnShortOk and knnHasLearntEnough
-    knnShort := true
+if hsaLongOk and hsaHasLearntEnough
+    hsaLong := true
+if hsaShortOk and hsaHasLearntEnough
+    hsaShort := true
 
-// knn substrategy - END
+// hsa substrategy - END
 
-// knn and swingLong integration - BEGIN
+// hsa and swingLong integration - BEGIN
 
 bool preKnnSwingLong = swingLong
 bool preKnnSwingShort = swingShort
 
 if (i_enableKnnFilter)
-    swingLong := swingLong and knnLong
-    swingShort := swingShort and knnShort
+    swingLong := swingLong and hsaLong
+    swingShort := swingShort and hsaShort
 
-// knn and swingLong integration - END
+// hsa and swingLong integration - END
 
 // Volume Bounce substrategy - BEGIN
 
@@ -1978,7 +1978,7 @@ virtLongOK = virtLongTakeProfitIsReached and (not virtLongStopLossIsReached)
 virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
 
 float suggestedResult = 0.0
-if (i_knnType == '_BOOLEAN_')
+if (i_hsaType == '_BOOLEAN_')
     if (virtShortStopLossIsReached)
         suggestedResult := 1.0
     if (virtLongStopLossIsReached)
@@ -1995,30 +1995,30 @@ if (i_enableKnnResultFilter)
 
 if (not i_enableKnnSwingMode)
     if ( (montecarloAtrIsPossible) and (virtLongStopLossIsReached or virtShortStopLossIsReached) )
-        knnMatrix := knnStoreResult(knnMatrix, swingFeature1[i_montecarloCheckAfter], swingFeature2[i_montecarloCheckAfter], i_knnSource[i_montecarloCheckAfter], i_maxKnnMatrixMaximumSize, suggestedResult)
-        knnLearnIterations := knnLearnIterations + 1
+        hsaMatrix := hsaStoreResult(hsaMatrix, swingFeature1[i_montecarloCheckAfter], swingFeature2[i_montecarloCheckAfter], i_hsaSource[i_montecarloCheckAfter], i_maxKnnMatrixMaximumSize, suggestedResult)
+        hsaLearnIterations := hsaLearnIterations + 1
 
 if (i_enableKnnSwingMode)
     if ( (montecarloAtrIsPossible) and (swingLong or swingShort) )
-        knnMatrix := knnStore(knnMatrix, swingFeature1, swingFeature2, i_knnSource, i_maxKnnMatrixMaximumSize)
-        knnLearnIterations := knnLearnIterations + 1
+        hsaMatrix := hsaStore(hsaMatrix, swingFeature1, swingFeature2, i_hsaSource, i_maxKnnMatrixMaximumSize)
+        hsaLearnIterations := hsaLearnIterations + 1
 
 // KNN Filter - Substrategy - Extra code - END
 
 // ImplementedStrategy - Extra Plot - BEGIN
 
-var knnMatrixLines = array.new_line()
+var hsaMatrixLines = array.new_line()
 
 if i_plotKnnMatrix
-    for l in knnMatrixLines
+    for l in hsaMatrixLines
         line.delete(l)
-    array.clear(knnMatrixLines)
+    array.clear(hsaMatrixLines)
 
-    knnRows = matrix.rows(knnMatrix)
-    for nrow = 0 to (knnRows - 1)
-        tmpFeature1 = matrix.get(knnMatrix, nrow, 0)
-        tmpFeature2 = matrix.get(knnMatrix, nrow, 1)
-        tmpRowResult = matrix.get(knnMatrix, nrow, 3)
+    hsaRows = matrix.rows(hsaMatrix)
+    for nrow = 0 to (hsaRows - 1)
+        tmpFeature1 = matrix.get(hsaMatrix, nrow, 0)
+        tmpFeature2 = matrix.get(hsaMatrix, nrow, 1)
+        tmpRowResult = matrix.get(hsaMatrix, nrow, 3)
 
         tmpX2 = int(time_close - (( 100 - tmpFeature1 ) * (timeframe.in_seconds(timeframe.period)) * 1000.0 ))
         tmpX1 = int(tmpX2 - (1 * (timeframe.in_seconds(timeframe.period))))
@@ -2026,9 +2026,9 @@ if i_plotKnnMatrix
         tmpY1 = (tmpFeature2 >= 0) ? (tmpFeature2 - 1.0) : (tmpFeature2      )
 
         if (tmpRowResult >= 0)
-            array.unshift(knnMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, color=color.lime, xloc=xloc.bar_time))
+            array.unshift(hsaMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, color=color.lime, xloc=xloc.bar_time))
         else
-            array.unshift(knnMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, color=color.maroon, xloc=xloc.bar_time))
+            array.unshift(hsaMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, color=color.maroon, xloc=xloc.bar_time))
 
 squareBoxX2 = int(time_close)
 squareBoxX1 = int(time_close - ((timeframe.in_seconds(timeframe.period)) * 100 * 1000.0 ))
