@@ -431,7 +431,6 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 // hsa inputs
 
-i_hsaSource = input.source(title='Source', defval=close, group='HSA', tooltip='')
 i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='HSA', tooltip='')
 i_hsaMinimumFeaturePairNumber = input.int(title='HSA minimum feature pairs', defval=3, group='HSA', tooltip='HSA - Minimum number of feature pairs to be found {3}')
 i_hsaNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='HSA', tooltip='')
@@ -783,13 +782,12 @@ hsaStoreResult(matrix<float> p_hsa, float p_feature1, float p_feature2, float p_
 // @param p_hsaNearestNeighbors k nearest neighbors
 // @param p_hsaMinimumMedianExpectedResult HSA median expected result
 // @param p_maxKnnMatrixMaximumSize kNN matrix size limit
-// @param p_source series
 // @param p_long long condition
 // @param p_short short condition
 // @param p_feature1 feature 1 value
 // @param p_feature2 feature 2 value
 // @returns [longOK, shortOK] filter output
-hsa_doHSA(matrix<float> p_hsaMatrix, int p_hsaNearestNeighbors = 5, float p_hsaMinimumMedianExpectedResult = 0, int p_maxKnnMatrixMaximumSize, float p_source, bool p_long, bool p_short, float p_feature1, float p_feature2) =>
+hsa_doHSA(matrix<float> p_hsaMatrix, int p_hsaNearestNeighbors = 5, float p_hsaMinimumMedianExpectedResult = 0, int p_maxKnnMatrixMaximumSize, bool p_long, bool p_short, float p_feature1, float p_feature2) =>
     longOK = true
     shortOK = true
 
@@ -1407,7 +1405,7 @@ bool longHasWon = false
 bool shortHasWon = false
 
 if (needToTrade)
-    [tmpKnnMatrix, hsaLongOkTmp, hsaShortOkTmp] = hsa_doHSA(hsaMatrix, i_hsaNearestNeighbors, i_hsaMinimumMedianExpectedResult, i_maxKnnMatrixMaximumSize, i_hsaSource, true, true, swingFeature1, swingFeature2)
+    [tmpKnnMatrix, hsaLongOkTmp, hsaShortOkTmp] = hsa_doHSA(hsaMatrix, i_hsaNearestNeighbors, i_hsaMinimumMedianExpectedResult, i_maxKnnMatrixMaximumSize, true, true, swingFeature1, swingFeature2)
     hsaLongOk := hsaLongOkTmp
     hsaShortOk := hsaShortOkTmp
 
