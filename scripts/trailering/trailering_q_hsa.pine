@@ -435,7 +435,7 @@ i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='HS
 i_hsaMinimumFeaturePairNumber = input.int(title='HSA minimum feature pairs', defval=3, group='HSA', tooltip='HSA - Minimum number of feature pairs to be found {3}')
 i_hsaMaximumFeaturePairNumber = input.int(title='HSA maximum feature pairs', defval=5, group='HSA', tooltip='HSA - Maximum number of values per feature pairs to be saved {5}')
 i_hsaNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='HSA', tooltip='')
-i_hsaMinimumMedianExpectedResult = input.float(title='HSA minimum minimum median expected result', defval=1.00, group='HSA', tooltip='')
+i_hsaMinimumMedianExpectedResult = input.float(title='HSA minimum minimum median expected result', defval=1.00, group='HSA', tooltip='') * 0.01
 i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=200, group='HSA', tooltip='')
 i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=2880, group='HSA', tooltip='')
 
