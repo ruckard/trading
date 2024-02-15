@@ -1944,8 +1944,9 @@ if (i_enableKnnResultFilter)
     virtLongStopLossIsReached := virtLongStopLossIsReached and (math.abs(suggestedResult) >= (i_shortKnnResultMinimum * 0.01))
 
 if ( (montecarloAtrIsPossible) and (virtLongStopLossIsReached or virtShortStopLossIsReached) )
-    hsaMatrix := hsaStoreResult(hsaMatrix, swingFeature1[i_montecarloCheckAfter], swingFeature2[i_montecarloCheckAfter], bar_index[i_montecarloCheckAfter], i_maxKnnMatrixMaximumSize, suggestedResult)
-    hsaLearnIterations := hsaLearnIterations + 1
+    if (preKnnSwingLong[i_montecarloCheckAfter] or preKnnSwingShort[i_montecarloCheckAfter])
+        hsaMatrix := hsaStoreResult(hsaMatrix, swingFeature1[i_montecarloCheckAfter], swingFeature2[i_montecarloCheckAfter], bar_index[i_montecarloCheckAfter], i_maxKnnMatrixMaximumSize, suggestedResult)
+        hsaLearnIterations := hsaLearnIterations + 1
 
 // HSA Filter - Substrategy - Extra code - END
 
@@ -1981,6 +1982,20 @@ var box squareBox = na
 box.delete(squareBox)
 if i_plotKnnMatrix
     squareBox := box.new(squareBoxX1, 100.0, squareBoxX2, 0.0, xloc=xloc.bar_time, bgcolor=na)
+
+knnMatrixPlotContents(p_hsa) =>
+    _matrixLastindex = matrix.rows(p_hsa) - 1
+    string _hsaMatrixTxt = '{'
+
+    for _nIndex = 0 to _matrixLastindex
+        _hsaMatrixTxt := _hsaMatrixTxt + '{' + str.tostring(matrix.get(p_hsa, _nIndex, 0)) + ',' + str.tostring(matrix.get(p_hsa, _nIndex, 1)) + ',' + str.tostring(matrix.get(p_hsa, _nIndex, 2)) + ',' + str.tostring(matrix.get(p_hsa, _nIndex, 3)) + '\n'
+    _hsaMatrixTxt := _hsaMatrixTxt + '}'
+    _hsaMatrixTxt
+
+knnMatrixPlotContentsStr = knnMatrixPlotContents(hsaMatrix)
+if (barstate.islast)
+    label.new(bar_index, low, text=knnMatrixPlotContentsStr, style=label.style_label_up)
+
 
 // ImplementedStrategy - Extra Plot - END
 
