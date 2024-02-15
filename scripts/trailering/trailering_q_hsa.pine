@@ -432,12 +432,12 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 // hsa inputs
 
 i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='HSA', tooltip='')
-i_hsaMinimumFeaturePairNumber = input.int(title='HSA minimum feature pairs', defval=3, group='HSA', tooltip='HSA - Minimum number of feature pairs to be found {3}')
-i_hsaMaximumFeaturePairNumber = input.int(title='HSA maximum feature pairs', defval=5, group='HSA', tooltip='HSA - Maximum number of values per feature pairs to be saved {5}')
+i_hsaMinimumFeaturePairNumber = input.int(title='HSA minimum feature pairs', defval=5, group='HSA', tooltip='HSA - Minimum number of feature pairs to be found {5}')
+i_hsaMaximumFeaturePairNumber = input.int(title='HSA maximum feature pairs', defval=7, group='HSA', tooltip='HSA - Maximum number of values per feature pairs to be saved {7}')
 i_hsaNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='HSA', tooltip='')
-i_hsaMinimumMedianExpectedResult = input.float(title='HSA minimum median expected result', defval=3.50, group='HSA', tooltip='') * 0.01
+i_hsaMinimumMedianExpectedResult = input.float(title='HSA minimum median expected result', defval=2.75, group='HSA', tooltip='') * 0.01
 i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=100, group='HSA', tooltip='')
-i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=2880, group='HSA', tooltip='')
+i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=100, group='HSA', tooltip='')
 
 i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
 i_montecarloPeriod = input.int(24, minval=2, title='MonteCarlo Period {24}', group='Montecarlo', tooltip='')
@@ -446,8 +446,8 @@ i_montecarloCheckAfter = input.int(24, minval=1, title='Check after {24} bars', 
 i_plotKnnMatrix = input.bool(false, title='Plot HSA Matrix', group='Debug', inline='DebugKnnMatrix', tooltip='Hide the pair and click on auto to see this properly.\nBecause I do not want to modify overlay value.\nDefault: false.')
 
 i_enableKnnResultFilter = input.bool(title='Enable Result filter', defval=true, group='HSA Result Filter', tooltip='')
-i_longKnnResultMinimum = input.float(title='(L) kNN Result minimum (%)', defval=2.00, group='HSA', tooltip='')
-i_shortKnnResultMinimum = input.float(title='(S) kNN Result minimum (%)', defval=2.00, group='HSA', tooltip='')
+i_longKnnResultMinimum = input.float(title='(L) kNN Result minimum (%)', defval=2.25, group='HSA', tooltip='')
+i_shortKnnResultMinimum = input.float(title='(S) kNN Result minimum (%)', defval=2.25, group='HSA', tooltip='')
 
 // Trailering inputs
 
