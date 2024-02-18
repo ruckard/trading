@@ -431,22 +431,27 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 // hta inputs
 
-i_longsHitByStopSize = input.int(title='longs Hit', defval=5, group='HTA', inline='htaLongInputs')
-i_longsHitOpenAdviceMinimumPercentage = input.float(title='', defval=80.00, group='HTA', inline='htaLongInputs')
-i_longsHitCloseAdviceMinimumPercentage = input.float(title='', defval=20.00, group='HTA', inline='htaLongInputs', tooltip='(L) Size of the array that saves long trade results in past candles.\n  Default: 5\n(L) Minimum Percentage of short Stop hits to open a new long position (%)\n  Default: 80.00%\n(L) Maximum Limit Percentage of short Stop hits to close current long position (%)\n  Default: 20.00%')
+i_longsHitByStopSize = input.int(title='longs Hit', defval=8, group='HTA', inline='htaLongInputs')
+i_longsHitOpenAdviceMinimumPercentage = input.float(title='', defval=60.00, group='HTA', inline='htaLongInputs')
+i_longsHitCloseAdviceMinimumPercentage = input.float(title='', defval=20.00, group='HTA', inline='htaLongInputs')
+i_longsHitCloseSameSideAdviceMaximumPercentage = input.float(title='', defval=10.00, group='HTA', inline='htaLongInputs', tooltip='(L) Size of the array that saves long trade results in past candles.\n  Default: 8\n(L) Minimum Percentage of short Stop hits to open a new long position (%)\n  Default: 60.00%\n(L) Maximum Limit Percentage of short Stop hits to close current long position (%)\n  Default: 20.00%\n(L) Maximum Limit Percentage of long Stop hits to close current long position (%)\n  Default: 10.00%')
 
-i_shortsHitByStopSize = input.int(title='shorts Hit', defval=5, group='HTA', inline='htaShortInputs')
-i_shortsHitOpenAdviceMinimumPercentage = input.float(title='', defval=80.00, group='HTA', inline='htaShortInputs')
-i_shortsHitCloseAdviceMinimumPercentage = input.float(title='', defval=20.00, group='HTA', inline='htaShortInputs', tooltip='(S) Size of the array that saves short trade results in past candles.\n  Default: 5\n(S) Minimum Percentage of long Stop hits to open a new short position (%)\n  Default: 80.00%\n(S) Maximum Limit Percentage of long Stop hits to close current short position (%)\n  Default: 20.00%')
+i_shortsHitByStopSize = input.int(title='shorts Hit', defval=8, group='HTA', inline='htaShortInputs')
+i_shortsHitOpenAdviceMinimumPercentage = input.float(title='', defval=40.00, group='HTA', inline='htaShortInputs')
+i_shortsHitCloseAdviceMinimumPercentage = input.float(title='', defval=20.00, group='HTA', inline='htaShortInputs')
+i_shortsHitCloseSameSideAdviceMaximumPercentage = input.float(title='', defval=10.00, group='HTA', inline='htaShortInputs', tooltip='(S) Size of the array that saves short trade results in past candles.\n  Default: 8\n(S) Minimum Percentage of long Stop hits to open a new short position (%)\n  Default: 40.00%\n(S) Maximum Limit Percentage of long Stop hits to close current short position (%)\n  Default: 20.00%\n(S) Maximum Limit Percentage of short Stop hits to close current short position (%)\n  Default: 10.00%')
 
 i_montecarloCheckAfter = input.int(24, minval=1, title='Check after {24} bars', group='Montecarlo', tooltip='')
 
-i_enableHtaResultFilter = input.bool(title='Enable Result filter', defval=true, group='HTA', tooltip='')
+i_enableHtaResultFilter = input.bool(title='Enable Result filter', defval=false, group='HTA', tooltip='')
 i_longHtaResultMinimum = input.float(title='(L) hta Result minimum (%)', defval=2.25, group='HTA', tooltip='')
 i_shortHtaResultMinimum = input.float(title='(S) hta Result minimum (%)', defval=2.25, group='HTA', tooltip='')
 
 i_longsHitCloseAdviceEnable = input.bool(true, title='(L) Close when not enough hits', group='HTA')
 i_shortsHitCloseAdviceEnable = input.bool(true, title='(S) Close when not enough hits', group='HTA')
+
+i_longsHitSameSideCloseAdviceEnable = input.bool(false, title='(L) Close when not enough hits (Same side)', group='HTA')
+i_shortsHitSameSideCloseAdviceEnable = input.bool(false, title='(S) Close when not enough hits (Same side)', group='HTA')
 
 // Trailering inputs
 
@@ -746,6 +751,20 @@ getHtaShortCloseAdvice (array<float> p_longsHta, float p_shortsHitCloseAdviceMin
     _htaShortCloseAdvice = _longsHtaStopHitsPercentage <= p_shortsHitCloseAdviceMinimumPercentage
 
     _htaShortCloseAdvice
+
+getHtaLongCloseSameSideAdvice (array<float> p_longsHta, float p_longsHitCloseSameSideAdviceMaximumPercentage) =>
+
+    _longsHtaStopHitsPercentage = (array.sum(p_longsHta) / i_longsHitByStopSize) * 100.0
+    _htaLongCloseSameSideAdvice = _longsHtaStopHitsPercentage <= p_longsHitCloseSameSideAdviceMaximumPercentage
+
+    _htaLongCloseSameSideAdvice
+
+getHtaShortCloseSameSideAdvice (array<float> p_shortsHta, float p_shortsHitCloseSameSideAdviceMaximumPercentage) =>
+
+    _shortsHtaStopHitsPercentage = (array.sum(p_shortsHta) / i_shortsHitByStopSize) * 100.0
+    _htaShortCloseSameSideAdvice = _shortsHtaStopHitsPercentage <= p_shortsHitCloseSameSideAdviceMaximumPercentage
+
+    _htaShortCloseSameSideAdvice
 
 // @function Store the previous trade result. Results are binary inverse. Loss means 1. Win means 0.
 // @param p_hta hta array
@@ -1394,6 +1413,9 @@ htaShort := htaShortOk
 htaLongCloseAdvice = getHtaLongCloseAdvice (shortsHta, i_longsHitCloseAdviceMinimumPercentage)
 htaShortCloseAdvice = getHtaShortCloseAdvice (longsHta, i_shortsHitCloseAdviceMinimumPercentage)
 
+htaLongCloseSameSideAdvice = getHtaLongCloseSameSideAdvice (longsHta, i_longsHitCloseSameSideAdviceMaximumPercentage)
+htaShortCloseSameSideAdvice = getHtaShortCloseSameSideAdvice (shortsHta, i_shortsHitCloseSameSideAdviceMaximumPercentage)
+
 // hta substrategy - END
 
 // Volume Bounce substrategy - BEGIN
@@ -1627,6 +1649,9 @@ if i_enableTraileringLongCumulativeBumpClose
 if i_longsHitCloseAdviceEnable
     LONG_CLOSE := LONG_CLOSE or htaLongCloseAdvice
 
+if i_longsHitSameSideCloseAdviceEnable
+    LONG_CLOSE := LONG_CLOSE or htaLongCloseSameSideAdvice
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if (offStopTimeInterval)
     LONG_CLOSE := true
@@ -1658,6 +1683,9 @@ if i_enableTraileringShortCumulativeBumpClose
 
 if i_shortsHitCloseAdviceEnable
     SHORT_CLOSE := SHORT_CLOSE or htaShortCloseAdvice
+
+if i_shortsHitSameSideCloseAdviceEnable
+    SHORT_CLOSE := SHORT_CLOSE or htaShortCloseSameSideAdvice
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if (offStopTimeInterval)
