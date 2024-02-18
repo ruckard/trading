@@ -453,6 +453,8 @@ i_shortsHitCloseAdviceEnable = input.bool(true, title='(S) Close when not enough
 i_longsHitSameSideCloseAdviceEnable = input.bool(false, title='(L) Close when not enough hits (Same side)', group='HTA')
 i_shortsHitSameSideCloseAdviceEnable = input.bool(false, title='(S) Close when not enough hits (Same side)', group='HTA')
 
+i_globalStopLossConsensusRsiLength = input.int(55, minval=1, title='RSI Length', group='Global StopLoss Consensus', tooltip='Default: 55')
+
 // Trailering inputs
 
 i_enableTraileringTakeProfit = input.bool(false, title='Enable Trailering TakeProfit {False}', group='Trailering')
@@ -1417,6 +1419,13 @@ htaLongCloseSameSideAdvice = getHtaLongCloseSameSideAdvice (longsHta, i_longsHit
 htaShortCloseSameSideAdvice = getHtaShortCloseSameSideAdvice (shortsHta, i_shortsHitCloseSameSideAdviceMaximumPercentage)
 
 // hta substrategy - END
+
+// globalStopLossConsensus substrategy - BEGIN
+
+globalStopLossConsensus = array.sum(shortsHta) - array.sum(longsHta)
+globalStopLossConsensusRsi = ta.rsi(globalStopLossConsensus, i_globalStopLossConsensusRsiLength)
+
+// globalStopLossConsensus substrategy - END
 
 // Volume Bounce substrategy - BEGIN
 
