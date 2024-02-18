@@ -1353,6 +1353,26 @@ float swingFeature2 = virtTraileringShortConsensus
 
 // swing substrategy - END
 
+// hta substrategy - BEGIN
+
+var longsHta = array.new_float()
+var shortsHta = array.new_float()
+
+bool htaLong = false
+bool htaShort = false
+
+bool htaLongOk = false
+bool htaShortOk = false
+
+[htaLongOkTmp, htaShortOkTmp] = hta_doHTA(longsHta, shortsHta, i_longsHitOpenAdviceMinimumPercentage, i_shortsHitOpenAdviceMinimumPercentage, (swingLong or swingShort), (swingLong or swingShort))
+htaLongOk := htaLongOkTmp
+htaShortOk := htaShortOkTmp
+
+htaLong := htaLongOk
+htaShort := htaShortOk
+
+// hta substrategy - END
+
 // Volume Bounce substrategy - BEGIN
 
 bool volumeBounceLong = false
