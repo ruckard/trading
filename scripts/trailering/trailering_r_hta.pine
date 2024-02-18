@@ -739,10 +739,7 @@ htaStoreResult(array<float> p_hta, int p_maximumSize = 0, float p_result) =>
 
     float binaryFloatResult = 0.0
 
-    if (p_result >= 0.0)
-        binaryFloatResult := 0.0
-    else
-        binaryFloatResult := 1.0
+    binaryFloatResult := p_result
 
     array.push(p_hta, binaryFloatResult)
 
