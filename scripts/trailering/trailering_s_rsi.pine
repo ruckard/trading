@@ -454,8 +454,13 @@ i_longsHitSameSideCloseAdviceEnable = input.bool(false, title='(L) Close when no
 i_shortsHitSameSideCloseAdviceEnable = input.bool(false, title='(S) Close when not enough hits (Same side)', group='HTA')
 
 i_globalStopLossConsensusRsiLength = input.int(55, minval=1, title='RSI Length', group='Global StopLoss Consensus', tooltip='Default: 55')
-i_globalStopLossConsensusRsiMinimum = input.int(10, minval=1, title='RSI UnderSold level', group='Global StopLoss Consensus', tooltip='Default: 10')
-i_globalStopLossConsensusRsiMaximum = input.int(90, minval=1, title='RSI OverBought', group='Global StopLoss Consensus', tooltip='Default: 90')
+i_globalStopLossConsensusRsiLongMinimum = input.int(10, minval=1, title='RSI UnderSold level', group='Global StopLoss Consensus', tooltip='Default: 10')
+i_globalStopLossConsensusRsiLongMaximum = input.int(65, minval=1, title='(L) RSI Close over', group='Global StopLoss Consensus', tooltip='Default: 65')
+i_globalStopLossConsensusRsiShortMinimum = input.int(65, minval=1, title='(S) RSI Close under', group='Global StopLoss Consensus', tooltip='Default: 65')
+i_globalStopLossConsensusRsiShortMaximum = input.int(90, minval=1, title='RSI OverBought', group='Global StopLoss Consensus', tooltip='Default: 90')
+
+i_globalStopLossConsensusRsiLongCloseAdviceEnable = input.bool(true, title='(L) Enable Close over RSI value', group='Global StopLoss Consensus')
+i_globalStopLossConsensusRsiShortCloseAdviceEnable = input.bool(true, title='(S) Enable Close under RSI value', group='Global StopLoss Consensus')
 
 // Trailering inputs
 
@@ -1427,11 +1432,14 @@ htaShortCloseSameSideAdvice = getHtaShortCloseSameSideAdvice (shortsHta, i_short
 globalStopLossConsensus = array.sum(shortsHta) - array.sum(longsHta)
 globalStopLossConsensusRsi = ta.rsi(globalStopLossConsensus, i_globalStopLossConsensusRsiLength)
 
-globalStopLossConsensusLong = globalStopLossConsensusRsi <= i_globalStopLossConsensusRsiMinimum
-globalStopLossConsensusShort = globalStopLossConsensusRsi >= i_globalStopLossConsensusRsiMaximum
+globalStopLossConsensusLong = globalStopLossConsensusRsi <= i_globalStopLossConsensusRsiLongMinimum
+globalStopLossConsensusShort = globalStopLossConsensusRsi >= i_globalStopLossConsensusRsiShortMaximum
 
 globalStopLossConsensusLong := globalStopLossConsensusLong and (swingLong or swingShort)
 globalStopLossConsensusShort := globalStopLossConsensusShort and (swingLong or swingShort)
+
+globalStopLossConsensusLongCloseAdvice = globalStopLossConsensusRsi >= i_globalStopLossConsensusRsiLongMaximum
+globalStopLossConsensusShortCloseAdvice = globalStopLossConsensusRsi <= i_globalStopLossConsensusRsiShortMinimum
 
 // globalStopLossConsensus substrategy - END
 
@@ -1669,6 +1677,9 @@ if i_longsHitCloseAdviceEnable
 if i_longsHitSameSideCloseAdviceEnable
     LONG_CLOSE := LONG_CLOSE or htaLongCloseSameSideAdvice
 
+if i_globalStopLossConsensusRsiLongCloseAdviceEnable
+    LONG_CLOSE := LONG_CLOSE or globalStopLossConsensusLongCloseAdvice
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if (offStopTimeInterval)
     LONG_CLOSE := true
@@ -1703,6 +1714,9 @@ if i_shortsHitCloseAdviceEnable
 
 if i_shortsHitSameSideCloseAdviceEnable
     SHORT_CLOSE := SHORT_CLOSE or htaShortCloseSameSideAdvice
+
+if i_globalStopLossConsensusRsiShortCloseAdviceEnable
+    SHORT_CLOSE := SHORT_CLOSE or globalStopLossConsensusShortCloseAdvice
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if (offStopTimeInterval)
