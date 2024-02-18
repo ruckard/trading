@@ -826,6 +826,19 @@ hta_doHTA(array<float> p_longsHta, array<float> p_shortsHta, float p_longsHitOpe
 
 // hta functions - END
 
+// globalStopLossConsensus functions - BEGIN
+
+getGlobalStopLossConsensusPercentaged (float p_globalStopLossConsensus, int p_longsHitByStopSize, int p_shortsHitByStopSize) =>
+    _globalStopLossConsensusPercentaged = p_globalStopLossConsensus
+    _globalStopLossConsensusPercentaged := _globalStopLossConsensusPercentaged + p_longsHitByStopSize
+    _longAndShortArraysLength = p_longsHitByStopSize + p_shortsHitByStopSize
+
+    _globalStopLossConsensusPercentaged := (_globalStopLossConsensusPercentaged / _longAndShortArraysLength) * 100.0
+
+    _globalStopLossConsensusPercentaged
+
+// globalStopLossConsensus functions - END
+
 // bodyOutlier functions - BEGIN
 
 bodyRange() =>
@@ -1430,16 +1443,16 @@ htaShortCloseSameSideAdvice = getHtaShortCloseSameSideAdvice (shortsHta, i_short
 // globalStopLossConsensus substrategy - BEGIN
 
 globalStopLossConsensus = array.sum(shortsHta) - array.sum(longsHta)
-globalStopLossConsensusRsi = ta.rsi(globalStopLossConsensus, i_globalStopLossConsensusRsiLength)
+globalStopLossConsensusPercentaged = getGlobalStopLossConsensusPercentaged (globalStopLossConsensus, i_longsHitByStopSize, i_shortsHitByStopSize)
 
-globalStopLossConsensusLong = globalStopLossConsensusRsi <= i_globalStopLossConsensusRsiLongMinimum
-globalStopLossConsensusShort = globalStopLossConsensusRsi >= i_globalStopLossConsensusRsiShortMaximum
+globalStopLossConsensusLong = globalStopLossConsensusPercentaged <= i_globalStopLossConsensusRsiLongMinimum
+globalStopLossConsensusShort = globalStopLossConsensusPercentaged >= i_globalStopLossConsensusRsiShortMaximum
 
 globalStopLossConsensusLong := globalStopLossConsensusLong and (swingLong or swingShort)
 globalStopLossConsensusShort := globalStopLossConsensusShort and (swingLong or swingShort)
 
-globalStopLossConsensusLongCloseAdvice = globalStopLossConsensusRsi >= i_globalStopLossConsensusRsiLongMaximum
-globalStopLossConsensusShortCloseAdvice = globalStopLossConsensusRsi <= i_globalStopLossConsensusRsiShortMinimum
+globalStopLossConsensusLongCloseAdvice = globalStopLossConsensusPercentaged >= i_globalStopLossConsensusRsiLongMaximum
+globalStopLossConsensusShortCloseAdvice = globalStopLossConsensusPercentaged <= i_globalStopLossConsensusRsiShortMinimum
 
 // globalStopLossConsensus substrategy - END
 
