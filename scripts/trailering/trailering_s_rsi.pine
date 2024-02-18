@@ -454,6 +454,8 @@ i_longsHitSameSideCloseAdviceEnable = input.bool(false, title='(L) Close when no
 i_shortsHitSameSideCloseAdviceEnable = input.bool(false, title='(S) Close when not enough hits (Same side)', group='HTA')
 
 i_globalStopLossConsensusRsiLength = input.int(55, minval=1, title='RSI Length', group='Global StopLoss Consensus', tooltip='Default: 55')
+i_globalStopLossConsensusRsiMinimum = input.int(10, minval=1, title='RSI UnderSold level', group='Global StopLoss Consensus', tooltip='Default: 10')
+i_globalStopLossConsensusRsiMaximum = input.int(90, minval=1, title='RSI OverBought', group='Global StopLoss Consensus', tooltip='Default: 90')
 
 // Trailering inputs
 
@@ -1424,6 +1426,9 @@ htaShortCloseSameSideAdvice = getHtaShortCloseSameSideAdvice (shortsHta, i_short
 
 globalStopLossConsensus = array.sum(shortsHta) - array.sum(longsHta)
 globalStopLossConsensusRsi = ta.rsi(globalStopLossConsensus, i_globalStopLossConsensusRsiLength)
+
+globalStopLossConsensusLong = globalStopLossConsensusRsi <= i_globalStopLossConsensusRsiMinimum
+globalStopLossConsensusShort = globalStopLossConsensusRsi >= i_globalStopLossConsensusRsiMaximum
 
 // globalStopLossConsensus substrategy - END
 
