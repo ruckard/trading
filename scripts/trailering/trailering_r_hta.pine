@@ -771,11 +771,11 @@ hta_doHTA(array<float> p_longsHta, array<float> p_shortsHta, float p_longsHitOpe
         // Minimum size check - Both arrays need to be complete
         _minimumSizeCheck = (array.size(p_longsHta) >= i_longsHitByStopSize) and (array.size(p_shortsHta) >= i_shortsHitByStopSize)
         if (_minimumSizeCheck)
-            _longsHtaStopHitsPercentage  = (array.sum(p_longsHta) / i_longsHitByStopSize) * 0.01
-            _shortsHtaStopHitsPercentage = (array.sum(p_shortsHta) / i_shortsHitByStopSize) * 0.01
+            _longsHtaStopHitsPercentage  = (array.sum(p_longsHta) / i_longsHitByStopSize) * 100.0
+            _shortsHtaStopHitsPercentage = (array.sum(p_shortsHta) / i_shortsHitByStopSize) * 100.0
 
-            _longOK := p_longsHitOpenAdviceMinimumPercentage >= _shortsHtaStopHitsPercentage
-            _shortOK := p_shortsHitOpenAdviceMinimumPercentage >= _longsHtaStopHitsPercentage
+            _longOK := _shortsHtaStopHitsPercentage >= p_longsHitOpenAdviceMinimumPercentage
+            _shortOK := _longsHtaStopHitsPercentage >= p_shortsHitOpenAdviceMinimumPercentage
         else
             _longOK := false
             _shortOK := false
