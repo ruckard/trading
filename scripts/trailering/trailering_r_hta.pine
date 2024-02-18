@@ -1860,17 +1860,25 @@ if (virtLongStopLossIsReached)
 if (virtShortStopLossIsReached)
     suggestedResult := suggestedResult + ((virtShortStopLoss / virtSource) - 1)
 
+bool virtLongStopLossIsReachedResultFilteredOk = true
+bool virtShortStopLossIsReachedResultFilteredOk = true
+
 if (i_enableHtaResultFilter)
-    virtShortStopLossIsReached := virtShortStopLossIsReached and (math.abs(suggestedResult) >= (i_longHtaResultMinimum * 0.01))
-    virtLongStopLossIsReached := virtLongStopLossIsReached and (math.abs(suggestedResult) >= (i_shortHtaResultMinimum * 0.01))
+    virtShortStopLossIsReachedResultFilteredOk := virtShortStopLossIsReached and (math.abs(suggestedResult) >= (i_longHtaResultMinimum * 0.01))
+    virtLongStopLossIsReachedResultFilteredOk := virtLongStopLossIsReached and (math.abs(suggestedResult) >= (i_shortHtaResultMinimum * 0.01))
 
-if (virtLongStopLossIsReached)
-    if (swingLong[i_montecarloCheckAfter] or swingShort[i_montecarloCheckAfter])
-        longsHta := htaStoreResult(longsHta, i_longsHitByStopSize, suggestedResult)
+if (swingLong[i_montecarloCheckAfter] or swingShort[i_montecarloCheckAfter])
+    if (virtLongStopLossIsReachedResultFilteredOk)
+        if (virtLongStopLossIsReached)
+            longsHta := htaStoreResult(longsHta, i_longsHitByStopSize, 1.0)
+        else
+            longsHta := htaStoreResult(longsHta, i_longsHitByStopSize, 0.0)
 
-if (virtShortStopLossIsReached)
-    if (swingLong[i_montecarloCheckAfter] or swingShort[i_montecarloCheckAfter])
-        shortsHta := htaStoreResult(shortsHta, i_shortsHitByStopSize, suggestedResult)
+    if (virtShortStopLossIsReachedResultFilteredOk)
+        if (virtShortStopLossIsReached)
+            shortsHta := htaStoreResult(shortsHta, i_shortsHitByStopSize, 1.0)
+        else
+            shortsHta := htaStoreResult(shortsHta, i_shortsHitByStopSize, 0.0)
 
 // HTA Filter - Substrategy - Extra code - END
 
