@@ -1834,6 +1834,46 @@ if (i_enableTraileringTakeProfit)
             orderStopLoss := orderStopLossPerOne * 100
             ShortStopLoss := strategy.position_avg_price * (1 + orderStopLossPerOne)
 
+// HTA Filter - Substrategy - Extra code - BEGIN
+
+latestLowest = ta.lowest(low, i_montecarloCheckAfter - 1)
+latestHighest = ta.highest(high, i_montecarloCheckAfter - 1)
+
+virtLongTakeProfit = LongTakeProfit[i_montecarloCheckAfter - 1]
+virtShortTakeProfit = ShortTakeProfit[i_montecarloCheckAfter - 1]
+virtLongStopLoss = LongStopLoss[i_montecarloCheckAfter - 1]
+virtShortStopLoss = ShortStopLoss[i_montecarloCheckAfter - 1]
+virtSource = close[i_montecarloCheckAfter]
+
+virtLongTakeProfitIsReached = (virtLongTakeProfit >= latestLowest) and (virtLongTakeProfit <= latestHighest)
+virtShortTakeProfitIsReached =  (virtShortTakeProfit >= latestLowest) and (virtShortTakeProfit <= latestHighest)
+
+virtLongStopLossIsReached = (virtLongStopLoss >= latestLowest) and (virtLongStopLoss <= latestHighest)
+virtShortStopLossIsReached =  (virtShortStopLoss >= latestLowest) and (virtShortStopLoss <= latestHighest)
+
+virtLongOK = virtLongTakeProfitIsReached and (not virtLongStopLossIsReached)
+virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
+
+float suggestedResult = 0.0
+if (virtLongStopLossIsReached)
+    suggestedResult := suggestedResult - ((virtSource / virtLongStopLoss) - 1)
+if (virtShortStopLossIsReached)
+    suggestedResult := suggestedResult + ((virtShortStopLoss / virtSource) - 1)
+
+if (i_enableHtaResultFilter)
+    virtShortStopLossIsReached := virtShortStopLossIsReached and (math.abs(suggestedResult) >= (i_longHtaResultMinimum * 0.01))
+    virtLongStopLossIsReached := virtLongStopLossIsReached and (math.abs(suggestedResult) >= (i_shortHtaResultMinimum * 0.01))
+
+if (virtLongStopLossIsReached)
+    if (swingLong[i_montecarloCheckAfter] or swingShort[i_montecarloCheckAfter])
+        longsHta := htaStoreResult(longsHta, i_longsHitByStopSize, suggestedResult)
+
+if (virtShortStopLossIsReached)
+    if (swingLong[i_montecarloCheckAfter] or swingShort[i_montecarloCheckAfter])
+        shortsHta := htaStoreResult(shortsHta, i_shortsHitByStopSize, suggestedResult)
+
+// HTA Filter - Substrategy - Extra code - END
+
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
 
