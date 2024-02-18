@@ -439,6 +439,12 @@ i_shortsHitByStopSize = input.int(title='shorts Hit', defval=5, group='HTA', inl
 i_shortsHitOpenAdviceMinimumPercentage = input.float(title='', defval=80.00, group='HTA', inline='htaShortInputs')
 i_shortsHitCloseAdviceMinimumPercentage = input.float(title='', defval=40.00, group='HTA', inline='htaShortInputs', tooltip='(S) Size of the array that saves short trade results in past candles.\n  Default: 5\n(S) Minimum Percentage of long Stop hits to open a new short position (%)\n  Default: 80.00%\n(S) Minimum Percentage of Stop hits to close current short position (%)\n  Default: 40.00%')
 
+i_montecarloCheckAfter = input.int(24, minval=1, title='Check after {24} bars', group='Montecarlo', tooltip='')
+
+i_enableHtaResultFilter = input.bool(title='Enable Result filter', defval=true, group='HTA', tooltip='')
+i_longHtaResultMinimum = input.float(title='(L) hta Result minimum (%)', defval=2.25, group='HTA', tooltip='')
+i_shortHtaResultMinimum = input.float(title='(S) hta Result minimum (%)', defval=2.25, group='HTA', tooltip='')
+
 // Trailering inputs
 
 i_enableTraileringTakeProfit = input.bool(false, title='Enable Trailering TakeProfit {False}', group='Trailering')
