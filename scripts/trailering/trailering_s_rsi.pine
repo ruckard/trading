@@ -1430,6 +1430,9 @@ globalStopLossConsensusRsi = ta.rsi(globalStopLossConsensus, i_globalStopLossCon
 globalStopLossConsensusLong = globalStopLossConsensusRsi <= i_globalStopLossConsensusRsiMinimum
 globalStopLossConsensusShort = globalStopLossConsensusRsi >= i_globalStopLossConsensusRsiMaximum
 
+globalStopLossConsensusLong := globalStopLossConsensusLong and (swingLong or swingShort)
+globalStopLossConsensusShort := globalStopLossConsensusShort and (swingLong or swingShort)
+
 // globalStopLossConsensus substrategy - END
 
 // Volume Bounce substrategy - BEGIN
