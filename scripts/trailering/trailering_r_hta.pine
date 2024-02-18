@@ -763,8 +763,8 @@ htaStoreResult(array<float> p_hta, int p_maximumSize = 0, float p_result) =>
 // @param p_feature2 feature 2 value
 // @returns [longOK, shortOK] filter output
 hta_doHTA(array<float> p_longsHta, array<float> p_shortsHta, float p_longsHitOpenAdviceMinimumPercentage, float p_shortsHitOpenAdviceMinimumPercentage, bool p_long, bool p_short) =>
-    _longOK = true
-    _shortOK = true
+    _longOK = false
+    _shortOK = false
 
     if (p_long or p_short)
 
