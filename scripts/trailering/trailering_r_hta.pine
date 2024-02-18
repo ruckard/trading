@@ -722,6 +722,62 @@ getTooOldOrderShortCloseAdvice () =>
 
 // ImplementedStrategy functions - BEGIN
 
+// hta functions - BEGIN
+
+// @function Store the previous trade result. Results are binary inverse. Loss means 1. Win means 0.
+// @param p_hta hta array
+// @param p_maximumSize limit the array size to this number of rows (0 of no limit)
+// @param p_result Trade result in per one.
+// @returns modified hta array
+htaStoreResult(array<float> p_hta, int p_maximumSize = 0, float p_result) =>
+
+    float binaryFloatResult = 0.0
+
+    if (p_result >= 0.0)
+        binaryFloatResult := 0.0
+    else
+        binaryFloatResult := 1.0
+
+    array.push(p_hta, binaryFloatResult)
+
+    if (p_maximumSize > 0 and array.size(p_hta) > p_maximumSize)
+        array.shift(p_hta)
+
+    p_hta
+
+// @function execute hta filter
+// @param p_longsHitHta (L) hta array
+// @param p_shortsHitHta (S) hta array
+// @param p_longsHitOpenAdviceMinimumPercentage (L) Minimum Percentage of opposite-side Stop hits to open a new asked-side position
+// @param p_shortsHitOpenAdviceMinimumPercentage (S) Minimum Percentage of opposite-side Stop hits to open a new asked-side position
+
+// @param p_long long condition
+// @param p_short short condition
+// @param p_feature1 feature 1 value
+// @param p_feature2 feature 2 value
+// @returns [longOK, shortOK] filter output
+hta_doHTA(array<float> p_longsHta, array<float> p_shortsHta, float p_longsHitOpenAdviceMinimumPercentage, float p_shortsHitOpenAdviceMinimumPercentage, bool p_long, bool p_short) =>
+    _longOK = true
+    _shortOK = true
+
+    if (p_long or p_short)
+
+        // Minimum size check - Both arrays need to be complete
+        _minimumSizeCheck = (array.size(p_longsHta) >= i_longsHitByStopSize) and (array.size(p_shortsHta) >= i_shortsHitByStopSize)
+        if (_minimumSizeCheck)
+            _longsHtaStopHitsPercentage  = (array.sum(p_longsHta) / i_longsHitByStopSize) * 0.01
+            _shortsHtaStopHitsPercentage = (array.sum(p_shortsHta) / i_shortsHitByStopSize) * 0.01
+
+            _longOK := p_longsHitOpenAdviceMinimumPercentage >= _shortsHtaStopHitsPercentage
+            _shortOK := p_shortsHitOpenAdviceMinimumPercentage >= _longsHtaStopHitsPercentage
+        else
+            _longOK := false
+            _shortOK := false
+
+    [_longOK, _shortOK]
+
+// hta functions - END
+
 // bodyOutlier functions - BEGIN
 
 bodyRange() =>
