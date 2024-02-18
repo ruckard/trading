@@ -429,26 +429,6 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 // ImplementedStrategy inputs - BEGIN
 
-// hsa inputs
-
-i_enableKnnFilter = input.bool(title='Enable kNN filter', defval=true, group='HSA', tooltip='')
-i_hsaMinimumFeaturePairNumber = input.int(title='HSA minimum feature pairs', defval=5, group='HSA', tooltip='HSA - Minimum number of feature pairs to be found {5}')
-i_hsaMaximumFeaturePairNumber = input.int(title='HSA maximum feature pairs', defval=7, group='HSA', tooltip='HSA - Maximum number of values per feature pairs to be saved {7}')
-i_hsaNearestNeighbors = input.int(title='kNN nearest neighbors (k)', defval=45, group='HSA', tooltip='')
-i_hsaMinimumMedianExpectedResult = input.float(title='HSA minimum median expected result', defval=2.75, group='HSA', tooltip='') * 0.01
-i_MaxKnnLearnIterations = input.int(title='Knn Learn Iterations', defval=100, group='HSA', tooltip='')
-i_maxKnnMatrixMaximumSize = input.int(title='Knn Matrix Maximum size', defval=100, group='HSA', tooltip='')
-
-i_montecarloOffset = input.int(0, title='MonteCarlo Offset {0}', group='Montecarlo', tooltip='')
-i_montecarloPeriod = input.int(24, minval=2, title='MonteCarlo Period {24}', group='Montecarlo', tooltip='')
-i_montecarloCheckAfter = input.int(24, minval=1, title='Check after {24} bars', group='Montecarlo', tooltip='')
-
-i_plotKnnMatrix = input.bool(false, title='Plot HSA Matrix', group='Debug', inline='DebugKnnMatrix', tooltip='Hide the pair and click on auto to see this properly.\nBecause I do not want to modify overlay value.\nDefault: false.')
-
-i_enableKnnResultFilter = input.bool(title='Enable Result filter', defval=true, group='HSA Result Filter', tooltip='')
-i_longKnnResultMinimum = input.float(title='(L) kNN Result minimum (%)', defval=2.25, group='HSA', tooltip='')
-i_shortKnnResultMinimum = input.float(title='(S) kNN Result minimum (%)', defval=2.25, group='HSA', tooltip='')
-
 // Trailering inputs
 
 i_enableTraileringTakeProfit = input.bool(false, title='Enable Trailering TakeProfit {False}', group='Trailering')
@@ -731,110 +711,6 @@ getTooOldOrderShortCloseAdvice () =>
 // Template functions - END
 
 // ImplementedStrategy functions - BEGIN
-
-// hsa functions - BEGIN
-
-// @function Remove oldest row matching the two given features
-// @param p_hsa hsa matrix
-// @param p_feature1 feature 1 value
-// @param p_feature2 feature 2 value
-// @returns number of matches
-hsaRemoveOldestRow(matrix<float> p_hsa, float p_feature1, float p_feature2) =>
-    bool _featurePairFound = false
-    int _matrixOldestIndex = 0
-    int _matrixLastindex = matrix.rows(p_hsa) - 1
-    for _nIndex = 0 to _matrixLastindex
-        if ((p_feature1 == matrix.get(p_hsa, _nIndex, 0)) and (p_feature2 == matrix.get(p_hsa, _nIndex, 1)))
-            if (not _featurePairFound)
-                _matrixOldestIndex := _nIndex
-            else
-                if ((matrix.get(p_hsa, _nIndex, 2)) < (matrix.get(p_hsa, _matrixOldestIndex, 2)))
-                    _matrixOldestIndex := _nIndex
-
-            _featurePairFound := true
-
-    if (_featurePairFound)
-        matrix.remove_row(p_hsa, _matrixOldestIndex)
-
-// @function Count data matching the two given features
-// @param p_hsa hsa matrix
-// @param p_feature1 feature 1 value
-// @param p_feature2 feature 2 value
-// @returns number of matches
-hsaFeaturePairCount(matrix<float> p_hsa, float p_feature1, float p_feature2) =>
-    int _featurePairCount = 0
-    _matrixLastindex = matrix.rows(p_hsa) - 1
-    for _nIndex = 0 to _matrixLastindex
-        if ((p_feature1 == matrix.get(p_hsa, _nIndex, 0)) and (p_feature2 == matrix.get(p_hsa, _nIndex, 1)))
-            _featurePairCount := _featurePairCount + 1
-    _featurePairCount
-
-// @function Median expected value based on matching features
-// @param p_hsa hsa matrix
-// @param p_feature1 feature 1 value
-// @param p_feature2 feature 2 value
-// @returns median expected value
-hsaMedianExpectedResult(matrix<float> p_hsa, float p_feature1, float p_feature2) =>
-    float _medianExpectedValue = 0.0
-    _medianArray = array.new_float(0, 0.0)
-    _matrixLastindex = matrix.rows(p_hsa) - 1
-    for _nIndex = 0 to _matrixLastindex
-        if ((p_feature1 == matrix.get(p_hsa, _nIndex, 0)) and (p_feature2 == matrix.get(p_hsa, _nIndex, 1)))
-            array.push(_medianArray,matrix.get(p_hsa, _nIndex, 3))
-
-    _medianExpectedValue := array.median(_medianArray)
-    _medianExpectedValue
-
-// @function Store the previous trade; buffer the current one until results are in. Results are binary: up/down
-// @param p_hsa hsa matrix
-// @param p_feature1 feature 1 value
-// @param p_feature2 feature 2 value
-// @param p_bar_index current bar_index
-// @param p_maximumSize limit the matrix size to this number of rows (0 of no limit)
-// @returns modified hsa matrix
-hsaStoreResult(matrix<float> p_hsa, float p_feature1, float p_feature2, int p_bar_index, int p_maximumSize = 0, float p_result) =>
-
-    float _float_bar_index = p_bar_index
-    if (p_maximumSize > 0 and matrix.rows(p_hsa) > p_maximumSize)
-        matrix.remove_row(p_hsa, 0)
-
-    if ((hsaFeaturePairCount(p_hsa, p_feature1, p_feature2)) >= i_hsaMaximumFeaturePairNumber)
-        hsaRemoveOldestRow(p_hsa, p_feature1, p_feature2)
-
-    // Add to storage matrix: parameter 1, parameter 2, price, result (up = 1; down = -1)
-    matrix.add_row(p_hsa, matrix.rows(p_hsa), array.from(p_feature1, p_feature2, _float_bar_index, p_result))
-
-    p_hsa
-
-// @function execute kNN filter
-// @param p_hsaNearestNeighbors k nearest neighbors
-// @param p_hsaMinimumMedianExpectedResult HSA median expected result
-// @param p_maxKnnMatrixMaximumSize kNN matrix size limit
-// @param p_long long condition
-// @param p_short short condition
-// @param p_feature1 feature 1 value
-// @param p_feature2 feature 2 value
-// @returns [longOK, shortOK] filter output
-hsa_doHSA(matrix<float> p_hsaMatrix, int p_hsaNearestNeighbors = 5, float p_hsaMinimumMedianExpectedResult = 0, int p_maxKnnMatrixMaximumSize, bool p_long, bool p_short, float p_feature1, float p_feature2) =>
-    longOK = true
-    shortOK = true
-
-    updatedKnnMatrix = matrix.copy(p_hsaMatrix)
-
-    if (p_long or p_short)
-
-        hsaFeaturePairNumber = hsaFeaturePairCount (updatedKnnMatrix, p_feature1, p_feature2)
-        if (hsaFeaturePairNumber >= i_hsaMinimumFeaturePairNumber)
-            medianExpectedResult = hsaMedianExpectedResult (updatedKnnMatrix, p_feature1, p_feature2)
-            longOK := medianExpectedResult >= p_hsaMinimumMedianExpectedResult
-            shortOK := medianExpectedResult <= -p_hsaMinimumMedianExpectedResult
-        else
-            longOK := false
-            shortOK := false
-
-    [updatedKnnMatrix, longOK, shortOK]
-
-// hsa functions - END
 
 // bodyOutlier functions - BEGIN
 
@@ -1411,53 +1287,6 @@ float swingFeature2 = virtTraileringShortConsensus
 
 // swing substrategy - END
 
-// hsa substrategy - BEGIN
-
-var hsaMatrix = matrix.new<float>(1, 4, 0)
-
-montecarloAtrIsPossible = bar_index >= i_atrStopLossLength
-
-bool hsaLong = false
-bool hsaShort = false
-
-// kNN
-var hsaLearnIterations = 0
-
-bool needToLearn = montecarloAtrIsPossible[i_montecarloCheckAfter]
-bool needToTrade = montecarloAtrIsPossible
-
-bool hsaLongOk = false
-bool hsaShortOk = false
-
-bool longHasWon = false
-bool shortHasWon = false
-
-if (needToTrade)
-    [tmpKnnMatrix, hsaLongOkTmp, hsaShortOkTmp] = hsa_doHSA(hsaMatrix, i_hsaNearestNeighbors, i_hsaMinimumMedianExpectedResult, i_maxKnnMatrixMaximumSize, true, true, swingFeature1, swingFeature2)
-    hsaLongOk := hsaLongOkTmp
-    hsaShortOk := hsaShortOkTmp
-
-hsaHasLearntEnough = hsaLearnIterations >= i_MaxKnnLearnIterations
-
-// Actions
-if hsaLongOk and hsaHasLearntEnough
-    hsaLong := true
-if hsaShortOk and hsaHasLearntEnough
-    hsaShort := true
-
-// hsa substrategy - END
-
-// hsa and swingLong integration - BEGIN
-
-bool preKnnSwingLong = swingLong
-bool preKnnSwingShort = swingShort
-
-if (i_enableKnnFilter)
-    swingLong := swingLong and hsaLong
-    swingShort := swingShort and hsaShort
-
-// hsa and swingLong integration - END
-
 // Volume Bounce substrategy - BEGIN
 
 bool volumeBounceLong = false
@@ -1912,78 +1741,6 @@ if (i_enableTraileringTakeProfit)
             orderStopLossPerOne := takeProfitPerOne / i_positionRatio
             orderStopLoss := orderStopLossPerOne * 100
             ShortStopLoss := strategy.position_avg_price * (1 + orderStopLossPerOne)
-
-// HSA Filter - Substrategy - Extra code - BEGIN
-
-latestLowest = ta.lowest(low, i_montecarloCheckAfter - 1)
-latestHighest = ta.highest(high, i_montecarloCheckAfter - 1)
-
-virtLongTakeProfit = LongTakeProfit[i_montecarloCheckAfter - 1]
-virtShortTakeProfit = ShortTakeProfit[i_montecarloCheckAfter - 1]
-virtLongStopLoss = LongStopLoss[i_montecarloCheckAfter - 1]
-virtShortStopLoss = ShortStopLoss[i_montecarloCheckAfter - 1]
-virtSource = close[i_montecarloCheckAfter]
-
-virtLongTakeProfitIsReached = (virtLongTakeProfit >= latestLowest) and (virtLongTakeProfit <= latestHighest)
-virtShortTakeProfitIsReached =  (virtShortTakeProfit >= latestLowest) and (virtShortTakeProfit <= latestHighest)
-
-virtLongStopLossIsReached = (virtLongStopLoss >= latestLowest) and (virtLongStopLoss <= latestHighest)
-virtShortStopLossIsReached =  (virtShortStopLoss >= latestLowest) and (virtShortStopLoss <= latestHighest)
-
-virtLongOK = virtLongTakeProfitIsReached and (not virtLongStopLossIsReached)
-virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
-
-float suggestedResult = 0.0
-if (virtLongStopLossIsReached)
-    suggestedResult := suggestedResult - ((virtSource / virtLongStopLoss) - 1)
-if (virtShortStopLossIsReached)
-    suggestedResult := suggestedResult + ((virtShortStopLoss / virtSource) - 1)
-
-if (i_enableKnnResultFilter)
-    virtShortStopLossIsReached := virtShortStopLossIsReached and (math.abs(suggestedResult) >= (i_longKnnResultMinimum * 0.01))
-    virtLongStopLossIsReached := virtLongStopLossIsReached and (math.abs(suggestedResult) >= (i_shortKnnResultMinimum * 0.01))
-
-if ( (montecarloAtrIsPossible) and (virtLongStopLossIsReached or virtShortStopLossIsReached) )
-    if (preKnnSwingLong[i_montecarloCheckAfter] or preKnnSwingShort[i_montecarloCheckAfter])
-        hsaMatrix := hsaStoreResult(hsaMatrix, swingFeature1[i_montecarloCheckAfter], swingFeature2[i_montecarloCheckAfter], bar_index[i_montecarloCheckAfter], i_maxKnnMatrixMaximumSize, suggestedResult)
-        hsaLearnIterations := hsaLearnIterations + 1
-
-// HSA Filter - Substrategy - Extra code - END
-
-// ImplementedStrategy - Extra Plot - BEGIN
-
-var hsaMatrixLines = array.new_line()
-
-if i_plotKnnMatrix
-    for l in hsaMatrixLines
-        line.delete(l)
-    array.clear(hsaMatrixLines)
-
-    hsaRows = matrix.rows(hsaMatrix)
-    for nrow = 0 to (hsaRows - 1)
-        tmpFeature1 = matrix.get(hsaMatrix, nrow, 0)
-        tmpFeature2 = matrix.get(hsaMatrix, nrow, 1)
-        tmpRowResult = matrix.get(hsaMatrix, nrow, 3)
-
-        tmpX2 = int(time_close - (( 100 - tmpFeature1 ) * (timeframe.in_seconds(timeframe.period)) * 1000.0 ))
-        tmpX1 = int(tmpX2 - (1 * (timeframe.in_seconds(timeframe.period))))
-        tmpY2 = (tmpFeature2 >= 0) ? (tmpFeature2      ) : (tmpFeature2 - 1.0)
-        tmpY1 = (tmpFeature2 >= 0) ? (tmpFeature2 - 1.0) : (tmpFeature2      )
-
-        if (tmpRowResult >= 0)
-            array.unshift(hsaMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, color=color.lime, xloc=xloc.bar_time))
-        else
-            array.unshift(hsaMatrixLines, line.new(x1=tmpX1, y1=tmpY1, x2=tmpX2, y2=tmpY2, color=color.maroon, xloc=xloc.bar_time))
-
-squareBoxX2 = int(time_close)
-squareBoxX1 = int(time_close - ((timeframe.in_seconds(timeframe.period)) * 100 * 1000.0 ))
-
-var box squareBox = na
-box.delete(squareBox)
-if i_plotKnnMatrix
-    squareBox := box.new(squareBoxX1, 100.0, squareBoxX2, 0.0, xloc=xloc.bar_time, bgcolor=na)
-
-// ImplementedStrategy - Extra Plot - END
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
