@@ -1936,6 +1936,22 @@ if (swingLong[i_montecarloCheckAfter] or swingShort[i_montecarloCheckAfter])
 
 // HTA Filter - Substrategy - Extra code - END
 
+// shortsHtaSum
+shortsHtaSumPlotBottom = 0.0
+shortsHtaSumPlotTop = (shortsHtaSumPlotBottom + i_shortsHitByStopSize)
+shortsHtaSumPlot = shortsHtaSum + shortsHtaSumPlotBottom
+plot(shortsHtaSumPlot, color=color.maroon)
+hline(shortsHtaSumPlotBottom)
+hline(shortsHtaSumPlotTop)
+
+// longsHtaSum
+longsHtaSumPlotBottom = shortsHtaSumPlotTop + 20.0
+longsHtaSumPlotTop = (longsHtaSumPlotBottom + i_longsHitByStopSize)
+longsHtaSumPlot = longsHtaSum + longsHtaSumPlotBottom
+plot(longsHtaSumPlot, color=color.lime)
+hline(longsHtaSumPlotBottom)
+hline(longsHtaSumPlotTop)
+
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
 
