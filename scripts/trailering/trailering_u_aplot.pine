@@ -1416,6 +1416,9 @@ htaShortCloseAdvice = getHtaShortCloseAdvice (longsHta, i_shortsHitCloseAdviceMi
 htaLongCloseSameSideAdvice = getHtaLongCloseSameSideAdvice (longsHta, i_longsHitCloseSameSideAdviceMaximumPercentage)
 htaShortCloseSameSideAdvice = getHtaShortCloseSameSideAdvice (shortsHta, i_shortsHitCloseSameSideAdviceMaximumPercentage)
 
+longsHtaSum = array.sum(longsHta)
+shortsHtaSum = array.sum(shortsHta)
+
 // hta substrategy - END
 
 // Volume Bounce substrategy - BEGIN
