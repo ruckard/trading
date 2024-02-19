@@ -441,7 +441,7 @@ i_shortsHitOpenAdviceMinimumPercentage = input.float(title='', defval=40.00, gro
 i_shortsHitCloseAdviceMinimumPercentage = input.float(title='', defval=20.00, group='HTA', inline='htaShortInputs')
 i_shortsHitCloseSameSideAdviceMaximumPercentage = input.float(title='', defval=10.00, group='HTA', inline='htaShortInputs', tooltip='(S) Size of the array that saves short trade results in past candles.\n  Default: 8\n(S) Minimum Percentage of long Stop hits to open a new short position (%)\n  Default: 40.00%\n(S) Maximum Limit Percentage of long Stop hits to close current short position (%)\n  Default: 20.00%\n(S) Maximum Limit Percentage of short Stop hits to close current short position (%)\n  Default: 10.00%')
 
-i_montecarloCheckAfter = input.int(24, minval=1, title='Check after {24} bars', group='Montecarlo', tooltip='')
+i_montecarloCheckAfter = input.int(10, minval=1, title='Check after {10} bars', group='Montecarlo', tooltip='')
 
 i_enableHtaResultFilter = input.bool(title='Enable Result filter', defval=false, group='HTA', tooltip='')
 i_longHtaResultMinimum = input.float(title='(L) hta Result minimum (%)', defval=2.25, group='HTA', tooltip='')
