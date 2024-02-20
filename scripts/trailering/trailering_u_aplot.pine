@@ -447,8 +447,8 @@ i_enableHtaResultFilter = input.bool(title='Enable Result filter', defval=false,
 i_longHtaResultMinimum = input.float(title='(L) hta Result minimum (%)', defval=2.25, group='HTA', tooltip='')
 i_shortHtaResultMinimum = input.float(title='(S) hta Result minimum (%)', defval=2.25, group='HTA', tooltip='')
 
-i_longsHitCloseAdviceEnable = input.bool(true, title='(L) Close when not enough hits', group='HTA')
-i_shortsHitCloseAdviceEnable = input.bool(true, title='(S) Close when not enough hits', group='HTA')
+i_longsHitCloseAdviceEnable = input.bool(false, title='(L) Close when not enough hits', group='HTA')
+i_shortsHitCloseAdviceEnable = input.bool(false, title='(S) Close when not enough hits', group='HTA')
 
 i_longsHitSameSideCloseAdviceEnable = input.bool(false, title='(L) Close when not enough hits (Same side)', group='HTA')
 i_shortsHitSameSideCloseAdviceEnable = input.bool(false, title='(S) Close when not enough hits (Same side)', group='HTA')
