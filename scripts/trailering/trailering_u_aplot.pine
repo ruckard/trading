@@ -453,6 +453,9 @@ i_shortsHitCloseAdviceEnable = input.bool(false, title='(S) Close when not enoug
 i_longsHitSameSideCloseAdviceEnable = input.bool(false, title='(L) Close when not enough hits (Same side)', group='HTA')
 i_shortsHitSameSideCloseAdviceEnable = input.bool(false, title='(S) Close when not enough hits (Same side)', group='HTA')
 
+i_longShortsHtaSumTrigger = input.int(title='(L) shortsHtaSum Trigger', defval=0, group='HTA', inline='htaLongTriggerInputs', tooltip='Default: 0')
+i_longLongConsensusMinimum = input.int(title='(L) LongConsensus Minimum Trigger', defval=1, group='HTA', inline='htaLongTriggerInputs', tooltip='Default: 1')
+
 // Trailering inputs
 
 i_enableTraileringTakeProfit = input.bool(false, title='Enable Trailering TakeProfit {False}', group='Trailering')
