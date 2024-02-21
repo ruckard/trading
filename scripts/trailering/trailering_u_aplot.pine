@@ -454,7 +454,9 @@ i_longsHitSameSideCloseAdviceEnable = input.bool(false, title='(L) Close when no
 i_shortsHitSameSideCloseAdviceEnable = input.bool(false, title='(S) Close when not enough hits (Same side)', group='HTA')
 
 i_longShortsHtaSumTrigger = input.int(title='(L) shortsHtaSum Trigger', defval=0, group='HTA', inline='htaLongTriggerInputs', tooltip='Default: 0')
-i_longLongConsensusMinimum = input.int(title='(L) LongConsensus Minimum Trigger', defval=1, group='HTA', inline='htaLongTriggerInputs', tooltip='Default: 1')
+i_longLongConsensusMinimum = input.int(title='(L) LongConsensus Minimum Trigger', defval=1, group='HTA', tooltip='Default: 1')
+i_longTraileringShortConsensusCloseAdviceEnable = input.bool(true, title='(L) Close when Trailering Short Consensus greater than', group='HTA', tooltip='Default: True')
+i_longTraileringShortConsensusMinimumToClose = input.int(title='(L) Minimum Trailering Short Consensus to close', defval=3, group='HTA', tooltip='Default: 3')
 
 // Trailering inputs
 
@@ -1419,6 +1421,8 @@ htaShortCloseAdvice = getHtaShortCloseAdvice (longsHta, i_shortsHitCloseAdviceMi
 htaLongCloseSameSideAdvice = getHtaLongCloseSameSideAdvice (longsHta, i_longsHitCloseSameSideAdviceMaximumPercentage)
 htaShortCloseSameSideAdvice = getHtaShortCloseSameSideAdvice (shortsHta, i_shortsHitCloseSameSideAdviceMaximumPercentage)
 
+htaVirtTraileringLongCloseAdvice = virtTraileringShortConsensus >= i_longTraileringShortConsensusMinimumToClose
+
 longsHtaSum = array.sum(longsHta)
 shortsHtaSum = array.sum(shortsHta)
 
@@ -1657,6 +1661,9 @@ if i_longsHitCloseAdviceEnable
 
 if i_longsHitSameSideCloseAdviceEnable
     LONG_CLOSE := LONG_CLOSE or htaLongCloseSameSideAdvice
+
+if i_longTraileringShortConsensusCloseAdviceEnable
+    LONG_CLOSE := LONG_CLOSE or htaVirtTraileringLongCloseAdvice
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if (offStopTimeInterval)
