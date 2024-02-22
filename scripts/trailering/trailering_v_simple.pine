@@ -429,35 +429,6 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 // ImplementedStrategy inputs - BEGIN
 
-// hta inputs
-
-i_longsHitByStopSize = input.int(title='longs Hit', defval=20, group='HTA', inline='htaLongInputs')
-i_longsHitOpenAdviceMinimumPercentage = input.float(title='', defval=60.00, group='HTA', inline='htaLongInputs')
-i_longsHitCloseAdviceMinimumPercentage = input.float(title='', defval=20.00, group='HTA', inline='htaLongInputs')
-i_longsHitCloseSameSideAdviceMaximumPercentage = input.float(title='', defval=10.00, group='HTA', inline='htaLongInputs', tooltip='(L) Size of the array that saves long trade results in past candles.\n  Default: 20\n(L) Minimum Percentage of short Stop hits to open a new long position (%)\n  Default: 60.00%\n(L) Maximum Limit Percentage of short Stop hits to close current long position (%)\n  Default: 20.00%\n(L) Maximum Limit Percentage of long Stop hits to close current long position (%)\n  Default: 10.00%')
-
-i_shortsHitByStopSize = input.int(title='shorts Hit', defval=20, group='HTA', inline='htaShortInputs')
-i_shortsHitOpenAdviceMinimumPercentage = input.float(title='', defval=40.00, group='HTA', inline='htaShortInputs')
-i_shortsHitCloseAdviceMinimumPercentage = input.float(title='', defval=20.00, group='HTA', inline='htaShortInputs')
-i_shortsHitCloseSameSideAdviceMaximumPercentage = input.float(title='', defval=10.00, group='HTA', inline='htaShortInputs', tooltip='(S) Size of the array that saves short trade results in past candles.\n  Default: 20\n(S) Minimum Percentage of long Stop hits to open a new short position (%)\n  Default: 40.00%\n(S) Maximum Limit Percentage of long Stop hits to close current short position (%)\n  Default: 20.00%\n(S) Maximum Limit Percentage of short Stop hits to close current short position (%)\n  Default: 10.00%')
-
-i_montecarloCheckAfter = input.int(10, minval=1, title='Check after {10} bars', group='Montecarlo', tooltip='')
-
-i_enableHtaResultFilter = input.bool(title='Enable Result filter', defval=false, group='HTA', tooltip='')
-i_longHtaResultMinimum = input.float(title='(L) hta Result minimum (%)', defval=2.25, group='HTA', tooltip='')
-i_shortHtaResultMinimum = input.float(title='(S) hta Result minimum (%)', defval=2.25, group='HTA', tooltip='')
-
-i_longsHitCloseAdviceEnable = input.bool(false, title='(L) Close when not enough hits', group='HTA')
-i_shortsHitCloseAdviceEnable = input.bool(false, title='(S) Close when not enough hits', group='HTA')
-
-i_longsHitSameSideCloseAdviceEnable = input.bool(false, title='(L) Close when not enough hits (Same side)', group='HTA')
-i_shortsHitSameSideCloseAdviceEnable = input.bool(false, title='(S) Close when not enough hits (Same side)', group='HTA')
-
-i_longShortsHtaSumTrigger = input.int(title='(L) shortsHtaSum Trigger', defval=0, group='HTA', inline='htaLongTriggerInputs', tooltip='Default: 0')
-i_longLongConsensusMinimum = input.int(title='(L) LongConsensus Minimum Trigger', defval=1, group='HTA', tooltip='Default: 1')
-i_longTraileringShortConsensusCloseAdviceEnable = input.bool(false, title='(L) Close when Trailering Short Consensus greater than', group='HTA', tooltip='Default: False')
-i_longTraileringShortConsensusMinimumToClose = input.int(title='(L) Minimum Trailering Short Consensus to close', defval=3, group='HTA', tooltip='Default: 3')
-
 // Trailering inputs
 
 i_enableTraileringTakeProfit = input.bool(false, title='Enable Trailering TakeProfit {False}', group='Trailering')
@@ -740,87 +711,6 @@ getTooOldOrderShortCloseAdvice () =>
 // Template functions - END
 
 // ImplementedStrategy functions - BEGIN
-
-// hta functions - BEGIN
-
-getHtaLongCloseAdvice (array<float> p_shortsHta, float p_longsHitCloseAdviceMinimumPercentage) =>
-
-    _shortsHtaStopHitsPercentage = (array.sum(p_shortsHta) / i_shortsHitByStopSize) * 100.0
-    _htaLongCloseAdvice = _shortsHtaStopHitsPercentage <= p_longsHitCloseAdviceMinimumPercentage
-
-    _htaLongCloseAdvice
-
-getHtaShortCloseAdvice (array<float> p_longsHta, float p_shortsHitCloseAdviceMinimumPercentage) =>
-
-    _longsHtaStopHitsPercentage = (array.sum(p_longsHta) / i_longsHitByStopSize) * 100.0
-    _htaShortCloseAdvice = _longsHtaStopHitsPercentage <= p_shortsHitCloseAdviceMinimumPercentage
-
-    _htaShortCloseAdvice
-
-getHtaLongCloseSameSideAdvice (array<float> p_longsHta, float p_longsHitCloseSameSideAdviceMaximumPercentage) =>
-
-    _longsHtaStopHitsPercentage = (array.sum(p_longsHta) / i_longsHitByStopSize) * 100.0
-    _htaLongCloseSameSideAdvice = _longsHtaStopHitsPercentage <= p_longsHitCloseSameSideAdviceMaximumPercentage
-
-    _htaLongCloseSameSideAdvice
-
-getHtaShortCloseSameSideAdvice (array<float> p_shortsHta, float p_shortsHitCloseSameSideAdviceMaximumPercentage) =>
-
-    _shortsHtaStopHitsPercentage = (array.sum(p_shortsHta) / i_shortsHitByStopSize) * 100.0
-    _htaShortCloseSameSideAdvice = _shortsHtaStopHitsPercentage <= p_shortsHitCloseSameSideAdviceMaximumPercentage
-
-    _htaShortCloseSameSideAdvice
-
-// @function Store the previous trade result. Results are binary inverse. Loss means 1. Win means 0.
-// @param p_hta hta array
-// @param p_maximumSize limit the array size to this number of rows (0 of no limit)
-// @param p_result Trade result in per one.
-// @returns modified hta array
-htaStoreResult(array<float> p_hta, int p_maximumSize = 0, float p_result) =>
-
-    float binaryFloatResult = 0.0
-
-    binaryFloatResult := p_result
-
-    array.push(p_hta, binaryFloatResult)
-
-    if (p_maximumSize > 0 and array.size(p_hta) > p_maximumSize)
-        array.shift(p_hta)
-
-    p_hta
-
-// @function execute hta filter
-// @param p_longsHitHta (L) hta array
-// @param p_shortsHitHta (S) hta array
-// @param p_longsHitOpenAdviceMinimumPercentage (L) Minimum Percentage of opposite-side Stop hits to open a new asked-side position
-// @param p_shortsHitOpenAdviceMinimumPercentage (S) Minimum Percentage of opposite-side Stop hits to open a new asked-side position
-
-// @param p_long long condition
-// @param p_short short condition
-// @param p_feature1 feature 1 value
-// @param p_feature2 feature 2 value
-// @returns [longOK, shortOK] filter output
-hta_doHTA(array<float> p_longsHta, array<float> p_shortsHta, float p_longsHitOpenAdviceMinimumPercentage, float p_shortsHitOpenAdviceMinimumPercentage, bool p_long, bool p_short) =>
-    _longOK = false
-    _shortOK = false
-
-    if (p_long or p_short)
-
-        // Minimum size check - Both arrays need to be complete
-        _minimumSizeCheck = (array.size(p_longsHta) >= i_longsHitByStopSize) and (array.size(p_shortsHta) >= i_shortsHitByStopSize)
-        if (_minimumSizeCheck)
-            _longsHtaStopHitsPercentage  = (array.sum(p_longsHta) / i_longsHitByStopSize) * 100.0
-            _shortsHtaStopHitsPercentage = (array.sum(p_shortsHta) / i_shortsHitByStopSize) * 100.0
-
-            _longOK := _shortsHtaStopHitsPercentage >= p_longsHitOpenAdviceMinimumPercentage
-            _shortOK := _longsHtaStopHitsPercentage >= p_shortsHitOpenAdviceMinimumPercentage
-        else
-            _longOK := false
-            _shortOK := false
-
-    [_longOK, _shortOK]
-
-// hta functions - END
 
 // bodyOutlier functions - BEGIN
 
@@ -1397,37 +1287,6 @@ float swingFeature2 = virtTraileringShortConsensus
 
 // swing substrategy - END
 
-// hta substrategy - BEGIN
-
-var longsHta = array.new_float()
-var shortsHta = array.new_float()
-
-bool htaLong = false
-bool htaShort = false
-
-bool htaLongOk = false
-bool htaShortOk = false
-
-[htaLongOkTmp, htaShortOkTmp] = hta_doHTA(longsHta, shortsHta, i_longsHitOpenAdviceMinimumPercentage, i_shortsHitOpenAdviceMinimumPercentage, (swingLong or swingShort), (swingLong or swingShort))
-htaLongOk := htaLongOkTmp
-htaShortOk := htaShortOkTmp
-
-htaLong := htaLongOk
-htaShort := htaShortOk
-
-htaLongCloseAdvice = getHtaLongCloseAdvice (shortsHta, i_longsHitCloseAdviceMinimumPercentage)
-htaShortCloseAdvice = getHtaShortCloseAdvice (longsHta, i_shortsHitCloseAdviceMinimumPercentage)
-
-htaLongCloseSameSideAdvice = getHtaLongCloseSameSideAdvice (longsHta, i_longsHitCloseSameSideAdviceMaximumPercentage)
-htaShortCloseSameSideAdvice = getHtaShortCloseSameSideAdvice (shortsHta, i_shortsHitCloseSameSideAdviceMaximumPercentage)
-
-htaVirtTraileringLongCloseAdvice = virtTraileringShortConsensus >= i_longTraileringShortConsensusMinimumToClose
-
-longsHtaSum = array.sum(longsHta)
-shortsHtaSum = array.sum(shortsHta)
-
-// hta substrategy - END
-
 // Volume Bounce substrategy - BEGIN
 
 bool volumeBounceLong = false
@@ -1455,7 +1314,7 @@ bodyRangeShort = bodyRange()  >= liftAverageBodyRange and (bodyRange() >= i_body
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
-bool longCondition1 = htaLong
+bool longCondition1 = false
 bool longCondition2 = false
 bool longCondition3 = false
 bool longCondition4 = false
@@ -1463,7 +1322,7 @@ bool longCondition5 = false
 // Define here your, at most, 5 long conditions. Use false if not used. - END
 
 // Define here your, at most, 5 short conditions. Use false if not used. - BEGIN
-bool shortCondition1 = htaShort
+bool shortCondition1 = false
 bool shortCondition2 = false
 bool shortCondition3 = false
 bool shortCondition4 = false
@@ -1656,15 +1515,6 @@ if i_enableTraileringLongFollowTheBumpClose
 if i_enableTraileringLongCumulativeBumpClose
     LONG_CLOSE := LONG_CLOSE or (traileringLongCumulativeBumpCloseAdvice and (close >= (positionPrice * (1 + i_breakEvenPerOne))))
 
-if i_longsHitCloseAdviceEnable
-    LONG_CLOSE := LONG_CLOSE or htaLongCloseAdvice
-
-if i_longsHitSameSideCloseAdviceEnable
-    LONG_CLOSE := LONG_CLOSE or htaLongCloseSameSideAdvice
-
-if i_longTraileringShortConsensusCloseAdviceEnable
-    LONG_CLOSE := LONG_CLOSE or htaVirtTraileringLongCloseAdvice
-
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if (offStopTimeInterval)
     LONG_CLOSE := true
@@ -1693,12 +1543,6 @@ if i_enableTraileringShortFollowTheBumpClose
 
 if i_enableTraileringShortCumulativeBumpClose
     SHORT_CLOSE := SHORT_CLOSE or (traileringShortCumulativeBumpCloseAdvice and (close <= (positionPrice * (1 - i_breakEvenPerOne))))
-
-if i_shortsHitCloseAdviceEnable
-    SHORT_CLOSE := SHORT_CLOSE or htaShortCloseAdvice
-
-if i_shortsHitSameSideCloseAdviceEnable
-    SHORT_CLOSE := SHORT_CLOSE or htaShortCloseSameSideAdvice
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if (offStopTimeInterval)
@@ -1897,70 +1741,6 @@ if (i_enableTraileringTakeProfit)
             orderStopLossPerOne := takeProfitPerOne / i_positionRatio
             orderStopLoss := orderStopLossPerOne * 100
             ShortStopLoss := strategy.position_avg_price * (1 + orderStopLossPerOne)
-
-// HTA Filter - Substrategy - Extra code - BEGIN
-
-latestLowest = ta.lowest(low, i_montecarloCheckAfter - 1)
-latestHighest = ta.highest(high, i_montecarloCheckAfter - 1)
-
-virtLongTakeProfit = LongTakeProfit[i_montecarloCheckAfter - 1]
-virtShortTakeProfit = ShortTakeProfit[i_montecarloCheckAfter - 1]
-virtLongStopLoss = LongStopLoss[i_montecarloCheckAfter - 1]
-virtShortStopLoss = ShortStopLoss[i_montecarloCheckAfter - 1]
-virtSource = close[i_montecarloCheckAfter]
-
-virtLongTakeProfitIsReached = (virtLongTakeProfit >= latestLowest) and (virtLongTakeProfit <= latestHighest)
-virtShortTakeProfitIsReached =  (virtShortTakeProfit >= latestLowest) and (virtShortTakeProfit <= latestHighest)
-
-virtLongStopLossIsReached = (virtLongStopLoss >= latestLowest) and (virtLongStopLoss <= latestHighest)
-virtShortStopLossIsReached =  (virtShortStopLoss >= latestLowest) and (virtShortStopLoss <= latestHighest)
-
-virtLongOK = virtLongTakeProfitIsReached and (not virtLongStopLossIsReached)
-virtShortOK = virtShortTakeProfitIsReached and (not virtShortStopLossIsReached)
-
-float suggestedResult = 0.0
-if (virtLongStopLossIsReached)
-    suggestedResult := suggestedResult - ((virtSource / virtLongStopLoss) - 1)
-if (virtShortStopLossIsReached)
-    suggestedResult := suggestedResult + ((virtShortStopLoss / virtSource) - 1)
-
-bool virtLongStopLossIsReachedResultFilteredOk = true
-bool virtShortStopLossIsReachedResultFilteredOk = true
-
-if (i_enableHtaResultFilter)
-    virtShortStopLossIsReachedResultFilteredOk := virtShortStopLossIsReached and (math.abs(suggestedResult) >= (i_longHtaResultMinimum * 0.01))
-    virtLongStopLossIsReachedResultFilteredOk := virtLongStopLossIsReached and (math.abs(suggestedResult) >= (i_shortHtaResultMinimum * 0.01))
-
-if (swingLong[i_montecarloCheckAfter] or swingShort[i_montecarloCheckAfter])
-    if (virtLongStopLossIsReachedResultFilteredOk)
-        if (virtLongStopLossIsReached)
-            longsHta := htaStoreResult(longsHta, i_longsHitByStopSize, 1.0)
-        else
-            longsHta := htaStoreResult(longsHta, i_longsHitByStopSize, 0.0)
-
-    if (virtShortStopLossIsReachedResultFilteredOk)
-        if (virtShortStopLossIsReached)
-            shortsHta := htaStoreResult(shortsHta, i_shortsHitByStopSize, 1.0)
-        else
-            shortsHta := htaStoreResult(shortsHta, i_shortsHitByStopSize, 0.0)
-
-// HTA Filter - Substrategy - Extra code - END
-
-// shortsHtaSum
-shortsHtaSumPlotBottom = 0.0
-shortsHtaSumPlotTop = (shortsHtaSumPlotBottom + i_shortsHitByStopSize)
-shortsHtaSumPlot = shortsHtaSum + shortsHtaSumPlotBottom
-plot(shortsHtaSumPlot, color=color.maroon)
-hline(shortsHtaSumPlotBottom)
-hline(shortsHtaSumPlotTop)
-
-// longsHtaSum
-longsHtaSumPlotBottom = shortsHtaSumPlotTop + 20.0
-longsHtaSumPlotTop = (longsHtaSumPlotBottom + i_longsHitByStopSize)
-longsHtaSumPlot = longsHtaSum + longsHtaSumPlotBottom
-plot(longsHtaSumPlot, color=color.lime)
-hline(longsHtaSumPlotBottom)
-hline(longsHtaSumPlotTop)
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
