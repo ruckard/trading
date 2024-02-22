@@ -492,6 +492,12 @@ i_enableTraileringShortProtection = input.bool(false, title='Trailering (S) Prot
 i_traileringShortProtectionLookback = input.int(4, minval = 1,  title = '', group='Trailering', inline='shortTraileringProtection')
 i_traileringShortProtectionConsensusMinimum = input.int(1, minval = 1,  title = '', group='Trailering', inline='shortTraileringProtection', tooltip='Defaults:\n(S) Enable: false,\nLookback: 4\nConsensus Minimum: 1')
 
+i_enableTraileringLongCurieFilter = input.bool(true, title='Trailering (L) Curie filter', group='Trailering', inline='longTraileringCurieFilter')
+i_traileringLongCurieFilterPercentage = input.float(0.5, minval=0.0001,  title = '', group='Trailering', inline='longTraileringCurieFilter', tooltip='Defaults:\n(L) Enable: true,\nMinimum Difference from the Curie closing line (%): 0.5 %')
+
+i_enableTraileringShortCurieFilter = input.bool(true, title='Trailering (S) Curie filter', group='Trailering', inline='shortTraileringCurieFilter')
+i_traileringShortCurieFilterPercentage = input.float(0.5, minval = 0.0001,  title = '', group='Trailering', inline='shortTraileringCurieFilter', tooltip='Defaults:\n(S) Enable: true,\nMinimum Difference from the Curie closing line (%): 0.5%')
+
 i_volumeBounceMinimumRatio = input.float(2.5, title='Min Ratio % {2.5}', minval=0.01, group='Volume Bounce')
 i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=0.01, group='Volume Bounce')
 
@@ -1137,6 +1143,14 @@ if (i_enableTraileringLongProtection)
 
 if (i_enableTraileringShortProtection)
     traileringShort := traileringShort and (not (longLookBackConsensus >= i_traileringShortProtectionConsensusMinimum))
+
+if (i_enableTraileringLongCurieFilter)
+    curieHighestClosingMAPlusExtra = (curieHighestClosingMA * i_traileringLongCurieFilterPercentage * 0.01) + curieHighestClosingMA
+    traileringLong := traileringLong and ( i_curieSource >= curieHighestClosingMAPlusExtra)
+
+if (i_enableTraileringShortCurieFilter)
+    curieLowestClosingMAMinusExtra = curieLowestClosingMA - (curieLowestClosingMA * i_traileringShortCurieFilterPercentage * 0.01)
+    traileringShort := traileringShort and ( i_curieSource <= curieLowestClosingMAMinusExtra)
 
 // Trailering Protection - END
 
