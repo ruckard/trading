@@ -457,8 +457,8 @@ i_virtTakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit M
 i_virtTraileringPeriod = input.int(24, minval=2, title='Trailering Period {24}', group='Trailering')
 i_virtTraileringPlotOffset = input.int(0, title='Trailering Plot Offset {0}', group='Trailering')
 
-i_virtTraileringLongMinimumConsensus2 = input.int(7, minval=1, title='1. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus2')
-i_virtTraileringLongMaximumConsensus2 = input.int(10, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus2', tooltip='Defaults:\n(L) Minimum: 7.\n(L) Maximum: 10.')
+i_virtTraileringLongMinimumConsensus2 = input.int(5, minval=1, title='1. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus2')
+i_virtTraileringLongMaximumConsensus2 = input.int(10, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus2', tooltip='Defaults:\n(L) Minimum: 5.\n(L) Maximum: 10.')
 
 i_virtTraileringShortMinimumConsensus2 = input.int(7, minval=1, title='1. (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus2')
 i_virtTraileringShortMaximumConsensus2 = input.int(10, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus2', tooltip='Defaults:\n(S) Minimum: 7.\n(S) Maximum: 10.')
