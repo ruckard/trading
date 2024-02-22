@@ -457,11 +457,11 @@ i_virtTakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit M
 i_virtTraileringPeriod = input.int(24, minval=2, title='Trailering Period {24}', group='Trailering')
 i_virtTraileringPlotOffset = input.int(0, title='Trailering Plot Offset {0}', group='Trailering')
 
-i_virtTraileringLongMinimumConsensus2 = input.int(1, minval=1, title='1. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus2')
-i_virtTraileringLongMaximumConsensus2 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus2', tooltip='Defaults:\n(L) Minimum: 1.\n(L) Maximum: 24.')
+i_virtTraileringLongMinimumConsensus2 = input.int(7, minval=1, title='1. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus2')
+i_virtTraileringLongMaximumConsensus2 = input.int(10, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus2', tooltip='Defaults:\n(L) Minimum: 7.\n(L) Maximum: 10.')
 
-i_virtTraileringShortMinimumConsensus2 = input.int(1, minval=1, title='1. (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus2')
-i_virtTraileringShortMaximumConsensus2 = input.int(24, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus2', tooltip='Defaults:\n(S) Minimum: 1.\n(S) Maximum: 24.')
+i_virtTraileringShortMinimumConsensus2 = input.int(7, minval=1, title='1. (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus2')
+i_virtTraileringShortMaximumConsensus2 = input.int(10, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus2', tooltip='Defaults:\n(S) Minimum: 7.\n(S) Maximum: 10.')
 
 i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
 i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
@@ -479,10 +479,10 @@ i_traileringShortProtectionLookback = input.int(4, minval = 1,  title = '', grou
 i_traileringShortProtectionConsensusMinimum = input.int(1, minval = 1,  title = '', group='Trailering', inline='shortTraileringProtection', tooltip='Defaults:\n(S) Enable: false,\nLookback: 4\nConsensus Minimum: 1')
 
 i_enableTraileringLongCurieFilter = input.bool(true, title='Trailering (L) Curie filter', group='Trailering', inline='longTraileringCurieFilter')
-i_traileringLongCurieFilterPercentage = input.float(0.5, minval=0.0001,  title = '', group='Trailering', inline='longTraileringCurieFilter', tooltip='Defaults:\n(L) Enable: true,\nMinimum Difference from the Curie closing line (%): 0.5 %')
+i_traileringLongCurieFilterPercentage = input.float(1.5, minval=0.0001,  title = '', group='Trailering', inline='longTraileringCurieFilter', tooltip='Defaults:\n(L) Enable: true,\nMinimum Difference from the Curie closing line (%): 1.5 %')
 
 i_enableTraileringShortCurieFilter = input.bool(true, title='Trailering (S) Curie filter', group='Trailering', inline='shortTraileringCurieFilter')
-i_traileringShortCurieFilterPercentage = input.float(0.5, minval = 0.0001,  title = '', group='Trailering', inline='shortTraileringCurieFilter', tooltip='Defaults:\n(S) Enable: true,\nMinimum Difference from the Curie closing line (%): 0.5%')
+i_traileringShortCurieFilterPercentage = input.float(1.5, minval = 0.0001,  title = '', group='Trailering', inline='shortTraileringCurieFilter', tooltip='Defaults:\n(S) Enable: true,\nMinimum Difference from the Curie closing line (%): 1.5%')
 
 i_enableLongTraileringOppositeConsensusClose = input.bool(true, title='1. (L) Opposite Min To Close', group='Trailering', inline='longTraileringOppositeConsensusClose')
 i_virtTraileringLongOppositeConsensusMinimumToClose2 = input.int(6, minval=1, title='', group='Trailering', inline='longTraileringOppositeConsensusClose', tooltip='Defaults:\n Enable: True\n Minimum:6.')
