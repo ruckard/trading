@@ -484,6 +484,11 @@ i_traileringLongCurieFilterPercentage = input.float(0.5, minval=0.0001,  title =
 i_enableTraileringShortCurieFilter = input.bool(true, title='Trailering (S) Curie filter', group='Trailering', inline='shortTraileringCurieFilter')
 i_traileringShortCurieFilterPercentage = input.float(0.5, minval = 0.0001,  title = '', group='Trailering', inline='shortTraileringCurieFilter', tooltip='Defaults:\n(S) Enable: true,\nMinimum Difference from the Curie closing line (%): 0.5%')
 
+i_enableLongTraileringOppositeConsensusClose = input.bool(true, title='1. (L) Opposite Min To Close', group='Trailering', inline='longTraileringOppositeConsensusClose')
+i_virtTraileringLongOppositeConsensusMinimumToClose2 = input.int(6, minval=1, title='', group='Trailering', inline='longTraileringOppositeConsensusClose', tooltip='Defaults:\n Enable: True\n Minimum:6.')
+i_enableShortTraileringOppositeConsensusClose = input.bool(true, title='1. (S) Opposite Min To Close', group='Trailering', inline='shortTraileringOppositeConsensusClose')
+i_virtTraileringShortOppositeConsensusMinimumToClose2 = input.int(6, minval=1, title='', group='Trailering', inline='shortTraileringOppositeConsensusClose', tooltip='Defaults:\n Enable: True\n Minimum:6.')
+
 i_volumeBounceMinimumRatio = input.float(2.5, title='Min Ratio % {2.5}', minval=0.01, group='Volume Bounce')
 i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=0.01, group='Volume Bounce')
 
@@ -1511,6 +1516,9 @@ if i_enableTraileringLongFollowTheBumpClose
 if i_enableTraileringLongCumulativeBumpClose
     LONG_CLOSE := LONG_CLOSE or (traileringLongCumulativeBumpCloseAdvice and (close >= (positionPrice * (1 + i_breakEvenPerOne))))
 
+if i_enableLongTraileringOppositeConsensusClose
+    LONG_CLOSE := LONG_CLOSE or (virtTraileringShortConsensus >= i_virtTraileringLongOppositeConsensusMinimumToClose2)
+
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if (offStopTimeInterval)
     LONG_CLOSE := true
@@ -1539,6 +1547,9 @@ if i_enableTraileringShortFollowTheBumpClose
 
 if i_enableTraileringShortCumulativeBumpClose
     SHORT_CLOSE := SHORT_CLOSE or (traileringShortCumulativeBumpCloseAdvice and (close <= (positionPrice * (1 - i_breakEvenPerOne))))
+
+if i_enableShortTraileringOppositeConsensusClose
+    SHORT_CLOSE := SHORT_CLOSE or (virtTraileringLongConsensus >= i_virtTraileringShortOppositeConsensusMinimumToClose2)
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if (offStopTimeInterval)
