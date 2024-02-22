@@ -369,7 +369,7 @@ i_RSIProtectionSource = input.source(close, title='', group='RSI Protection', in
 
 // Curie Closing Lines - Inputs
 i_enableCurieClosingLines = input.bool(false, title='Enable', group='Curie Closing Lines', inline='CurieEnableShow')
-i_showCurieClosingLines = input.bool(false, title='Show', group='Curie Closing Lines', inline='CurieEnableShow', tooltip='Defaults:\nEnable: False.\nShow: False.')
+i_showCurieClosingLines = input.bool(true, title='Show', group='Curie Closing Lines', inline='CurieEnableShow', tooltip='Defaults:\nEnable: False.\nShow: True.')
 
 i_curieHighClosingMaType = input.string(defval = 'SMA', options = ['SMA', 'EMA', 'VWMA', 'RMA'], title = 'High MA', group='Curie Closing Lines', inline='High Closing Ma')
 i_curieHighClosingMaLength = input.int(200, minval = 1,  title = '', group='Curie Closing Lines', inline='High Closing Ma')
