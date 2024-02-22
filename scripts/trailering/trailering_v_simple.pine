@@ -1109,10 +1109,10 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
     if (array.get(traileringStatus, virtTraileringOffset).traileringShortBet)
         virtTraileringShortConsensus := virtTraileringShortConsensus + 1
 
-if ((virtTraileringShortConsensus >= i_virtTraileringLongMinimumConsensus2) and (virtTraileringShortConsensus <= i_virtTraileringLongMaximumConsensus2))
+if (( virtTraileringLongConsensus >= i_virtTraileringLongMinimumConsensus2) and (virtTraileringLongConsensus <= i_virtTraileringLongMaximumConsensus2))
     traileringLong := true
 
-if ((virtTraileringLongConsensus >= i_virtTraileringShortMinimumConsensus2) and (virtTraileringLongConsensus <= i_virtTraileringShortMaximumConsensus2))
+if ((virtTraileringShortConsensus >= i_virtTraileringShortMinimumConsensus2) and (virtTraileringShortConsensus <= i_virtTraileringShortMaximumConsensus2))
     traileringShort := true
 
 // Trailering Protection - BEGIN
