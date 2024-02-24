@@ -465,6 +465,14 @@ i_enableVirtTraileringShortNonMomentumConsensus2 = input.bool(true, title='1. (S
 i_virtTraileringShortNonMomentumMinimumConsensus2 = input.int(7, minval=1, title='', group='Trailering', inline='virtTraileringShortNonMomentumConsensus2')
 i_virtTraileringShortNonMomentumMaximumConsensus2 = input.int(10, minval=1, title='', group='Trailering', inline='virtTraileringShortNonMomentumConsensus2', tooltip='(S) NonMomentum Consensus (Min/Max).\nDefaults:\nEnabled: True\n(S) Minimum: 7.\n(S) Maximum: 10.')
 
+i_enableVirtTraileringLongMomentumConsensus = input.bool(true, title='2. (L) Momentum Consensus', group='Trailering', inline='virtTraileringLongMomentumConsensus')
+i_virtTraileringLongMomentumMinimumConsensus = input.int(15, minval=1, title='', group='Trailering', inline='virtTraileringLongMomentumConsensus')
+i_virtTraileringLongMomentumMaximumConsensus = input.int(23, minval=1, title='', group='Trailering', inline='virtTraileringLongMomentumConsensus', tooltip='(L) Momentum Consensus (Min/Max).\nDefaults:\nEnabled: True\n(L) Minimum: 15.\n(L) Maximum: 23.')
+
+i_enableVirtTraileringShortMomentumConsensus = input.bool(true, title='2. (S) Momentum Consensus', group='Trailering', inline='virtTraileringShortMomentumConsensus')
+i_virtTraileringShortMomentumMinimumConsensus = input.int(15, minval=1, title='', group='Trailering', inline='virtTraileringShortMomentumConsensus')
+i_virtTraileringShortMomentumMaximumConsensus = input.int(23, minval=1, title='', group='Trailering', inline='virtTraileringShortMomentumConsensus', tooltip='(S) Momentum Consensus (Min/Max).\nDefaults:\nEnabled: True\n(S) Minimum: 15.\n(S) Maximum: 23.')
+
 i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
 i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
 i_traileringAtrTakeProfitMultiplier = input.float(1.50, title='ATR Take Profit Multiplier % {1.50}', minval=0.01, group='Trailering')
@@ -1117,6 +1125,14 @@ if (i_enableVirtTraileringLongNonMomentumConsensus2)
 
 if (i_enableVirtTraileringShortNonMomentumConsensus2)
     if ((virtTraileringShortConsensus >= i_virtTraileringShortNonMomentumMinimumConsensus2) and (virtTraileringShortConsensus <= i_virtTraileringShortNonMomentumMaximumConsensus2))
+        traileringShort := true
+
+if (i_enableVirtTraileringLongMomentumConsensus)
+    if (( virtTraileringShortConsensus >= i_virtTraileringLongMomentumMinimumConsensus) and (virtTraileringShortConsensus <= i_virtTraileringLongMomentumMaximumConsensus))
+        traileringLong := true
+
+if (i_enableVirtTraileringShortMomentumConsensus)
+    if ((virtTraileringLongConsensus >= i_virtTraileringShortMomentumMinimumConsensus) and (virtTraileringLongConsensus <= i_virtTraileringShortMomentumMaximumConsensus))
         traileringShort := true
 
 // Trailering Protection - BEGIN
