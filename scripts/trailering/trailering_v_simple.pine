@@ -466,12 +466,12 @@ i_virtTraileringShortNonMomentumMinimumConsensus2 = input.int(7, minval=1, title
 i_virtTraileringShortNonMomentumMaximumConsensus2 = input.int(10, minval=1, title='', group='Trailering', inline='virtTraileringShortNonMomentumConsensus2', tooltip='(S) NonMomentum Consensus (Min/Max).\nDefaults:\nEnabled: True\n(S) Minimum: 7.\n(S) Maximum: 10.')
 
 i_enableVirtTraileringLongMomentumConsensus = input.bool(true, title='2. (L) Momentum Consensus', group='Trailering', inline='virtTraileringLongMomentumConsensus')
-i_virtTraileringLongMomentumMinimumConsensus = input.int(15, minval=1, title='', group='Trailering', inline='virtTraileringLongMomentumConsensus')
-i_virtTraileringLongMomentumMaximumConsensus = input.int(23, minval=1, title='', group='Trailering', inline='virtTraileringLongMomentumConsensus', tooltip='(L) Momentum Consensus (Min/Max).\nDefaults:\nEnabled: True\n(L) Minimum: 15.\n(L) Maximum: 23.')
+i_virtTraileringLongMomentumMinimumConsensus = input.int(12, minval=1, title='', group='Trailering', inline='virtTraileringLongMomentumConsensus')
+i_virtTraileringLongMomentumMaximumConsensus = input.int(18, minval=1, title='', group='Trailering', inline='virtTraileringLongMomentumConsensus', tooltip='(L) Momentum Consensus (Min/Max).\nDefaults:\nEnabled: True\n(L) Minimum: 12.\n(L) Maximum: 18.')
 
 i_enableVirtTraileringShortMomentumConsensus = input.bool(true, title='2. (S) Momentum Consensus', group='Trailering', inline='virtTraileringShortMomentumConsensus')
-i_virtTraileringShortMomentumMinimumConsensus = input.int(15, minval=1, title='', group='Trailering', inline='virtTraileringShortMomentumConsensus')
-i_virtTraileringShortMomentumMaximumConsensus = input.int(23, minval=1, title='', group='Trailering', inline='virtTraileringShortMomentumConsensus', tooltip='(S) Momentum Consensus (Min/Max).\nDefaults:\nEnabled: True\n(S) Minimum: 15.\n(S) Maximum: 23.')
+i_virtTraileringShortMomentumMinimumConsensus = input.int(22, minval=1, title='', group='Trailering', inline='virtTraileringShortMomentumConsensus')
+i_virtTraileringShortMomentumMaximumConsensus = input.int(22, minval=1, title='', group='Trailering', inline='virtTraileringShortMomentumConsensus', tooltip='(S) Momentum Consensus (Min/Max).\nDefaults:\nEnabled: True\n(S) Minimum: 22.\n(S) Maximum: 22.')
 
 i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
 i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
