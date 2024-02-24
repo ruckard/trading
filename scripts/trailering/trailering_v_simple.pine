@@ -457,11 +457,11 @@ i_virtTakeProfitMaximumLossExcursionRatio = input.float(1.0, title='TakeProfit M
 i_virtTraileringPeriod = input.int(24, minval=2, title='Trailering Period {24}', group='Trailering')
 i_virtTraileringPlotOffset = input.int(0, title='Trailering Plot Offset {0}', group='Trailering')
 
-i_virtTraileringLongMinimumConsensus2 = input.int(5, minval=1, title='1. (L) Min/Max Consensus', group='Trailering', inline='virtTraileringLongConsensus2')
-i_virtTraileringLongMaximumConsensus2 = input.int(10, minval=1, title='', group='Trailering', inline='virtTraileringLongConsensus2', tooltip='Defaults:\n(L) Minimum: 5.\n(L) Maximum: 10.')
+i_virtTraileringLongNonMomentumMinimumConsensus2 = input.int(5, minval=1, title='1. (L) NonMomentum Consensus', group='Trailering', inline='virtTraileringLongNonMomentumConsensus2')
+i_virtTraileringLongNonMomentumMaximumConsensus2 = input.int(10, minval=1, title='', group='Trailering', inline='virtTraileringLongNonMomentumConsensus2', tooltip='(L) NonMomentum Consensus (Min/Max).\nDefaults:\n(L) Minimum: 5.\n(L) Maximum: 10.')
 
-i_virtTraileringShortMinimumConsensus2 = input.int(7, minval=1, title='1. (S) Min/Max Consensus', group='Trailering', inline='virtTraileringShortConsensus2')
-i_virtTraileringShortMaximumConsensus2 = input.int(10, minval=1, title='', group='Trailering', inline='virtTraileringShortConsensus2', tooltip='Defaults:\n(S) Minimum: 7.\n(S) Maximum: 10.')
+i_virtTraileringShortNonMomentumMinimumConsensus2 = input.int(7, minval=1, title='1. (S) NonMomentum Consensus', group='Trailering', inline='virtTraileringShortNonMomentumConsensus2')
+i_virtTraileringShortNonMomentumMaximumConsensus2 = input.int(10, minval=1, title='', group='Trailering', inline='virtTraileringShortNonMomentumConsensus2', tooltip='(S) NonMomentum Consensus (Min/Max).\nDefaults:\n(S) Minimum: 7.\n(S) Maximum: 10.')
 
 i_traileringAtrTakeProfitLength = input.int(14, minval = 1,  title = 'ATR Take Profit Length [14]', group='Trailering')
 i_traileringAtrTakeProfitSource = input.source(close, title = 'ATR Take Profit Source [close]', group='Trailering')
@@ -484,10 +484,10 @@ i_traileringLongCurieFilterPercentage = input.float(1.5, minval=0.0001,  title =
 i_enableTraileringShortCurieFilter = input.bool(true, title='Trailering (S) Curie filter', group='Trailering', inline='shortTraileringCurieFilter')
 i_traileringShortCurieFilterPercentage = input.float(1.5, minval = 0.0001,  title = '', group='Trailering', inline='shortTraileringCurieFilter', tooltip='Defaults:\n(S) Enable: true,\nMinimum Difference from the Curie closing line (%): 1.5%')
 
-i_enableLongTraileringOppositeConsensusClose = input.bool(true, title='1. (L) Opposite Min To Close', group='Trailering', inline='longTraileringOppositeConsensusClose')
-i_virtTraileringLongOppositeConsensusMinimumToClose2 = input.int(6, minval=1, title='', group='Trailering', inline='longTraileringOppositeConsensusClose', tooltip='Defaults:\n Enable: True\n Minimum:6.')
-i_enableShortTraileringOppositeConsensusClose = input.bool(true, title='1. (S) Opposite Min To Close', group='Trailering', inline='shortTraileringOppositeConsensusClose')
-i_virtTraileringShortOppositeConsensusMinimumToClose2 = input.int(6, minval=1, title='', group='Trailering', inline='shortTraileringOppositeConsensusClose', tooltip='Defaults:\n Enable: True\n Minimum:6.')
+i_enableLongNonMomentumTraileringOppositeConsensusClose = input.bool(true, title='1. (L) NonMomentum OppMin To Close', group='Trailering', inline='longNonMomentumTraileringOppositeConsensusClose')
+i_virtTraileringLongNonMomentumOppositeConsensusMinimumToClose2 = input.int(6, minval=1, title='', group='Trailering', inline='longNonMomentumTraileringOppositeConsensusClose', tooltip='(L) NonMomentum Opposite Min To Close\nDefaults:\n Enable: True\n Minimum:6.')
+i_enableShortNonMomentumTraileringOppositeConsensusClose = input.bool(true, title='1. (S) NonMomentum OppMin To Close', group='Trailering', inline='shortNonMomentumTraileringOppositeConsensusClose')
+i_virtTraileringShortNonMomentumOppositeConsensusMinimumToClose2 = input.int(6, minval=1, title='', group='Trailering', inline='shortNonMomentumTraileringOppositeConsensusClose', tooltip='(S) NonMomentum Opposite Min To Close\nDefaults:\n Enable: True\n Minimum:6.')
 
 i_volumeBounceMinimumRatio = input.float(2.5, title='Min Ratio % {2.5}', minval=0.01, group='Volume Bounce')
 i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=0.01, group='Volume Bounce')
@@ -1109,10 +1109,10 @@ for virtTraileringOffset = 0 to (i_virtTraileringPeriod - 1)
     if (array.get(traileringStatus, virtTraileringOffset).traileringShortBet)
         virtTraileringShortConsensus := virtTraileringShortConsensus + 1
 
-if (( virtTraileringLongConsensus >= i_virtTraileringLongMinimumConsensus2) and (virtTraileringLongConsensus <= i_virtTraileringLongMaximumConsensus2))
+if (( virtTraileringLongConsensus >= i_virtTraileringLongNonMomentumMinimumConsensus2) and (virtTraileringLongConsensus <= i_virtTraileringLongNonMomentumMaximumConsensus2))
     traileringLong := true
 
-if ((virtTraileringShortConsensus >= i_virtTraileringShortMinimumConsensus2) and (virtTraileringShortConsensus <= i_virtTraileringShortMaximumConsensus2))
+if ((virtTraileringShortConsensus >= i_virtTraileringShortNonMomentumMinimumConsensus2) and (virtTraileringShortConsensus <= i_virtTraileringShortNonMomentumMaximumConsensus2))
     traileringShort := true
 
 // Trailering Protection - BEGIN
@@ -1516,8 +1516,8 @@ if i_enableTraileringLongFollowTheBumpClose
 if i_enableTraileringLongCumulativeBumpClose
     LONG_CLOSE := LONG_CLOSE or (traileringLongCumulativeBumpCloseAdvice and (close >= (positionPrice * (1 + i_breakEvenPerOne))))
 
-if i_enableLongTraileringOppositeConsensusClose
-    LONG_CLOSE := LONG_CLOSE or (virtTraileringShortConsensus >= i_virtTraileringLongOppositeConsensusMinimumToClose2)
+if i_enableLongNonMomentumTraileringOppositeConsensusClose
+    LONG_CLOSE := LONG_CLOSE or (virtTraileringShortConsensus >= i_virtTraileringLongNonMomentumOppositeConsensusMinimumToClose2)
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if (offStopTimeInterval)
@@ -1548,8 +1548,8 @@ if i_enableTraileringShortFollowTheBumpClose
 if i_enableTraileringShortCumulativeBumpClose
     SHORT_CLOSE := SHORT_CLOSE or (traileringShortCumulativeBumpCloseAdvice and (close <= (positionPrice * (1 - i_breakEvenPerOne))))
 
-if i_enableShortTraileringOppositeConsensusClose
-    SHORT_CLOSE := SHORT_CLOSE or (virtTraileringLongConsensus >= i_virtTraileringShortOppositeConsensusMinimumToClose2)
+if i_enableShortNonMomentumTraileringOppositeConsensusClose
+    SHORT_CLOSE := SHORT_CLOSE or (virtTraileringLongConsensus >= i_virtTraileringShortNonMomentumOppositeConsensusMinimumToClose2)
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if (offStopTimeInterval)
