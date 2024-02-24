@@ -498,6 +498,8 @@ i_enableLongNonMomentumTraileringOppositeConsensusClose = input.bool(true, title
 i_virtTraileringLongNonMomentumOppositeConsensusMinimumToClose2 = input.int(6, minval=1, title='', group='Trailering', inline='longNonMomentumTraileringOppositeConsensusClose', tooltip='(L) NonMomentum Opposite Min To Close\nDefaults:\n Enable: True\n Minimum:6.')
 i_enableShortNonMomentumTraileringOppositeConsensusClose = input.bool(true, title='1. (S) NonMomentum OppMin To Close', group='Trailering', inline='shortNonMomentumTraileringOppositeConsensusClose')
 i_virtTraileringShortNonMomentumOppositeConsensusMinimumToClose2 = input.int(6, minval=1, title='', group='Trailering', inline='shortNonMomentumTraileringOppositeConsensusClose', tooltip='(S) NonMomentum Opposite Min To Close\nDefaults:\n Enable: True\n Minimum:6.')
+i_enableLongLazyTraileringOppositeConsensusClose = input.bool(true, title='(L) Lazy OppMin To Close', group='Trailering', inline='longLazyTraileringOppositeConsensusClose')
+i_enableShortLazyTraileringOppositeConsensusClose = input.bool(true, title='(S) Lazy OppMin To Close', group='Trailering', inline='shortLazyTraileringOppositeConsensusClose')
 
 i_volumeBounceMinimumRatio = input.float(2.5, title='Min Ratio % {2.5}', minval=0.01, group='Volume Bounce')
 i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=0.01, group='Volume Bounce')
@@ -1127,12 +1129,14 @@ if (i_enableVirtTraileringShortNonMomentumConsensus2)
     if ((virtTraileringShortConsensus >= i_virtTraileringShortNonMomentumMinimumConsensus2) and (virtTraileringShortConsensus <= i_virtTraileringShortNonMomentumMaximumConsensus2))
         traileringShort := true
 
+traileringLongMomentumInRange = (( virtTraileringShortConsensus >= i_virtTraileringLongMomentumMinimumConsensus) and (virtTraileringShortConsensus <= i_virtTraileringLongMomentumMaximumConsensus))
 if (i_enableVirtTraileringLongMomentumConsensus)
-    if (( virtTraileringShortConsensus >= i_virtTraileringLongMomentumMinimumConsensus) and (virtTraileringShortConsensus <= i_virtTraileringLongMomentumMaximumConsensus))
+    if (traileringLongMomentumInRange)
         traileringLong := true
 
+traileringShortMomentumInRange = ((virtTraileringLongConsensus >= i_virtTraileringShortMomentumMinimumConsensus) and (virtTraileringLongConsensus <= i_virtTraileringShortMomentumMaximumConsensus))
 if (i_enableVirtTraileringShortMomentumConsensus)
-    if ((virtTraileringLongConsensus >= i_virtTraileringShortMomentumMinimumConsensus) and (virtTraileringLongConsensus <= i_virtTraileringShortMomentumMaximumConsensus))
+    if (traileringShortMomentumInRange)
         traileringShort := true
 
 // Trailering Protection - BEGIN
@@ -1537,7 +1541,12 @@ if i_enableTraileringLongCumulativeBumpClose
     LONG_CLOSE := LONG_CLOSE or (traileringLongCumulativeBumpCloseAdvice and (close >= (positionPrice * (1 + i_breakEvenPerOne))))
 
 if i_enableLongNonMomentumTraileringOppositeConsensusClose
-    LONG_CLOSE := LONG_CLOSE or (virtTraileringShortConsensus >= i_virtTraileringLongNonMomentumOppositeConsensusMinimumToClose2)
+    longNonMomentumTraileringOppositeConsensusCloseAdvice = (virtTraileringShortConsensus >= i_virtTraileringLongNonMomentumOppositeConsensusMinimumToClose2)
+    if (i_enableLongLazyTraileringOppositeConsensusClose)
+        if (i_enableLongNonMomentumTraileringOppositeConsensusClose and i_enableVirtTraileringLongMomentumConsensus and traileringLongMomentumInRange)
+            longNonMomentumTraileringOppositeConsensusCloseAdvice := false
+
+    LONG_CLOSE := LONG_CLOSE or longNonMomentumTraileringOppositeConsensusCloseAdvice
 
 // Let's make sure LONG does not trigger if LONG_CLOSE would tell us to close the LONG
 if (offStopTimeInterval)
@@ -1569,7 +1578,12 @@ if i_enableTraileringShortCumulativeBumpClose
     SHORT_CLOSE := SHORT_CLOSE or (traileringShortCumulativeBumpCloseAdvice and (close <= (positionPrice * (1 - i_breakEvenPerOne))))
 
 if i_enableShortNonMomentumTraileringOppositeConsensusClose
-    SHORT_CLOSE := SHORT_CLOSE or (virtTraileringLongConsensus >= i_virtTraileringShortNonMomentumOppositeConsensusMinimumToClose2)
+    shortNonMomentumTraileringOppositeConsensusCloseAdvice = (virtTraileringLongConsensus >= i_virtTraileringShortNonMomentumOppositeConsensusMinimumToClose2)
+    if (i_enableShortLazyTraileringOppositeConsensusClose)
+        if (i_enableShortNonMomentumTraileringOppositeConsensusClose and i_enableVirtTraileringShortMomentumConsensus and traileringShortMomentumInRange)
+            shortNonMomentumTraileringOppositeConsensusCloseAdvice := false
+
+    SHORT_CLOSE := SHORT_CLOSE or shortNonMomentumTraileringOppositeConsensusCloseAdvice
 
 // Let's make sure SHORT does not trigger if SHORT_CLOSE would tell us to close the SHORT
 if (offStopTimeInterval)
