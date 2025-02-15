@@ -700,6 +700,21 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 // Template substrategies - END
 
 // ImplementedStrategy substrategies - BEGIN
+
+// voladder substrategy - BEGIN
+
+bool longVoladderDownwards = ( price[2] > price[0] )
+bool longVoladderInitialLadder = ( volume[2] > volume[1] ) and ( volume[1] > volume[0] )
+bool longVoladderRebound = ( volume[1] < volume[0] )
+bool longVoladder = ( longVoladderDownwards[1] and longVoladderInitialLadder[1] and longVoladderRebound[0])
+
+bool shortVoladderUpwards = ( price[2] < price[0] )
+bool shortVoladderInitialLadder = ( volume[2] > volume[1] ) and ( volume[1] > volume[0] )
+bool shortVoladderRebound = ( volume[1] < volume[0] )
+bool shortVoladder = ( shortVoladderUpwards[1] and shortVoladderInitialLadder[1] and shortVoladderRebound[0])
+
+// voladder substrategy - END
+
 // ImplementedStrategy substrategies - END
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
