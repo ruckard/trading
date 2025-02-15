@@ -3,7 +3,7 @@
 
 //@version=5
 
-// Current version: v20230304 ( A024 )
+// Current version: v20250215 ( A001 )
 // Tradingview Public description - BEGIN
 // 
 // This is a template for Ruckard strategies that interact with Zignaly.
@@ -191,7 +191,7 @@
 
 // Tradingview Public description - END
 
-strategy('Ruckard Zignaly Template A024', shorttitle='A024RZigTemplate', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
+strategy('Ruckard Voladder A001', shorttitle='A001RVoladder', overlay=true, max_bars_back=5000, calc_on_order_fills=false, calc_on_every_tick=false, pyramiding=0, initial_capital=1000, slippage=1, commission_type=strategy.commission.percent, commission_value=0.04)
 
 import ruckard/RiskManagementBeta/4 as rm
 import ruckard/Zignaly2Beta/4 as zig
