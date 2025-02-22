@@ -815,6 +815,19 @@ if (i_enableLongADXProtection)
     longCondition := longCondition and adxProtectionLongCondition
 if (i_enableShortADXProtection)
     shortCondition := shortCondition and adxProtectionShortCondition
+
+// Safeguards - BEGIN
+
+// ATR Safeguard
+// Do not trade till ATR Stop Loss is finally done
+
+bool atrStopLossCalculated = bar_index >= i_atrStopLossLength + 1
+
+longCondition := longCondition and atrStopLossCalculated
+shortCondition := shortCondition and atrStopLossCalculated
+
+// Safeguards - END
+
 // Common Logic to go LONG/LONG or go SHORT/SHORT - END
 
 // Volatility - Plot - BEGIN
