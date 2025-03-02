@@ -1122,7 +1122,7 @@ if (i_enableTakeProfitDefaultLogic)
 var float originalTakeProfitPerOne = na
 if (i_enableVoladderTakeProfit)
     if (not insideABuyOrder[1] and LONG)
-        originalTakeProfitPerOne := ( close[1] / positionPrice ) - 1
+        originalTakeProfitPerOne := ( close[2] / positionPrice ) - 1
         takeProfitPerOne := i_voladderTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
@@ -1131,7 +1131,7 @@ if (i_enableVoladderTakeProfit)
             orderStopLoss := orderStopLossPerOne * 100
             LongStopLoss := positionPrice * (1 - orderStopLossPerOne)
     if (not insideASellOrder[1] and SHORT)
-        originalTakeProfitPerOne := ( positionPrice / close[1] ) - 1
+        originalTakeProfitPerOne := ( positionPrice / close[2] ) - 1
         takeProfitPerOne := i_voladderTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
@@ -1142,7 +1142,7 @@ if (i_enableVoladderTakeProfit)
 
 if (i_enableVoladderTakeProfit)
     if (LONG[1] and (not (insideABuyOrder)))
-        originalTakeProfitPerOne := ( close[1] / positionPrice[1] ) - 1
+        originalTakeProfitPerOne := ( close[2] / positionPrice[1] ) - 1
         takeProfitPerOne := i_voladderTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         LongTakeProfit := positionPrice[1] * (1 + takeProfitPerOne)
@@ -1151,7 +1151,7 @@ if (i_enableVoladderTakeProfit)
             orderStopLoss := orderStopLossPerOne * 100
             LongStopLoss := positionPrice[1] * (1 - orderStopLossPerOne)
     if (SHORT[1] and (not (insideASellOrder)))
-        originalTakeProfitPerOne := ( positionPrice[1] / close[1] ) - 1
+        originalTakeProfitPerOne := ( positionPrice[1] / close[2] ) - 1
         takeProfitPerOne := i_voladderTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         ShortTakeProfit := positionPrice[1] * (1 - takeProfitPerOne)
@@ -1162,7 +1162,7 @@ if (i_enableVoladderTakeProfit)
 
 if (i_enableVoladderTakeProfit)
     if ((not insideABuyOrder[1]) and (insideABuyOrder))
-        originalTakeProfitPerOne := ( close[2] / strategy.position_avg_price ) - 1
+        originalTakeProfitPerOne := ( close[3] / strategy.position_avg_price ) - 1
         takeProfitPerOne := i_voladderTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         LongTakeProfit := strategy.position_avg_price * (1 + takeProfitPerOne)
@@ -1171,7 +1171,7 @@ if (i_enableVoladderTakeProfit)
             orderStopLoss := orderStopLossPerOne * 100
             LongStopLoss := strategy.position_avg_price * (1 - orderStopLossPerOne)
     if ((not insideASellOrder[1]) and (insideASellOrder))
-        originalTakeProfitPerOne := ( strategy.position_avg_price / close[2] ) - 1
+        originalTakeProfitPerOne := ( strategy.position_avg_price / close[3] ) - 1
         takeProfitPerOne := i_voladderTakeProfitPerOne * originalTakeProfitPerOne
         takeProfit := takeProfitPerOne * 100
         ShortTakeProfit := strategy.position_avg_price * (1 - takeProfitPerOne)
