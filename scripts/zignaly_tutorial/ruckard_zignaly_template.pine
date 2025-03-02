@@ -1114,6 +1114,11 @@ float entryQuantityContractsReducer = 0.99
 
 contractMultiplier = f_getContractMultiplier(i_contractMaximumDecimalNumber)
 
+// Total liquidation workaround - BEGIN
+if (entryQuantity < 0.0)
+    entryQuantity := 0.0
+// Total liquidation workaround - END
+
 // We assume the current price is current bar close
 
 entryQuantityContracts = (math.floor(((entryQuantity / close) * entryQuantityContractsReducer) * contractMultiplier) / contractMultiplier)
