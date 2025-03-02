@@ -249,7 +249,7 @@ i_strategyStopTime = input.time(timestamp('31 Dec 2021'), title= 'Ends at:', gro
 
 // SubStrategies - Inputs
 i_subStrategiesLookback = input.int(1, title='Lookback', group='SubStrategies', inline='SubStrategies')
-i_subStrategiesMinimum = input.int(1, title='Minimum', group='SubStrategies', inline='SubStrategies', tooltip='Take a look at the 1 latest candles and then if a minimum of 1 substrategy triggers to open a trade then open the trade.\nDefaults:\nLookback: 1\nMinimum: 1')
+i_subStrategiesMinimum = input.int(2, title='Minimum', group='SubStrategies', inline='SubStrategies', tooltip='Take a look at the 1 latest candles and then if a minimum of 1 substrategy triggers to open a trade then open the trade.\nDefaults:\nLookback: 1\nMinimum: 2')
 
 // Take Profit - Inputs
 i_enableTakeProfit = input.bool(true, title='Take Profit', group='Take Profit', inline='TakeProfitSimple')
@@ -790,7 +790,7 @@ volumeBounceShort := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volu
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
 // Define here your, at most, 5 long conditions. Use false if not used. - BEGIN
 bool longCondition1 = longVoladder
-bool longCondition2 = false
+bool longCondition2 = volumeBounceLong
 bool longCondition3 = false
 bool longCondition4 = false
 bool longCondition5 = false
@@ -798,7 +798,7 @@ bool longCondition5 = false
 
 // Define here your, at most, 5 short conditions. Use false if not used. - BEGIN
 bool shortCondition1 = shortVoladder
-bool shortCondition2 = false
+bool shortCondition2 = volumeBounceShort
 bool shortCondition3 = false
 bool shortCondition4 = false
 bool shortCondition5 = false
