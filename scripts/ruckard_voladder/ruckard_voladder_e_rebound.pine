@@ -437,6 +437,11 @@ i_voladderTakeProfitPerOne = i_voladderTakeProfitPercentage * 0.01
 i_voladderTakeProfitMinimumPercentage = input.float(0.25, minval = 0.001, title='Take Profit Minimum Percentage {0.25 %}', group='Voladder', tooltip='Default: 0.20%')
 i_voladderTakeProfitMinimumPerOne = i_voladderTakeProfitMinimumPercentage * 0.01
 
+// Volume Bounce inputs
+
+i_volumeBounceMinimumRatio = input.float(3.0, title='Min Ratio % {3.0}', minval=0.01, group='Volume Bounce')
+i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=0.01, group='Volume Bounce')
+
 // ImplementedStrategy inputs - END
 
 // Strategy - INIT - BEGIN
@@ -767,6 +772,18 @@ bool shortVoladderReboundNotToHigh = close[0] > close[3]
 bool shortVoladder = ( shortVoladderUpwards[1] and shortVoladderInitialLadder[1] and shortVoladderRebound[0] and shortVoladderReboundNotToHigh[0] and (candleOpenCloseLowest[1] < close) )
 
 // voladder substrategy - END
+
+// Volume Bounce substrategy - BEGIN
+
+bool volumeBounceLong = false
+bool volumeBounceShort = false
+
+volumeBounceRatio = volume / volume[1]
+
+volumeBounceLong := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volumeBounceRatio <= i_volumeBounceMaximumRatio)
+volumeBounceShort := (volumeBounceRatio >= i_volumeBounceMinimumRatio) and (volumeBounceRatio <= i_volumeBounceMaximumRatio)
+
+// Volume Bounce substrategy - END
 
 // ImplementedStrategy substrategies - END
 
