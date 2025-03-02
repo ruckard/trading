@@ -18,6 +18,10 @@
 // ImplementedStrategy foo - END
 //
 // ImplementedStrategy explanation - BEGIN
+// How to open (Long)
+// Condition 1: Three or more consecutive volume candles with lesser volume and then a candle with higher volume.
+// Condition 2: From the volume candles start to the end the price is lower.
+// How to close (Long): Probably the opposite but we are not sure.
 // ImplementedStrategy explanation - END
 //
 // In addition the former strategy also includes Risk Management.
