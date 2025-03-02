@@ -737,6 +737,26 @@ if ((protectionAdx < shortADXProtectionMinimumLevel) or (protectionAdx >= shortA
 // Template substrategies - END
 
 // ImplementedStrategy substrategies - BEGIN
+
+// voladder substrategy - BEGIN
+
+candleOpenCloseHighest = ( close > open ) ? close : open
+candleOpenCloseLowest  = ( close > open ) ? open  : close
+
+bool longVoladderDownwards = ( close[2] > close[1] ) and (close [1] > close[0] )
+bool longVoladderInitialLadder = ( volume[2] > volume[1] ) and ( volume[1] > volume[0] )
+bool longVoladderRebound = ( volume[1] < volume[0] )
+bool longVoladderReboundNotToHigh = close[0] < close[3]
+bool longVoladder = ( longVoladderDownwards[1] and longVoladderInitialLadder[1] and longVoladderRebound[0] and longVoladderReboundNotToHigh[0] and (candleOpenCloseHighest[1] > close) )
+
+bool shortVoladderUpwards = ( close[2] < close[1] ) and (close [1] < close[0] )
+bool shortVoladderInitialLadder = ( volume[2] > volume[1] ) and ( volume[1] > volume[0] )
+bool shortVoladderRebound = ( volume[1] < volume[0] )
+bool shortVoladderReboundNotToHigh = close[0] > close[3]
+bool shortVoladder = ( shortVoladderUpwards[1] and shortVoladderInitialLadder[1] and shortVoladderRebound[0] and shortVoladderReboundNotToHigh[0] and (candleOpenCloseLowest[1] < close) )
+
+// voladder substrategy - END
+
 // ImplementedStrategy substrategies - END
 
 // Common Logic to go LONG/LONG or go SHORT/SHORT - BEGIN
