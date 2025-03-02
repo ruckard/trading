@@ -432,6 +432,8 @@ i_enableVoladderTakeProfit = input.bool(true, title='Enable Voladder TakeProfit 
 i_enableVoladderStopLoss = input.bool(true, title='Enable Voladder StopLoss {True}', group='Voladder')
 i_voladderTakeProfitPercentage = input.float(100.0, minval = 0.001, title='Take Profit Percentage {100.0 %}', group='Voladder')
 i_voladderTakeProfitPerOne = i_voladderTakeProfitPercentage * 0.01
+i_voladderTakeProfitMinimumPercentage = input.float(0.25, minval = 0.001, title='Take Profit Minimum Percentage {0.25 %}', group='Voladder', tooltip='Default: 0.20%')
+i_voladderTakeProfitMinimumPerOne = i_voladderTakeProfitMinimumPercentage * 0.01
 
 // ImplementedStrategy inputs - END
 
@@ -1124,6 +1126,10 @@ if (i_enableVoladderTakeProfit)
     if (not insideABuyOrder[1] and LONG)
         originalTakeProfitPerOne := ( close[2] / positionPrice ) - 1
         takeProfitPerOne := i_voladderTakeProfitPerOne * originalTakeProfitPerOne
+        // Force a minimum - BEGIN
+        if (takeProfitPerOne < i_voladderTakeProfitMinimumPerOne)
+            LONG := false
+        // Force a minimum - END
         takeProfit := takeProfitPerOne * 100
         LongTakeProfit := positionPrice * (1 + takeProfitPerOne)
         if (i_enableVoladderStopLoss)
@@ -1133,6 +1139,10 @@ if (i_enableVoladderTakeProfit)
     if (not insideASellOrder[1] and SHORT)
         originalTakeProfitPerOne := ( positionPrice / close[2] ) - 1
         takeProfitPerOne := i_voladderTakeProfitPerOne * originalTakeProfitPerOne
+        // Force a minimum - BEGIN
+        if (takeProfitPerOne < i_voladderTakeProfitMinimumPerOne)
+            SHORT := false
+        // Force a minimum - END
         takeProfit := takeProfitPerOne * 100
         ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
         if (i_enableVoladderStopLoss)
