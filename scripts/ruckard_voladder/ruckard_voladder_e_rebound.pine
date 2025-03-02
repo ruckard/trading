@@ -439,7 +439,7 @@ i_voladderTakeProfitMinimumPerOne = i_voladderTakeProfitMinimumPercentage * 0.01
 
 // Volume Bounce inputs
 
-i_volumeBounceMinimumRatio = input.float(3.0, title='Min Ratio % {3.0}', minval=0.01, group='Volume Bounce')
+i_volumeBounceMinimumRatio = input.float(0.01, title='Min Ratio % {0.01}', minval=0.01, group='Volume Bounce')
 i_volumeBounceMaximumRatio = input.float(7.0, title='Max Ratio % {7.0}', minval=0.01, group='Volume Bounce')
 
 // ImplementedStrategy inputs - END
