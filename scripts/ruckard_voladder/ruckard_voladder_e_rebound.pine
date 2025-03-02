@@ -428,6 +428,8 @@ i_tooRecentMinutesNumber = input.int(0, 'Number of minutes to wait to open a new
 
 // ImplementedStrategy inputs - BEGIN
 
+// Voladder inputs
+
 i_enableVoladderTakeProfit = input.bool(true, title='Enable Voladder TakeProfit {True}', group='Voladder')
 i_enableVoladderStopLoss = input.bool(true, title='Enable Voladder StopLoss {True}', group='Voladder')
 i_voladderTakeProfitPercentage = input.float(100.0, minval = 0.001, title='Take Profit Percentage {100.0 %}', group='Voladder')
