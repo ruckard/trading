@@ -1117,6 +1117,8 @@ if (i_enableTakeProfitDefaultLogic)
     if ((not insideASellOrder[1]) and (insideASellOrder))
         ShortTakeProfit := positionPrice * (1 - takeProfitPerOne)
 
+// Voladder - TakeProfit Logic - BEGIN
+
 var float originalTakeProfitPerOne = na
 if (i_enableVoladderTakeProfit)
     if (not insideABuyOrder[1] and LONG)
@@ -1177,6 +1179,8 @@ if (i_enableVoladderTakeProfit)
             orderStopLossPerOne := takeProfitPerOne / i_positionRatio
             orderStopLoss := orderStopLossPerOne * 100
             ShortStopLoss := strategy.position_avg_price * (1 + orderStopLossPerOne)
+
+// Voladder - TakeProfit Logic - END
 
 float entryQuantity = na
 float currentCapital = strategy.initial_capital + strategy.netprofit
